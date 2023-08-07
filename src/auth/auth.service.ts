@@ -5,6 +5,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as argon from 'argon2';
 import { TSignupData, TSigninData } from 'src/auth/dto';
+import { ConfirmationService } from 'src/confirmation/confirmation.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -13,20 +14,22 @@ export class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private conf: ConfigService,
+    private confirmationService: ConfirmationService,
   ) {}
   async signup(dto: TSignupData) {
     try {
       const hash = await argon.hash(dto.password);
 
-      const newUser = await this.prisma.user.create({
+      const newUser = await this.prisma.session.create({
         data: {
           email: dto.email,
           username: dto.username,
           hash,
         },
       });
+      this.confirmationService.sendConfirmationEmail(newUser.email);
 
-      return this.getJwtToken(newUser.id, newUser.username, newUser.email);
+      return 'check your email to confirm your account';
     } catch (error) {
       console.log(error);
 
@@ -38,7 +41,24 @@ export class AuthService {
       return error;
     }
   }
+  async confirm_register(token: string) {
+    try {
+      const email = await this.confirmationService.confirmEmail(token);
+      const user = await this.prisma.session.findUniqueOrThrow({
+        where: { email },
+      });
+      await this.prisma.user.create({ data: user });
+      const jwt = await this.getJwtToken(user.id, user.username, user.email);
+      await this.prisma.session.delete({ where: { email } });
 
+      return jwt;
+    } catch (error) {
+      console.log(error);
+      console.log('error in confirm_register');
+
+      return error;
+    }
+  }
   async signin(dto: TSigninData) {
     try {
       const where: Prisma.UserWhereUniqueInput =
@@ -69,7 +89,7 @@ export class AuthService {
       return error;
     }
   }
-
+  //TODO: add jwt refresh token
   getJwtToken(id: number, username: string, email: string): Promise<string> {
     const payload = {
       sub: id,
@@ -79,7 +99,7 @@ export class AuthService {
 
     return this.jwt.signAsync(payload, {
       expiresIn: '15m',
-      secret: this.conf.get('SECRET'),
+      secret: this.conf.get('ACCESS_TOKEN_JWT_SECRET'),
     });
   }
 }

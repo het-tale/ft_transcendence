@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -24,9 +25,12 @@ export class AuthController {
   @UseZodGuard('body', AuthSignUpDto)
   @Post('signup')
   signup(@Req() request: Request, @Body() dto: TSignupData) {
-    console.log(dto, request.cookies);
-
     return this.authService.signup(dto);
+  }
+
+  @Get('confirm-email')
+  confirm(@Query('token') token: string) {
+    return this.authService.confirm_register(token);
   }
 
   @UseZodGuard('body', AuthSignInDto)
