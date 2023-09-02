@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from 'src/mailer/mailer.service';
@@ -15,12 +15,12 @@ export class ConfirmationService {
       const token = this.jwt.sign(
         { email },
         {
-          expiresIn: '10min',
+          expiresIn: '15m',
           secret: this.conf.get('EMAIL_VERIFICATION_JWT_SECRET'),
         },
       );
       console.log(token);
-      const url = `${this.conf.get('FRONTEND_URL')}/confirm/?token=${token}`;
+      const url = `${this.conf.get('FRONTEND_URL')}/confirm-email/?token=${token}`;
       const html = `<a href="${url}">Confirm your email</a>`;
       console.log(html);
       await this.mailer.sendMail({
@@ -31,7 +31,7 @@ export class ConfirmationService {
       });
     } catch (error) {
       console.log(error);
-      console.log("couldn't send email");
+      throw new HttpException('Sending confirmation email failed', 500);
     }
   }
   async confirmEmail(token: string) {
@@ -39,10 +39,15 @@ export class ConfirmationService {
       const payload = await this.jwt.verify(token, {
         secret: this.conf.get('EMAIL_VERIFICATION_JWT_SECRET'),
       });
-
-      return payload.email;
+      if (typeof payload === 'object' && 'email' in payload) {
+        return payload.email;
+      }
+      throw new BadRequestException();
     } catch (error) {
-      throw new ForbiddenException('invalid token');
+      if (error?.name === 'TokenExpiredError') {
+        throw new BadRequestException('Email confirmation token expired');
+      }
+      throw new BadRequestException('Bad confirmation token');
     }
   }
 }
