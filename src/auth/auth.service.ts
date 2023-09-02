@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma } from '@prisma/client';
@@ -20,7 +25,7 @@ export class AuthService {
     try {
       const hash = await argon.hash(dto.password);
 
-      const newUser = await this.prisma.session.create({
+      const newUser = await this.prisma.user.create({
         data: {
           email: dto.email,
           username: dto.username,
@@ -28,66 +33,81 @@ export class AuthService {
         },
       });
       this.confirmationService.sendConfirmationEmail(newUser.email);
+      const token = await this.getJwtToken(
+        newUser.id,
+        newUser.username,
+        newUser.email,
+      );
+      const obj = {
+        token,
+        message: 'check your email to confirm your account',
+      };
 
-      return 'check your email to confirm your account';
+      return obj;
     } catch (error) {
       console.log(error);
 
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002')
-          return new ForbiddenException('duplicate unique data');
+          throw new HttpException(
+            'duplicate unique data',
+            HttpStatus.FORBIDDEN,
+          );
       }
 
-      return error;
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
   async confirm_register(token: string) {
-    try {
       const email = await this.confirmationService.confirmEmail(token);
-      const user = await this.prisma.session.findUniqueOrThrow({
+      const user = await this.prisma.user.findUnique({ where: { email } });
+      if (user.IsEmailConfirmed) {
+        throw new ForbiddenException('email already confirmed');
+      }
+      await this.prisma.user.update({
         where: { email },
+        data: { IsEmailConfirmed: true },
       });
-      await this.prisma.user.create({ data: user });
       const jwt = await this.getJwtToken(user.id, user.username, user.email);
-      await this.prisma.session.delete({ where: { email } });
 
       return jwt;
-    } catch (error) {
-      console.log(error);
-      console.log('error in confirm_register');
-
-      return error;
-    }
   }
-  async signin(dto: TSigninData) {
-    try {
-      const where: Prisma.UserWhereUniqueInput =
-        'email' in dto
-          ? {
-              email: dto.email,
-            }
-          : { username: dto.username };
 
-      const user = await this.prisma.user.findUnique({
-        where,
-      });
-      console.log(user);
-      if (!user) {
-        throw new ForbiddenException('incorrect credentiels');
-      }
-
-      const cmp = await argon.verify(user.hash, dto.password);
-
-      if (!cmp) {
-        throw new ForbiddenException('wrong password');
-      }
-
-      const token = await this.getJwtToken(user.id, user.username, user.email);
-
-      return token;
-    } catch (error) {
-      return error;
+  async resend_email(usery) {
+    const user = await this.prisma.user.findUnique({ where: { id: usery.id } });
+    if (user.IsEmailConfirmed) {
+      throw new ForbiddenException('email already confirmed');
     }
+    this.confirmationService.sendConfirmationEmail(user.email);
+  }
+
+  async signin(dto: TSigninData) {
+    const where: Prisma.UserWhereUniqueInput =
+      'email' in dto
+        ? {
+            email: dto.email,
+          }
+        : { username: dto.username };
+
+    const user = await this.prisma.user.findUnique({
+      where,
+    });
+    console.log(user);
+    if (!user) {
+      throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+    }
+
+    const cmp = await argon.verify(user.hash, dto.password);
+
+    if (!cmp) {
+      throw new HttpException('wrong password', HttpStatus.FORBIDDEN);
+    }
+    const token = await this.getJwtToken(
+      user.id,
+      user.username,
+      user.email,
+    );
+    return token;
   }
   //TODO: add jwt refresh token
   getJwtToken(id: number, username: string, email: string): Promise<string> {

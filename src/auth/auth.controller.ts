@@ -18,6 +18,8 @@ import {
   TSignupData,
 } from 'src/auth/dto';
 import { AuthService } from './auth.service';
+import { EmailConfirmationGuard } from './guards/email-confirmation.guard';
+import JwtAuthenticationGuard from './guards/jwt-authentication.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -33,6 +35,13 @@ export class AuthController {
     return this.authService.confirm_register(token);
   }
 
+  @UseGuards(JwtAuthenticationGuard )
+  @Get('resend-email')
+  resend(@Req() request: Request) {
+    return this.authService.resend_email(request.user);
+  }
+
+
   @UseZodGuard('body', AuthSignInDto)
   @Post('signin')
   signin(
@@ -41,7 +50,11 @@ export class AuthController {
   ) {
     return this.authService.signin(dto);
   }
-  @UseGuards(AuthGuard('jwt'))
+
+
+  // decorators resolve from bottom to top
+  @UseGuards(EmailConfirmationGuard)
+  @UseGuards(JwtAuthenticationGuard )
   @Get('me')
   me(@Req() request: Request) {
     return request.user;
