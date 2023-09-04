@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email            String  @unique
+  IsEmailConfirmed Boolean @default(false)
+  username         String  @unique
+  hash             String
+  avatar           String  @default("https://res.cloudinary.com/dfvofzons/image/upload/v1691008123/sample.jpg") // TODO: verify endpoint that would be stored in .env to only keep the path relative to pictures 
+  nickname         String?
+  tfaStatus        Boolean @default(false)
+
+  friend User? @relation("FriendList", fields: [userId], references: [id])
+  userId Int?
+
+  messages       Message[]     @relation("SentMessages")
+  friends        User[]        @relation("FriendList")
+  matchHistoryA  Match[]       @relation("MatchPlayerA")
+  matchHistoryB  Match[]       @relation("MatchPlayerB")
+  winningmatches Match[]       @relation("MatchWinner")
+  achievements   Achievement[] @relation("Achiever")
+  channels       Channel[]     @relation("ChannelParticipants")
+  ownedChannels  Channel[]     @relation("ChannelOwner")
+}
+
+model Match {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  start  DateTime
+  end    DateTime
+  result String
+
+  playerA   User? @relation("MatchPlayerA", fields: [playerAId], references: [id])
+  playerAId Int?
+  playerB   User? @relation("MatchPlayerB", fields: [playerBId], references: [id])
+  playerBId Int?
+  winner    User? @relation("MatchWinner", fields: [winnerId], references: [id])
+  winnerId  Int?
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  content String
+  time    DateTime
+
+  sender    User    @relation("SentMessages", fields: [userId], references: [id])
+  userId    Int
+  channel   Channel @relation("ChannelMessages", fields: [messageId], references: [id])
+  messageId Int
+
+  @@index([userId])
+}
+
+model Channel {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type   Boolean @default(true)
+  hash   String?
+  owner  User    @relation("ChannelOwner", fields: [userId], references: [id])
+  userId Int
+
+  messages     Message[] @relation("ChannelMessages")
+  participants User[]    @relation("ChannelParticipants")
+}
+
+model Achievement {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  icon        String
+  description String
+
+  achievers User[] @relation("Achiever")
+}
