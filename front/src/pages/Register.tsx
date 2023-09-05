@@ -14,25 +14,11 @@ function Register() {
     const [register, setRegister] = useState(false);
     const [errorMessage, setErrorMessage] = React.useState('')
     const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-    const [passwordError, setPasswordError] = useState('');
     let navigate = useNavigate();
     
 
-    const validate = (value) => {
-  
-        if (validator.isStrongPassword(value, {
-            minLength: 8, minLowercase: 1,
-            minUppercase: 1, minNumbers: 1, minSymbols: 1
-        })) {
-            setErrorMessage('Is Strong Password')
-        } else {
-            setErrorMessage('Is Not Strong Password')
-        }
-    }
-
     const handleSubmit = (e: any) => {
         setErrorMessage('');
-        // prevent the form from refreshing the whole page
         e.preventDefault();
         const configuration = {
             method: "post",
