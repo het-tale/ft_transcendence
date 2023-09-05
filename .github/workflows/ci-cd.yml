@@ -17,17 +17,36 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Use Node.js 16.x
+
+    - name: Use Node.js 16.x for backend
       uses: actions/setup-node@v3
       with:
         node-version: 16.x
         cache: 'npm'
-    - name: dependencies
+    - name: backend dependencies
       run: npm ci
+      working-directory: ./back
 
-    - name: Build the app
+    - name: Build the backend
       run: npm run build
+      working-directory: ./back
 
     - name: Lint and Format
       run:
         npm run lint && npm run format
+      working-directory: ./back
+
+
+    - name: use Node.js 16.x for frontend
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+        cache: 'npm'
+    - name: frontend dependencies
+      run: npm ci
+      working-directory: ./front
+    # - name: Build the frontend
+    #   run: npm run start
+    #   working-directory: ./front
+    
+
