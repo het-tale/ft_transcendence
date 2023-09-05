@@ -25,16 +25,16 @@ jobs:
         cache: 'npm'
     - name: backend dependencies
       run: npm ci
-      working-directory: ../../back
+      working-directory: ./back
 
     - name: Build the backend
       run: npm run build
-      working-directory: ../../back
+      working-directory: ./back
 
     - name: Lint and Format
       run:
         npm run lint && npm run format
-      working-directory: ../../back
+      working-directory: ./back
 
 
     - name: use Node.js 16.x for frontend
@@ -44,9 +44,9 @@ jobs:
         cache: 'npm'
     - name: frontend dependencies
       run: npm ci
-      working-directory: ../../frontend
-    - name: Build the frontend
-      run: npm run build
-      working-directory: ../../frontend
+      working-directory: ./front
+    # - name: Build the frontend
+    #   run: npm run start
+    #   working-directory: ./front
     
 

@@ -1,9 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../css/register.css';
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, Navigate } from "react-router-dom";
 import Home from './Home';
+import axios from 'axios';
+import { useNavigate } from "react-router-dom"
 
 function Register() {
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [register, setRegister] = useState(false);
+    const [errrorMessage, setErrorMessage] = React.useState('')
+    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+    let navigate = useNavigate();
+    const handleSubmit = (e: any) => {
+        // prevent the form from refreshing the whole page
+        e.preventDefault();
+        const configuration = {
+            method: "post",
+            url: "http://localhost:3001/auth/signup",
+            data: {
+                username,
+              email,
+              password,
+            },
+          };
+        axios(configuration)
+        .then((result) => {
+          setRegister(true);
+          setIsLoggedIn(true);
+          localStorage.setItem('token', result.data.token);
+          navigate('/home');
+
+        })
+        .catch((error) => {
+            const errorMessage = error.response.data.message;
+            setErrorMessage(errorMessage);
+            console.log(errrorMessage);   
+        });
+      }
+    
     return (
         <div className="signupContainer">
         <div className="left">
@@ -61,22 +97,28 @@ function Register() {
                 </g>
             </svg>
             </div>
-            <form action="/complete-profile">
+            <form onSubmit={(e)=>handleSubmit(e)}>
                 <div className="form-group">
                     <label htmlFor="username">Username</label>
-                    <input className="form-control" type="text" placeholder="Enter your username" id="username" required />
+                    <input className="form-control" type="text" name="username"
+                    value={username} placeholder="Enter your username" id="username"
+                    onChange={(e) => setUsername(e.target.value)} required />
                 </div>
                 <div className="form-group">
                     <label htmlFor="email">Email</label>
-                    <input className="form-control" type="text" name="email" id="email" placeholder="Enter your email" required />
+                    <input className="form-control" type="email" name="email"
+                    value={email} id="email" placeholder="Enter your email"
+                    onChange={(e) => setEmail(e.target.value)} required />
                   </div>
                   <div className="form-group">
                     <label htmlFor="password">Password</label>
-                    <input className="form-control" type="password" name="password" id="password" placeholder="Enter password" required />
+                    <input className="form-control" type="password" name="password"
+                    value={password} id="password" placeholder="Enter password"
+                    onChange={(e) => setPassword(e.target.value)} required />
                   </div>
 
                   <div className="submit">
-                    <input type="submit" value="Register" />
+                    <input type="submit" onClick={(e)=>handleSubmit(e)} value="Register" />
                     <Link to="/login" className='dejavu'>already have an account?</Link>
                   </div>
             </form>
