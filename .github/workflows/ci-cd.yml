@@ -45,8 +45,8 @@ jobs:
     - name: frontend dependencies
       run: npm ci
       working-directory: ./front
-    - name: Build the frontend
-      run: npm run start
-      working-directory: ./front
+    # - name: Build the frontend
+    #   run: npm run start
+    #   working-directory: ./front
     
 
