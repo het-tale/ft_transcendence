@@ -155,22 +155,22 @@ label {
     margin-bottom: 0.5rem;
   }
 .form-control {
-    background-color: transparent;
-    border-top: 0;
-    border-right: 0;
-    border-left: 0;
-    border-radius: 0;
-    border-bottom: 1px solid var(--fakhti);
-    display: block;
-    width: 100%;
-    /* padding: 0.5rem;
-    margin-bottom: 1.8rem; */
+    background-color: transparent !important;
+    border-top: 0 !important;
+    border-right: 0 !important;
+    border-left: 0 !important;
+    border-radius: 0 !important;
+    border-bottom: 1px solid var(--fakhti) !important;
+    display: block !important;
+    width: 100% !important;
+    padding: 0.5rem;
+    margin-bottom: 1.8rem;
     
   }
   .form-control:focus {
-    outline: none;
-    box-shadow: none;
-    border-bottom: 1px solid var(--fakhti);
+    outline: none !important;
+    box-shadow: none !important;
+    border-bottom: 1px solid var(--fakhti) !important;
   }
   .submit {
     display: flex;

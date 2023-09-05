@@ -5,7 +5,7 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import CompleteProfile from "./pages/CompleteProfile";
-import React from 'react';
+import ErrorToast from "./components/ErrorToast";
 
 
 function App() {
@@ -21,6 +21,7 @@ function App() {
           <Route path="complete-profile" element={<CompleteProfile />} />
       </Routes>
     </BrowserRouter>
+    {/* <ErrorToast/> */}
     </div>
   );
 }

@@ -3,17 +3,35 @@ import '../css/register.css';
 import { Outlet, Link, Navigate } from "react-router-dom";
 import Home from './Home';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
+import ErrorToast from '../components/ErrorToast';
+import validator from 'validator';
 
 function Register() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [register, setRegister] = useState(false);
-    const [errrorMessage, setErrorMessage] = React.useState('')
+    const [errorMessage, setErrorMessage] = React.useState('')
     const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+    const [passwordError, setPasswordError] = useState('');
     let navigate = useNavigate();
+    
+
+    const validate = (value) => {
+  
+        if (validator.isStrongPassword(value, {
+            minLength: 8, minLowercase: 1,
+            minUppercase: 1, minNumbers: 1, minSymbols: 1
+        })) {
+            setErrorMessage('Is Strong Password')
+        } else {
+            setErrorMessage('Is Not Strong Password')
+        }
+    }
+
     const handleSubmit = (e: any) => {
+        setErrorMessage('');
         // prevent the form from refreshing the whole page
         e.preventDefault();
         const configuration = {
@@ -36,9 +54,10 @@ function Register() {
         .catch((error) => {
             const errorMessage = error.response.data.message;
             setErrorMessage(errorMessage);
-            console.log(errrorMessage);   
+            console.log(errorMessage);   
         });
       }
+      
     
     return (
         <div className="signupContainer">
@@ -122,6 +141,9 @@ function Register() {
                     <Link to="/login" className='dejavu'>already have an account?</Link>
                   </div>
             </form>
+            <span>
+                {errorMessage !== '' ? <ErrorToast message={errorMessage}/> : null }  
+            </span>
         </div>
     </div>
     );
