@@ -11,7 +11,6 @@ async function bootstrap() {
     allowedHeaders: 'Authorization, Content-Type',
   });
 
-
   const config = new DocumentBuilder()
     .setTitle('Cats example')
     .setDescription('The cats API description')
