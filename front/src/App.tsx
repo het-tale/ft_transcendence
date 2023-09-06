@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import CompleteProfile from "./pages/CompleteProfile";
 import ErrorToast from "./components/ErrorToast";
+import ProtectRoutes from "./components/ProtectRoutes";
 
 
 function App() {
@@ -19,9 +20,9 @@ function App() {
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route path="complete-profile" element={<CompleteProfile />} />
+          <Route path="me" element={<ProtectRoutes />}/>
       </Routes>
     </BrowserRouter>
-    {/* <ErrorToast/> */}
     </div>
   );
 }
