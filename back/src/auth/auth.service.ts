@@ -33,11 +33,7 @@ export class AuthService {
         },
       });
       this.confirmationService.sendConfirmationEmail(newUser.email);
-      const token = await this.getJwtToken(
-        newUser.id,
-        newUser.username,
-        newUser.email,
-      );
+      const token = await this.getJwtToken(newUser.id, newUser.email);
       const obj = {
         token,
         message: 'check your email to confirm your account',
@@ -68,7 +64,7 @@ export class AuthService {
       where: { email },
       data: { IsEmailConfirmed: true },
     });
-    const jwt = await this.getJwtToken(user.id, user.username, user.email);
+    const jwt = await this.getJwtToken(user.id, user.email);
 
     return jwt;
   }
@@ -102,15 +98,32 @@ export class AuthService {
     if (!cmp) {
       throw new HttpException('wrong password', HttpStatus.FORBIDDEN);
     }
-    const token = await this.getJwtToken(user.id, user.username, user.email);
+    const token = await this.getJwtToken(user.id, user.email);
 
     return token;
   }
+  async signin42(user) {
+    const token = await this.getJwtToken(user.id, user.email);
+
+    return token;
+  }
+
+  async setNewPassword(password: string, user) {
+    if (user.hash)
+      throw new HttpException(
+        'user already has a password',
+        HttpStatus.FORBIDDEN,
+      );
+    const hash = await argon.hash(password);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { hash },
+    });
+  }
   //TODO: add jwt refresh token
-  getJwtToken(id: number, username: string, email: string): Promise<string> {
+  getJwtToken(id: number, email: string): Promise<string> {
     const payload = {
       sub: id,
-      username,
       email,
     };
 
