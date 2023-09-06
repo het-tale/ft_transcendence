@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom"
 import '../css/login.css';
 import React, { useState } from 'react';
+import { error } from 'console';
 // let setIsLoggedIn: boolean = false;
 function Login() {
     const [errrorMessage, setErrorMessage] = React.useState('');
@@ -10,9 +11,9 @@ function Login() {
     const [password, setPassword] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     let navigate = useNavigate();
-    const handleSubmit = async (event : any) => {
-        console.log("Hello world");
+    const handleSubmite = (event : any) => {
         event.preventDefault();
+        console.log("Hello world");
         const configuration = {
             method: "post",
             url: "http://localhost:3001/auth/signin",
@@ -21,18 +22,26 @@ function Login() {
               password,
             },
           };
-        axios(configuration)
-        .then((result) => {
-            setIsLoggedIn(true);
-            localStorage.setItem('token', result.data.token);
-            navigate('/home');
+          axios(configuration)
+          .then((result) => {console.log(result);})
+          .catch((error) => {console.log(error);})
+        //   console.log(configuration.data.username);
+        //   console.log(configuration.data.password);
+        // axios(configuration)
+        // .then((result) => {
+        //     console.log(result);
+        // //     if (result && result.data && result.data.token) {
+        // //     setIsLoggedIn(true);
+        // //    // localStorage.setItem('token', result.data.token);
+        // //     navigate('/home');}
   
-          })
-          .catch((error) => {
-              const errorMessage = error.response.data.message;
-              setErrorMessage(errorMessage);
-              console.log(errorMessage);   
-          });
+        //   })
+        //   .catch((error) => {
+        //     console.log(error);
+        //     // const errorMessage = error.response ? error.response.data.message : 'An error occurred';
+        //     //   setErrorMessage(errorMessage);
+        //     //   console.log(error.response);
+        //   });
     }
     return (
         
@@ -92,7 +101,7 @@ function Login() {
                 </g>
             </svg>
             </div>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={(e)=>handleSubmite(e)}>
                 <div className="form-group">
                     <label htmlFor="username">Username</label>
                     <input className="form-control" type="text"
@@ -105,11 +114,11 @@ function Login() {
                     <input className="form-control" type="password"
                     name="password" id="password" placeholder="Enter password"
                     value={password} onChange={(e) => setPassword(e.target.value)} required />
-                    <span className='error-message'>{errrorMessage}</span>
+                    {/* <span className='error-message'>{errrorMessage}</span> */}
                   </div>
 
                   <div className="submit">
-                    <input type="submit" value="Login" onClick={handleSubmit}/>
+                    <input type="submit" value="Login" onClick={(e)=>handleSubmite(e)}/>
                     <a href="#" className="dejavu">forgot password?</a>
                   </div>
             </form>
