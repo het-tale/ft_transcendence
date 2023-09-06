@@ -31,7 +31,7 @@ function Register() {
         .then((result) => {
           setRegister(true);
           localStorage.setItem('token', result.data.token);
-          navigate('/completeprofile');
+          navigate('/complete-profile');
 
         })
         .catch((error) => {
