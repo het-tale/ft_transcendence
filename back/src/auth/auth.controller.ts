@@ -19,6 +19,7 @@ import {
 import { AuthService } from './auth.service';
 import { EmailConfirmationGuard } from './guards/email-confirmation.guard';
 import JwtAuthenticationGuard from './guards/jwt-authentication.guard';
+import { Strategy42 } from './strategies';
 
 @Controller('auth')
 export class AuthController {
@@ -49,6 +50,25 @@ export class AuthController {
     return this.authService.signin(dto);
   }
 
+  @UseGuards(Strategy42)
+  @Get('42signin')
+  signin42() {
+    return;
+  }
+
+  @UseGuards(Strategy42)
+  @Get('42/callback')
+  signin42Callback(@Req() request: Request) {
+    const { user } = request;
+
+    return this.authService.signin42(user);
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Post('set-new-password')
+  setNewPassword(@Body() pass: string, @Req() request: Request) {
+    return this.authService.setNewPassword(pass, request.user);
+  }
   // decorators resolve from bottom to top
   @UseGuards(EmailConfirmationGuard)
   @UseGuards(JwtAuthenticationGuard)
