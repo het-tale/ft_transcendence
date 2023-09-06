@@ -4,44 +4,38 @@ import { useNavigate } from "react-router-dom"
 import '../css/login.css';
 import React, { useState } from 'react';
 import { error } from 'console';
+import ErrorToast from '../components/ErrorToast';
 // let setIsLoggedIn: boolean = false;
 function Login() {
-    const [errrorMessage, setErrorMessage] = React.useState('');
+    const [errorMessage, setErrorMessage] = React.useState('');
     const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     let navigate = useNavigate();
     const handleSubmite = (event : any) => {
         event.preventDefault();
-        console.log("Hello world");
+        setErrorMessage("");
         const configuration = {
             method: "post",
             url: "http://localhost:3001/auth/signin",
             data: {
-                username,
+                email,
               password,
             },
           };
-          axios(configuration)
-          .then((result) => {console.log(result);})
-          .catch((error) => {console.log(error);})
-        //   console.log(configuration.data.username);
-        //   console.log(configuration.data.password);
-        // axios(configuration)
-        // .then((result) => {
-        //     console.log(result);
-        // //     if (result && result.data && result.data.token) {
-        // //     setIsLoggedIn(true);
-        // //    // localStorage.setItem('token', result.data.token);
-        // //     navigate('/home');}
+        axios(configuration)
+        .then((result) => {
+            setIsLoggedIn(true);
+            localStorage.setItem('token', result.data.token);
+            navigate('/home');
   
-        //   })
-        //   .catch((error) => {
-        //     console.log(error);
-        //     // const errorMessage = error.response ? error.response.data.message : 'An error occurred';
-        //     //   setErrorMessage(errorMessage);
-        //     //   console.log(error.response);
-        //   });
+          })
+          .catch((error) => {
+              const errorMessage = error.response.data.message;
+              setErrorMessage(errorMessage);
+              console.log(errorMessage);   
+          });
     }
     return (
         
@@ -103,11 +97,11 @@ function Login() {
             </div>
             <form onSubmit={(e)=>handleSubmite(e)}>
                 <div className="form-group">
-                    <label htmlFor="username">Username</label>
+                    <label htmlFor="email">Email</label>
                     <input className="form-control" type="text"
-                    placeholder="Enter your username/email"
-                    id="username" name="username" value={username}
-                    onChange={(e) => setUsername(e.target.value)} required />
+                    placeholder="Enter your email"
+                    id="email" name="email" value={email}
+                    onChange={(e) => setEmail(e.target.value)} required />
                 </div>
                   <div className="form-group">
                     <label htmlFor="password">Password</label>
@@ -122,6 +116,9 @@ function Login() {
                     <a href="#" className="dejavu">forgot password?</a>
                   </div>
             </form>
+            <span>
+                {errorMessage !== '' ? <ErrorToast message={errorMessage}/> : null }  
+            </span>
         </div>
     </div>
     
