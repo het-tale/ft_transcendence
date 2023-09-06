@@ -1,67 +1,39 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom"
-import '../css/login.css'
+import '../css/login.css';
+import React, { useState } from 'react';
 // let setIsLoggedIn: boolean = false;
 function Login() {
-    const [errrorMessage, setErrorMessage] = React.useState('')
+    const [errrorMessage, setErrorMessage] = React.useState('');
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     let navigate = useNavigate();
     const handleSubmit = async (event : any) => {
         console.log("Hello world");
         event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const form = {
-          email: formData.get('email'),
-          password: formData.get('password')
-        };
-        console.log(form.email, form.password);
-        // const { data } = await axios.post("http://localhost:3001/auth/signin", form);
-        // console.log(data.status);
-        // try {
-        //     console.log("hello axios");
-        // } catch (error) {
-        //     // setErrorMessage(data.response);
-        //     if (error.response) {
-
-        //     }
-        //     console.log("Bad axios");
-        // }
-        // if (data.status === parseInt('401')) {
-        //   setErrorMessage(data.response);
-        // console.log("Bad axios");
-        // } else {
-        //   localStorage.setItem('token', data.token);
-        // //   console.log("Hello axios");
-        // //   setIsLoggedIn(true)
-        //   navigate('/home');
-        // }
-        axios.post("http://localhost:3001/auth/signin", form).then((response) => {
-            console.log("hello axios");
-        
-            
-        })
-        .catch((error) => {
-            if (error.response) {
-                // Server responded with an error status code
-                const errorMessage = error.response.data.message;
-                setErrorMessage(errorMessage);
-                // Display the error message to the user
-                console.log('Server error:', errorMessage);
-              } else if (error.request) {
-                // The request was made but no response was received
-                console.log('Network error:', error.request);
-              } else {
-                // Something else happened
-                console.log('Error:', error.message);
-              }
-        })
-      };
-
-let hello = (e:any) => {
-    e.preventDefault();
-    console.log("hello");
-}
+        const configuration = {
+            method: "post",
+            url: "http://localhost:3001/auth/signin",
+            data: {
+                username,
+              password,
+            },
+          };
+        axios(configuration)
+        .then((result) => {
+            setIsLoggedIn(true);
+            localStorage.setItem('token', result.data.token);
+            navigate('/home');
+  
+          })
+          .catch((error) => {
+              const errorMessage = error.response.data.message;
+              setErrorMessage(errorMessage);
+              console.log(errorMessage);   
+          });
+    }
     return (
         
         <div className="signupContainer">
@@ -123,21 +95,24 @@ let hello = (e:any) => {
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="username">Username</label>
-                    <input className="form-control" type="text" placeholder="Enter your username/email" id="username" name="email" required />
+                    <input className="form-control" type="text"
+                    placeholder="Enter your username/email"
+                    id="username" name="username" value={username}
+                    onChange={(e) => setUsername(e.target.value)} required />
                 </div>
                   <div className="form-group">
                     <label htmlFor="password">Password</label>
-                    <input className="form-control" type="password" name="password" id="password" placeholder="Enter password" required />
+                    <input className="form-control" type="password"
+                    name="password" id="password" placeholder="Enter password"
+                    value={password} onChange={(e) => setPassword(e.target.value)} required />
                     <span className='error-message'>{errrorMessage}</span>
                   </div>
 
                   <div className="submit">
-                    {/* <input type="submit" value="Login" onSubmit={handleSubmit}/> */}
-                    <button type="submit" value="Login">Login</button>
+                    <input type="submit" value="Login" onClick={handleSubmit}/>
                     <a href="#" className="dejavu">forgot password?</a>
                   </div>
             </form>
-        {/* <button onClick={hello}>hola</button> */}
         </div>
     </div>
     
