@@ -5,15 +5,13 @@ import Home from './Home';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import ErrorToast from '../components/ErrorToast';
-import validator from 'validator';
 
 function Register() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [register, setRegister] = useState(false);
-    const [errorMessage, setErrorMessage] = React.useState('')
-    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState('');
     let navigate = useNavigate();
     
 
@@ -32,9 +30,8 @@ function Register() {
         axios(configuration)
         .then((result) => {
           setRegister(true);
-          setIsLoggedIn(true);
           localStorage.setItem('token', result.data.token);
-          navigate('/home');
+          navigate('/completeprofile');
 
         })
         .catch((error) => {
