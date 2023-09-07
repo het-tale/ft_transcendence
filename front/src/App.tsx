@@ -26,7 +26,11 @@ function App() {
         {/* <Route path="home" element={<Home />} /> */}
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
-          <Route path="complete-profile" element={<CompleteProfile />} />
+          <Route path="complete-profile" element={
+            <ProtectRoutes>
+              <CompleteProfile />
+            </ProtectRoutes>
+          } />
           {/* <Route path="me" element={<ProtectRoutes />}/> */}
       </Routes>
     </BrowserRouter>

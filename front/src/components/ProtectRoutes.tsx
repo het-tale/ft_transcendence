@@ -1,27 +1,38 @@
-import { useNavigate } from "react-router-dom"
-import React, { useState } from 'react';
 import client from "./Client";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const ProtectRoutes = (props : any) => {
-  let navigate = useNavigate();
-  let [resp, setResp] = useState("");
-    client.get("/", {headers: {
-        Authorization: 'Bearer ' + localStorage.getItem("token"),
-      }}).then((response) => {
-        // console.log(response.data);
-        setResp(response.data);
-      }).catch((error) => {
-        navigate("/login");
-      })
-      console.log(resp);
-      return (
-        <React.Fragment>
-        {
-          resp ? props.children : null
+const ProtectRoutes = (props: any) => {
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        const response = await client.get('/', {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('token'),
+          },
+        });
+
+        if (response.status === 200) {
+          setIsLoggedIn(true);
+        } else {
+          navigate('/login');
+        }
+      } catch (error) {
+        navigate('/login');
       }
-        </React.Fragment>
-      )
-      return null
-}
+    };
+
+    checkAuthentication();
+  }, [navigate]);
+
+  if (isLoggedIn) {
+    return <React.Fragment>{props.children}</React.Fragment>;
+  } else {
+    return null;
+  }
+};
 
 export default ProtectRoutes;
