@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as argon from 'argon2';
-import { TSignupData, TSigninData } from 'src/auth/dto';
+import { TSignupData, TSigninData, TSetPasswordData } from 'src/auth/dto';
 import { ConfirmationService } from 'src/confirmation/confirmation.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -32,12 +32,8 @@ export class AuthService {
           hash,
         },
       });
-      this.confirmationService.sendConfirmationEmail(newUser.email);
-      const token = await this.getJwtToken(
-        newUser.id,
-        newUser.username,
-        newUser.email,
-      );
+      await this.confirmationService.sendConfirmationEmail(newUser.email);
+      const token = await this.getJwtToken(newUser.id, newUser.email);
       const obj = {
         token,
         message: 'check your email to confirm your account',
@@ -68,7 +64,7 @@ export class AuthService {
       where: { email },
       data: { IsEmailConfirmed: true },
     });
-    const jwt = await this.getJwtToken(user.id, user.username, user.email);
+    const jwt = await this.getJwtToken(user.id, user.email);
 
     return jwt;
   }
@@ -82,17 +78,19 @@ export class AuthService {
   }
 
   async signin(dto: TSigninData) {
-    const where: Prisma.UserWhereUniqueInput =
-      'email' in dto
-        ? {
-            email: dto.email,
-          }
-        : { username: dto.username };
+    //if identifier is email then search by email else search by username
+    const user =
+      (await this.prisma.user.findUnique({
+        where: {
+          email: dto.identifier,
+        },
+      })) ||
+      (await this.prisma.user.findUnique({
+        where: {
+          username: dto.identifier,
+        },
+      }));
 
-    const user = await this.prisma.user.findUnique({
-      where,
-    });
-    console.log(user);
     if (!user) {
       throw new HttpException('user not found', HttpStatus.NOT_FOUND);
     }
@@ -102,15 +100,35 @@ export class AuthService {
     if (!cmp) {
       throw new HttpException('wrong password', HttpStatus.FORBIDDEN);
     }
-    const token = await this.getJwtToken(user.id, user.username, user.email);
+    const token = await this.getJwtToken(user.id, user.email);
 
     return token;
   }
+  async signin42(user) {
+    const token = await this.getJwtToken(user.payload.id, user.payload.email);
+
+    return token;
+  }
+
+  async setNewPassword(dto: TSetPasswordData, user) {
+    if (user.isPasswordRequired === false)
+      throw new HttpException(
+        'user already has a password',
+        HttpStatus.FORBIDDEN,
+      );
+    const hash = await argon.hash(dto.password);
+    await this.prisma.user.update({
+      where: { email: user.email },
+      data: {
+        hash,
+        isPasswordRequired: false,
+      },
+    });
+  }
   //TODO: add jwt refresh token
-  getJwtToken(id: number, username: string, email: string): Promise<string> {
+  getJwtToken(id: number, email: string): Promise<string> {
     const payload = {
       sub: id,
-      username,
       email,
     };
 
