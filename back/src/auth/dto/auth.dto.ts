@@ -23,15 +23,10 @@ export const AuthsignUpSchema = z.object({
   password: z.password(),
 });
 
-export const AuthSignInSchema = z
-  .object({
-    password: z.password(),
-    username: z.string().optional(),
-    email: customEmailValidator.optional(),
-  })
-  .refine((data) => data.username || data.email, {
-    message: 'Either "username" or "email" must be provided',
-  });
+export const AuthSignInSchema = z.object({
+  password: z.password(),
+  identifier: z.string(),
+});
 
 export const SetPasswordSchema = z.object({
   password: z.password(),
