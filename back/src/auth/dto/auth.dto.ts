@@ -32,10 +32,16 @@ export const SetPasswordSchema = z.object({
   password: z.password(),
 });
 
+export const TwofaCodeSchema = z.object({
+  code: z.string(),
+});
+
 export class AuthSignUpDto extends createZodDto(AuthsignUpSchema) {}
 export class AuthSignInDto extends createZodDto(AuthSignInSchema) {}
 export class SetPasswordDto extends createZodDto(SetPasswordSchema) {}
+export class TwofaCodeDto extends createZodDto(TwofaCodeSchema) {}
 
 export type TSigninData = z.infer<typeof AuthSignInSchema>;
 export type TSignupData = z.infer<typeof AuthsignUpSchema>;
 export type TSetPasswordData = z.infer<typeof SetPasswordSchema>;
+export type TtwofaCodeData = z.infer<typeof TwofaCodeSchema>;

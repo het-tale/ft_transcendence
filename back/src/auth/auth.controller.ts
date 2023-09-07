@@ -5,10 +5,9 @@ import {
   Post,
   Query,
   Req,
-  Res,
   UseGuards,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { UseZodGuard } from 'nestjs-zod';
 import {
   AuthSignInDto,
@@ -17,18 +16,22 @@ import {
   TSetPasswordData,
   TSigninData,
   TSignupData,
+  TtwofaCodeData,
+  TwofaCodeDto,
 } from 'src/auth/dto';
 import { AuthService } from './auth.service';
 import { EmailConfirmationGuard } from './guards/email-confirmation.guard';
 import JwtAuthenticationGuard from './guards/jwt-authentication.guard';
 import _42AuthenticationGuard from './guards/42-authentication.guard';
+import { TwoFaVerificationGuard } from './guards/twofa-verification.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
   @UseZodGuard('body', AuthSignUpDto)
   @Post('signup')
-  signup(@Req() request: Request, @Body() dto: TSignupData) {
+  signup(@Body() dto: TSignupData) {
     return this.authService.signup(dto);
   }
 
@@ -37,6 +40,7 @@ export class AuthController {
     return this.authService.confirm_register(token);
   }
 
+  @UseGuards(TwoFaVerificationGuard)
   @UseGuards(JwtAuthenticationGuard)
   @Get('resend-email')
   resend(@Req() request: Request) {
@@ -45,10 +49,7 @@ export class AuthController {
 
   @UseZodGuard('body', AuthSignInDto)
   @Post('signin')
-  signin(
-    @Res({ passthrough: true }) response: Response,
-    @Body() dto: TSigninData,
-  ) {
+  signin(@Body() dto: TSigninData) {
     return this.authService.signin(dto);
   }
 
@@ -67,13 +68,30 @@ export class AuthController {
   }
 
   @UseZodGuard('body', SetPasswordDto)
+  @UseGuards(TwoFaVerificationGuard)
   @UseGuards(JwtAuthenticationGuard)
   @Post('set-new-password')
   setNewPassword(@Req() request: Request, @Body() dto: TSetPasswordData) {
     return this.authService.setNewPassword(dto, request.user);
   }
+
+  @UseGuards(EmailConfirmationGuard)
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('2fa/enable')
+  enable2fa(@Req() request: Request) {
+    return this.authService.enable2fa(request.user);
+  }
+
+  @UseGuards(EmailConfirmationGuard)
+  @UseGuards(JwtAuthenticationGuard)
+  @UseZodGuard('body', TwofaCodeDto)
+  @Post('2fa/verify')
+  async verify2fa(@Req() request: Request, @Body('code') dto: TtwofaCodeData) {
+    await this.authService.verify2fa(dto.code, request.user);
+  }
   // decorators resolve from bottom to top
   @UseGuards(EmailConfirmationGuard)
+  @UseGuards(TwoFaVerificationGuard)
   @UseGuards(JwtAuthenticationGuard)
   @Get('me')
   me(@Req() request: Request) {
