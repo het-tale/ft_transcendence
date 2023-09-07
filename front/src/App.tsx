@@ -7,6 +7,9 @@ import Register from "./pages/Register";
 import CompleteProfile from "./pages/CompleteProfile";
 import ErrorToast from "./components/ErrorToast";
 import ProtectRoutes from "./components/ProtectRoutes";
+import ConfirmEmail from "./pages/ConfirmEmail";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 
 function App() {
@@ -31,7 +34,9 @@ function App() {
               <CompleteProfile />
             </ProtectRoutes>
           } />
-          {/* <Route path="me" element={<ProtectRoutes />}/> */}
+          <Route path="confirm-email" element={<ConfirmEmail />}/>
+          <Route path="forgot-password" element={<ForgotPassword />}/>
+          <Route path="reset-password" element={<ResetPassword />}/>
       </Routes>
     </BrowserRouter>
     </div>
