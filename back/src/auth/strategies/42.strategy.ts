@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-42';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { exclude } from 'utils';
 
 @Injectable()
 export class Strategy42 extends PassportStrategy(Strategy, '42') {
@@ -14,9 +13,11 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
     super({
       clientID: configService.get('UID_42'),
       clientSecret: configService.get('SECRET_42'),
-      callbackURL: 'http://127.0.0.1:3001/auth/42/callback',
-      scope: 'email',
-      profileFields: ['email', 'login'],
+      callbackURL: 'http://localhost:3001/auth/42/callback',
+      profileFields: {
+        login: 'login',
+        email: 'email',
+      },
     });
   }
 
@@ -25,34 +26,45 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
     refreshToken: string,
     profile: Profile,
   ): Promise<any> {
+    console.log('validate called');
     const { login, email } = profile;
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
+    let payload: {
+      id: number;
+      createdAt: Date;
+      updatedAt: Date;
+      email: string;
+      IsEmailConfirmed: boolean;
+      username: string;
+      hash: string;
+      avatar: string;
+      login: string;
+      isPasswordRequired: boolean;
+      tfaStatus: boolean;
+      userId: number;
+    };
     if (!user) {
-      await this.prisma.user.create({
+      payload = await this.prisma.user.create({
         data: {
           email,
           login,
           isPasswordRequired: true,
+          IsEmailConfirmed: true,
         },
       });
     } else {
-      await this.prisma.user.update({
+      payload = await this.prisma.user.update({
         where: { email },
         data: {
           login,
+          IsEmailConfirmed: true,
         },
       });
     }
-    if (user && user.hash) {
-      exclude(user, 'hash');
-    }
-    const payload = {
-      user,
-      accessToken,
-    };
+    console.log(payload);
 
-    return payload;
+    return { payload, accessToken };
   }
 }

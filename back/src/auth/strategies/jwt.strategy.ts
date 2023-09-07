@@ -15,7 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: number; username: string; email: string }) {
+  async validate(payload: { sub: number; email: string }) {
     const id = payload.sub;
     const user = await this.prisma.user.findUnique({ where: { id } });
     //Based on the way JWT signing works, we're guaranteed that we're receiving a valid token that we have previously signed and issued to a valid user.
