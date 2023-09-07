@@ -27,7 +27,7 @@ function Login() {
         axios(configuration)
         .then((result) => {
             setIsLoggedIn(true);
-            localStorage.setItem('token', result.data.token);
+            localStorage.setItem('token', result.data);
             navigate('/home');
   
           })

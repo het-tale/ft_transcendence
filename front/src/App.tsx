@@ -16,11 +16,18 @@ function App() {
       <Routes>
         <Route path="/" element={<Landing />}>
           
-        </Route><Route path="home" element={<Home />} />
+        </Route>
+        <Route path="home" element={
+            <ProtectRoutes>
+              <Home/>
+             </ProtectRoutes>
+          }>
+        </Route>
+        {/* <Route path="home" element={<Home />} /> */}
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route path="complete-profile" element={<CompleteProfile />} />
-          <Route path="me" element={<ProtectRoutes />}/>
+          {/* <Route path="me" element={<ProtectRoutes />}/> */}
       </Routes>
     </BrowserRouter>
     </div>
