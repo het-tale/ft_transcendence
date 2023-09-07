@@ -78,17 +78,19 @@ export class AuthService {
   }
 
   async signin(dto: TSigninData) {
-    const where: Prisma.UserWhereUniqueInput =
-      'email' in dto
-        ? {
-            email: dto.email,
-          }
-        : { username: dto.username };
+    //if identifier is email then search by email else search by username
+    const user =
+      (await this.prisma.user.findUnique({
+        where: {
+          email: dto.identifier,
+        },
+      })) ||
+      (await this.prisma.user.findUnique({
+        where: {
+          username: dto.identifier,
+        },
+      }));
 
-    const user = await this.prisma.user.findUnique({
-      where,
-    });
-    console.log(user);
     if (!user) {
       throw new HttpException('user not found', HttpStatus.NOT_FOUND);
     }
