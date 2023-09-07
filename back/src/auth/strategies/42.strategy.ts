@@ -42,7 +42,8 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
       avatar: string;
       login: string;
       isPasswordRequired: boolean;
-      tfaStatus: boolean;
+      is2faEnabled: boolean;
+      twofaSecret: string;
       userId: number;
     };
     if (!user) {

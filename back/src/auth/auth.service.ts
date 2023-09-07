@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as argon from 'argon2';
+import { TwoFaService } from 'src/2fa/two-fa.service';
 import { TSignupData, TSigninData, TSetPasswordData } from 'src/auth/dto';
 import { ConfirmationService } from 'src/confirmation/confirmation.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -20,6 +20,7 @@ export class AuthService {
     private jwt: JwtService,
     private conf: ConfigService,
     private confirmationService: ConfirmationService,
+    private tw: TwoFaService,
   ) {}
   async signup(dto: TSignupData) {
     try {
@@ -135,6 +136,33 @@ export class AuthService {
     return this.jwt.signAsync(payload, {
       expiresIn: '15m',
       secret: this.conf.get('ACCESS_TOKEN_JWT_SECRET'),
+    });
+  }
+
+  async enable2fa(user) {
+    if (user.is2faEnabled)
+      throw new HttpException('2fa already enabled', HttpStatus.FORBIDDEN);
+    const secret = await this.tw.generateSecret();
+    await this.prisma.user.update({
+      where: { email: user.email },
+      data: {
+        is2faEnabled: true,
+        twofaSecret: secret,
+      },
+    });
+    const qr = await this.tw.generateQRCode(secret, user.email);
+
+    return qr;
+  }
+  async verify2fa(token: string, user) {
+    const isValid = await this.tw.verifyToken(token, user.twofaSecret);
+    if (!isValid)
+      throw new HttpException('invalid token', HttpStatus.FORBIDDEN);
+    await this.prisma.user.update({
+      where: { email: user.email },
+      data: {
+        is2faVerified: true,
+      },
     });
   }
 }
