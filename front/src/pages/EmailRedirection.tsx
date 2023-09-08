@@ -2,29 +2,38 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../css/login.css';
 import client from "../components/Client";
 import { useLocation } from "react-router-dom";
+import { useEffect } from 'react';
 
 
 function EmailRedirection() {
-    const Email = async () => {
-        let navigate = useNavigate();
+    let navigate = useNavigate();
     const location = useLocation();
-    // console.log(location);
+    useEffect(() => {
+const Email = async () => {
     const token = location.search.split('=')[1];
-    // console.log(token);
     try {
     const response = await client.get("/auth/confirm-email?token=" + token);
     console.log("STATUS", response.status);
     console.log("MESSAGE", response.data.message);                     
-    if (response.status === 200 || (response.status === 403 && response.data.message === 'email already confirmed')) {
+    if (response.status === 200) {
         navigate('/home');
     }
     }
-    catch (error) {
-        navigate('/');
+    catch (error : any) {
+        const errorMessage = error.response.data.message;
+        const errorStatus = error.response.status;
+        if (errorMessage === 'email already confirmed' && errorStatus === 403)
+        {
+            navigate('/home');
+        }
+        else
+        {
+            navigate('/confirm-email');
+        }
     }
-    return null;
 };
 Email();
+}, [navigate]);
     return (
         
         <div className="signupContainer">

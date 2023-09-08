@@ -20,7 +20,7 @@ function Login() {
             method: "post",
             url: "http://localhost:3001/auth/signin",
             data: {
-                identif,
+                identifier: email,
               password,
             },
           };
