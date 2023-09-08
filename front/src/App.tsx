@@ -31,16 +31,16 @@ function App() {
         {/* <Route path="home" element={<Home />} /> */}
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
-          <Route path="complete-profile" element={
+          {/* <Route path="complete-profile" element={
             <ProtectRoutes>
               <CompleteProfile />
             </ProtectRoutes>
-          } />
+          } /> */}
           <Route path="confirm-email" element={<ConfirmEmail />}/>
           <Route path="forgot-password" element={<ForgotPassword />}/>
           <Route path="reset-password" element={<ResetPassword />}/>
           <Route path="redirect-email" element={<EmailRedirection />}/>
-          <Route path="test" element={<ProtectRoutes />}/>
+          {/* <Route path="test" element={<ProtectRoutes />}/> */}
       </Routes>
     </BrowserRouter>
     </div>

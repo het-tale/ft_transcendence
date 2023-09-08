@@ -14,16 +14,14 @@ const ProtectRoutes = (props: any) => {
             Authorization: 'Bearer ' + localStorage.getItem('token'),
           },
         });
-        console.log("DATRA",response.data);
-        console.log(response.data.IsEmailConfirmed);
         if (response.status === 200) {
           setIsLoggedIn(true);
         } else {
-          // navigate('/login');
+          navigate('/login');
         }
       } catch (error) {
-        console.log("Erroe",error);
-        // navigate('/login');
+        // console.log("Erroe",error);
+        navigate('/login');
       }
     };
 
