@@ -12,6 +12,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import EmailRedirection from "./pages/EmailRedirection";
 import Email from "./components/Email";
+import ResendEmail from "./pages/ResendEmail";
 
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
           <Route path="forgot-password" element={<ForgotPassword />}/>
           <Route path="reset-password" element={<ResetPassword />}/>
           <Route path="redirect-email" element={<EmailRedirection />}/>
+          <Route path="resend-email" element={<ResendEmail />}/>
           {/* <Route path="test" element={<ProtectRoutes />}/> */}
       </Routes>
     </BrowserRouter>
