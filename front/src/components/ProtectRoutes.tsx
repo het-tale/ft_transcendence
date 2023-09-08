@@ -9,24 +9,26 @@ const ProtectRoutes = (props: any) => {
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
-        const response = await client.get('/', {
+        const response = await client.get('/auth/me', {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('token'),
           },
         });
-
+        console.log("DATRA",response.data);
+        console.log(response.data.IsEmailConfirmed);
         if (response.status === 200) {
           setIsLoggedIn(true);
         } else {
-          navigate('/login');
+          // navigate('/login');
         }
       } catch (error) {
-        navigate('/login');
+        console.log("Erroe",error);
+        // navigate('/login');
       }
     };
 
     checkAuthentication();
-  }, [navigate]);
+  },[navigate]);
 
   if (isLoggedIn) {
     return <React.Fragment>{props.children}</React.Fragment>;
