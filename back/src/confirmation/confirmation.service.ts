@@ -22,7 +22,7 @@ export class ConfirmationService {
       console.log(token);
       const url = `${this.conf.get(
         'FRONTEND_URL',
-      )}/confirm-email/?token=${token}`;
+      )}/?token=${token}`;
       const html = `<a href="${url}">Confirm your email</a>`;
       console.log(html);
       await this.mailer.sendMail({

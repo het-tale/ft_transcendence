@@ -1,42 +1,30 @@
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from 'react-router-dom';
 import '../css/login.css';
-import React, { useState } from 'react';
-import { error } from 'console';
-import ErrorToast from '../components/ErrorToast';
-// let setIsLoggedIn: boolean = false;
-function Login() {
-    const [errorMessage, setErrorMessage] = React.useState('');
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    let navigate = useNavigate();
-    const handleSubmite = (event : any) => {
-        event.preventDefault();
-        setErrorMessage("");
-        const configuration = {
-            method: "post",
-            url: "http://localhost:3001/auth/signin",
-            data: {
-                identif,
-              password,
-            },
-          };
-        axios(configuration)
-        .then((result) => {
-            setIsLoggedIn(true);
-            localStorage.setItem('token', result.data);
-            navigate('/home');
-  
-          })
-          .catch((error) => {
-              const errorMessage = error.response.data.message;
-              setErrorMessage(errorMessage);
-              console.log(errorMessage);   
-          });
+import client from "../components/Client";
+import { useLocation } from "react-router-dom";
+
+
+function EmailRedirection() {
+    const Email = async () => {
+        let navigate = useNavigate();
+    const location = useLocation();
+    // console.log(location);
+    const token = location.search.split('=')[1];
+    // console.log(token);
+    try {
+    const response = await client.get("/auth/confirm-email?token=" + token);
+    console.log("STATUS", response.status);
+    console.log("MESSAGE", response.data.message);                     
+    if (response.status === 200 || (response.status === 403 && response.data.message === 'email already confirmed')) {
+        navigate('/home');
     }
+    }
+    catch (error) {
+        navigate('/');
+    }
+    return null;
+};
+Email();
     return (
         
         <div className="signupContainer">
@@ -95,35 +83,11 @@ function Login() {
                 </g>
             </svg>
             </div>
-            <form onSubmit={(e)=>handleSubmite(e)}>
-                <div className="form-group">
-                    <label htmlFor="email">Email</label>
-                    <input className="form-control" type="text"
-                    placeholder="Enter your email"
-                    id="email" name="email" value={email}
-                    onChange={(e) => setEmail(e.target.value)} required />
-                </div>
-                  <div className="form-group">
-                    <label htmlFor="password">Password</label>
-                    <input className="form-control" type="password"
-                    name="password" id="password" placeholder="Enter password"
-                    value={password} onChange={(e) => setPassword(e.target.value)} required />
-                    {/* <span className='error-message'>{errrorMessage}</span> */}
-                  </div>
-
-                  <div className="submit">
-                    <input type="submit" value="Login" onClick={(e)=>handleSubmite(e)}/>
-                    {/* <a href="#" className="dejavu">forgot password?</a> */}
-                    <Link to={'/forgot-password'} className="dejavu">forgot password?</Link>
-                  </div>
-            </form>
-            <span>
-                {errorMessage !== '' ? <ErrorToast message={errorMessage}/> : null }  
-            </span>
+            <h1>a Sample page</h1>
         </div>
     </div>
     
     );
 }
 
-export default Login;
+export default EmailRedirection;
