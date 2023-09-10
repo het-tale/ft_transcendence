@@ -64,7 +64,6 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
         },
       });
     }
-    console.log(payload);
 
     return { payload, accessToken };
   }

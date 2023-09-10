@@ -30,18 +30,25 @@ export const AuthSignInSchema = z.object({
 
 export const SetPasswordSchema = z.object({
   password: z.password(),
+  password2: z.password(),
 });
 
 export const TwofaCodeSchema = z.object({
   code: z.string(),
 });
 
+export const ForgetPasswordSchema = z.object({
+  email: z.string(),
+});
+
 export class AuthSignUpDto extends createZodDto(AuthsignUpSchema) {}
 export class AuthSignInDto extends createZodDto(AuthSignInSchema) {}
 export class SetPasswordDto extends createZodDto(SetPasswordSchema) {}
 export class TwofaCodeDto extends createZodDto(TwofaCodeSchema) {}
+export class ForgetPassworddto extends createZodDto(ForgetPasswordSchema) {}
 
 export type TSigninData = z.infer<typeof AuthSignInSchema>;
 export type TSignupData = z.infer<typeof AuthsignUpSchema>;
 export type TSetPasswordData = z.infer<typeof SetPasswordSchema>;
 export type TtwofaCodeData = z.infer<typeof TwofaCodeSchema>;
+export type TforgetPasswordData = z.infer<typeof ForgetPasswordSchema>;
