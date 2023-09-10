@@ -83,7 +83,7 @@ export class AuthController {
   @UseZodGuard('body', ForgetPassworddto)
   @Post('forget-password')
   async forgetPassword(@Body() dto: TforgetPasswordData) {
-    return this.forgetPassword(dto);
+    return this.authService.forgetPassword(dto);
   }
 
   @UseZodGuard('body', SetPasswordDto)
