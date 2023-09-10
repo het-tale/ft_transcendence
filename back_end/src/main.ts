@@ -13,6 +13,6 @@ async function bootstrap() {
 	credentials: true,
 });
   app.useWebSocketAdapter(new IoAdapter(app));
-  await app.listen(5432);
+  await app.listen(3001);
 }
 bootstrap();

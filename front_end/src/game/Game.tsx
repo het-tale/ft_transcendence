@@ -66,7 +66,7 @@ const Game: React.FC = () => {
 
 	const setupSocket = () => {
 	console.log('connecting');
-		const wsInstance = io('http://10.14.1.8:5432', {
+		const wsInstance = io('http://10.14.1.8:3001', {
 			withCredentials: true,
 			forceNew: true,
 			timeout: 100000,
