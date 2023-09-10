@@ -10,7 +10,7 @@ export class ConfirmationService {
     private mailer: MailerService,
     private conf: ConfigService,
   ) {}
-  async sendConfirmationEmail(email: string) {
+  async sendConfirmationEmail(email: string, subject: string) {
     try {
       const token = this.jwt.sign(
         { email },
@@ -19,21 +19,23 @@ export class ConfirmationService {
           secret: this.conf.get('EMAIL_VERIFICATION_JWT_SECRET'),
         },
       );
+      let front_url: string;
+      if (subject === 'Confirm your email')
+        front_url = this.conf.get('FRONTEND_CONFIRM_EMAIL_URL');
+      else front_url = this.conf.get('FRONTEND_SET_PASSWORD_URL');
       console.log(token);
-      const url = `${this.conf.get(
-        'FRONTEND_URL',
-      )}/confirm-email/?token=${token}`;
+      const url = `${front_url}/confirm-email/?token=${token}`;
       const html = `<a href="${url}">Confirm your email</a>`;
       console.log(html);
       await this.mailer.sendMail({
         from: this.conf.get('EMAIL_USER'),
         to: email,
-        subject: 'Confirm your email',
+        subject,
         html,
       });
     } catch (error) {
       console.log(error);
-      throw new HttpException('Sending confirmation email failed', 500);
+      throw new HttpException('Sending  email failed', 500);
     }
   }
   async confirmEmail(token: string) {
@@ -47,9 +49,9 @@ export class ConfirmationService {
       throw new BadRequestException();
     } catch (error) {
       if (error?.name === 'TokenExpiredError') {
-        throw new BadRequestException('Email confirmation token expired');
+        throw new BadRequestException('Email token expired');
       }
-      throw new BadRequestException('Bad confirmation token');
+      throw new BadRequestException('Bad email token');
     }
   }
 }
