@@ -17,35 +17,35 @@ const customEmailValidator = z.string().refine(
   },
 );
 
-const customPasswordValidator = z.string().refine(
-  (value) => {
-    const passwordRegex =
-      /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{8}$/;
-    const isStandardPassword = passwordRegex.test(value);
+// const z.passwor().min  = z.string().refine(
+//   (value) => {
+//     const passwordRegex =
+//       /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{8}$/;
+//     const isStandardPassword = passwordRegex.test(value);
 
-    return isStandardPassword;
-  },
-  {
-    message:
-      'Password must contain at least 8 characters,one special character, 2 uppercase letters, 2 numbers, 3 lowercase letters',
-  },
-);
+//     return isStandardPassword;
+//   },
+//   {
+//     message:
+//       'Password must contain at least 8 characters,one special character, 2 uppercase letters, 2 numbers, 3 lowercase letters',
+//   },
+// );
 
 export const AuthsignUpSchema = z.object({
   username: z.string().trim().min(1, { message: 'Required' }),
   email: customEmailValidator,
-  password: customPasswordValidator,
+  password: z.password().min(8, { message: 'Required' }),
 });
 
 export const AuthSignInSchema = z.object({
-  password: customPasswordValidator,
+  password: z.password().min(8, { message: 'Required' }),
   identifier: z.string().trim().min(1, { message: 'Required' }),
 });
 
 export const SetPasswordSchema = z
   .object({
-    password: customPasswordValidator,
-    confirmPassword: customPasswordValidator,
+    password: z.password().min(8, { message: 'Required' }),
+    confirmPassword: z.password().min(8, { message: 'Required' }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",

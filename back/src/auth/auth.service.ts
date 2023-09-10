@@ -159,11 +159,12 @@ export class AuthService {
   }
 
   async forgetPassword(dto: TforgetPasswordData) {
-    await this.prisma.user.findUniqueOrThrow({
+    const user = await this.prisma.user.findUnique({
       where: {
         email: dto.email,
       },
     });
+    if (!user) throw new HttpException('user not found', HttpStatus.NOT_FOUND);
     await this.confirmationService.sendConfirmationEmail(
       dto.email,
       'Set New Password',
