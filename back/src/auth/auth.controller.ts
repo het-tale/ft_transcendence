@@ -3,15 +3,13 @@ import {
   Controller,
   Get,
   Header,
-  HttpException,
-  HttpStatus,
   Post,
   Query,
   Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Request, query } from 'express';
+import { Request } from 'express';
 import { UseZodGuard } from 'nestjs-zod';
 import {
   AuthSignInDto,
@@ -109,7 +107,7 @@ export class AuthController {
   @UseGuards(EmailConfirmationGuard)
   @UseGuards(JwtAuthenticationGuard)
   @UseZodGuard('body', TwofaCodeDto)
-  @Get('2fa/enable')
+  @Post('2fa/enable')
   async enable2fa(@Req() request: Request, @Body() dto: TtwofaCodeData) {
     return this.authService.enable2fa(dto.code, request.user);
   }
@@ -120,6 +118,14 @@ export class AuthController {
   @Post('2fa/verify')
   async verify2fa(@Req() request: Request, @Body() dto: TtwofaCodeData) {
     await this.authService.verify2fa(dto.code, request.user);
+  }
+
+  @UseGuards(TwoFaVerificationGuard)
+  @UseGuards(EmailConfirmationGuard)
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('2fa/disable')
+  async disable2fa(@Req() request: Request) {
+    await this.authService.disable2fa(request.user);
   }
   // decorators resolve from bottom to top
   @UseGuards(EmailConfirmationGuard)

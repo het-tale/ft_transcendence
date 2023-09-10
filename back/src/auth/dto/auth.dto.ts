@@ -17,28 +17,47 @@ const customEmailValidator = z.string().refine(
   },
 );
 
+const customPasswordValidator = z.string().refine(
+  (value) => {
+    const passwordRegex =
+      /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{8}$/;
+    const isStandardPassword = passwordRegex.test(value);
+
+    return isStandardPassword;
+  },
+  {
+    message:
+      'Password must contain at least 8 characters,one special character, 2 uppercase letters, 2 numbers, 3 lowercase letters',
+  },
+);
+
 export const AuthsignUpSchema = z.object({
-  username: z.string(),
+  username: z.string().trim().min(1, { message: 'Required' }),
   email: customEmailValidator,
-  password: z.password(),
+  password: customPasswordValidator,
 });
 
 export const AuthSignInSchema = z.object({
-  password: z.password(),
-  identifier: z.string(),
+  password: customPasswordValidator,
+  identifier: z.string().trim().min(1, { message: 'Required' }),
 });
 
-export const SetPasswordSchema = z.object({
-  password: z.password(),
-  password2: z.password(),
-});
+export const SetPasswordSchema = z
+  .object({
+    password: customPasswordValidator,
+    confirmPassword: customPasswordValidator,
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirm'],
+  });
 
 export const TwofaCodeSchema = z.object({
-  code: z.string(),
+  code: z.string().trim().min(1, { message: 'Required' }),
 });
 
 export const ForgetPasswordSchema = z.object({
-  email: z.string(),
+  email: z.string().trim().min(1, { message: 'Required' }),
 });
 
 export class AuthSignUpDto extends createZodDto(AuthsignUpSchema) {}
