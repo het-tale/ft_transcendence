@@ -107,7 +107,11 @@ export class AuthService {
     if (!user) {
       throw new HttpException('user not found', HttpStatus.NOT_FOUND);
     }
-
+    if (user.hash === null)
+      throw new HttpException(
+        'user has no password please signin with intra and set a new one',
+        HttpStatus.FORBIDDEN,
+      );
     const cmp = await argon.verify(user.hash, dto.password);
 
     if (!cmp) {
@@ -132,8 +136,6 @@ export class AuthService {
     await this.updatePassword(dto, user.email);
   }
   async updatePassword(dto: TSetPasswordData, email: string) {
-    if (dto.password !== dto.password2)
-      throw new HttpException('wrong confirm password', HttpStatus.BAD_REQUEST);
     const hash = await argon.hash(dto.password);
     await this.prisma.user.update({
       where: { email },
@@ -185,10 +187,14 @@ export class AuthService {
       },
     });
     const qr = await this.tw.generateQRCode(secret, user.email, res);
+    console.log(user.email, secret);
+    console.log('in generate function : email, secret');
 
     return qr;
   }
   async enable2fa(code: string, user) {
+    if (user.twofaSecret === null)
+      throw new HttpException('generate 2fa qr code', HttpStatus.FORBIDDEN);
     const isValid = await this.tw.verifyToken(code, user.twofaSecret);
     console.log(isValid);
     if (!isValid) throw new HttpException('invalid code', HttpStatus.FORBIDDEN);
@@ -196,10 +202,13 @@ export class AuthService {
       where: { email: user.email },
       data: {
         is2faEnabled: true,
+        is2faVerified: true,
       },
     });
   }
   async verify2fa(token: string, user) {
+    if (!user.is2faEnabled)
+      throw new HttpException('2fa not enabled', HttpStatus.FORBIDDEN);
     console.log(user.twofaSecret);
     console.log(token);
     const isValid = await this.tw.verifyToken(token, user.twofaSecret);
@@ -208,6 +217,18 @@ export class AuthService {
       where: { email: user.email },
       data: {
         is2faVerified: true,
+      },
+    });
+  }
+  async disable2fa(user) {
+    if (!user.is2faEnabled)
+      throw new HttpException('2fa already disabled', HttpStatus.FORBIDDEN);
+    await this.prisma.user.update({
+      where: { email: user.email },
+      data: {
+        is2faEnabled: false,
+        is2faVerified: false,
+        twofaSecret: null,
       },
     });
   }
