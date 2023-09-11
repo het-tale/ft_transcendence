@@ -66,6 +66,11 @@ export class SetPasswordDto extends createZodDto(SetPasswordSchema) {}
 export class TwofaCodeDto extends createZodDto(TwofaCodeSchema) {}
 export class ForgetPassworddto extends createZodDto(ForgetPasswordSchema) {}
 
+// cloudinary-response.ts
+import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
+
+export type CloudinaryResponse = UploadApiResponse | UploadApiErrorResponse;
+
 export type TSigninData = z.infer<typeof AuthSignInSchema>;
 export type TSignupData = z.infer<typeof AuthsignUpSchema>;
 export type TSetPasswordData = z.infer<typeof SetPasswordSchema>;

@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { JwtStrategy, Strategy42 } from './strategies';
 import { ConfirmationModule } from 'src/confirmation/confirmation.module';
 import { TwoFaModule } from 'src/2fa/two-fa.module';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TwoFaModule } from 'src/2fa/two-fa.module';
     JwtModule.register({}),
     ConfirmationModule,
     TwoFaModule,
+    CloudinaryModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, Strategy42],
