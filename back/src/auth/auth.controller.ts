@@ -7,7 +7,9 @@ import {
   Query,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { UseZodGuard } from 'nestjs-zod';
@@ -29,6 +31,7 @@ import JwtAuthenticationGuard from './guards/jwt-authentication.guard';
 import _42AuthenticationGuard from './guards/42-authentication.guard';
 import { TwoFaVerificationGuard } from './guards/twofa-verification.guard';
 import { Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('auth')
 export class AuthController {
@@ -126,6 +129,24 @@ export class AuthController {
   @Get('2fa/disable')
   async disable2fa(@Req() request: Request) {
     await this.authService.disable2fa(request.user);
+  }
+
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(EmailConfirmationGuard)
+  @UseGuards(JwtAuthenticationGuard)
+  @Post('upload-avatar')
+  uploadAvatar(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() request: Request,
+  ) {
+    if (!file || !file.originalname) {
+      return {
+        message: 'Please provide a file named "file" in the request.',
+        error: 'Bad Request',
+        statusCode: 400,
+      };
+    }
+    return this.authService.uploadAvatar(file, request.user);
   }
   // decorators resolve from bottom to top
   @UseGuards(EmailConfirmationGuard)
