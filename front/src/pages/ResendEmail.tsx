@@ -4,12 +4,14 @@ import client from "../components/Client";
 import { useLocation } from "react-router-dom";
 import { useEffect } from 'react';
 import ConfirmEmail from './ConfirmEmail';
+import 'react-toastify/dist/ReactToastify.css';
+import { useToast } from '@chakra-ui/react'
 
 
 function ResendEmail() {
     let navigate = useNavigate();
     const location = useLocation();
-    useEffect(() => {
+    const toast = useToast();
 const Email = async () => {
     // const token = location.search.split('=')[1];
     try {
@@ -21,7 +23,16 @@ const Email = async () => {
     console.log("STATUS", response.status);
     console.log("MESSAGE", response.data.message);                     
     if (response.status === 200) {
-        navigate('/home');
+        toast({
+            title: 'Email Sent.',
+            description: "we've sent you an email to confirm your email address.",
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+            position: "bottom-right",
+          })
+        navigate('/');
+        // console.log("SUCCESS");
     }
     }
     catch (error : any) {
@@ -29,17 +40,33 @@ const Email = async () => {
         const errorStatus = error.response.status;
         if (errorMessage === 'email already confirmed' && errorStatus === 403)
         {
-            navigate('/home');
+            toast({
+                title: 'Email Failed.',
+                description: "Email already confirmed.",
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: "bottom-right",
+              })
+            navigate('/');
+            // console.log("email already confirmed");
         }
         else
         {
-            console.log("ERROR", errorMessage);
+            // console.log("ERROR", errorMessage);
             navigate('/confirm-email');
         }
     }
 };
-Email();
-}, [navigate]);
+useEffect(() => {
+    const timer = setTimeout(() => {
+        Email();
+      }, 500);
+    
+      return () => {
+        clearTimeout(timer);
+      };
+    }, [navigate]);
     return (
         // <ConfirmEmail/>
         <></>

@@ -22,7 +22,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />}>
-          
+          {/* <Route path=":message" element={<Landing />}/> */}
         </Route>
         <Route path="home" element={
             <ProtectRoutes>
