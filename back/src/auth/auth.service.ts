@@ -18,6 +18,8 @@ import {
 import { ConfirmationService } from 'src/confirmation/confirmation.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Response } from 'express';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { generateRandomAvatar } from 'src/utils/generateRandomAvatar';
 
 @Injectable()
 export class AuthService {
@@ -27,16 +29,18 @@ export class AuthService {
     private conf: ConfigService,
     private confirmationService: ConfirmationService,
     private tw: TwoFaService,
+    private cloudinary: CloudinaryService,
   ) {}
   async signup(dto: TSignupData) {
     try {
       const hash = await argon.hash(dto.password);
-
+      const avatar = generateRandomAvatar(this.conf);
       const newUser = await this.prisma.user.create({
         data: {
           email: dto.email,
           username: dto.username,
           hash,
+          avatar,
         },
       });
       await this.confirmationService.sendConfirmationEmail(
@@ -230,6 +234,15 @@ export class AuthService {
         is2faEnabled: false,
         is2faVerified: false,
         twofaSecret: null,
+      },
+    });
+  }
+  async uploadAvatar(file: Express.Multer.File, user) {
+    const result = await this.cloudinary.uploadFile(file);
+    await this.prisma.user.update({
+      where: { email: user.email },
+      data: {
+        avatar: result,
       },
     });
   }
