@@ -13,6 +13,7 @@ import ResetPassword from "./pages/ResetPassword";
 import EmailRedirection from "./pages/EmailRedirection";
 import Email from "./components/Email";
 import ResendEmail from "./pages/ResendEmail";
+import SignIn42 from "./pages/SignIn42";
 
 
 function App() {
@@ -32,16 +33,17 @@ function App() {
         {/* <Route path="home" element={<Home />} /> */}
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
-          {/* <Route path="complete-profile" element={
-            <ProtectRoutes>
+          <Route path="complete-profile" element={
+            // <ProtectRoutes>
               <CompleteProfile />
-            </ProtectRoutes>
-          } /> */}
+            // </ProtectRoutes>
+          } />
           <Route path="confirm-email" element={<ConfirmEmail />}/>
           <Route path="forgot-password" element={<ForgotPassword />}/>
           <Route path="reset-password" element={<ResetPassword />}/>
           <Route path="redirect-email" element={<EmailRedirection />}/>
           <Route path="resend-email" element={<ResendEmail />}/>
+          <Route path="signin42" element={<SignIn42 />}/>
           {/* <Route path="test" element={<ProtectRoutes />}/> */}
       </Routes>
     </BrowserRouter>
