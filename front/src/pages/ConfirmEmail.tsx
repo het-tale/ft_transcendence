@@ -62,8 +62,8 @@ const ConfirmEmail = () => {
             </div>
             <div className="confirm-box">
                 <h2>Confirm Your Email address</h2>
-                {/* <p>confirmation link has been sent to your email. Please check your inbox</p> */}
-                {/* <button className="resend">Resend Link</button> */}
+                {/* <p className='papa'>Check your inbox for the verification email.</p> */}
+                <p className='papa'>If you need another email verification link, you can resend it by clicking the button below</p>
                 <Link to="/resend-email" className='resend'>Resend Link</Link>
             </div>
         </div>

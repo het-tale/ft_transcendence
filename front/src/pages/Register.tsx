@@ -5,6 +5,7 @@ import Home from './Home';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import ErrorToast from '../components/ErrorToast';
+import { useToast } from '@chakra-ui/react';
 
 function Register() {
     const [username, setUsername] = useState("");
@@ -13,6 +14,7 @@ function Register() {
     const [register, setRegister] = useState(false);
     const [errorMessage, setErrorMessage] = React.useState('');
     let navigate = useNavigate();
+    const toast = useToast();
     
 
     const handleSubmit = (e: any) => {
@@ -31,13 +33,29 @@ function Register() {
         .then((result) => {
           setRegister(true);
           localStorage.setItem('token', result.data.token);
+          toast({
+            title: 'Email Sent.',
+            description: "we've sent you an email to confirm your email address.",
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+            position: "bottom-right",
+          });
           navigate('/confirm-email');
 
         })
         .catch((error) => {
             const errorMessage = error.response.data.message;
             setErrorMessage(errorMessage);
-            console.log(errorMessage);   
+            console.log(errorMessage);
+            toast({
+                title: 'Registration Failed.',
+                description: errorMessage,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: "bottom-right",
+              })   
         });
       }
       
@@ -124,9 +142,9 @@ function Register() {
                     <Link to="/login" className='dejavu'>already have an account?</Link>
                   </div>
             </form>
-            <span>
+            {/* <span>
                 {errorMessage !== '' ? <ErrorToast message={errorMessage}/> : null }  
-            </span>
+            </span> */}
         </div>
     </div>
     );
