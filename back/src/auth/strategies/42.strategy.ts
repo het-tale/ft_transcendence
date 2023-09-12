@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-42';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { generateRandomAvatar } from 'src/utils/generateRandomAvatar';
 
 @Injectable()
 export class Strategy42 extends PassportStrategy(Strategy, '42') {
@@ -42,16 +43,19 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
       avatar: string;
       login: string;
       isPasswordRequired: boolean;
-      tfaStatus: boolean;
+      is2faEnabled: boolean;
+      twofaSecret: string;
       userId: number;
     };
     if (!user) {
+      const avatar = generateRandomAvatar(this.configService);
       payload = await this.prisma.user.create({
         data: {
           email,
           login,
           isPasswordRequired: true,
           IsEmailConfirmed: true,
+          avatar,
         },
       });
     } else {
@@ -63,7 +67,6 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
         },
       });
     }
-    console.log(payload);
 
     return { payload, accessToken };
   }
