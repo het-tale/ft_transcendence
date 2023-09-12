@@ -6,11 +6,11 @@ import {
 } from '@nestjs/common';
 
 @Injectable()
-export class EmailConfirmationGuard implements CanActivate {
+export class TwoFaVerificationGuard implements CanActivate {
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    if (!request.user?.IsEmailConfirmed) {
-      throw new UnauthorizedException('Confirm your email first');
+    if (request.user?.is2faEnabled && !request.user?.is2faVerified) {
+      throw new UnauthorizedException('verify your 2fa first');
     }
 
     return true;

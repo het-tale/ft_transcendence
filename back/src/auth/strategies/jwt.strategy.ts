@@ -2,11 +2,11 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { exclude } from 'utils';
+import { exclude } from 'src/utils';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private prisma: PrismaService, private conf: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -15,7 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: number; username: string; email: string }) {
+  async validate(payload: { sub: number; email: string }) {
     const id = payload.sub;
     const user = await this.prisma.user.findUnique({ where: { id } });
     //Based on the way JWT signing works, we're guaranteed that we're receiving a valid token that we have previously signed and issued to a valid user.
