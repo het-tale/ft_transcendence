@@ -1,10 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
 }
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -15,13 +12,16 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  email            String  @unique
-  IsEmailConfirmed Boolean @default(false)
-  username         String  @unique
-  hash             String
-  avatar           String  @default("https://res.cloudinary.com/dfvofzons/image/upload/v1691008123/sample.jpg") // TODO: verify endpoint that would be stored in .env to only keep the path relative to pictures 
-  nickname         String?
-  tfaStatus        Boolean @default(false)
+  email              String  @unique
+  IsEmailConfirmed   Boolean @default(false)
+  username           String? @unique
+  hash               String?
+  avatar             String
+  login              String? @unique
+  isPasswordRequired Boolean @default(false)
+  is2faEnabled       Boolean @default(false)
+  twofaSecret        String?
+  is2faVerified      Boolean @default(false)
 
   friend User? @relation("FriendList", fields: [userId], references: [id])
   userId Int?
