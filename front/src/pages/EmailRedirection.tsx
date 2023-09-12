@@ -14,7 +14,8 @@ function EmailRedirection() {
 
         const response = await client.get("/auth/confirm-email?token=" + token);                 
         if (response.status === 200) {
-            navigate('/complete-profile');
+            navigate('/login');
+            // navigate('/complete-profile');
         }
         }
         catch (error : any) {
@@ -22,7 +23,8 @@ function EmailRedirection() {
             const errorStatus = error.response.status;
             if (errorMessage === 'email already confirmed' && errorStatus === 403)
             {
-                navigate('/home');
+                // navigate('/home');
+                navigate('/login');
             }
             else
             {

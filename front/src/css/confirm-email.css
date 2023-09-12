@@ -131,3 +131,11 @@ body {
     text-align: center;
     padding: 10px;
 }
+
+.papa {
+    font-family: var(--corona);
+    color: #ccc;
+    margin-top: 20px;
+    /* margin-left: 20%;
+    font-size: 10px; */
+}
