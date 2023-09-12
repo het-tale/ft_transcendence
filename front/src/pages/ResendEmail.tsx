@@ -31,7 +31,7 @@ const Email = async () => {
             isClosable: true,
             position: "bottom-right",
           })
-        navigate('/');
+        navigate('/login');
         // console.log("SUCCESS");
     }
     }
@@ -48,12 +48,20 @@ const Email = async () => {
                 isClosable: true,
                 position: "bottom-right",
               })
-            navigate('/');
+            navigate('/login');
             // console.log("email already confirmed");
         }
         else
         {
             // console.log("ERROR", errorMessage);
+            toast({
+              title: 'Email Failed.',
+              description: errorMessage,
+              status: 'error',
+              duration: 9000,
+              isClosable: true,
+              position: "bottom-right",
+            })
             navigate('/confirm-email');
         }
     }
