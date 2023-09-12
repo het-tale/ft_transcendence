@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-	"moduleResolution": "nodenext",
+	"moduleResolution": "node",
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,

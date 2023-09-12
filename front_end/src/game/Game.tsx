@@ -2,7 +2,7 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import { drawPaddle, drawBall, drawRounds, drawScore } from './DrawElements';
-import { SetEventLisners, ListenOnSocket } from './Game.lisners';
+import { ListenOnSocket } from './Game.lisners';
 import { ctxrend, cnvelem, initialState, State, Action, GameData, Paddle} from '../../Game.types';
 
 export type MySocket = ReturnType<typeof io>;
@@ -36,8 +36,8 @@ function draw(ctx: ctxrend, canvas: cnvelem, state: State) {
 	// console.log('draw pdalles ', gamedata.playerpad);
 	if (state.otherpad && state.playerpad)
 	{
-		drawPaddle(state.otherpad, 'red', ctx, canvas);
-		drawPaddle(state.playerpad, 'green', ctx, canvas);
+		drawPaddle(state.otherpad, '#c5b26b', ctx, canvas);
+		drawPaddle(state.playerpad, '#a7d6dc', ctx, canvas);
 	}
 	if (state.ball)
 		drawBall(ctx, state.ball);
@@ -66,7 +66,7 @@ const Game: React.FC = () => {
 
 	const setupSocket = () => {
 	console.log('connecting');
-		const wsInstance = io('http://10.14.1.8:3001', {
+		const wsInstance = io('http://10.14.1.6:3001', {
 			withCredentials: true,
 			forceNew: true,
 			timeout: 100000,
@@ -97,7 +97,7 @@ const Game: React.FC = () => {
 
 	
 	useEffect(() => {
-		console.log('useEffect callsed ');
+		// console.log('useEffect callsed ');
 		if (state.ws && !init)
 		state.ws.on('InitGame', (game: GameData) => {
 			setInit(true);
@@ -146,9 +146,9 @@ const Game: React.FC = () => {
 	}, [init]);
 
 	const update = () => {
-		console.log('update functiuon hase been called');
+		// console.log('update functiuon hase been called');
 		if (state.ws && state.playerpad) {
-			console.log('UpdatePaddle in front end', state.playerpad);
+			// console.log('UpdatePaddle in front end', state.playerpad);
 
 			state.ws.emit('UpdatePlayerPaddle', state.playerpad);
 		}

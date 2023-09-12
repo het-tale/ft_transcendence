@@ -9,7 +9,7 @@ function drawPaddle(paddle: Paddle, color: string, ctx: ctxrend, canvas: cnvelem
 function drawBall(ctx: ctxrend, ball: Ball) {
 	ctx.beginPath();
 	ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-	ctx.fillStyle = 'blue';
+	ctx.fillStyle = 'white';
 	ctx.fill();
 	ctx.closePath();
 }

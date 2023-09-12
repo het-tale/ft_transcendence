@@ -17,12 +17,14 @@ interface Player {
 	socket: Socket;
 	paddle: Paddle;
 	room: string;
+	score: number;
 }
 
 
 class Room {
 	players: Player[] = [];
 	ball: Ball = defaultBall;
+	lastspeedincrease: number;
 	roomName: string = "";
 	}
 
@@ -50,10 +52,11 @@ const defaultBall: Ball = {
 	dy: 3,
 };
 
-const INITIAL_SCORE = { player: 0, computer: 0 };
 const ROUNDS = 3;
 const INTERVAL = 16;
 const INCREASE_SPEED = 0.2;
+const MAX_ANGLE_CHANGE = Math.PI / 4;
+const SPEED_INTERVAL = 1000;
 
 @WebSocketGateway()
 @Injectable()
@@ -85,16 +88,17 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 	if (!room) {
 		room = new Room();
 		room.roomName = Math.random().toString(36).substring(7);
+		room.lastspeedincrease = Date.now();
 		this.rooms.set(room.roomName, room);
-		room.players.push({ id: room.players.length + 1, socket: client, paddle: defaultPaddle, room: room.roomName });
+		room.players.push({ id: room.players.length + 1, socket: client, paddle: defaultPaddle, room: room.roomName, score: 0 });
 		client.join(room.roomName);
 		client.emit('JoinRoom', room.roomName);
 		let gamedata: GameData = {
 			playerpad: defaultPaddle,
 			otherpad: defaultOtherPaddle,
 			ball: defaultBall,
-			playerScore: INITIAL_SCORE.player,
-			otherScore: INITIAL_SCORE.computer,
+			playerScore: 0,
+			otherScore: 0,
 			rounds: ROUNDS,
 			id: room.players.length + 1,
 			padlleSpeed: 3,
@@ -103,15 +107,15 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 	}
 	else
 	{
-		room.players.push({ id: room.players.length + 1, socket: client, paddle: defaultOtherPaddle, room: room.roomName });
+		room.players.push({ id: room.players.length + 1, socket: client, paddle: defaultOtherPaddle, room: room.roomName , score: 0});
 		client.join(room.roomName);
 		client.emit('JoinRoom', room.roomName);
 		const gamedata: GameData = {
 			playerpad: defaultOtherPaddle,
 			otherpad: defaultPaddle,
 			ball: defaultBall,
-			playerScore: INITIAL_SCORE.player,
-			otherScore: INITIAL_SCORE.computer,
+			playerScore: 0,
+			otherScore: 0,
 			rounds: ROUNDS,
 			id: room.players.length + 1,
 			padlleSpeed: 3,
@@ -129,7 +133,7 @@ handleDisconnect(client: any) {
 	if (room) {
 		room.players = room.players.filter((player) => player.socket !== client);
 		if (room.players.length < 2) {
-			this.stopGame();
+			this.stopGame(room);
 			this.gameActive = false;
 			this.rooms.delete(room.roomName); // Remove the room if it's empty
 		}
@@ -155,12 +159,6 @@ private findRoomByPlayerSocket(socket: any): Room | undefined {
 	
 		if (player) {
 			player.paddle = paddle;
-			// Emit the updated paddle to the other player in the same room
-		// 	const otherPlayer = room.players.find((p) => p !== player);
-		// 	if (otherPlayer) {
-		// 		console.log('PLAYE ', player.id, 'PADDLE ', player.paddle,  ' OTHER ', otherPlayer.id, 'PADDLE ', otherPlayer.paddle);
-		// 		otherPlayer.socket.emit('SET_OTHER_PADDLE', player.paddle);
-		// }
 		}
 	}
 }
@@ -179,57 +177,77 @@ private startGame(room: Room) {
 	}
 }
 
-private stopGame() {
+private stopGame(room: Room) {
 	console.log("stopGame");
-		this.gameActive = false;
-	if (this.gameInterval)
+	//dell room from map
+	this.rooms.delete(room.roomName);
+	this.gameActive = false;
+	if (this.gameInterval){
+		this.rooms
 		this.gameInterval.unsubscribe();
+	}
 }
 
 private updateGame(room: Room) {
 	// Calculate the new ball position based on its current position and velocity
 	room.ball.x += room.ball.dx;
 	room.ball.y += room.ball.dy;
-	let newgameData 
 	// Check for collisions with top and bottom walls
 	if (room.ball.y - room.ball.radius < 0 || room.ball.y + room.ball.radius > 300) {
 		room.ball.dy *= -1; // Reverse the vertical velocity of the ball
-	}
+	} 
 
+	if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL)
+	{
+		room.lastspeedincrease = Date.now();
+		room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
+		room.ball.dy += room.ball.dy > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
+	}
 	// Check for collisions with paddles
 	for (const player of room.players) {
 		const otherPlayer = room.players.find((p) => p !== player);
+
 		if (
 			room.ball.x + room.ball.radius >= player.paddle.x &&
 			room.ball.y >= player.paddle.y &&
 			room.ball.y < player.paddle.y + player.paddle.height
 		) {
-			// Ball hits the player's paddle
-			room.ball.dx *= -1; // Reverse the horizontal velocity of the ball
+			// change angle of ball depending on where it hits the paddle
+			const relativeIntersectY = player.paddle.y + player.paddle.height / 2 - room.ball.y;
+			const normalizedRelativeIntersectionY = relativeIntersectY / (player.paddle.height / 2);
+			const bounceAngle = normalizedRelativeIntersectionY * MAX_ANGLE_CHANGE;
+			room.ball.dx = -room.ball.dx;
+			room.ball.dy = room.ball.dy > 0 ? Math.sin(bounceAngle) * -3 : Math.sin(bounceAngle) * 3;
 		} else if (
-			room.ball.x - room.ball.radius <= otherPlayer.paddle.x + otherPlayer.paddle.width &&
+			room.ball.x - room.ball.radius <= otherPlayer.paddle.x &&
 			room.ball.y >= otherPlayer.paddle.y &&
 			room.ball.y < otherPlayer.paddle.y + otherPlayer.paddle.height
 		) {
-			// Ball hits the other player's paddle
-			room.ball.dx *= -1; // Reverse the horizontal velocity of the ball
+			// change angle of ball depending on where it hits the paddle
+			const relativeIntersectY = otherPlayer.paddle.y + otherPlayer.paddle.height / 2 - room.ball.y;
+			const normalizedRelativeIntersectionY = relativeIntersectY / (otherPlayer.paddle.height / 2);
+			const bounceAngle = normalizedRelativeIntersectionY * MAX_ANGLE_CHANGE;
+			room.ball.dx = -room.ball.dx;
+			room.ball.dy = room.ball.dy > 0 ? Math.sin(bounceAngle) * -3 : Math.sin(bounceAngle) * 3;
 		}
 
 		// Check for scoring conditions
-		if (room.ball.x + room.ball.radius > 600) {
+		if (room.ball.x + room.ball.radius > player.paddle.x + player.paddle.width) {
+			console.log("player score");
 			// Player misses the ball
-		//	 computerScore++;
+			otherPlayer.score++;
 			this.resetBall(room.ball);
-		} else if (room.ball.x - room.ball.radius < 0) {
+		} else if (room.ball.x - room.ball.radius < otherPlayer.paddle.x - otherPlayer.paddle.width) {
+			console.log("other player score");
 			// Other player misses the ball
-		//	 playerScore++;
+			player.score++;
 			this.resetBall(room.ball);
 		}
 		// Emit updated ball position to the current player and the other player paddle
 		player.socket.emit('UPDATE', room.ball, otherPlayer.paddle);
 		otherPlayer.socket.emit('UPDATE', room.ball, player.paddle);
 		break;
-		}
+	}
 }
 
 private resetBall(ball: Ball) {

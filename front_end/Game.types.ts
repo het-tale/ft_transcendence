@@ -22,31 +22,6 @@ export interface Ball {
 	dy: number;
 }
 
-
-// const initialBall: Ball = {
-// 	x: 300,
-// 	y: 150,
-// 	radius: 5,
-// 	dx: 3,
-// 	dy: 3,
-// };
-
-// export const initialPlayerPaddle: Paddle = {
-// 	x: 600 - 20,
-// 	y: 300 / 2 - 50 / 2,
-// 	width: 5,
-// 	height: 60,
-// 	dy: 3,
-// };
-
-// const initalotherpaddle: Paddle = {
-// 	x: 10,
-// 	y: 300 / 2 - 50 / 2,
-// 	width: 5,
-// 	height: 60,
-// 	dy: 3,
-// };
-
 interface State {
 	ws: MySocket | null;
 	playerpad: Paddle | null;
