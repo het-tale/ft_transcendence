@@ -5,6 +5,8 @@ import '../css/login.css';
 import React, { useState } from 'react';
 import { error } from 'console';
 import ErrorToast from '../components/ErrorToast';
+import client from '../components/Client';
+import { useToast } from '@chakra-ui/react';
 // let setIsLoggedIn: boolean = false;
 function Login() {
     const [errorMessage, setErrorMessage] = React.useState('');
@@ -12,7 +14,24 @@ function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    let navigate = useNavigate();
+    const navigate = useNavigate();
+    const toast = useToast();
+    const checkAuthentication = async () => {
+        try {
+          const response = await client.get('/auth/me', {
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('token'),
+            },
+          });
+          if (response.status === 200 && response.data.IsEmailConfirmed === true) {
+            return true;
+          } else {
+            return false;
+          }
+        } catch (error) {
+          return false;
+        }
+      };
     const handleSubmite = (event : any) => {
         event.preventDefault();
         setErrorMessage("");
@@ -25,16 +44,38 @@ function Login() {
             },
           };
         axios(configuration)
-        .then((result) => {
+        .then(async (result) => {
             setIsLoggedIn(true);
             localStorage.setItem('token', result.data);
-            navigate('/home');
+            const condition = await checkAuthentication();
+            if (condition === true)
+                navigate('/home');
+            else
+            {
+                toast({
+                    title: 'Email not Confirmed.',
+                    description: "Your email address has not been verified.",
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                    position: "bottom-right",
+                  })
+                navigate('/confirm-email');
+            }
   
           })
           .catch((error) => {
               const errorMessage = error.response.data.message;
               setErrorMessage(errorMessage);
-              console.log(errorMessage);   
+              console.log(errorMessage);
+              toast({
+                title: 'Login Failed.',
+                description: errorMessage,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: "bottom-right",
+              })    
           });
     }
     return (
@@ -117,9 +158,9 @@ function Login() {
                     <Link to={'/forgot-password'} className="dejavu">forgot password?</Link>
                   </div>
             </form>
-            <span>
+            {/* <span>
                 {errorMessage !== '' ? <ErrorToast message={errorMessage}/> : null }  
-            </span>
+            </span> */}
         </div>
     </div>
     
