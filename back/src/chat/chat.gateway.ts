@@ -1,4 +1,3 @@
-import { Logger } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -8,41 +7,41 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 
-import { Server } from 'socket.io';
+import { Socket, Server } from 'socket.io';
+import { ChatService } from './chat.service';
 
 @WebSocketGateway()
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  private readonly logger = new Logger(ChatGateway.name);
-
+  constructor(private chatService: ChatService) {}
   @WebSocketServer() io: Server;
+  private connectedUsers: { clientId: string; username: string }[] = [];
 
   afterInit() {
-    this.logger.log('Initialized');
+    console.log('Initialized');
   }
 
-  handleConnection(client: any, ...args: any[]) {
-    const { sockets } = this.io.sockets;
-
-    this.logger.log(`Client id: ${client.id} connected`);
-    this.logger.debug(`Number of connected clients: ${sockets.size}`);
-    console.log(sockets.size);
-    const connectedClients = Array.from(sockets).map(([_, socket]) => ({
-      userID: socket.id,
-    }));
-
-    client.emit('connected clients', connectedClients);
+  async handleConnection(client: Socket) {
+    const token = client.handshake.query.token;
+    try {
+      const username = await this.chatService.verifyToken(token);
+      this.connectedUsers.push({ clientId: client.id, username });
+      console.log(this.connectedUsers);
+    } catch (err) {
+      client.disconnect();
+      console.error('Authentication failed:', err.message);
+    }
   }
 
-  handleDisconnect(client: any) {
-    this.logger.log(`Cliend id:${client.id} disconnected`);
+  handleDisconnect(client: Socket) {
+    console.log(`Cliend id:${client.id} disconnected`);
   }
 
   @SubscribeMessage('ping')
-  handleMessage(client: any, data: any) {
-    this.logger.log(`Message received from client id: ${client.id}`);
-    this.logger.debug(`Payload: ${data}`);
+  handleMessage(client: Socket, data: any) {
+    console.log(`Message received from client id: ${client.id}`);
+    console.log(`Payload: ${data}`);
 
     return {
       event: 'pong',
@@ -50,9 +49,25 @@ export class ChatGateway
     };
   }
   @SubscribeMessage('private message')
-  handlePrivateMessage(client: any, data: any) {
+  async handlePrivateMessage(client: Socket, data: any) {
+    console.log(`client is heeeeeere`);
+    console.log(client);
+    const sender = this.connectedUsers.find(
+      (user) => user.clientId === client.id,
+    );
+    const receiver = this.connectedUsers.find(
+      (user) => user.username === data.to,
+    );
+    const sentAt = new Date();
+    await this.chatService.saveMessage({
+      sender: sender.username,
+      receiver: receiver.username,
+      message: data.message,
+      date: sentAt,
+    });
+
     client.to(data.to).emit('private message', {
-      from: client.id,
+      from: sender.username,
       message: data.message,
     });
   }

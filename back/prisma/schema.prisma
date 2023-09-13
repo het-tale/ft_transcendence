@@ -1,7 +1,7 @@
-
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -26,14 +26,15 @@ model User {
   friend User? @relation("FriendList", fields: [userId], references: [id])
   userId Int?
 
-  messages       Message[]     @relation("SentMessages")
-  friends        User[]        @relation("FriendList")
-  matchHistoryA  Match[]       @relation("MatchPlayerA")
-  matchHistoryB  Match[]       @relation("MatchPlayerB")
-  winningmatches Match[]       @relation("MatchWinner")
-  achievements   Achievement[] @relation("Achiever")
-  channels       Channel[]     @relation("ChannelParticipants")
-  ownedChannels  Channel[]     @relation("ChannelOwner")
+  sentMessages     Message[]     @relation("SentMessages")
+  receivedMessages Message[]     @relation("ReceivedMessages")
+  friends          User[]        @relation("FriendList")
+  matchHistoryA    Match[]       @relation("MatchPlayerA")
+  matchHistoryB    Match[]       @relation("MatchPlayerB")
+  winningmatches   Match[]       @relation("MatchWinner")
+  achievements     Achievement[] @relation("Achiever")
+  channels         Channel[]     @relation("ChannelParticipants")
+  ownedChannels    Channel[]     @relation("ChannelOwner")
 }
 
 model Match {
@@ -59,14 +60,16 @@ model Message {
   updatedAt DateTime @updatedAt
 
   content String
-  time    DateTime
+  sentAt  DateTime
 
-  sender    User    @relation("SentMessages", fields: [userId], references: [id])
-  userId    Int
-  channel   Channel @relation("ChannelMessages", fields: [messageId], references: [id])
-  messageId Int
+  isDM Boolean @default(true)
 
-  @@index([userId])
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  senderId   Int
+  receiver   User?    @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiverId Int?
+  channel    Channel? @relation("ChannelMessages", fields: [channelId], references: [id])
+  channelId  Int?
 }
 
 model Channel {

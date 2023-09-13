@@ -15,7 +15,7 @@ import {
   TSetPasswordData,
   TforgetPasswordData,
   TAdd42CredentialsData,
-} from 'src/auth/dto';
+} from 'src/dto';
 import { ConfirmationService } from 'src/confirmation/confirmation.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Response } from 'express';

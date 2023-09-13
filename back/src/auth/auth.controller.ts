@@ -26,12 +26,12 @@ import {
   TforgetPasswordData,
   TtwofaCodeData,
   TwofaCodeDto,
-} from 'src/auth/dto';
+} from 'src/dto';
 import { AuthService } from './auth.service';
-import { EmailConfirmationGuard } from './guards/email-confirmation.guard';
-import JwtAuthenticationGuard from './guards/jwt-authentication.guard';
-import _42AuthenticationGuard from './guards/42-authentication.guard';
-import { TwoFaVerificationGuard } from './guards/twofa-verification.guard';
+import { EmailConfirmationGuard } from '../guards/email-confirmation.guard';
+import JwtAuthenticationGuard from '../guards/jwt-authentication.guard';
+import _42AuthenticationGuard from '../guards/42-authentication.guard';
+import { TwoFaVerificationGuard } from '../guards/twofa-verification.guard';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 
