@@ -6,11 +6,8 @@ import { MailerModule } from './mailer/mailer.module';
 import { ConfirmationModule } from './confirmation/confirmation.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { TwoFaModule } from './2fa/two-fa.module';
-<<<<<<< HEAD
-=======
-import { ChatGateway } from './chat/chat.gateway';
-import { JwtModule, JwtService } from '@nestjs/jwt';
->>>>>>> 1a8cbe95b363595425710e501aa0ab5271bfab88
+import { JwtModule } from '@nestjs/jwt';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -24,7 +21,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
     ConfirmationModule,
     TwoFaModule,
     CloudinaryModule,
+    ChatModule,
   ],
-  providers: [ChatGateway, JwtService],
 })
 export class AppModule {}

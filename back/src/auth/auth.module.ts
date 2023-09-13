@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtStrategy, Strategy42 } from './strategies';
+import { JwtStrategy, Strategy42 } from '../strategies';
 import { ConfirmationModule } from 'src/confirmation/confirmation.module';
 import { TwoFaModule } from 'src/2fa/two-fa.module';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
