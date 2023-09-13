@@ -216,3 +216,27 @@ label {
     font-size: 12px;
     /* margin-top: -50px; */
   }
+
+  #formui {
+    box-sizing: border-box;
+    width: none !important;
+  }
+
+  #inform {
+    width: 100% !important;
+  }
+
+  .formm {
+    margin-left: 150px !important;
+  }
+  .css-1kxonj9{
+    width: 40% !important;
+  }
+
+  #buttonui {
+    margin-left: 300px !important;
+    margin-top: 20px;
+    width: 41%;
+    background-color: var(--fakhti);
+    color: var(--white);
+  }
