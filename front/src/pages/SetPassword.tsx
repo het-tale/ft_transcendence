@@ -15,83 +15,52 @@ import axios from "axios";
 
 const SetPassword = () => {
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const toast = useToast();
     const navigate = useNavigate();
     const SubmitPassword = async (e: any) => {
         e.preventDefault();
-        console.log("Password", password);
-        console.log(`Bearer ${localStorage.getItem('token')}`);
-        const configuration = {
-            method: "post",
-            url: "http://localhost:3001/auth/set-new-password",
-            data: {
-              password : password,
-            },
-            headers : {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
+         try {
+
+            console.log(`Bearer ${localStorage.getItem('token')}`);
+            const data = {
+                password : password,
+                confirmPassword : confirmPassword
             }
-          };
-          axios(configuration).then( async (res) => {
-        
+            const headers = {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            }
+            const resp = await client.post('/auth/set-new-password', data, {
+                headers : headers
+            });
+            console.log(resp);
+            if (resp.status === 201)
+            {
                 toast({
-                    title: 'Password Set.',
-                    description: "Your password is set successfully.",
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: "bottom-right",
-                  })
-                // navigate('/login');
-                navigate('/home');
-          }).catch((error) => {
+                                title: 'Password Set.',
+                                description: "Your password is set successfully.",
+                                status: 'success',
+                                duration: 9000,
+                                isClosable: true,
+                                position: "bottom-right",
+                              })
+                            navigate('/home');
+            }
+        } catch (error : any)
+        {
+            const errorMessage = error.response.data.message;
             toast({
-                        title: 'Fatal Error.',
-                        description: "An error occured while setting your password.",
-                        status: 'error',
-                        duration: 9000,
-                        isClosable: true,
-                        position: "bottom-right",
-                      })
-          })
-        // try {
+                                title: 'Fatal Error.',
+                                description: errorMessage,
+                                status: 'error',
+                                duration: 9000,
+                                isClosable: true,
+                                position: "bottom-right",
+                              })
+            if (error.response.status === 403)
+                navigate('/login');
 
-        //     const resp = await client.post('/auth/set-new-password', {
-        //         data : {
-        //             password: password,
-        //         },
-        //         headers : {
-        //             // Authorization: `Bearer ${localStorage.getItem('token')}`
-        //             Authorization: 'Bearer ' + localStorage.getItem('token'),
-        //         }
-        //     })
-        //     if (resp.status === 200)
-        //     {
-        //         toast({
-        //             title: 'Password Set.',
-        //             description: "Your password is set successfully.",
-        //             status: 'success',
-        //             duration: 9000,
-        //             isClosable: true,
-        //             position: "bottom-right",
-        //           })
-        //         // navigate('/login');
-        //         navigate('/home');
-        //     }
-        //     else
-        //     {
-
-        //     }
-        // } catch (error)
-        // {
-        //     toast({
-        //         title: 'Fatal Error.',
-        //         description: "An error occured while setting your password.",
-        //         status: 'error',
-        //         duration: 9000,
-        //         isClosable: true,
-        //         position: "bottom-right",
-        //       })
-        // }
+        }
     }
     return (
         <div>
@@ -158,6 +127,9 @@ const SetPassword = () => {
                 <input className="form-control" type="password" name="password"
                     value={password} id="password" placeholder="Enter password"
                     onChange={(e) => setPassword(e.target.value)} required />
+                <input className="form-control" type="password" name="confirmPassword"
+                    value={confirmPassword} id="password2" placeholder="Confirm password"
+                    onChange={(e) => setConfirmPassword(e.target.value)} required />
             </div>
             <div className="submit">
                 <input type="submit" onClick={(e)=>SubmitPassword(e)} value="Submit" />
