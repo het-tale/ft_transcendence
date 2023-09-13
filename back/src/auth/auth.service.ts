@@ -14,6 +14,7 @@ import {
   TSigninData,
   TSetPasswordData,
   TforgetPasswordData,
+  TAdd42CredentialsData,
 } from 'src/auth/dto';
 import { ConfirmationService } from 'src/confirmation/confirmation.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -131,13 +132,21 @@ export class AuthService {
     return token;
   }
 
-  async setNewPassword(dto: TSetPasswordData, user) {
+  async setNewPasswordUsername(dto: TAdd42CredentialsData, user) {
     if (user.isPasswordRequired === false)
       throw new HttpException(
         'user already has a password',
         HttpStatus.FORBIDDEN,
       );
-    await this.updatePassword(dto, user.email);
+    const hash = await argon.hash(dto.password);
+    await this.prisma.user.update({
+      where: { email: user.email },
+      data: {
+        hash,
+        isPasswordRequired: false,
+        username: dto.username,
+      },
+    });
   }
   async updatePassword(dto: TSetPasswordData, email: string) {
     const hash = await argon.hash(dto.password);
@@ -145,7 +154,6 @@ export class AuthService {
       where: { email },
       data: {
         hash,
-        isPasswordRequired: false,
       },
     });
   }

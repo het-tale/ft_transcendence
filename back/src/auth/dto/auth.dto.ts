@@ -51,6 +51,16 @@ export const SetPasswordSchema = z
     message: "Passwords don't match",
     path: ['confirm'],
   });
+export const Add42CredentialsSchema = z
+  .object({
+    password: z.password().min(8, { message: 'Required' }),
+    confirmPassword: z.password().min(8, { message: 'Required' }),
+    username: z.string().trim().min(1, { message: 'Required' }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirm'],
+  });
 
 export const TwofaCodeSchema = z.object({
   code: z.string().trim().min(1, { message: 'Required' }),
@@ -63,16 +73,13 @@ export const ForgetPasswordSchema = z.object({
 export class AuthSignUpDto extends createZodDto(AuthsignUpSchema) {}
 export class AuthSignInDto extends createZodDto(AuthSignInSchema) {}
 export class SetPasswordDto extends createZodDto(SetPasswordSchema) {}
+export class Add42CredentialsDto extends createZodDto(Add42CredentialsSchema) {}
 export class TwofaCodeDto extends createZodDto(TwofaCodeSchema) {}
 export class ForgetPassworddto extends createZodDto(ForgetPasswordSchema) {}
-
-// cloudinary-response.ts
-import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
-
-export type CloudinaryResponse = UploadApiResponse | UploadApiErrorResponse;
 
 export type TSigninData = z.infer<typeof AuthSignInSchema>;
 export type TSignupData = z.infer<typeof AuthsignUpSchema>;
 export type TSetPasswordData = z.infer<typeof SetPasswordSchema>;
 export type TtwofaCodeData = z.infer<typeof TwofaCodeSchema>;
 export type TforgetPasswordData = z.infer<typeof ForgetPasswordSchema>;
+export type TAdd42CredentialsData = z.infer<typeof Add42CredentialsSchema>;
