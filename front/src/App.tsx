@@ -13,6 +13,9 @@ import ResetPassword from "./pages/ResetPassword";
 import EmailRedirection from "./pages/EmailRedirection";
 import Email from "./components/Email";
 import ResendEmail from "./pages/ResendEmail";
+import ModalUi from "./components/ModalUi";
+import SetPassword from "./pages/SetPassword";
+import Signin42 from "./pages/Signin42";
 
 
 function App() {
@@ -43,6 +46,8 @@ function App() {
           <Route path="redirect-email" element={<EmailRedirection />}/>
           <Route path="resend-email" element={<ResendEmail />}/>
           {/* <Route path="test" element={<ProtectRoutes />}/> */}
+          <Route path="set-password" element={<SetPassword />}/>
+          <Route path="signin42" element={<Signin42 />}/>
       </Routes>
     </BrowserRouter>
     </div>
