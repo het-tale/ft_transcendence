@@ -14,10 +14,12 @@ import {
 import { Request } from 'express';
 import { UseZodGuard } from 'nestjs-zod';
 import {
+  Add42CredentialsDto,
   AuthSignInDto,
   AuthSignUpDto,
   ForgetPassworddto,
   SetPasswordDto,
+  TAdd42CredentialsData,
   TSetPasswordData,
   TSigninData,
   TSignupData,
@@ -76,12 +78,12 @@ export class AuthController {
     return res.redirect(`http://localhost:3000/signin42?token=${token}`);
   }
 
-  @UseZodGuard('body', SetPasswordDto)
+  @UseZodGuard('body', Add42CredentialsDto)
   @UseGuards(TwoFaVerificationGuard)
   @UseGuards(JwtAuthenticationGuard)
-  @Post('set-new-password')
-  setNewPassword(@Req() request: Request, @Body() dto: TSetPasswordData) {
-    return this.authService.setNewPassword(dto, request.user);
+  @Post('set-new-username-password')
+  setNewPassword(@Req() request: Request, @Body() dto: TAdd42CredentialsData) {
+    return this.authService.setNewPasswordUsername(dto, request.user);
   }
 
   @UseZodGuard('body', ForgetPassworddto)
@@ -147,6 +149,7 @@ export class AuthController {
         statusCode: 400,
       };
     }
+
     return this.authService.uploadAvatar(file, request.user);
   }
   // decorators resolve from bottom to top
