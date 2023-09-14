@@ -26,7 +26,7 @@ export class ChatService {
       throw new HttpException('user not found', 404);
     }
 
-    return user.username;
+    return user;
   }
   async saveMessage(data) {
     const user1 = await this.prisma.user.findUnique({
@@ -46,6 +46,7 @@ export class ChatService {
         sentAt: data.date,
         senderId: user1.id,
         receiverId: user2.id,
+        isOnline: data.isOnline,
       },
     });
   }
@@ -65,6 +66,7 @@ export class ChatService {
     });
     const messages = await this.prisma.message.findMany({
       where: {
+        isDM: true,
         OR: [
           {
             senderId: user1.id,
@@ -83,6 +85,19 @@ export class ChatService {
     if (!messages || messages.length === 0) {
       throw new HttpException('no messages found', 404);
     }
+
+    return messages;
+  }
+  async getOfflineMessages(userId) {
+    const messages = await this.prisma.message.findMany({
+      where: {
+        receiverId: userId,
+        isOnline: false,
+      },
+      orderBy: {
+        sentAt: 'asc',
+      },
+    });
 
     return messages;
   }
