@@ -1,7 +1,47 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import '../css/forgot-password.css'
+import { useState } from "react";
+import ReactDOM from "react-dom";
+import { useForm, SubmitHandler } from "react-hook-form";
+import client from "../components/Client";
+import { useToast } from '@chakra-ui/react';
 
 const ForgotPassword = () => {
+    const [email, setEmail] = useState("");
+    let navigate = useNavigate();
+    const toast = useToast();
+    interface EmailInput {
+        email: String;
+      }
+      const { register, handleSubmit } = useForm<EmailInput>();
+      const handleEmail: SubmitHandler<EmailInput> = async (data) => {
+        try {
+            const response = await client.post("/auth/forget-password", {
+                email: data.email,
+            });
+            if (response.status === 201) {
+                toast({
+                    title: 'Email Sent.',
+                    description: response.data,
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                    position: "bottom-right",
+                  });
+            }
+        }
+        catch (error : any) {
+            const errorMessage = error.response.data.message;
+            toast({
+                title: 'Email Failed.',
+                description: errorMessage,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: "bottom-right",
+              });
+        }
+      }
     return (
         <div className="signupContainer">
         <div className="left">
@@ -59,15 +99,19 @@ const ForgotPassword = () => {
                 </g>
             </svg>
             </div>
-            <div className="card-pass">
+            <form className="card-pass" onSubmit={handleSubmit(handleEmail)}>
                 <p className="lock-icon"><i className="fas fa-lock"></i></p>
                 <h2>Forgot Password?</h2>
                 <p>You can reset your Password here</p>
-                <input type="text" className="passInput" placeholder="Email address" />
-                <button>Send My Password</button>
-            </div>
+                <input type="text" className="passInput"
+                placeholder="Email address" {...register("email", { required: true })} onChange={(e) => setEmail(e.target.value)}
+                />
+                <button type="submit">Send My Password</button>
+            </form>
         </div>
     </div>);
 }
 
 export default ForgotPassword;
+
+
