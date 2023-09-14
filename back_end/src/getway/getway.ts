@@ -6,57 +6,11 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket } from 'dgram';
-import { Ball, Paddle, GameData } from '../../../Types';
 import { Server } from 'socket.io';
 import { interval, take } from 'rxjs';
+import { colision } from './colision';
+import { GameData, Room, defaultBall, defaultOtherPaddle, defaultPaddle, ROUNDS, INTERVAL, INCREASE_SPEED, SPEED_INTERVAL } from '../types';
 // import {exit} from 'process';
-
-interface Player {
-	id: number;
-	socket: Socket;
-	paddle: Paddle;
-	room: string;
-	score: number;
-}
-
-
-class Room {
-	players: Player[] = [];
-	ball: Ball = defaultBall;
-	lastspeedincrease: number;
-	roomName: string = "";
-	}
-
-const defaultPaddle: Paddle = {
-	x: 600 - 20,
-	y: 300 / 2 - 50 / 2,
-	width: 5,
-	height: 60,
-	dy: 3,
-};
-
-const defaultOtherPaddle: Paddle = {
-	x: 10,
-	y: 300 / 2 - 50 / 2,
-	width: 5,
-	height: 60,
-	dy: 3,
-};
-
-const defaultBall: Ball = {
-	x: 600 / 2,
-	y: 300 / 2,
-	radius: 5,
-	dx: 3,
-	dy: 3,
-};
-
-const ROUNDS = 3;
-const INTERVAL = 16;
-const INCREASE_SPEED = 0.2;
-const MAX_ANGLE_CHANGE = Math.PI / 4;
-const SPEED_INTERVAL = 1000;
 
 @WebSocketGateway()
 @Injectable()
@@ -151,17 +105,18 @@ private findRoomByPlayerSocket(socket: any): Room | undefined {
 }
 
 	@SubscribeMessage('UpdatePlayerPaddle')
-	handleUpdatePaddle(client: any, paddle: Paddle) {
-	const room = this.findRoomByPlayerSocket(client);
-
-	if (room) {
-		const player = room.players.find((p) => p.socket === client);
-	
-		if (player) {
-			player.paddle = paddle;
+	handleUpdatePaddle(client: any, event: any) {
+		const room = this.findRoomByPlayerSocket(client);
+		if (room) {
+			const player = room.players.find((p) => p.socket === client);
+			if (player){
+				// Constrain the paddle's position within the canvas boundaries
+				const minY = event.top;
+				const maxY = event.top + event.hight - player.paddle.height;
+				player.paddle.y = Math.max(minY, Math.min(event.y, maxY));
+			}
 		}
 	}
-}
 
 private startGame(room: Room) {
 	console.log("startGame");
@@ -195,8 +150,8 @@ private updateGame(room: Room) {
 	// Check for collisions with top and bottom walls
 	if (room.ball.y - room.ball.radius < 0 || room.ball.y + room.ball.radius > 300) {
 		room.ball.dy *= -1; // Reverse the vertical velocity of the ball
-	} 
-
+	}
+	colision(room);
 	if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL)
 	{
 		room.lastspeedincrease = Date.now();
@@ -204,56 +159,13 @@ private updateGame(room: Room) {
 		room.ball.dy += room.ball.dy > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
 	}
 	// Check for collisions with paddles
-	for (const player of room.players) {
-		const otherPlayer = room.players.find((p) => p !== player);
 
-		if (
-			room.ball.x + room.ball.radius >= player.paddle.x &&
-			room.ball.y >= player.paddle.y &&
-			room.ball.y < player.paddle.y + player.paddle.height
-		) {
-			// change angle of ball depending on where it hits the paddle
-			const relativeIntersectY = player.paddle.y + player.paddle.height / 2 - room.ball.y;
-			const normalizedRelativeIntersectionY = relativeIntersectY / (player.paddle.height / 2);
-			const bounceAngle = normalizedRelativeIntersectionY * MAX_ANGLE_CHANGE;
-			room.ball.dx = -room.ball.dx;
-			room.ball.dy = room.ball.dy > 0 ? Math.sin(bounceAngle) * -3 : Math.sin(bounceAngle) * 3;
-		} else if (
-			room.ball.x - room.ball.radius <= otherPlayer.paddle.x &&
-			room.ball.y >= otherPlayer.paddle.y &&
-			room.ball.y < otherPlayer.paddle.y + otherPlayer.paddle.height
-		) {
-			// change angle of ball depending on where it hits the paddle
-			const relativeIntersectY = otherPlayer.paddle.y + otherPlayer.paddle.height / 2 - room.ball.y;
-			const normalizedRelativeIntersectionY = relativeIntersectY / (otherPlayer.paddle.height / 2);
-			const bounceAngle = normalizedRelativeIntersectionY * MAX_ANGLE_CHANGE;
-			room.ball.dx = -room.ball.dx;
-			room.ball.dy = room.ball.dy > 0 ? Math.sin(bounceAngle) * -3 : Math.sin(bounceAngle) * 3;
-		}
-
-		// Check for scoring conditions
-		if (room.ball.x + room.ball.radius > player.paddle.x + player.paddle.width) {
-			console.log("player score");
-			// Player misses the ball
-			otherPlayer.score++;
-			this.resetBall(room.ball);
-		} else if (room.ball.x - room.ball.radius < otherPlayer.paddle.x - otherPlayer.paddle.width) {
-			console.log("other player score");
-			// Other player misses the ball
-			player.score++;
-			this.resetBall(room.ball);
-		}
-		// Emit updated ball position to the current player and the other player paddle
-		player.socket.emit('UPDATE', room.ball, otherPlayer.paddle);
-		otherPlayer.socket.emit('UPDATE', room.ball, player.paddle);
-		break;
-	}
 }
 
-private resetBall(ball: Ball) {
-		ball.x = 600 / 2;
-		ball.y = 300 / 2;
-		ball.dx = 3;
-		ball.dy = 3;
-	}
+// private resetBall(ball: Ball) {
+// 		ball.x = 600 / 2;
+// 		ball.y = 300 / 2;
+// 		ball.dx = 3;
+// 		ball.dy = 3;
+// 	}
 }

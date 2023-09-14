@@ -1,34 +1,25 @@
 
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
+import { throttle } from 'lodash';
 import { drawPaddle, drawBall, drawRounds, drawScore } from './DrawElements';
 import { ListenOnSocket } from './Game.lisners';
-import { ctxrend, cnvelem, initialState, State, Action, GameData, Paddle} from '../../Game.types';
+import { ctxrend, cnvelem, initialState, State, Action, GameData} from '../../Game.types';
 
 export type MySocket = ReturnType<typeof io>;
 
 export const gameReducer = (state: State, action: Action): State => {
 	switch (action.type) {
-	  case 'SET_WS':
-		return { ...state, ws: action.payload };
-	  case 'SET_PLAYER_PADDLE':
-			return { ...state, playerpad: action.payload  };
-	  case 'SET_OTHER_PADDLE':
-			return { ...state, otherpad: action.payload  };
-	  case 'SET_BALL':
-		return { ...state, ball: action.payload };
-	  case 'SET_PLAYER_SCORE':
-		return { ...state, playerScore: action.payload };
-	  case 'SET_OTHER_SCORE':
-		return { ...state, otherScore: action.payload };
-	  case 'SET_ROUNDS':
-		return { ...state, rounds: action.payload };
-	  case 'SET_ID':
-		return { ...state, id: action.payload };
-	  case 'SET_PADDLE_SPEED':
-		return { ...state, padlleSpeed: action.payload };
-	  default:
-		return state;
+	  case 'SET_WS': return { ...state, ws: action.payload };
+	  case 'SET_PLAYER_PADDLE': return { ...state, playerpad: action.payload  };
+	  case 'SET_OTHER_PADDLE': return { ...state, otherpad: action.payload  };
+	  case 'SET_BALL': return { ...state, ball: action.payload };
+	  case 'SET_PLAYER_SCORE': return { ...state, playerScore: action.payload };
+	  case 'SET_OTHER_SCORE': return { ...state, otherScore: action.payload };
+	  case 'SET_ROUNDS': return { ...state, rounds: action.payload };
+	  case 'SET_ID': return { ...state, id: action.payload };
+	  case 'SET_PADDLE_SPEED': return { ...state, padlleSpeed: action.payload };
+	  default: return state;
 	}
   };
 
@@ -43,8 +34,10 @@ function draw(ctx: ctxrend, canvas: cnvelem, state: State) {
 		drawBall(ctx, state.ball);
 	if (state.rounds)
 		drawRounds(state.rounds, ctx, canvas);
-	if (state.playerScore && state.otherScore)
-		drawScore(state.playerScore, state.otherScore , ctx, canvas);
+	if (state.playerScore)
+		drawScore(true, state.playerScore, ctx, canvas);
+	if (state.otherScore)
+		drawScore(false, state.otherScore, ctx, canvas);
 }
 
 function useEffectOnce(effect: React.EffectCallback) {
@@ -59,40 +52,35 @@ function useEffectOnce(effect: React.EffectCallback) {
 
 const Game: React.FC = () => {
 	const canvasRef = useRef<cnvelem | null>(null);
+	const ctx = canvasRef.current?.getContext('2d');
+	
 	
 	const [state, dispatch] = useReducer(gameReducer, initialState);
 	const [init, setInit] = useState(false);
 	let listning = false;
-
+	
 	const setupSocket = () => {
 	console.log('connecting');
-		const wsInstance = io('http://10.14.1.6:3001', {
-			withCredentials: true,
-			forceNew: true,
-			timeout: 100000,
-			transports: ['websocket']
-		});
-		dispatch({ type: 'SET_WS', payload: wsInstance });
+	const wsInstance = io('http://localhost:3001', {
+		withCredentials: true,
+		forceNew: true,
+		timeout: 100000,
+		transports: ['websocket']
+	});
+	dispatch({ type: 'SET_WS', payload: wsInstance });
+};
+
+	const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+		if (state.ws && state.playerpad && canvasRef.current) {
+				const rect = canvasRef.current.getBoundingClientRect();
+				state.ws.emit('UpdatePlayerPaddle', {y: event.clientY, top: rect.top, hight: rect.height, with: rect.width});
+		}
 	};
 
+	const throttlehandlemousemouve = throttle(handleMouseMove, 20); // Call handleMouseMove at most every 20ms
 	const setupEventListeners = () => {
-		const canvas = canvasRef.current;
-
-		if (canvas)
-			canvas.addEventListener('mousemove', (event: any) => {
-			const canvasRect = canvas.getBoundingClientRect();
-			const mouseY = event.clientY - canvasRect.top;
-			let padd : Paddle ;
-			if (state.playerpad)
-			{
-				padd = state.playerpad;	
-				padd.y = mouseY - padd.height / 2;
-				padd.y = Math.max(Math.min(padd.y, canvas.height - padd.height), 0); // Ensure it's not less than 0 or greater than canvas height - paddle height		
-				dispatch({ type: 'SET_PLAYER_PADDLE', payload: padd}); // set the player paddle position based on the mouse position
-			}
-			// console.log('paddle at mousemove ', padd);
-
-		});// need to send actions instead of values to the erver, (protection of data)
+		if(canvasRef.current)
+			canvasRef.current.addEventListener('mousemove', throttlehandlemousemouve);
 	};
 
 	
@@ -103,36 +91,29 @@ const Game: React.FC = () => {
 			setInit(true);
 			// console.log('InitGame', game);
 			// let newgameData = {...gamedata, ...game};
-			if(game.ball) 
-			dispatch({ type: 'SET_BALL', payload: game.ball });
-			if(game.playerpad) 
-			dispatch({ type: 'SET_PLAYER_PADDLE', payload: game.playerpad });
-			if(game.otherpad) 
-			dispatch({ type: 'SET_OTHER_PADDLE', payload: game.otherpad });
-			if(game.playerScore) 
-			dispatch({ type: 'SET_PLAYER_SCORE', payload: game.playerScore });
-			if(game.otherScore)
-			dispatch({ type: 'SET_OTHER_SCORE', payload: game.otherScore });
-			if(game.rounds)
-			dispatch({ type: 'SET_ROUNDS', payload: game.rounds });
-			if(game.id)
-			dispatch({ type: 'SET_ID', payload: game.id });
+			if(game.ball) dispatch({ type: 'SET_BALL', payload: game.ball });
+			if(game.playerpad) dispatch({ type: 'SET_PLAYER_PADDLE', payload: game.playerpad });
+			if(game.otherpad) dispatch({ type: 'SET_OTHER_PADDLE', payload: game.otherpad });
+			if(game.playerScore) dispatch({ type: 'SET_PLAYER_SCORE', payload: game.playerScore });
+			if(game.otherScore) dispatch({ type: 'SET_OTHER_SCORE', payload: game.otherScore });
+			if(game.rounds) dispatch({ type: 'SET_ROUNDS', payload: game.rounds });
+			if(game.id) dispatch({ type: 'SET_ID', payload: game.id });
 			});
 		}, [init, state.ws]);
 
 	const updateCanvas = () => {
 		if (canvasRef.current && state && state.ws) {
 			const canvas = canvasRef.current;
-			const ctx: ctxrend = canvas.getContext('2d') as ctxrend;
 			
 			// console.log('clearing canvas');
 			if (!listning){
 				listning = true;
-				ListenOnSocket(state.ws, dispatch, state);
+				ListenOnSocket(state.ws, dispatch);
 			} 
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx?.clearRect(0, 0, canvas.width, canvas.height);
 			// console.log('draw in front end', state);
-			draw(ctx, canvas, state);
+			if (ctx)
+				draw(ctx, canvas, state);
 		}
 	};
 
@@ -145,17 +126,17 @@ const Game: React.FC = () => {
 			setupEventListeners();
 	}, [init]);
 
-	const update = () => {
-		// console.log('update functiuon hase been called');
-		if (state.ws && state.playerpad) {
-			// console.log('UpdatePaddle in front end', state.playerpad);
+	// const update = () => {
+	// 	// console.log('update functiuon hase been called');
+	// 	if (state.ws && state.playerpad) {
+	// 		// console.log('UpdatePaddle in front end', state.playerpad);
 
-			state.ws.emit('UpdatePlayerPaddle', state.playerpad);
-		}
-	};
+	// 		state.ws.emit('UpdatePlayerPaddle', state.playerpad);
+	// 	}
+	// };
 
 	useEffect(updateCanvas, [state]);
-	useEffect(update, [state]);
+	// useEffect(update, [state]);
 
 	return (
 		<center>

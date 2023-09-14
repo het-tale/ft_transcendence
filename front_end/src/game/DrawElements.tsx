@@ -14,10 +14,12 @@ function drawBall(ctx: ctxrend, ball: Ball) {
 	ctx.closePath();
 }
 
-function drawScore(playerScore: number, computerScore : number, ctx: ctxrend, canvas: cnvelem) {
+function drawScore(first: boolean, Score: number, ctx: ctxrend, canvas: cnvelem) {
 	ctx.font = '32px Courier New';
-	ctx.fillText(playerScore.toString(), canvas.width / 2 + 100, 50);
-	ctx.fillText(computerScore.toString(), canvas.width / 2 - 100, 50);
+	if (first)
+		ctx.fillText(Score.toString(), canvas.width / 2 + 100, 50);
+	else
+		ctx.fillText(Score.toString(), canvas.width / 2 - 100, 50);
 }
 // Draw the number of rounds
 function drawRounds(rounds : number, ctx: ctxrend, canvas: cnvelem) {
