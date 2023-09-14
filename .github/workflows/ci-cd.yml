@@ -24,7 +24,7 @@ jobs:
         node-version: 16.x
         cache: 'npm'
     - name: backend dependencies
-      run: npm ci
+      run: npm i
       working-directory: ./back
 
     - name: Build the backend
@@ -43,7 +43,7 @@ jobs:
         node-version: 16.x
         cache: 'npm'
     - name: frontend dependencies
-      run: npm ci
+      run: npm i
       working-directory: ./front
     # - name: Build the frontend
     #   run: npm run start
