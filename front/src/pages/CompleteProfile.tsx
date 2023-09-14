@@ -93,7 +93,7 @@ export default function CompleteProfile() {
                         </div> 
                         <label htmlFor="file" className="footer"></label> 
                         <input className="form-control" type="file" id="file"
-                        {...register("file", { required: true })}
+                        {...register("file")}
                         onChange={(e) => {setImage(e.target.files![0])}}
                         />
                                 

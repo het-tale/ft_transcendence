@@ -13,6 +13,7 @@ import {
     Input,
   } from '@chakra-ui/react'
 import React from 'react'
+import Main from './Main'
 
 function ModalUi() {
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -23,10 +24,6 @@ function ModalUi() {
     return (
       <>
         <Button onClick={onOpen}>Open Modal</Button>
-        <Button ml={4} ref={finalRef}>
-          I'll receive focus on close
-        </Button>
-  
         <Modal
           initialFocusRef={initialRef}
           finalFocusRef={finalRef}
@@ -35,18 +32,10 @@ function ModalUi() {
         >
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Create your account</ModalHeader>
+            <ModalHeader>Please scan the QR code Below</ModalHeader>
             <ModalCloseButton />
             <ModalBody pb={6}>
-              <FormControl>
-                <FormLabel>First name</FormLabel>
-                <Input ref={initialRef} placeholder='First name' />
-              </FormControl>
-  
-              <FormControl mt={4}>
-                <FormLabel>Last name</FormLabel>
-                <Input placeholder='Last name' />
-              </FormControl>
+              Hello
             </ModalBody>
   
             <ModalFooter>
