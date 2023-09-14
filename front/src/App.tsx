@@ -42,7 +42,7 @@ function App() {
           } />
           <Route path="confirm-email" element={<ConfirmEmail />}/>
           <Route path="forgot-password" element={<ForgotPassword />}/>
-          <Route path="reset-password" element={<ResetPassword />}/>
+          <Route path="change-password" element={<ResetPassword />}/>
           <Route path="redirect-email" element={<EmailRedirection />}/>
           <Route path="resend-email" element={<ResendEmail />}/>
           {/* <Route path="test" element={<ProtectRoutes />}/> */}

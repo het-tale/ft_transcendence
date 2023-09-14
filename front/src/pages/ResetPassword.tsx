@@ -1,8 +1,60 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 // import '../css/reset-password.css'
 import '../css/forgot-password.css'
+import SetPassword from "./SetPassword";
+import ReactDOM from "react-dom";
+import { useForm, SubmitHandler } from "react-hook-form";
+import client from "../components/Client";
+import { useToast } from '@chakra-ui/react';
+import { useState } from "react";
 
 const ResetPassword = () => {
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    let navigate = useNavigate();
+    const toast = useToast();
+    const location = useLocation();
+    interface PasswordInput {
+        password: String;
+        confirmPassword: String;
+      }
+      const { register, handleSubmit } = useForm<PasswordInput>();
+      const handlePassword: SubmitHandler<PasswordInput> = async (data) => {
+        try {
+            const token = location.search.split('=')[1];
+            const data1 = {
+                password: data.password,
+                confirmPassword: data.confirmPassword,
+            }
+            console.log(data1);
+            console.log("Token", token);
+            const response = await client.post("/auth/change-password?token=" + token, data1);
+            console.log(response);
+            if (response.status === 201) {
+                toast({
+                    title: 'Password updated.',
+                    description: "Your password has been successfully updated.",
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                    position: "bottom-right",
+                  });
+                  navigate('/login');
+            }
+        }
+        catch (error : any) {
+            const errorMessage = error.response.data.message;
+            console.log(errorMessage);
+            toast({
+                title: 'Error.',
+                description: errorMessage,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: "bottom-right",
+              });
+      }
+    };
     return (
         <div className="signupContainer">
         <div className="left">
@@ -60,13 +112,17 @@ const ResetPassword = () => {
                 </g>
             </svg>
             </div>
-            <div className="card-pass">
+            <form className="card-pass" onSubmit={handleSubmit(handlePassword)}>
                 <p className="lock-icon"><i className="fas fa-lock"></i></p>
                 <h2>Change password</h2>
-                {/* <p>You can reset your Password here</p> */}
-                <input type="text" className="passInput" placeholder="password" />
+                <input type="password" className="passInput" placeholder="password"
+                {...register("password", { required: true })}
+                />
+                <input type="password" className="passInput" placeholder="Confirm password"
+                {...register("confirmPassword", { required: true })}
+                />
                 <button>Change My Password</button>
-            </div>
+            </form>
         </div>
     </div>);
 }
