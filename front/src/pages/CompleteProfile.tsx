@@ -12,20 +12,17 @@ export default function CompleteProfile() {
     interface DataInput {
         file: FileList;
       }
+    const formData = new FormData();
+    formData.append('file', image);
+    console.log("Form Data", formData);
     const { register, handleSubmit } = useForm<DataInput>();
       const handleAvatar: SubmitHandler<DataInput> = async (data) => {
         try {
-            // console.log("", data.file);
             const token = localStorage.getItem('token');
-            const data1 = {
-                file: image,
-            }
             const headers = {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             }
-            console.log("Data1", data1.file);
-            console.log("Token", token);
-            const response = await client.post("/auth/upload-avatar", data1, {
+            const response = await client.post("/auth/upload-avatar", formData, {
                 headers: headers,
             });
             console.log(response);
@@ -96,8 +93,7 @@ export default function CompleteProfile() {
                         </div> 
                         <label htmlFor="file" className="footer"></label> 
                         <input className="form-control" type="file" id="file"
-                        // {...register("file", { required: true })}
-                        name="file"
+                        {...register("file", { required: true })}
                         onChange={(e) => {setImage(e.target.files![0])}}
                         />
                                 
