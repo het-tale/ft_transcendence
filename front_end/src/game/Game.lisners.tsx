@@ -23,6 +23,7 @@ function ListenOnSocket(ws: MySocket, dispatch: React.Dispatch<Action>) {
 	});
 
 	ws.on('UPDATE', (update: any) => {
+		console.log('UPDATE', update);
 		dispatch({ type: 'SET_BALL', payload: update.ball});
 		dispatch({ type: 'SET_PLAYER_PADDLE', payload: update.paddle});
 		dispatch({ type: 'SET_OTHER_PADDLE', payload: update.otherPaddle});

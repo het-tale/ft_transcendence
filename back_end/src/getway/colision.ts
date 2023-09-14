@@ -41,12 +41,12 @@ export function colision(room: Room) {
 		// Player misses the ball
 		otherPlayer.score++;
 		resetBall(room.ball);
-		console.log("player " + otherPlayer.id + " score " + otherPlayer.score);
+		// console.log("player " + otherPlayer.id + " score " + otherPlayer.score);
 	} else if (room.ball.x - room.ball.radius < otherPlayer.paddle.x - otherPlayer.paddle.width) {
 		// Other player misses the ball
 		player.score++;
 		resetBall(room.ball);
-		console.log("player " + player.id + " score " + player.score);
+		// console.log("player " + player.id + " score " + player.score);
 	}
 	// Emit updated ball position to the current player and the other player paddle
 	player.socket.emit('UPDATE', { ball: room.ball, paddle: player.paddle, otherPaddle: otherPlayer.paddle, score: player.score, otherScore: otherPlayer.score});

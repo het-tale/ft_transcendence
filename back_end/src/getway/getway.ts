@@ -10,7 +10,7 @@ import { Server } from 'socket.io';
 import { interval, take } from 'rxjs';
 import { colision } from './colision';
 import { GameData, Room, defaultBall, defaultOtherPaddle, defaultPaddle, ROUNDS, INTERVAL, INCREASE_SPEED, SPEED_INTERVAL } from '../types';
-// import {exit} from 'process';
+import { ClientRequest } from 'http';
 
 @WebSocketGateway()
 @Injectable()
@@ -158,14 +158,5 @@ private updateGame(room: Room) {
 		room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
 		room.ball.dy += room.ball.dy > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
 	}
-	// Check for collisions with paddles
-
 }
-
-// private resetBall(ball: Ball) {
-// 		ball.x = 600 / 2;
-// 		ball.y = 300 / 2;
-// 		ball.dx = 3;
-// 		ball.dy = 3;
-// 	}
 }

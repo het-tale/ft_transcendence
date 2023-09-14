@@ -2,7 +2,7 @@ import React from 'react';
 import { MySocket} from './src/game/Game';
 
 type ctxrend = CanvasRenderingContext2D;
-type cnvelem = HTMLCanvasElement;
+type cnvelem = HTMLDivElement;
 type ballstat = React.Dispatch<React.SetStateAction<Ball>>;
 type paddlestat = React.Dispatch<React.SetStateAction<Paddle>>;
 

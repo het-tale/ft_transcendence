@@ -1,10 +1,11 @@
 
-import React, { useEffect, useReducer, useRef, useState } from 'react';
+import React, { useEffect, useReducer, useRef, useState } from 'react'; // Clear the canvas
 import { io } from 'socket.io-client';
 import { throttle } from 'lodash';
-import { drawPaddle, drawBall, drawRounds, drawScore } from './DrawElements';
+// import { drawPaddle, drawBall, drawRounds, drawScore } from './DrawElements';
 import { ListenOnSocket } from './Game.lisners';
-import { ctxrend, cnvelem, initialState, State, Action, GameData} from '../../Game.types';
+import { ctxrend, cnvelem, initialState, State, Action, GameData, Paddle, Ball} from '../../Game.types';
+import p5 from 'p5';
 
 export type MySocket = ReturnType<typeof io>;
 
@@ -23,25 +24,52 @@ export const gameReducer = (state: State, action: Action): State => {
 	}
   };
 
-function draw(ctx: ctxrend, canvas: cnvelem, state: State) {
-	// console.log('draw pdalles ', gamedata.playerpad);
-	if (state.otherpad && state.playerpad)
-	{
-		drawPaddle(state.otherpad, '#c5b26b', ctx, canvas);
-		drawPaddle(state.playerpad, '#a7d6dc', ctx, canvas);
-	}
-	if (state.ball)
-		drawBall(ctx, state.ball);
-	if (state.rounds)
-		drawRounds(state.rounds, ctx, canvas);
-	if (state.playerScore)
-		drawScore(true, state.playerScore, ctx, canvas);
-	if (state.otherScore)
-		drawScore(false, state.otherScore, ctx, canvas);
-}
+// function draw(state: State, p: p5, canvas: HTMLDivElement) {
+// 	// console.log('draw pdalles ', gamedata.playerpad);
+// 	if (state.otherpad && state.playerpad)
+// 	{
+// 		drawPaddle(state.otherpad, '#c5b26b', p);
+// 		drawPaddle(state.playerpad, '#a7d6dc', p);
+// 	}
+// 	if (state.ball)
+// 		drawBall(p, state.ball);
+// 	// if (state.rounds)
+// 	// 	drawRounds(state.rounds, p, canvas);
+// 	// if (state.playerScore)
+// 	// 	drawScore(true, state.playerScore, ctx, canvas);
+// 	// if (state.otherScore)
+// 	// 	drawScore(false, state.otherScore, ctx, canvas);
+// }
+
+function drawPaddle(paddle: Paddle, color: string, p: p5) {
+	p.fill(color);
+	p.rect(paddle.x, paddle.y, paddle.width, paddle.height);
+  }
+  
+  function drawBall(p: p5, ball: Ball) {
+	p.noStroke();
+	p.fill(255); // White color
+	p.ellipse(ball.x, ball.y, ball.radius * 2);
+  }
+  
+//   function drawScore(first: boolean, Score: number, p: p5, canvas: cnvelem) {
+// 	p.textSize(32);
+// 	p.textAlign(p.CENTER);
+
+// 	if (first)
+// 	  p.text(Score.toString(), canvas.width / 2 + 100, 50);
+// 	else
+// 	  p.text(Score.toString(), canvas.width / 2 - 100, 50);
+//   }
+  
+//   function drawRounds(rounds: number, p: p5, canvas: cnvelem) {
+// 	p.textSize(32);
+// 	p.textAlign(p.CENTER);
+// 	p.text(rounds.toString(), canvas.width / 2, 50);
+//   }
 
 function useEffectOnce(effect: React.EffectCallback) {
-	let ref = useRef(false);
+	const ref = useRef(false);
 	useEffect((...args) => {
 		if (ref.current === false) {
 			ref.current = true;
@@ -51,10 +79,9 @@ function useEffectOnce(effect: React.EffectCallback) {
 }
 
 const Game: React.FC = () => {
-	const canvasRef = useRef<cnvelem | null>(null);
-	const ctx = canvasRef.current?.getContext('2d');
-	
-	
+	//  const canvasContainerRef = useRef(null); // Create a ref for the canvas container
+	const canvasContainerRef = useRef<HTMLDivElement | null>(null); // Add type annotation for the ref
+	// const ctx = canvasRef.current?.getContext('2d');
 	const [state, dispatch] = useReducer(gameReducer, initialState);
 	const [init, setInit] = useState(false);
 	let listning = false;
@@ -71,16 +98,17 @@ const Game: React.FC = () => {
 };
 
 	const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
-		if (state.ws && state.playerpad && canvasRef.current) {
-				const rect = canvasRef.current.getBoundingClientRect();
+		if (state.ws && state.playerpad && canvasContainerRef.current) {
+			// console.log('handleMouseMove');
+				const rect = canvasContainerRef.current.getBoundingClientRect();
 				state.ws.emit('UpdatePlayerPaddle', {y: event.clientY, top: rect.top, hight: rect.height, with: rect.width});
 		}
 	};
 
 	const throttlehandlemousemouve = throttle(handleMouseMove, 20); // Call handleMouseMove at most every 20ms
 	const setupEventListeners = () => {
-		if(canvasRef.current)
-			canvasRef.current.addEventListener('mousemove', throttlehandlemousemouve);
+		if(canvasContainerRef.current)
+			canvasContainerRef.current.addEventListener('mousemove', throttlehandlemousemouve);
 	};
 
 	
@@ -88,9 +116,8 @@ const Game: React.FC = () => {
 		// console.log('useEffect callsed ');
 		if (state.ws && !init)
 		state.ws.on('InitGame', (game: GameData) => {
+			console.log('InitGame');
 			setInit(true);
-			// console.log('InitGame', game);
-			// let newgameData = {...gamedata, ...game};
 			if(game.ball) dispatch({ type: 'SET_BALL', payload: game.ball });
 			if(game.playerpad) dispatch({ type: 'SET_PLAYER_PADDLE', payload: game.playerpad });
 			if(game.otherpad) dispatch({ type: 'SET_OTHER_PADDLE', payload: game.otherpad });
@@ -101,46 +128,66 @@ const Game: React.FC = () => {
 			});
 		}, [init, state.ws]);
 
-	const updateCanvas = () => {
-		if (canvasRef.current && state && state.ws) {
-			const canvas = canvasRef.current;
-			
+	const updateCanvas = (p: p5) => {
+		if (canvasContainerRef.current && state && state.ws) {
+			p.resizeCanvas(600, 300);
+
+			p.background(0); // Clear the canvas to black
 			// console.log('clearing canvas');
 			if (!listning){
 				listning = true;
 				ListenOnSocket(state.ws, dispatch);
-			} 
-			ctx?.clearRect(0, 0, canvas.width, canvas.height);
-			// console.log('draw in front end', state);
-			if (ctx)
-				draw(ctx, canvas, state);
+			}
+			// draw(state, p, canvasContainerRef.current);
+			if (state.otherpad && state.playerpad)
+			{
+				drawPaddle(state.otherpad, '#c5b26b', p);
+				drawPaddle(state.playerpad, '#a7d6dc', p);
+			}
+			if (state.ball)
+				drawBall(p, state.ball);
 		}
 	};
 
+
 	useEffectOnce(() => {
-	//set up socket and listners
-	setupSocket();
+		setupSocket(); 
+		return () => {
+			if (state.ws)
+			state.ws.disconnect();
+		}
 	});
+
 	useEffect(() => {
-		if (init)
-			setupEventListeners();
+		if (init) setupEventListeners(); 
+		return () => {
+			if (canvasContainerRef.current)
+			canvasContainerRef.current.removeEventListener('mousemove', throttlehandlemousemouve);
+		}
 	}, [init]);
 
-	// const update = () => {
-	// 	// console.log('update functiuon hase been called');
-	// 	if (state.ws && state.playerpad) {
-	// 		// console.log('UpdatePaddle in front end', state.playerpad);
-
-	// 		state.ws.emit('UpdatePlayerPaddle', state.playerpad);
-	// 	}
-	// };
-
-	useEffect(updateCanvas, [state]);
-	// useEffect(update, [state]);
-
+	useEffect(() => {
+		if (init) {
+		  const p = new p5((p) => {
+			p.setup = () => {
+				p.createCanvas(600, 300).parent('canvas-container');
+			};
+			p.draw = () =>{
+				updateCanvas(p);
+			}
+		  });
+	  
+		  return () => {
+			p.remove(); // Remove the p5.js instance when the component unmounts
+		  };
+		}
+	  }, [init]);
+	// useEffect( updateCanvas , [state]);
 	return (
 		<center>
-			<canvas ref={canvasRef} width={600} height={300} />
+			<div ref={canvasContainerRef} id="canvas-container">
+			{/* I hope that p5.js create the canvas here */}
+			</div>
 		</center>
 	);
 };
