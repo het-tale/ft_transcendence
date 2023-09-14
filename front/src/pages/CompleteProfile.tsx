@@ -1,7 +1,57 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../css/complete.css';
+import { useForm, SubmitHandler } from "react-hook-form";
+import { useToast } from '@chakra-ui/react';
+import client from '../components/Client';
+
 export default function CompleteProfile() {
+    let navigate = useNavigate();
+    const [image, setImage] = React.useState<any>();                                                                                                                                                                                                                                                                                                   
+    const toast = useToast();
+    interface DataInput {
+        file: FileList;
+      }
+    const { register, handleSubmit } = useForm<DataInput>();
+      const handleAvatar: SubmitHandler<DataInput> = async (data) => {
+        try {
+            // console.log("", data.file);
+            const token = localStorage.getItem('token');
+            const data1 = {
+                file: image,
+            }
+            const headers = {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            }
+            console.log("Data1", data1.file);
+            console.log("Token", token);
+            const response = await client.post("/auth/upload-avatar", data1, {
+                headers: headers,
+            });
+            console.log(response);
+            if (response.status === 201) {
+                toast({
+                    title: 'Avatar updated.',
+                    description: "Your avatar has been successfully updated.",
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                    position: "bottom-right",
+                  });
+                  navigate('/home');
+            }
+        } catch (error :any) {
+            const errorMessage = error.response.data.message;
+            toast({
+                                title: 'Fatal Error.',
+                                description: errorMessage,
+                                status: 'error',
+                                duration: 9000,
+                                isClosable: true,
+                                position: "bottom-right",
+                              })
+        }
+      }
     return (
         <div className="signupContainer">
         <div className="left">
@@ -38,25 +88,28 @@ export default function CompleteProfile() {
         </div>
         <div className="right">
             <div className="wrapper">
-                <form action="">
-                                <div className="form-group container">
-                                        <div className="header"> 
-                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> 
-                                            <path d="M7 10V9C7 6.23858 9.23858 4 12 4C14.7614 4 17 6.23858 17 9V10C19.2091 10 21 11.7909 21 14C21 15.4806 20.1956 16.8084 19 17.5M7 10C4.79086 10 3 11.7909 3 14C3 15.4806 3.8044 16.8084 5 17.5M7 10C7.43285 10 7.84965 10.0688 8.24006 10.1959M12 12V21M12 12L15 15M12 12L9 15" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg> <p>Choose avatar!</p>
-                                        </div> 
-                                        <label htmlFor="file" className="footer"> 
-                                        </label> 
-                                        <input className="form-control" type="file" name="avatar" id="file"/>
+                <form onSubmit={handleSubmit(handleAvatar)}>
+                    <div className="form-group container">
+                        <div className="header"> 
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> 
+                            <path d="M7 10V9C7 6.23858 9.23858 4 12 4C14.7614 4 17 6.23858 17 9V10C19.2091 10 21 11.7909 21 14C21 15.4806 20.1956 16.8084 19 17.5M7 10C4.79086 10 3 11.7909 3 14C3 15.4806 3.8044 16.8084 5 17.5M7 10C7.43285 10 7.84965 10.0688 8.24006 10.1959M12 12V21M12 12L15 15M12 12L9 15" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg> <p>Choose avatar!</p>
+                        </div> 
+                        <label htmlFor="file" className="footer"></label> 
+                        <input className="form-control" type="file" id="file"
+                        // {...register("file", { required: true })}
+                        name="file"
+                        onChange={(e) => {setImage(e.target.files![0])}}
+                        />
                                 
                                     
                                 </div>
-                                <div className="form-group twofa">
+                                {/* <div className="form-group twofa">
                                     <p>Enable 2FA?</p>
                                     <label className="switch">
                                         <input type="checkbox" />
                                         <span className="slider round"></span>
                                     </label>
-                                </div>
+                                </div> */}
                                 <div className="submit">
                                     <input type="submit" value="Submit" />
                                     <span></span>
