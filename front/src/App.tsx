@@ -16,6 +16,8 @@ import ResendEmail from "./pages/ResendEmail";
 import ModalUi from "./components/ModalUi";
 import SetPassword from "./pages/SetPassword";
 import Signin42 from "./pages/Signin42";
+import TFactorAuth from "./pages/TFactorAuth";
+import GenerateQr from "./pages/GenerateQr";
 
 
 function App() {
@@ -48,6 +50,8 @@ function App() {
           {/* <Route path="test" element={<ProtectRoutes />}/> */}
           <Route path="set-password" element={<SetPassword />}/>
           <Route path="signin42" element={<Signin42 />}/>
+          <Route path="2fa" element={<TFactorAuth />}/>
+          <Route path="generate-qr" element={<GenerateQr />}/>
       </Routes>
     </BrowserRouter>
     </div>
