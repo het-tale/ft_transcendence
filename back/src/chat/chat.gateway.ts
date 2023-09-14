@@ -1,4 +1,6 @@
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
@@ -22,36 +24,40 @@ export class ChatGateway
     console.log('Initialized');
   }
 
-  async handleConnection(client: Socket) {
+  async handleConnection(@ConnectedSocket() client: Socket) {
     const token = client.handshake.query.token;
     try {
-      const username = await this.chatService.verifyToken(token);
-      this.connectedUsers.push({ clientId: client.id, username });
+      const user = await this.chatService.verifyToken(token);
+      this.connectedUsers.push({
+        clientId: client.id,
+        username: user.username,
+      });
       console.log(this.connectedUsers);
+      const offlineMessages = await this.chatService.getOfflineMessages(
+        user.userId,
+      );
+      if (offlineMessages.length > 0) {
+        client.emit('offline messages', offlineMessages);
+      }
     } catch (err) {
       client.disconnect();
       console.error('Authentication failed:', err.message);
     }
   }
 
-  handleDisconnect(client: Socket) {
+  handleDisconnect(@ConnectedSocket() client: Socket) {
+    this.connectedUsers = this.connectedUsers.filter(
+      (user) => user.clientId !== client.id,
+    );
     console.log(`Cliend id:${client.id} disconnected`);
   }
 
-  @SubscribeMessage('ping')
-  handleMessage(client: Socket, data: any) {
-    console.log(`Message received from client id: ${client.id}`);
-    console.log(`Payload: ${data}`);
-
-    return {
-      event: 'pong',
-      data,
-    };
-  }
   @SubscribeMessage('private message')
-  async handlePrivateMessage(client: Socket, data: any) {
-    console.log(`client is heeeeeere`);
-    console.log(client);
+  async handlePrivateMessage(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    console.log(`client is heeeeeere ${client.id}`);
     const sender = this.connectedUsers.find(
       (user) => user.clientId === client.id,
     );
@@ -59,16 +65,20 @@ export class ChatGateway
       (user) => user.username === data.to,
     );
     const sentAt = new Date();
+    let isOnline = false;
+    if (receiver) {
+      isOnline = true;
+      client.to(receiver.clientId).emit('private message', {
+        from: sender.username,
+        message: data.message,
+      });
+    }
     await this.chatService.saveMessage({
       sender: sender.username,
       receiver: receiver.username,
       message: data.message,
       date: sentAt,
-    });
-
-    client.to(data.to).emit('private message', {
-      from: sender.username,
-      message: data.message,
+      isOnline,
     });
   }
 }

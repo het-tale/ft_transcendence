@@ -71,10 +71,11 @@ export class AuthController {
 
   @UseGuards(_42AuthenticationGuard)
   @Get('42/callback')
-  signin42Callback(@Req() request: Request) {
+  async signin42Callback(@Req() request: Request, @Res() res: Response) {
     const { user } = request;
+    const token = await this.authService.signin42(user);
 
-    return this.authService.signin42(user);
+    return res.redirect(`http://localhost:3000/signin42?token=${token}`);
   }
 
   @UseZodGuard('body', Add42CredentialsDto)

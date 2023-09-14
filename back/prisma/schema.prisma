@@ -37,6 +37,26 @@ model User {
   ownedChannels    Channel[]     @relation("ChannelOwner")
 }
 
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  content String
+  sentAt  DateTime
+
+  isDM Boolean @default(true)
+  isOnline Boolean
+
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  senderId   Int
+  receiver   User?    @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiverId Int?
+  channel    Channel? @relation("ChannelMessages", fields: [channelId], references: [id])
+  channelId  Int?
+}
+
 model Match {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
@@ -53,25 +73,6 @@ model Match {
   winner    User? @relation("MatchWinner", fields: [winnerId], references: [id])
   winnerId  Int?
 }
-
-model Message {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  content String
-  sentAt  DateTime
-
-  isDM Boolean @default(true)
-
-  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
-  senderId   Int
-  receiver   User?    @relation("ReceivedMessages", fields: [receiverId], references: [id])
-  receiverId Int?
-  channel    Channel? @relation("ChannelMessages", fields: [channelId], references: [id])
-  channelId  Int?
-}
-
 model Channel {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
