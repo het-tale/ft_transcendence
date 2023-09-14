@@ -16,6 +16,7 @@ import axios from "axios";
 const SetPassword = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [username, setUsername] = useState("");
     const toast = useToast();
     const navigate = useNavigate();
     const SubmitPassword = async (e: any) => {
@@ -25,12 +26,13 @@ const SetPassword = () => {
             console.log(`Bearer ${localStorage.getItem('token')}`);
             const data = {
                 password : password,
-                confirmPassword : confirmPassword
+                confirmPassword : confirmPassword,
+                username : username,
             }
             const headers = {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             }
-            const resp = await client.post('/auth/set-new-password', data, {
+            const resp = await client.post('/auth/set-new-username-password', data, {
                 headers : headers
             });
             console.log(resp);
@@ -123,10 +125,15 @@ const SetPassword = () => {
 
             <form onSubmit={(e) => SubmitPassword(e)}>
             <div className="form-group">
+                <label htmlFor="username">username</label>
+                <input className="form-control" type="text" name="username"
+                    value={username} id="username" placeholder="Enter username"
+                    onChange={(e) => setUsername(e.target.value)} required />
                 <label htmlFor="password">Password</label>
                 <input className="form-control" type="password" name="password"
                     value={password} id="password" placeholder="Enter password"
                     onChange={(e) => setPassword(e.target.value)} required />
+                <label htmlFor="password">Confirm Password</label>
                 <input className="form-control" type="password" name="confirmPassword"
                     value={confirmPassword} id="password2" placeholder="Confirm password"
                     onChange={(e) => setConfirmPassword(e.target.value)} required />
