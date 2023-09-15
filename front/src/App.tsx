@@ -18,6 +18,8 @@ import SetPassword from "./pages/SetPassword";
 import Signin42 from "./pages/Signin42";
 import TFactorAuth from "./pages/TFactorAuth";
 import GenerateQr from "./pages/GenerateQr";
+import Logout from "./components/Logout";
+import RequireNoAuth from "./components/RequireNoAuth";
 
 
 function App() {
@@ -25,25 +27,39 @@ function App() {
     <div>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Landing />}>
-          {/* <Route path=":message" element={<Landing />}/> */}
+        <Route path="/" element={
+          <RequireNoAuth>
+            <Landing/>
+          </RequireNoAuth>
+        }>
+          
         </Route>
+          <Route path="login" element={
+            <RequireNoAuth>
+                <Login />
+            </RequireNoAuth>
+          }/>
+          <Route path="register" element={
+            <RequireNoAuth>
+              <Register />
+            </RequireNoAuth>
+          }/>
         <Route path="home" element={
             <ProtectRoutes>
               <Home/>
              </ProtectRoutes>
           }>
         </Route>
-        {/* <Route path="home" element={<Home />} /> */}
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
           <Route path="complete-profile" element={
-            // <ProtectRoutes>
+            <ProtectRoutes>
               <CompleteProfile />
-            // </ProtectRoutes>
+            </ProtectRoutes>
           } />
           <Route path="confirm-email" element={<ConfirmEmail />}/>
-          <Route path="forgot-password" element={<ForgotPassword />}/>
+          <Route path="forgot-password" element={
+            <RequireNoAuth>
+              <ForgotPassword />
+            </RequireNoAuth>}/>
           <Route path="change-password" element={<ResetPassword />}/>
           <Route path="redirect-email" element={<EmailRedirection />}/>
           <Route path="resend-email" element={<ResendEmail />}/>
@@ -52,6 +68,7 @@ function App() {
           <Route path="signin42" element={<Signin42 />}/>
           <Route path="2fa" element={<TFactorAuth />}/>
           <Route path="generate-qr" element={<GenerateQr />}/>
+          <Route path="/logout" element={<Logout />}/>
       </Routes>
     </BrowserRouter>
     </div>
