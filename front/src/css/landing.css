@@ -92,9 +92,9 @@
     color: var(--fakhti);
     }
 
-    .Rectangle-4 {
+    .intra-wrapper {
         width: 366px;
-        height: 25px;
+        height: 65px;
         padding: 22px 51px 21px;
         background-color: var(--fakhti);
         border-radius: 30px 0 30px 0;
