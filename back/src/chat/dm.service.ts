@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
-export class ChatService {
+export class DMService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
@@ -88,7 +88,7 @@ export class ChatService {
 
     return messages;
   }
-  async getOfflineMessages(userId) {
+  async getOfflineMessages(userId: number) {
     const messages = await this.prisma.message.findMany({
       where: {
         receiverId: userId,

@@ -10,13 +10,17 @@ import {
 } from '@nestjs/websockets';
 
 import { Socket, Server } from 'socket.io';
-import { ChatService } from './chat.service';
+import { DMService } from './dm.service';
+import { ChannelService } from './channel.service';
 
 @WebSocketGateway()
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private chatService: ChatService) {}
+  constructor(
+    private dmService: DMService,
+    private channelService: ChannelService,
+  ) {}
   @WebSocketServer() io: Server;
   private connectedUsers: { clientId: string; username: string }[] = [];
 
@@ -27,17 +31,20 @@ export class ChatGateway
   async handleConnection(@ConnectedSocket() client: Socket) {
     const token = client.handshake.query.token;
     try {
-      const user = await this.chatService.verifyToken(token);
+      const user = await this.dmService.verifyToken(token);
       this.connectedUsers.push({
         clientId: client.id,
         username: user.username,
       });
       console.log(this.connectedUsers);
-      const offlineMessages = await this.chatService.getOfflineMessages(
-        user.userId,
-      );
+      const offlineMessages = await this.dmService.getOfflineMessages(user.id);
+      const offlineInvitations =
+        await this.channelService.getOfflineInvitations(user.id);
       if (offlineMessages.length > 0) {
         client.emit('offline messages', offlineMessages);
+      }
+      if (offlineInvitations.length > 0) {
+        client.emit('offline invitations', offlineInvitations);
       }
     } catch (err) {
       client.disconnect();
@@ -73,12 +80,68 @@ export class ChatGateway
         message: data.message,
       });
     }
-    await this.chatService.saveMessage({
+    await this.dmService.saveMessage({
       sender: sender.username,
       receiver: receiver.username,
       message: data.message,
       date: sentAt,
       isOnline,
     });
+  }
+  @SubscribeMessage('createRoom')
+  async createRoom(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      if (data.type === 'protected' && !data.password) {
+        throw new Error('password is required for protected rooms');
+      }
+      const owner = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      );
+      await this.channelService.createChannel(
+        data.room,
+        owner.username,
+        data.type,
+        data.password ? data.password : null,
+      );
+      client.join(data.room);
+      client.to(data.room).emit('roomCreated', { room: data.room });
+
+      return { event: 'roomCreated', room: data.room };
+    } catch (err) {
+      return { event: 'roomCreationError', error: err.message };
+    }
+  }
+  @SubscribeMessage('sendRoomInvitation')
+  async sendRoomInvitation(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const sender = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      );
+      const receiver = this.connectedUsers.find(
+        (user) => user.username === data.to,
+      );
+      let isReceiverOnline = false;
+      await this.channelService.saveInvitation({
+        sender: sender.username,
+        receiver: data.to,
+        room: data.room,
+        isReceiverOnline,
+      });
+      if (receiver) {
+        isReceiverOnline = true;
+        client.to(receiver.clientId).emit('room invitation', {
+          from: sender.username,
+          room: data.room,
+        });
+      }
+    } catch (err) {
+      return { event: 'roomInvitationError', error: err.message };
+    }
   }
 }
