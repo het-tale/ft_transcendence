@@ -14,6 +14,6 @@ export class ChatController {
 
   @Get('dms/:username')
   async getDms(@Param('username') username: string, @Req() request: Request) {
-    return this.dmService.getDms(username, request.user);
+    return this.dmService.getDmConversation(username, request.user);
   }
 }

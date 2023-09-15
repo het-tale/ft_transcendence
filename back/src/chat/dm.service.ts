@@ -50,7 +50,7 @@ export class DMService {
       },
     });
   }
-  async getDms(username: string, user) {
+  async getDmConversation(username: string, user) {
     const user1 = await this.prisma.user.findUnique({
       where: {
         username,
@@ -92,6 +92,7 @@ export class DMService {
     const messages = await this.prisma.message.findMany({
       where: {
         receiverId: userId,
+        isDM: true,
         isOnline: false,
       },
       orderBy: {
