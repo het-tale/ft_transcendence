@@ -15,8 +15,22 @@ export class ChannelService {
         createdAt: 'asc',
       },
     });
+    const updatedConversations = await Promise.all(
+      invitations.map(async (message) => {
+        const updatedConversation = await this.prisma.message.update({
+          where: {
+            id: message.id,
+          },
+          data: {
+            isPending: false,
+          },
+        });
 
-    return invitations;
+        return updatedConversation;
+      }),
+    );
+
+    return updatedConversations;
   }
   async saveInvitation(data: {
     sender: string;

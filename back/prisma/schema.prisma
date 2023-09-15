@@ -63,8 +63,8 @@ model Message {
   content String
   sentAt  DateTime
 
-  isDM     Boolean @default(true)
-  isOnline Boolean? @default(false)
+  isDM      Boolean  @default(true)
+  isPending Boolean? @default(true)
 
   sender     User     @relation("SentMessages", fields: [senderId], references: [id])
   senderId   Int
