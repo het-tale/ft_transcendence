@@ -17,20 +17,6 @@ const customEmailValidator = z.string().refine(
   },
 );
 
-// const z.passwor().min  = z.string().refine(
-//   (value) => {
-//     const passwordRegex =
-//       /^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{8}$/;
-//     const isStandardPassword = passwordRegex.test(value);
-
-//     return isStandardPassword;
-//   },
-//   {
-//     message:
-//       'Password must contain at least 8 characters,one special character, 2 uppercase letters, 2 numbers, 3 lowercase letters',
-//   },
-// );
-
 export const AuthsignUpSchema = z.object({
   username: z
     .string()

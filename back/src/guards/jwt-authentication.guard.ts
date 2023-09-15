@@ -4,4 +4,4 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiBearerAuth()
 @Injectable()
-export default class Jwt2faAuthenticationGuard extends AuthGuard('jwt') {}
+export default class JwtAuthenticationGuard extends AuthGuard('jwt') {}
