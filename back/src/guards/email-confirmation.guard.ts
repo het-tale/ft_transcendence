@@ -4,7 +4,11 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ApiUnauthorizedResponse } from '@nestjs/swagger';
 
+@ApiUnauthorizedResponse({
+  description: 'Unauthorized - Confirm your email first',
+})
 @Injectable()
 export class EmailConfirmationGuard implements CanActivate {
   canActivate(context: ExecutionContext) {

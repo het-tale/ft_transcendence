@@ -4,7 +4,11 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ApiUnauthorizedResponse } from '@nestjs/swagger';
 
+@ApiUnauthorizedResponse({
+  description: 'Unauthorized - Verify your 2FA first',
+})
 @Injectable()
 export class TwoFaVerificationGuard implements CanActivate {
   canActivate(context: ExecutionContext) {
