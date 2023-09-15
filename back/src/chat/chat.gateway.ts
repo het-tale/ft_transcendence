@@ -72,9 +72,9 @@ export class ChatGateway
       (user) => user.username === data.to,
     );
     const sentAt = new Date();
-    let isOnline = false;
+    let isPending = true;
     if (receiver) {
-      isOnline = true;
+      isPending = false;
       this.io.to(receiver.clientId).emit('private message', {
         from: sender.username,
         message: data.message,
@@ -85,7 +85,7 @@ export class ChatGateway
       receiver: receiver.username,
       message: data.message,
       date: sentAt,
-      isOnline,
+      isPending,
     });
   }
   @SubscribeMessage('createRoom')

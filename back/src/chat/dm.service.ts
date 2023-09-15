@@ -46,7 +46,7 @@ export class DMService {
         sentAt: data.date,
         senderId: user1.id,
         receiverId: user2.id,
-        isOnline: data.isOnline,
+        isPending: data.isPending,
       },
     });
   }
@@ -93,13 +93,28 @@ export class DMService {
       where: {
         receiverId: userId,
         isDM: true,
-        isOnline: false,
+        isPending: true,
       },
       orderBy: {
         sentAt: 'asc',
       },
     });
 
-    return messages;
+    const updatedMessages = await Promise.all(
+      messages.map(async (message) => {
+        const updatedMessage = await this.prisma.message.update({
+          where: {
+            id: message.id,
+          },
+          data: {
+            isPending: false,
+          },
+        });
+
+        return updatedMessage;
+      }),
+    );
+
+    return updatedMessages;
   }
 }
