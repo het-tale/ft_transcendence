@@ -28,8 +28,9 @@ c-34 -13 -75 -19 -130 -19 -68 0 -89 5 -145 31 -79 38 -140 97 -177 172 -23
 201 -813 261 -153 22 -637 27 -810 9z"/>
 </g>
 </svg>
-        <div className="Rectangle-4">
-            <Link to="/complete-profile" className="intra">Sign in with intra 42</Link>
+        <div className="intra-wrapper">
+            {/* <Link to="/signin42" className="intra">Sign in with intra 42</Link> */}
+            <button className='intra' onClick={() => {window.location.assign("http://localhost:3001/auth/42signin");}}>Sign in with intra 42</button>
         </div>
     </div>);
 }

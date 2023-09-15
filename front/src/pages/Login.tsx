@@ -1,8 +1,85 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import '../css/login.css'
+import axios from 'axios';
+import { useNavigate } from "react-router-dom"
+import '../css/login.css';
+import React, { useState } from 'react';
+import { error } from 'console';
+import ErrorToast from '../components/ErrorToast';
+import client from '../components/Client';
+import { useToast } from '@chakra-ui/react';
+// let setIsLoggedIn: boolean = false;
 function Login() {
+    const [errorMessage, setErrorMessage] = React.useState('');
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const navigate = useNavigate();
+    const toast = useToast();
+    const checkAuthentication = async () => {
+        try {
+          const response = await client.get('/auth/me', {
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('token'),
+            },
+          });
+          if (response.status === 200 && response.data.IsEmailConfirmed === true) {
+            return true;
+          } else {
+            return false;
+          }
+        } catch (error) {
+          return false;
+        }
+      };
+    const handleSubmite = (event : any) => {
+        event.preventDefault();
+        setErrorMessage("");
+        const configuration = {
+            method: "post",
+            url: "http://localhost:3001/auth/signin",
+            data: {
+                identifier: email,
+              password,
+            },
+          };
+        axios(configuration)
+        .then(async (result) => {
+            setIsLoggedIn(true);
+            localStorage.setItem('token', result.data);
+            const condition = await checkAuthentication();
+            if (condition === true)
+                navigate('/home');
+            else
+            {
+                toast({
+                    title: 'Email not Confirmed.',
+                    description: "Your email address has not been verified.",
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                    position: "bottom-right",
+                  })
+                navigate('/confirm-email');
+            }
+  
+          })
+          .catch((error) => {
+              const errorMessage = error.response.data.message;
+              setErrorMessage(errorMessage);
+              console.log(errorMessage);
+              toast({
+                title: 'Login Failed.',
+                description: errorMessage,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: "bottom-right",
+              })    
+          });
+    }
     return (
+        
         <div className="signupContainer">
         <div className="left">
         <Link to="/">
@@ -59,23 +136,34 @@ function Login() {
                 </g>
             </svg>
             </div>
-            <form action="">
+            <form onSubmit={(e)=>handleSubmite(e)}>
                 <div className="form-group">
-                    <label htmlFor="username">Username</label>
-                    <input className="form-control" type="text" placeholder="Enter your username/email" id="username" required />
+                    <label htmlFor="email">Email</label>
+                    <input className="form-control" type="text"
+                    placeholder="Enter your email"
+                    id="email" name="email" value={email}
+                    onChange={(e) => setEmail(e.target.value)} required />
                 </div>
                   <div className="form-group">
                     <label htmlFor="password">Password</label>
-                    <input className="form-control" type="password" name="password" id="password" placeholder="Enter password" required />
+                    <input className="form-control" type="password"
+                    name="password" id="password" placeholder="Enter password"
+                    value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    {/* <span className='error-message'>{errrorMessage}</span> */}
                   </div>
 
                   <div className="submit">
-                    <input type="submit" value="Login" />
-                    <a href="#" className="dejavu">forgot password?</a>
+                    <input type="submit" value="Login" onClick={(e)=>handleSubmite(e)}/>
+                    {/* <a href="#" className="dejavu">forgot password?</a> */}
+                    <Link to={'/forgot-password'} className="dejavu">forgot password?</Link>
                   </div>
             </form>
+            {/* <span>
+                {errorMessage !== '' ? <ErrorToast message={errorMessage}/> : null }  
+            </span> */}
         </div>
     </div>
+    
     );
 }
 
