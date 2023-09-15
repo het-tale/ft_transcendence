@@ -75,7 +75,7 @@ export class ChatGateway
     let isOnline = false;
     if (receiver) {
       isOnline = true;
-      client.to(receiver.clientId).emit('private message', {
+      this.io.to(receiver.clientId).emit('private message', {
         from: sender.username,
         message: data.message,
       });
@@ -107,7 +107,7 @@ export class ChatGateway
         data.password ? data.password : null,
       );
       client.join(data.room);
-      client.to(data.room).emit('roomCreated', { room: data.room });
+      this.io.to(data.room).emit('roomCreated', { room: data.room });
 
       return { event: 'roomCreated', room: data.room };
     } catch (err) {
@@ -115,6 +115,54 @@ export class ChatGateway
     }
   }
   @SubscribeMessage('sendRoomInvitation')
+  @SubscribeMessage('joinRoom')
+  async joinRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    try {
+      if (data.type === 'protected' && !data.password) {
+        throw new Error('password is required for protected rooms');
+      }
+      const user = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      );
+      await this.channelService.joinChannel(
+        data.room,
+        user.username,
+        data.type,
+        data.password ? data.password : null,
+      );
+      client.join(data.room);
+      this.io.to(data.room).emit('roomJoined', `${user.username} joined`);
+    } catch (err) {
+      return { event: 'roomJoinError', error: err.message };
+    }
+  }
+
+  @SubscribeMessage('sendRoomMessage')
+  async sendRoomMessage(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const sender = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      );
+      const sentAt = new Date();
+      await this.channelService.saveMessagetoChannel({
+        sender: sender.username,
+        room: data.room,
+        message: data.message,
+        date: sentAt,
+      });
+      this.io.to(data.room).emit('roomMessage', {
+        from: sender.username,
+        message: data.message,
+        room: data.room,
+      });
+    } catch (err) {
+      return { event: 'roomMessageError', error: err.message };
+    }
+  }
+
   async sendRoomInvitation(
     @MessageBody() data: any,
     @ConnectedSocket() client: Socket,
@@ -135,10 +183,39 @@ export class ChatGateway
       });
       if (receiver) {
         isReceiverOnline = true;
-        client.to(receiver.clientId).emit('room invitation', {
+        this.io.to(receiver.clientId).emit('room invitation', {
           from: sender.username,
           room: data.room,
         });
+      }
+    } catch (err) {
+      return { event: 'roomInvitationError', error: err.message };
+    }
+  }
+  @SubscribeMessage('handleRoomInvitation')
+  async handleRoomInvitation(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.handleChannelInvitation({
+        sender: data.from,
+        receiver: clientUsername,
+        room: data.room,
+        isAccepted: data.isAccepted,
+      });
+      if (data.isAccepted) {
+        client.join(data.room);
+        this.io
+          .to(data.room)
+          .emit('roomJoined', `${clientUsername} joind ${data.room}`);
+      } else {
+        client
+          .to(data.room)
+          .emit('roomInvitationDeclined', { room: data.room });
       }
     } catch (err) {
       return { event: 'roomInvitationError', error: err.message };

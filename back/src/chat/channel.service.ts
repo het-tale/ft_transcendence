@@ -116,4 +116,132 @@ export class ChannelService {
       },
     });
   }
+  async joinChannel(
+    channelName: string,
+    username: string,
+    type: string,
+    password: string,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
+    if (!user) {
+      throw new Error('user not found');
+    }
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+    });
+    if (!channel) {
+      throw new Error('channel not found');
+    }
+    if (channel.type === 'protected') {
+      const isPasswordValid = await argon.verify(channel.hash, password);
+      if (!isPasswordValid) {
+        throw new Error('invalid password');
+      }
+    }
+    await this.prisma.channel.update({
+      where: {
+        name: channelName,
+      },
+      data: {
+        participants: {
+          connect: {
+            id: user.id,
+          },
+        },
+      },
+    });
+  }
+
+  async handleChannelInvitation(data: {
+    sender: string;
+    receiver: string;
+    room: string;
+    isAccepted: boolean;
+  }) {
+    const userReceiver = await this.prisma.user.findUnique({
+      where: {
+        username: data.receiver,
+      },
+    });
+    const userSender = await this.prisma.user.findUnique({
+      where: {
+        username: data.sender,
+      },
+    });
+    if (!userReceiver || !userSender) {
+      throw new Error('user not found');
+    }
+    const status: string = data.isAccepted ? 'accepted' : 'rejected';
+    const invitation = await this.prisma.invitation.findFirst({
+      where: {
+        senderId: userSender.id,
+        receiverId: userReceiver.id,
+        room: data.room,
+      },
+    });
+    if (!invitation) {
+      throw new Error('Invitation not found');
+    }
+    await this.prisma.invitation.update({
+      where: {
+        id: invitation.id,
+      },
+      data: {
+        status,
+      },
+    });
+    //add user to room if accepted
+    if (data.isAccepted) {
+      const channelupdated = await this.prisma.channel.update({
+        where: {
+          name: data.room,
+        },
+        data: {
+          participants: {
+            connect: {
+              id: userReceiver.id,
+            },
+          },
+        },
+      });
+      if (!channelupdated) {
+        throw new Error('room not found');
+      }
+    }
+  }
+  async saveMessagetoChannel(data: {
+    sender: string;
+    room: string;
+    message: string;
+    date: Date;
+  }) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username: data.sender,
+      },
+    });
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: data.room,
+      },
+    });
+    if (!user || !channel) {
+      throw new Error('user or channel not found');
+    }
+    await this.prisma.message.create({
+      data: {
+        content: data.message,
+        senderId: user.id,
+        channelId: channel.id,
+        sentAt: data.date,
+        isDM: false,
+      },
+    });
+  }
 }

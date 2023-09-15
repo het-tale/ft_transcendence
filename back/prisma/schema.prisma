@@ -64,7 +64,7 @@ model Message {
   sentAt  DateTime
 
   isDM     Boolean @default(true)
-  isOnline Boolean
+  isOnline Boolean? @default(false)
 
   sender     User     @relation("SentMessages", fields: [senderId], references: [id])
   senderId   Int
