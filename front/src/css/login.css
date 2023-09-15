@@ -151,7 +151,7 @@ label {
     text-transform: uppercase;
     color: #ccc;
     display: block;
-    margin-bottom: 0.5rem;
+    margin-top: 1.8rem;
   }
 .form-control {
     background-color: transparent;
@@ -163,7 +163,7 @@ label {
     display: block;
     width: 100%;
     padding: 0.5rem;
-    margin-bottom: 1.8rem;
+    margin-bottom: 0.5rem;
     
   }
   .form-control:focus {
@@ -209,4 +209,34 @@ label {
   
   .left a {
     text-decoration: none;
+  }
+
+  .error-message {
+    color: red;
+    font-size: 12px;
+    /* margin-top: -50px; */
+  }
+
+  #formui {
+    box-sizing: border-box;
+    width: none !important;
+  }
+
+  #inform {
+    width: 100% !important;
+  }
+
+  .formm {
+    margin-left: 150px !important;
+  }
+  .css-1kxonj9{
+    width: 40% !important;
+  }
+
+  #buttonui {
+    margin-left: 300px !important;
+    margin-top: 20px;
+    width: 41%;
+    background-color: var(--fakhti);
+    color: var(--white);
   }

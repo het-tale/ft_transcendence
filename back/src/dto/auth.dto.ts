@@ -18,20 +18,34 @@ const customEmailValidator = z.string().refine(
 );
 
 export const AuthsignUpSchema = z.object({
-  username: z.string().trim().min(1, { message: 'Required' }),
-  email: customEmailValidator,
-  password: z.password().min(8, { message: 'Required' }),
+  username: z
+    .string()
+    .trim()
+    .min(1, { message: 'Required' })
+    .describe('Username'),
+  email: customEmailValidator.describe('Email'),
+  password: z
+    .password()
+    .min(8, { message: 'Required' })
+    .describe('This is a password'),
 });
 
 export const AuthSignInSchema = z.object({
-  password: z.password().min(8, { message: 'Required' }),
-  identifier: z.string().trim().min(1, { message: 'Required' }),
+  password: z.password().min(8, { message: 'Required' }).describe('Password'),
+  identifier: z
+    .string()
+    .trim()
+    .min(1, { message: 'Required' })
+    .describe('Username or email'),
 });
 
 export const SetPasswordSchema = z
   .object({
-    password: z.password().min(8, { message: 'Required' }),
-    confirmPassword: z.password().min(8, { message: 'Required' }),
+    password: z.password().min(8, { message: 'Required' }).describe('Password'),
+    confirmPassword: z
+      .password()
+      .min(8, { message: 'Required' })
+      .describe('Matching password'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -39,9 +53,16 @@ export const SetPasswordSchema = z
   });
 export const Add42CredentialsSchema = z
   .object({
-    password: z.password().min(8, { message: 'Required' }),
-    confirmPassword: z.password().min(8, { message: 'Required' }),
-    username: z.string().trim().min(1, { message: 'Required' }),
+    password: z.password().min(8, { message: 'Required' }).describe('Password'),
+    confirmPassword: z
+      .password()
+      .min(8, { message: 'Required' })
+      .describe('Matching password'),
+    username: z
+      .string()
+      .trim()
+      .min(1, { message: 'Required' })
+      .describe('Username'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -49,11 +70,11 @@ export const Add42CredentialsSchema = z
   });
 
 export const TwofaCodeSchema = z.object({
-  code: z.string().trim().min(1, { message: 'Required' }),
+  code: z.string().trim().min(1, { message: 'Required' }).describe('2fa Code'),
 });
 
 export const ForgetPasswordSchema = z.object({
-  email: z.string().trim().min(1, { message: 'Required' }),
+  email: z.string().trim().min(1, { message: 'Required' }).describe('Email'),
 });
 
 export class AuthSignUpDto extends createZodDto(AuthsignUpSchema) {}
