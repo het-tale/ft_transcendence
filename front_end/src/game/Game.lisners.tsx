@@ -1,7 +1,7 @@
-import { Action} from "../../Game.types";
+
 import { MySocket } from "./Game";
 
-function ListenOnSocket(ws: MySocket, dispatch: React.Dispatch<Action>) {
+function ListenOnSocket(ws: MySocket, setPadd: any, setBall: any, setOtherpad: any) {
   
 	ws.on('connect', () => {
 	  console.log('connected');
@@ -23,12 +23,9 @@ function ListenOnSocket(ws: MySocket, dispatch: React.Dispatch<Action>) {
 	});
 
 	ws.on('UPDATE', (update: any) => {
-		console.log('UPDATE', update);
-		dispatch({ type: 'SET_BALL', payload: update.ball});
-		dispatch({ type: 'SET_PLAYER_PADDLE', payload: update.paddle});
-		dispatch({ type: 'SET_OTHER_PADDLE', payload: update.otherPaddle});
-		dispatch({ type: 'SET_PLAYER_SCORE', payload: update.playerScore});
-		dispatch({ type: 'SET_OTHER_SCORE', payload: update.otherScore});
+		setPadd(update.paddle);
+		setBall(update.ball);
+		setOtherpad(update.otherPaddle );
 	});
 }
 

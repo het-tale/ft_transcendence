@@ -7,7 +7,7 @@ import {
 	WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { interval, take } from 'rxjs';
+import { interval} from 'rxjs';
 import { colision } from './colision';
 import { GameData, Room, defaultBall, defaultOtherPaddle, defaultPaddle, ROUNDS, INTERVAL, INCREASE_SPEED, SPEED_INTERVAL } from '../types';
 import { ClientRequest } from 'http';
@@ -103,19 +103,24 @@ private findRoomByPlayerSocket(socket: any): Room | undefined {
 	}
 	return undefined;
 }
-
 	@SubscribeMessage('UpdatePlayerPaddle')
-	handleUpdatePaddle(client: any, event: any) {
-		const room = this.findRoomByPlayerSocket(client);
-		if (room) {
-			const player = room.players.find((p) => p.socket === client);
-			if (player){
-				// Constrain the paddle's position within the canvas boundaries
-				const minY = event.top;
-				const maxY = event.top + event.hight - player.paddle.height;
-				player.paddle.y = Math.max(minY, Math.min(event.y, maxY));
-			}
+	handleUpdatePaddle(client: any, eventData: any) {
+	  const room = this.findRoomByPlayerSocket(client);
+	
+	  if (room) {
+		const player = room.players.find((p) => p.socket === client);
+	
+		if (player) {
+		  // Receive relative mouse position and container height from the client
+		  const relativeMouseY = eventData.relativeMouseY;
+		  const containerHeight = eventData.containerHeight;
+	
+		  // Calculate the new paddle position based on the received data
+		  const minY = 0;
+		  const maxY = containerHeight - player.paddle.height;
+		  player.paddle.y = Math.max(minY, Math.min(relativeMouseY, maxY));
 		}
+	  }
 	}
 
 private startGame(room: Room) {

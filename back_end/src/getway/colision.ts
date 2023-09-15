@@ -49,8 +49,7 @@ export function colision(room: Room) {
 		// console.log("player " + player.id + " score " + player.score);
 	}
 	// Emit updated ball position to the current player and the other player paddle
-	player.socket.emit('UPDATE', { ball: room.ball, paddle: player.paddle, otherPaddle: otherPlayer.paddle, score: player.score, otherScore: otherPlayer.score});
-	otherPlayer.socket.emit('UPDATE', { ball: room.ball, paddle: otherPlayer.paddle, otherPaddle: player.paddle, score: otherPlayer.score, otherScore: player.score});
-
+	player.socket.emit('UPDATE', { ball: room.ball, paddle: player.paddle, otherPaddle: otherPlayer.paddle});
+	otherPlayer.socket.emit('UPDATE', { ball: room.ball, paddle: otherPlayer.paddle, otherPaddle: player.paddle});
 }
 
