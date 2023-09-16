@@ -7,6 +7,8 @@ import { JwtStrategy, Strategy42 } from '../strategies';
 import { ConfirmationModule } from 'src/confirmation/confirmation.module';
 import { TwoFaModule } from 'src/2fa/two-fa.module';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { SecurityService } from './security.service';
+import { SecurityController } from './security.controller';
 
 @Module({
   imports: [
@@ -16,7 +18,7 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
     TwoFaModule,
     CloudinaryModule,
   ],
-  controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, Strategy42],
+  controllers: [AuthController, SecurityController],
+  providers: [AuthService, JwtStrategy, Strategy42, SecurityService],
 })
 export class AuthModule {}
