@@ -20,7 +20,8 @@ import { ConfirmationService } from 'src/confirmation/confirmation.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Response } from 'express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { generateRandomAvatar } from 'src/utils/generateRandomAvatar';
+import { generateRandomAvatar } from 'src/utils/generate-random-avatar';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -69,24 +70,23 @@ export class AuthService {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  async confirm_register(token: string) {
+  async confirmRegister(token: string) {
     const email = await this.confirmationService.confirmEmail(token);
     const user = await this.prisma.user.findUnique({ where: { email } });
-    if (user.IsEmailConfirmed) {
+    if (user.isEmailConfirmed) {
       throw new ForbiddenException('email already confirmed');
     }
     await this.prisma.user.update({
       where: { email },
-      data: { IsEmailConfirmed: true },
+      data: { isEmailConfirmed: true },
     });
     const jwt = await this.getJwtToken(user.id, user.email);
 
     return jwt;
   }
 
-  async resend_email(usery) {
-    const user = await this.prisma.user.findUnique({ where: { id: usery.id } });
-    if (user.IsEmailConfirmed) {
+  async resendEmail(user: User) {
+    if (user.isEmailConfirmed) {
       throw new ForbiddenException('email already confirmed');
     }
     this.confirmationService.sendConfirmationEmail(
@@ -126,13 +126,13 @@ export class AuthService {
 
     return token;
   }
-  async signin42(user) {
-    const token = await this.getJwtToken(user.payload.id, user.payload.email);
+  async signin42(user: User) {
+    const token = await this.getJwtToken(user.id, user.email);
 
     return token;
   }
 
-  async setNewPasswordUsername(dto: TAdd42CredentialsData, user) {
+  async setNewPasswordUsername(dto: TAdd42CredentialsData, user: User) {
     if (user.isPasswordRequired === false)
       throw new HttpException(
         'user already has a password',
@@ -157,7 +157,6 @@ export class AuthService {
       },
     });
   }
-  //TODO: add jwt refresh token
   getJwtToken(id: number, email: string): Promise<string> {
     const payload = {
       sub: id,
@@ -189,26 +188,24 @@ export class AuthService {
     await this.updatePassword(dto, email);
   }
 
-  async generate2fa(user, res: Response) {
+  async generate2Fa(user: User, res: Response) {
     if (user.is2faEnabled)
       throw new HttpException('2fa already enabled', HttpStatus.FORBIDDEN);
     const secret = await this.tw.generateSecret();
     await this.prisma.user.update({
       where: { email: user.email },
       data: {
-        twofaSecret: secret,
+        twoFaSecret: secret,
       },
     });
     const qr = await this.tw.generateQRCode(secret, user.email, res);
-    console.log(user.email, secret);
-    console.log('in generate function : email, secret');
 
     return qr;
   }
-  async enable2fa(code: string, user) {
-    if (user.twofaSecret === null)
+  async enable2Fa(code: string, user: User) {
+    if (user.twoFaSecret === null)
       throw new HttpException('generate 2fa qr code', HttpStatus.FORBIDDEN);
-    const isValid = await this.tw.verifyToken(code, user.twofaSecret);
+    const isValid = await this.tw.verifyToken(code, user.twoFaSecret);
     console.log(isValid);
     if (!isValid) throw new HttpException('invalid code', HttpStatus.FORBIDDEN);
     await this.prisma.user.update({
@@ -219,12 +216,12 @@ export class AuthService {
       },
     });
   }
-  async verify2fa(token: string, user) {
+  async verify2Fa(token: string, user: User) {
     if (!user.is2faEnabled)
       throw new HttpException('2fa not enabled', HttpStatus.FORBIDDEN);
-    console.log(user.twofaSecret);
+    console.log(user.twoFaSecret);
     console.log(token);
-    const isValid = await this.tw.verifyToken(token, user.twofaSecret);
+    const isValid = await this.tw.verifyToken(token, user.twoFaSecret);
     if (!isValid) throw new HttpException('invalid code', HttpStatus.FORBIDDEN);
     await this.prisma.user.update({
       where: { email: user.email },
@@ -233,7 +230,7 @@ export class AuthService {
       },
     });
   }
-  async disable2fa(user) {
+  async disable2Fa(user: User) {
     if (!user.is2faEnabled)
       throw new HttpException('2fa already disabled', HttpStatus.FORBIDDEN);
     await this.prisma.user.update({
@@ -241,11 +238,11 @@ export class AuthService {
       data: {
         is2faEnabled: false,
         is2faVerified: false,
-        twofaSecret: null,
+        twoFaSecret: null,
       },
     });
   }
-  async uploadAvatar(file: Express.Multer.File, user) {
+  async uploadAvatar(file: Express.Multer.File, user: User) {
     const result = await this.cloudinary.uploadFile(file);
     await this.prisma.user.update({
       where: { email: user.email },

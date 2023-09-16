@@ -11,7 +11,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Request } from 'express';
+import { File } from '../dto/auth.types';
 import { UseZodGuard } from 'nestjs-zod';
 import {
   Add42CredentialsDto,
@@ -31,7 +31,7 @@ import { AuthService } from './auth.service';
 import { EmailConfirmationGuard } from '../guards/email-confirmation.guard';
 import JwtAuthenticationGuard from '../guards/jwt-authentication.guard';
 import _42AuthenticationGuard from '../guards/42-authentication.guard';
-import { TwoFaVerificationGuard } from '../guards/twofa-verification.guard';
+import { TwoFaVerificationGuard } from '../guards/two-fa-verification.guard';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -42,6 +42,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { User } from '@prisma/client';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -60,7 +61,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Confirm email' })
   @Get('confirm-email')
   confirm(@Query('token') token: string) {
-    return this.authService.confirm_register(token);
+    return this.authService.confirmRegister(token);
   }
 
   @ApiUnauthorizedResponse({
@@ -71,8 +72,8 @@ export class AuthController {
   @UseGuards(TwoFaVerificationGuard)
   @UseGuards(JwtAuthenticationGuard)
   @Get('resend-email')
-  resend(@Req() request: Request) {
-    return this.authService.resend_email(request.user);
+  resend(@Req() request: { user: User }) {
+    return this.authService.resendEmail(request.user);
   }
 
   @ApiBody({ type: AuthSignInDto })
@@ -90,9 +91,8 @@ export class AuthController {
 
   @UseGuards(_42AuthenticationGuard)
   @Get('42/callback')
-  async signin42Callback(@Req() request: Request, @Res() res: Response) {
-    const { user } = request;
-    const token = await this.authService.signin42(user);
+  async signin42Callback(@Req() request: { user: User }, @Res() res: Response) {
+    const token = await this.authService.signin42(request.user);
 
     return res.redirect(`http://localhost:3000/signin42?token=${token}`);
   }
@@ -108,7 +108,10 @@ export class AuthController {
   @UseGuards(TwoFaVerificationGuard)
   @UseGuards(JwtAuthenticationGuard)
   @Post('set-new-username-password')
-  setNewPassword(@Req() request: Request, @Body() dto: TAdd42CredentialsData) {
+  setNewPassword(
+    @Req() request: { user: User },
+    @Body() dto: TAdd42CredentialsData,
+  ) {
     return this.authService.setNewPasswordUsername(dto, request.user);
   }
 
@@ -139,8 +142,8 @@ export class AuthController {
   @UseGuards(JwtAuthenticationGuard)
   @Get('2fa/generate')
   @Header('Content-Type', 'image/png')
-  async generate2fa(@Req() request: Request, @Res() res: Response) {
-    const code = await this.authService.generate2fa(request.user, res);
+  async generate2Fa(@Req() request: { user: User }, @Res() res: Response) {
+    const code = await this.authService.generate2Fa(request.user, res);
 
     return code;
   }
@@ -155,8 +158,8 @@ export class AuthController {
   @UseGuards(JwtAuthenticationGuard)
   @UseZodGuard('body', TwofaCodeDto)
   @Post('2fa/enable')
-  async enable2fa(@Req() request: Request, @Body() dto: TtwofaCodeData) {
-    return this.authService.enable2fa(dto.code, request.user);
+  async enable2Fa(@Req() request: { user: User }, @Body() dto: TtwofaCodeData) {
+    return this.authService.enable2Fa(dto.code, request.user);
   }
 
   @ApiBody({ type: TwofaCodeDto })
@@ -169,8 +172,8 @@ export class AuthController {
   @UseGuards(JwtAuthenticationGuard)
   @UseZodGuard('body', TwofaCodeDto)
   @Post('2fa/verify')
-  async verify2fa(@Req() request: Request, @Body() dto: TtwofaCodeData) {
-    await this.authService.verify2fa(dto.code, request.user);
+  async verify2Fa(@Req() request: { user: User }, @Body() dto: TtwofaCodeData) {
+    await this.authService.verify2Fa(dto.code, request.user);
   }
 
   @ApiUnauthorizedResponse({
@@ -182,8 +185,8 @@ export class AuthController {
   @UseGuards(EmailConfirmationGuard)
   @UseGuards(JwtAuthenticationGuard)
   @Get('2fa/disable')
-  async disable2fa(@Req() request: Request) {
-    await this.authService.disable2fa(request.user);
+  async disable2Fa(@Req() request: { user: User }) {
+    await this.authService.disable2Fa(request.user);
   }
 
   @ApiBody({ type: File })
@@ -198,7 +201,7 @@ export class AuthController {
   @Post('upload-avatar')
   uploadAvatar(
     @UploadedFile() file: Express.Multer.File,
-    @Req() request: Request,
+    @Req() request: { user: User },
   ) {
     if (!file || !file.originalname) {
       return {
@@ -220,7 +223,7 @@ export class AuthController {
   @UseGuards(TwoFaVerificationGuard)
   @UseGuards(JwtAuthenticationGuard)
   @Get('me')
-  me(@Req() request: Request) {
+  me(@Req() request: { user: User }) {
     return request.user;
   }
 }

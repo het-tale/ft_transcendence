@@ -3,7 +3,7 @@ import { Request } from 'express';
 import { DMService } from './dm.service';
 import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
 import { EmailConfirmationGuard } from 'src/guards/email-confirmation.guard';
-import { TwoFaVerificationGuard } from 'src/guards/twofa-verification.guard';
+import { TwoFaVerificationGuard } from 'src/guards/two-fa-verification.guard';
 
 @Controller('chat')
 @UseGuards(EmailConfirmationGuard)

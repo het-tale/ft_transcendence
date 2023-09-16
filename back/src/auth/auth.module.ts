@@ -19,4 +19,4 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, Strategy42],
 })
-export class authModule {}
+export class AuthModule {}

@@ -2,8 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-42';
+import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { generateRandomAvatar } from 'src/utils/generateRandomAvatar';
+import { exclude } from 'src/utils';
+import { generateRandomAvatar } from 'src/utils/generate-random-avatar';
 
 @Injectable()
 export class Strategy42 extends PassportStrategy(Strategy, '42') {
@@ -26,27 +28,13 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
     accessToken: string,
     refreshToken: string,
     profile: Profile,
-  ): Promise<any> {
+  ): Promise<User> {
     console.log('validate called');
     const { login, email } = profile;
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
-    let payload: {
-      id: number;
-      createdAt: Date;
-      updatedAt: Date;
-      email: string;
-      IsEmailConfirmed: boolean;
-      username: string;
-      hash: string;
-      avatar: string;
-      login: string;
-      isPasswordRequired: boolean;
-      is2faEnabled: boolean;
-      twofaSecret: string;
-      userId: number;
-    };
+    let payload: User;
     if (!user) {
       const avatar = generateRandomAvatar(this.configService);
       payload = await this.prisma.user.create({
@@ -54,7 +42,7 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
           email,
           login,
           isPasswordRequired: true,
-          IsEmailConfirmed: true,
+          isEmailConfirmed: true,
           avatar,
         },
       });
@@ -63,11 +51,13 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
         where: { email },
         data: {
           login,
-          IsEmailConfirmed: true,
+          isEmailConfirmed: true,
         },
       });
     }
+    if (payload.hash !== null) payload = exclude(payload, 'hash');
+    if (payload.twoFaSecret !== null) payload = exclude(payload, 'twoFaSecret');
 
-    return { payload, accessToken };
+    return payload;
   }
 }

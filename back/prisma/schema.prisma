@@ -13,18 +13,18 @@ model User {
   updatedAt DateTime @updatedAt
 
   email              String  @unique
-  IsEmailConfirmed   Boolean @default(false)
+  isEmailConfirmed   Boolean @default(false)
   username           String? @unique
   hash               String?
   avatar             String
   login              String? @unique
   isPasswordRequired Boolean @default(false)
   is2faEnabled       Boolean @default(false)
-  twofaSecret        String?
+  twoFaSecret        String?
   is2faVerified      Boolean @default(false)
 
-  friend User? @relation("FriendList", fields: [userId], references: [id])
-  userId Int?
+  friend User? @relation("FriendList", fields: [friendId], references: [id])
+  friendId Int?
 
   sentMessages        Message[]     @relation("SentMessages")
   receivedMessages    Message[]     @relation("ReceivedMessages")
@@ -33,7 +33,7 @@ model User {
   friends             User[]        @relation("FriendList")
   matchHistoryA       Match[]       @relation("MatchPlayerA")
   matchHistoryB       Match[]       @relation("MatchPlayerB")
-  winningmatches      Match[]       @relation("MatchWinner")
+  winningMatches      Match[]       @relation("MatchWinner")
   achievements        Achievement[] @relation("Achiever")
   channels            Channel[]     @relation("ChannelParticipants")
   ownedChannels       Channel[]     @relation("ChannelOwner")
