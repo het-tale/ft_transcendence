@@ -3,6 +3,8 @@ import {
   Controller,
   Get,
   Header,
+  HttpException,
+  HttpStatus,
   Post,
   Req,
   Res,
@@ -11,7 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { SecurityService } from './security.service';
-import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { EmailConfirmationGuard } from 'src/guards/email-confirmation.guard';
 import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
 import { User } from '@prisma/client';
@@ -26,6 +28,7 @@ import { TwoFaVerificationGuard } from 'src/guards/two-fa-verification.guard';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+@ApiTags('Authentication protected routes')
 @ApiBearerAuth()
 @UseGuards(EmailConfirmationGuard)
 @UseGuards(JwtAuthenticationGuard)
@@ -83,11 +86,10 @@ export class SecurityController {
     @Req() request: { user: User },
   ) {
     if (!file || !file.originalname) {
-      return {
-        message: 'Please provide a file named "file" in the request.',
-        error: 'Bad Request',
-        statusCode: 400,
-      };
+      throw new HttpException(
+        'Please provide a file named "file" in the request.',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     return this.securityService.uploadAvatar(file, request.user);

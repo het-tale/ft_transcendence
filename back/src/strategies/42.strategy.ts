@@ -55,8 +55,8 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
         },
       });
     }
-    if (payload.hash !== null) payload = exclude(payload, 'hash');
-    if (payload.twoFaSecret !== null) payload = exclude(payload, 'twoFaSecret');
+    payload = exclude(payload, 'hash');
+    payload = exclude(payload, 'twoFaSecret');
 
     return payload;
   }

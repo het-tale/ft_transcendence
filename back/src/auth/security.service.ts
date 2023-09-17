@@ -22,7 +22,7 @@ export class SecurityService {
     private cloudinary: CloudinaryService,
   ) {}
   async generate2Fa(user: User, res: Response) {
-    if (user.is2faEnabled)
+    if (user.is2FaEnabled)
       throw new HttpException('2fa already enabled', HttpStatus.FORBIDDEN);
     const secret = await this.tw.generateSecret();
     await this.prisma.user.update({
@@ -35,7 +35,11 @@ export class SecurityService {
 
     return qr;
   }
-  async enable2Fa(code: string, user: User) {
+  async enable2Fa(code: string, jwtUser: User) {
+    //get the user from the db to check if 2fa is enabled because the 2fa secret is not returned by the jwt strategy for security reasons
+    const user = await this.prisma.user.findUnique({
+      where: { email: jwtUser.email },
+    });
     if (user.twoFaSecret === null)
       throw new HttpException('generate 2fa qr code', HttpStatus.FORBIDDEN);
     const isValid = await this.tw.verifyToken(code, user.twoFaSecret);
@@ -44,13 +48,13 @@ export class SecurityService {
     await this.prisma.user.update({
       where: { email: user.email },
       data: {
-        is2faEnabled: true,
-        is2faVerified: true,
+        is2FaEnabled: true,
+        is2FaVerified: true,
       },
     });
   }
   async verify2Fa(token: string, user: User) {
-    if (!user.is2faEnabled)
+    if (!user.is2FaEnabled)
       throw new HttpException('2fa not enabled', HttpStatus.FORBIDDEN);
     console.log(user.twoFaSecret);
     console.log(token);
@@ -59,18 +63,18 @@ export class SecurityService {
     await this.prisma.user.update({
       where: { email: user.email },
       data: {
-        is2faVerified: true,
+        is2FaVerified: true,
       },
     });
   }
   async disable2Fa(user: User) {
-    if (!user.is2faEnabled)
+    if (!user.is2FaEnabled)
       throw new HttpException('2fa already disabled', HttpStatus.FORBIDDEN);
     await this.prisma.user.update({
       where: { email: user.email },
       data: {
-        is2faEnabled: false,
-        is2faVerified: false,
+        is2FaEnabled: false,
+        is2FaVerified: false,
         twoFaSecret: null,
       },
     });

@@ -24,8 +24,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       throw new UnauthorizedException('verify your 2fa first');
     }
 
-    if (user.hash !== null) user = exclude(user, 'hash');
-    if (user.twoFaSecret !== null) user = exclude(user, 'twoFaSecret');
+    user = exclude(user, 'hash');
+    user = exclude(user, 'twoFaSecret');
 
     return user;
   }

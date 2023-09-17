@@ -19,9 +19,9 @@ model User {
   avatar             String
   login              String? @unique
   isPasswordRequired Boolean @default(false)
-  is2faEnabled       Boolean @default(false)
+  is2FaEnabled       Boolean @default(false)
   twoFaSecret        String?
-  is2faVerified      Boolean @default(false)
+  is2FaVerified      Boolean @default(false)
 
   friend User? @relation("FriendList", fields: [friendId], references: [id])
   friendId Int?
