@@ -42,11 +42,11 @@ const Game: React.FC = () => {
 	
 	const setupSocket = () => {
 	console.log('connecting');
-	setSocket(io('http://10.14.3.6:3001', {
+	setSocket(io('http://localhost:3001', {
 		withCredentials: true,
 		forceNew: true,
 		timeout: 100000,
-		transports: ['websocket']
+		transports: ['websocket'],
 	}));
 	};
 
@@ -84,17 +84,6 @@ const handleMouseMove = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
     }
   };
 
-
-// const  updateGameElements = () => {
-	// if (padd)
-	// 	updateDivPosition(divRefs.playerPaddle.current, padd);
-	// if (otherpad)
-	// 	updateDivPosition(divRefs.otherPaddle.current, otherpad);
-	// if(ball)
-	// 	updateDivPosition(divRefs.ball.current, ball);	
-// };
-
-
 useEffectOnce(() => {
 	setupSocket();
 	return () => {
@@ -111,19 +100,16 @@ useEffect(() => {
 }, [init]);
 
 useEffect(() => {
-	// updateGameElements();
 	if (padd)
 		updateDivPosition(divRefs.playerPaddle.current, padd);
 }, [padd]);
 
 useEffect(() => {
-	// updateGameElements();
 	if (ball)
 		updateDivPosition(divRefs.ball.current, ball);
 }, [ball]);
 
 useEffect(() => {
-	// updateGameElements();
 	if (otherpad)
 		updateDivPosition(divRefs.otherPaddle.current, otherpad);
 }, [otherpad]);
@@ -134,7 +120,7 @@ return (
 	  <div ref={divRefs.playerPaddle} className="paddle player-paddle"></div>
 	  <div ref={divRefs.otherPaddle} className="paddle other-paddle"></div>
 	  <div ref={divRefs.ball} className="ball"></div>
-	  {/* Add other game elements as <div> elements */}
+	  {/* Add other game elements as <div> elements, i didn't need it but i my */}
 	</div>
   </center>
 	);

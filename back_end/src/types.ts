@@ -22,7 +22,8 @@ export interface GameData {
 	otherScore: number;
 	rounds: number;
 	id: number;
-	padlleSpeed: number;
+	containerHeight: number;
+	containerWidth: number;
 }
 
 export interface Player {
@@ -48,24 +49,24 @@ export class Room {
 	}
 
 export const defaultPaddle: Paddle = {
-	x: 600 - 20,
-	y: 300 / 2 - 50 / 2,
-	width: 5,
-	height: 50,
+	x: 980,
+	y: 500,
+	width: 8,
+	height: 80,
 	dy: 3,
 };
 
 export const defaultOtherPaddle: Paddle = {
-	x: 10,
-	y: 300 / 2 - 50 / 2,
-	width: 5,
-	height: 50,
+	x: 20,
+	y: 500,
+	width: 8,
+	height: 80,
 	dy: 3,
 };
 
 export const defaultBall: Ball = {
-	x: 600 / 2,
-	y: 300 / 2,
+	x: 500,
+	y: 300,
 	radius: 5,
 	dx: 3,
 	dy: 3,

@@ -24,8 +24,9 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 	private gameActive = false;
 
 	onModuleInit() {
-		// Initialize env variables if nedded not socket
 	}
+	private containerWidth = 1000;
+	private containerHeight = 600;
 
 	handleConnection(client: any) {
 		console.log('Client connected: ', client.id);
@@ -47,6 +48,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 		room.players.push({ id: room.players.length + 1, socket: client, paddle: defaultPaddle, room: room.roomName, score: 0 });
 		client.join(room.roomName);
 		client.emit('JoinRoom', room.roomName);
+
 		let gamedata: GameData = {
 			playerpad: defaultPaddle,
 			otherpad: defaultOtherPaddle,
@@ -55,7 +57,8 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 			otherScore: 0,
 			rounds: ROUNDS,
 			id: room.players.length + 1,
-			padlleSpeed: 3,
+			containerHeight: this.containerHeight,
+			containerWidth: this.containerWidth,
 		};
 		client.emit('InitGame', gamedata);
 	}
@@ -72,7 +75,8 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 			otherScore: 0,
 			rounds: ROUNDS,
 			id: room.players.length + 1,
-			padlleSpeed: 3,
+			containerHeight: this.containerHeight,
+			containerWidth: this.containerWidth,
 		};
 		client.emit('InitGame', gamedata);
 		this.server.to(room.roomName).emit('StartGame', room.roomName);
@@ -108,19 +112,19 @@ private findRoomByPlayerSocket(socket: any): Room | undefined {
 	  const room = this.findRoomByPlayerSocket(client);
 	
 	  if (room) {
-		const player = room.players.find((p) => p.socket === client);
-	
-		if (player) {
-		  // Receive relative mouse position and container height from the client
-		  const relativeMouseY = eventData.relativeMouseY;
-		  const containerHeight = eventData.containerHeight;
-	
-		  // Calculate the new paddle position based on the received data
-		  const minY = 0;
-		  const maxY = containerHeight - player.paddle.height;
-		  player.paddle.y = Math.max(minY, Math.min(relativeMouseY, maxY));
+			const player = room.players.find((p) => p.socket === client);
+		
+			if (player) {
+				// Receive relative mouse position and container height from the client
+				const relativeMouseYPercentage = eventData.relativeMouseY;
+				const containerHeight = eventData.containerHeight;
+			
+				// Calculate the new paddle position based on the received data
+				const minY = 0;
+				const maxY = containerHeight - player.paddle.height;
+				player.paddle.y = (relativeMouseYPercentage / 100) * containerHeight;
+			}
 		}
-	  }
 	}
 
 private startGame(room: Room) {
@@ -153,10 +157,10 @@ private updateGame(room: Room) {
 	room.ball.x += room.ball.dx;
 	room.ball.y += room.ball.dy;
 	// Check for collisions with top and bottom walls
-	if (room.ball.y - room.ball.radius < 0 || room.ball.y + room.ball.radius > 300) {
+	if (room.ball.y - room.ball.radius < 0 || room.ball.y + room.ball.radius > 600) {
 		room.ball.dy *= -1; // Reverse the vertical velocity of the ball
 	}
-	colision(room);
+	colision(room, this.containerWidth, this.containerHeight);
 	if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL)
 	{
 		room.lastspeedincrease = Date.now();
