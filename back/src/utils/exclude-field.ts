@@ -1,7 +1,5 @@
-export function exclude<User, Field extends keyof User>(
-  user: User,
-  field: keyof User,
-): Omit<User, Field> {
+import { User } from '@prisma/client';
+export function exclude(user: User, field: keyof User): User {
   const res = Object.entries(user)
     .map(([key, val]: [string, string]) =>
       key !== field

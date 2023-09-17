@@ -4,8 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { patchNestJsSwagger } from 'nestjs-zod';
 
 async function bootstrap() {
-
-  patchNestJsSwagger()
+  patchNestJsSwagger();
   const app = await NestFactory.create(AppModule);
   app.enableCors({
     origin: 'http://localhost:3000',

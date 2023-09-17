@@ -1,1 +1,1 @@
-export * from './excludeField';
+export * from './exclude-field';

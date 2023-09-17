@@ -23,7 +23,7 @@ function Login() {
               Authorization: 'Bearer ' + localStorage.getItem('token'),
             },
           });
-          if (response.status === 200 && response.data.IsEmailConfirmed === true) {
+          if (response.status === 200 && response.data.isEmailConfirmed === true) {
             return true;
           } else {
             return false;

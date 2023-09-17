@@ -13,7 +13,8 @@ import { ApiUnauthorizedResponse } from '@nestjs/swagger';
 export class EmailConfirmationGuard implements CanActivate {
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    if (!request.user?.IsEmailConfirmed) {
+    if (!request.user?.isEmailConfirmed) {
+      console.log('email not confirmed');
       throw new UnauthorizedException('Confirm your email first');
     }
 
