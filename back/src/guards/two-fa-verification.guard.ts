@@ -13,7 +13,7 @@ import { ApiUnauthorizedResponse } from '@nestjs/swagger';
 export class TwoFaVerificationGuard implements CanActivate {
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    if (request.user?.is2faEnabled && !request.user?.is2faVerified) {
+    if (request.user?.is2FaEnabled && !request.user?.is2FaVerified) {
       throw new UnauthorizedException('verify your 2fa first');
     }
 

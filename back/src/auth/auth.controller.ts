@@ -20,22 +20,12 @@ import {
   TforgetPasswordData,
 } from 'src/dto';
 import { AuthService } from './auth.service';
-import { EmailConfirmationGuard } from '../guards/email-confirmation.guard';
-import JwtAuthenticationGuard from '../guards/jwt-authentication.guard';
 import _42AuthenticationGuard from '../guards/42-authentication.guard';
-import { TwoFaVerificationGuard } from '../guards/two-fa-verification.guard';
 import { Response } from 'express';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiQuery,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
+import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
-@ApiTags('Authentication')
+@ApiTags('Authentication non protected routes')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -70,6 +60,7 @@ export class AuthController {
   @Get('42/callback')
   async signin42Callback(@Req() request: { user: User }, @Res() res: Response) {
     const token = await this.authService.signin42(request.user);
+    console.log(token);
 
     return res.redirect(`http://localhost:3000/signin42?token=${token}`);
   }
