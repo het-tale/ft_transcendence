@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Message } from '@prisma/client';
+import { Message, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -51,7 +51,7 @@ export class DMService {
       },
     });
   }
-  async getDmConversation(username: string, user) {
+  async getDmConversation(username: string, user: User) {
     const user1 = await this.prisma.user.findUnique({
       where: {
         username,

@@ -23,7 +23,7 @@ model User {
   twoFaSecret        String?
   is2FaVerified      Boolean @default(false)
 
-  friend User? @relation("FriendList", fields: [friendId], references: [id])
+  friend   User? @relation("FriendList", fields: [friendId], references: [id])
   friendId Int?
 
   sentMessages        Message[]     @relation("SentMessages")
@@ -38,6 +38,8 @@ model User {
   channels            Channel[]     @relation("ChannelParticipants")
   ownedChannels       Channel[]     @relation("ChannelOwner")
   adminChannels       Channel[]     @relation("ChannelAdmins")
+  bannedChannels      Channel[]     @relation("ChannelBanned")
+  mutedChannels       Channel[]     @relation("ChannelMuted")
 }
 
 model Invitation {
@@ -105,6 +107,8 @@ model Channel {
   messages     Message[] @relation("ChannelMessages")
   participants User[]    @relation("ChannelParticipants")
   admins       User[]    @relation("ChannelAdmins")
+  banned       User[]    @relation("ChannelBanned")
+  muted        User[]    @relation("ChannelMuted")
 }
 
 model Achievement {
