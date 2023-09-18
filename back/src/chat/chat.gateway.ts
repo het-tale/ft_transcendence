@@ -40,11 +40,21 @@ export class ChatGateway
       const offlineMessages = await this.dmService.getOfflineMessages(user.id);
       const offlineInvitations =
         await this.channelService.getOfflineInvitations(user.id);
+      const offlineChannelMessages =
+        await this.channelService.getOfflineChannelMessages(user.id);
+      if (offlineChannelMessages.length > 0) {
+        client.emit('offline channel messages', offlineChannelMessages);
+        this.channelService.deleteOfflineChannelMessages(
+          offlineChannelMessages,
+        );
+      }
       if (offlineMessages.length > 0) {
         client.emit('offline messages', offlineMessages);
+        this.dmService.changeOfflineMessagesStatus(offlineMessages);
       }
       if (offlineInvitations.length > 0) {
         client.emit('offline invitations', offlineInvitations);
+        this.channelService.changeOfflineInvitationsStatus(offlineInvitations);
       }
     } catch (err) {
       client.disconnect();
@@ -153,6 +163,13 @@ export class ChatGateway
         message: data.message,
         date: sentAt,
       });
+      await this.channelService.createOfflineChannelMessages(
+        this.connectedUsers,
+        data.room,
+        data.message,
+        sender.username,
+        sentAt,
+      );
       this.io.to(data.room).emit('roomMessage', {
         from: sender.username,
         message: data.message,
@@ -219,6 +236,52 @@ export class ChatGateway
       }
     } catch (err) {
       return { event: 'roomInvitationError', error: err.message };
+    }
+  }
+  @SubscribeMessage('leaveRoom')
+  async leaveRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.leaveChannel(data.room, clientUsername);
+      client.leave(data.room);
+      this.io.to(data.room).emit('roomLeft', `${clientUsername} left`);
+    } catch (err) {
+      return { event: 'roomLeaveError', error: err.message };
+    }
+  }
+  @SubscribeMessage('cickUser')
+  async kickUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.kickUser(
+        data.room,
+        clientUsername,
+        data.target,
+      );
+      client.leave(data.room);
+      this.io.to(data.room).emit('userKicked', `${data.user} kicked`);
+    } catch (err) {
+      return { event: 'userKickError', error: err.message };
+    }
+  }
+  @SubscribeMessage('addAdmin')
+  async addAdmin(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.addAdmin(
+        data.room,
+        clientUsername,
+        data.target,
+      );
+      this.io.to(data.room).emit('adminAdded', `${data.target} is admin now`);
+    } catch (err) {
+      return { event: 'adminAddError', error: err.message };
     }
   }
 }
