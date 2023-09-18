@@ -251,7 +251,7 @@ export class ChatGateway
       return { event: 'roomLeaveError', error: err.message };
     }
   }
-  @SubscribeMessage('cickUser')
+  @SubscribeMessage('kickUser')
   async kickUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
     try {
       const clientUsername = this.connectedUsers.find(
@@ -282,6 +282,65 @@ export class ChatGateway
       this.io.to(data.room).emit('adminAdded', `${data.target} is admin now`);
     } catch (err) {
       return { event: 'adminAddError', error: err.message };
+    }
+  }
+  @SubscribeMessage('banneUser')
+  async banneUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.banUser(data.room, clientUsername, data.target);
+      client.leave(data.room);
+      this.io.to(data.room).emit('userBanned', `${data.target} banned`);
+    } catch (err) {
+      return { event: 'userBanError', error: err.message };
+    }
+  }
+  @SubscribeMessage('unbanUser')
+  async unbanUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.unbanUser(
+        data.room,
+        clientUsername,
+        data.target,
+      );
+      this.io.to(data.room).emit('userUnbanned', `${data.target} unbanned`);
+    } catch (err) {
+      return { event: 'userUnbanError', error: err.message };
+    }
+  }
+  @SubscribeMessage('muteUser')
+  async muteUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    const clientUsername = this.connectedUsers.find(
+      (user) => user.clientId === client.id,
+    ).username;
+    await this.channelService.muteUser(data.room, clientUsername, data.target);
+    this.io.to(data.room).emit('userMuted', `${data.target} muted`);
+  }
+  catch(err: Error) {
+    return { event: 'userMuteError', error: err.message };
+  }
+  @SubscribeMessage('unmuteUser')
+  async unmuteUser(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.unmuteUser(
+        data.room,
+        clientUsername,
+        data.target,
+      );
+      this.io.to(data.room).emit('userUnmuted', `${data.target} unmuted`);
+    } catch (err) {
+      return { event: 'userUnmuteError', error: err.message };
     }
   }
 }

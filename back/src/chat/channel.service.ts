@@ -6,16 +6,24 @@ import { Invitation, Message, User } from '@prisma/client';
 @Injectable()
 export class ChannelService {
   constructor(private prisma: PrismaService) {}
-  async getChannelMessages(channelName: string) {
+  async getChannelMessages(channelName: string, user: User) {
     const channel = await this.prisma.channel.findUnique({
       where: {
         name: channelName,
       },
       include: {
         messages: true,
+        banned: true,
+        participants: true,
       },
     });
-    if (!channel) {
+    const isParticipant = channel.participants.some(
+      (participant) => participant.id === user.id,
+    );
+    const isBanned = channel.banned.some(
+      (bannedUser) => bannedUser.id === user.id,
+    );
+    if (!channel || isBanned || !isParticipant) {
       throw new HttpException('channel not found', HttpStatus.NOT_FOUND);
     }
 
@@ -294,9 +302,27 @@ export class ChannelService {
       where: {
         name: data.room,
       },
+      include: {
+        participants: true,
+        muted: true,
+        banned: true,
+      },
     });
     if (!user || !channel) {
       throw new Error('user or channel not found');
+    }
+    const isParticipant = channel.participants.some(
+      (participant) => participant.id === user.id,
+    );
+    if (!isParticipant) {
+      throw new Error('user is not a participant');
+    }
+    const isMuted = channel.muted.some((mutedUser) => mutedUser.id === user.id);
+    const isBanned = channel.banned.some(
+      (bannedUser) => bannedUser.id === user.id,
+    );
+    if (isMuted || isBanned) {
+      throw new Error('user is muted or banned');
     }
     await this.prisma.message.create({
       data: {
@@ -486,6 +512,176 @@ export class ChannelService {
         admins: {
           connect: {
             id: newAdmin.id,
+          },
+        },
+      },
+    });
+  }
+  async banUser(
+    channelName: string,
+    clientUsername: string,
+    bannedUsername: string,
+  ) {
+    const { target, channel } = await this.checkInput(
+      channelName,
+      clientUsername,
+      bannedUsername,
+    );
+    const isParticipant = channel.participants.some(
+      (participant) => participant.id === target.id,
+    );
+    if (!isParticipant) {
+      throw new Error('user is not a participant');
+    }
+    const isBanned = channel.banned.some(
+      (bannedUser) => bannedUser.id === target.id,
+    );
+    if (isBanned) {
+      throw new Error('user is already banned');
+    }
+    await this.prisma.channel.update({
+      where: {
+        id: channel.id,
+      },
+      data: {
+        banned: {
+          connect: {
+            id: target.id,
+          },
+        },
+        participants: {
+          disconnect: {
+            id: target.id,
+          },
+        },
+      },
+    });
+  }
+  async checkInput(
+    clientUsername: string,
+    channelName: string,
+    targetUsername: string,
+  ) {
+    {
+      const client = await this.prisma.user.findUnique({
+        where: {
+          username: clientUsername,
+        },
+      });
+      const target = await this.prisma.user.findUnique({
+        where: {
+          username: targetUsername,
+        },
+      });
+      const channel = await this.prisma.channel.findUnique({
+        where: {
+          name: channelName,
+        },
+        include: {
+          participants: true,
+          banned: true,
+          admins: true,
+          muted: true,
+        },
+      });
+      if (!channel || !client || !target) {
+        throw new Error('channel not found or user not found');
+      }
+      const isAdmin = channel.admins.some((admin) => admin.id === client.id);
+      if (!isAdmin) {
+        throw new Error('user is not an admin');
+      }
+
+      return { target, channel };
+    }
+  }
+  async unbanUser(
+    clientUsername: string,
+    channelName: string,
+    targetUsername: string,
+  ) {
+    const { target, channel } = await this.checkInput(
+      clientUsername,
+      channelName,
+      targetUsername,
+    );
+    const isBanned = channel.banned.some(
+      (bannedUser) => bannedUser.id === target.id,
+    );
+    if (!isBanned) {
+      throw new Error('user is not banned');
+    }
+    await this.prisma.channel.update({
+      where: {
+        id: channel.id,
+      },
+      data: {
+        banned: {
+          disconnect: {
+            id: target.id,
+          },
+        },
+        participants: {
+          connect: {
+            id: target.id,
+          },
+        },
+      },
+    });
+  }
+  async muteUser(
+    clientUsername: string,
+    channelName: string,
+    targetUsername: string,
+  ) {
+    const { target, channel } = await this.checkInput(
+      clientUsername,
+      channelName,
+      targetUsername,
+    );
+    const ismuted = channel.muted.some(
+      (mutedUser) => mutedUser.id === target.id,
+    );
+    if (!ismuted) {
+      throw new Error('user is not muted');
+    }
+    await this.prisma.channel.update({
+      where: {
+        id: channel.id,
+      },
+      data: {
+        muted: {
+          connect: {
+            id: target.id,
+          },
+        },
+      },
+    });
+  }
+  async unmuteUser(
+    clientUsername: string,
+    channelName: string,
+    targetUsername: string,
+  ) {
+    const { target, channel } = await this.checkInput(
+      clientUsername,
+      channelName,
+      targetUsername,
+    );
+    const ismuted = channel.muted.some(
+      (mutedUser) => mutedUser.id === target.id,
+    );
+    if (ismuted) {
+      throw new Error('user is not muted');
+    }
+    await this.prisma.channel.update({
+      where: {
+        id: channel.id,
+      },
+      data: {
+        muted: {
+          disconnect: {
+            id: target.id,
           },
         },
       },
