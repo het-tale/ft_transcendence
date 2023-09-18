@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { Message } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -100,6 +101,9 @@ export class DMService {
       },
     });
 
+    return messages;
+  }
+  async changeOfflineMessagesStatus(messages: Message[]) {
     const updatedMessages = await Promise.all(
       messages.map(async (message) => {
         const updatedMessage = await this.prisma.message.update({

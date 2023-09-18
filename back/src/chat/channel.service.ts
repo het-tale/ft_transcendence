@@ -1,10 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
+import { Invitation, Message, User } from '@prisma/client';
 
 @Injectable()
 export class ChannelService {
   constructor(private prisma: PrismaService) {}
+  async getChannelMessages(channelName: string) {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: {
+        messages: true,
+      },
+    });
+    if (!channel) {
+      throw new HttpException('channel not found', HttpStatus.NOT_FOUND);
+    }
+
+    return channel.messages;
+  }
   async getOfflineInvitations(userId: number) {
     const invitations = await this.prisma.invitation.findMany({
       where: {
@@ -15,6 +31,11 @@ export class ChannelService {
         createdAt: 'asc',
       },
     });
+
+    return invitations;
+  }
+
+  async changeOfflineInvitationsStatus(invitations: Invitation[]) {
     const updatedConversations = await Promise.all(
       invitations.map(async (message) => {
         const updatedConversation = await this.prisma.message.update({
@@ -31,6 +52,35 @@ export class ChannelService {
     );
 
     return updatedConversations;
+  }
+  async getOfflineChannelMessages(userId: number) {
+    const messages = await this.prisma.message.findMany({
+      where: {
+        receiverId: userId,
+        isDM: false,
+        isPending: true,
+      },
+      orderBy: {
+        sentAt: 'asc',
+      },
+    });
+
+    return messages;
+  }
+  async deleteOfflineChannelMessages(messages: Message[]) {
+    const deletedMessages = await Promise.all(
+      messages.map(async (message) => {
+        const deletedMessage = await this.prisma.message.delete({
+          where: {
+            id: message.id,
+          },
+        });
+
+        return deletedMessage;
+      }),
+    );
+
+    return deletedMessages;
   }
   async saveInvitation(data: {
     sender: string;
@@ -255,6 +305,189 @@ export class ChannelService {
         channelId: channel.id,
         sentAt: data.date,
         isDM: false,
+      },
+    });
+
+    return channel.id;
+  }
+  async createOfflineChannelMessages(
+    connected: { clientId: string; username: string }[],
+    channelName: string,
+    message: string,
+    senderUsername: string,
+    sentAt: Date,
+  ) {
+    const sender = await this.prisma.user.findUnique({
+      where: {
+        username: senderUsername,
+      },
+    });
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: {
+        participants: true,
+      },
+    });
+
+    if (!channel) {
+      throw new Error('Channel not found');
+    }
+
+    const participants = channel.participants;
+
+    await Promise.all(
+      participants.map(async (participant: User) => {
+        const user = connected.find(
+          (user) => user.username === participant.username,
+        );
+
+        if (!user) {
+          await this.prisma.message.create({
+            data: {
+              content: message,
+              senderId: sender.id,
+              channelId: channel.id,
+              isPending: true,
+              isDM: false,
+              sentAt,
+              receiverId: participant.id,
+            },
+          });
+        }
+      }),
+    );
+  }
+  async leaveChannel(channelName: string, username: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
+    if (!user) {
+      throw new Error('user not found');
+    }
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: {
+        participants: true,
+      },
+    });
+    if (!channel) {
+      throw new Error('channel not found');
+    }
+    const isUserInChannel = channel.participants.some(
+      (participant) => participant.id === user.id,
+    );
+    if (!isUserInChannel) {
+      throw new Error('user is not in the channel');
+    }
+    await this.prisma.channel.update({
+      where: {
+        name: channelName,
+      },
+      data: {
+        participants: {
+          disconnect: {
+            id: user.id,
+          },
+        },
+      },
+    });
+  }
+  async kickUser(
+    channelName: string,
+    kickerUsername: string,
+    kickedUsername: string,
+  ) {
+    const kicker = await this.prisma.user.findUnique({
+      where: {
+        username: kickerUsername,
+      },
+    });
+    const kicked = await this.prisma.user.findUnique({
+      where: {
+        username: kickedUsername,
+      },
+    });
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: {
+        participants: true,
+        admins: true,
+      },
+    });
+    if (!kicker || !kicked || !channel) {
+      throw new Error('user or channel not found');
+    }
+    const isAdmin = channel.admins.some((admin) => admin.id === kicker.id);
+    if (!isAdmin) {
+      throw new Error('user is not an admin');
+    }
+    if (kicked.id === channel.ownerId) {
+      throw new Error('cannot kick owner');
+    }
+    await this.prisma.channel.update({
+      where: {
+        id: channel.id,
+      },
+      data: {
+        participants: {
+          disconnect: {
+            id: kicked.id,
+          },
+        },
+      },
+    });
+  }
+  async addAdmin(
+    channelName: string,
+    adderUsername: string,
+    newAdminUsername: string,
+  ) {
+    const adder = await this.prisma.user.findUnique({
+      where: {
+        username: adderUsername,
+      },
+    });
+    const newAdmin = await this.prisma.user.findUnique({
+      where: {
+        username: newAdminUsername,
+      },
+    });
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: {
+        participants: true,
+        admins: true,
+      },
+    });
+    if (!adder || !newAdmin || !channel) {
+      throw new Error('user or channel not found');
+    }
+    const isAdderAdmin = channel.admins.some((admin) => admin.id === adder.id);
+    if (!isAdderAdmin) {
+      throw new Error('user is not an admin');
+    }
+    const isAdmin = channel.admins.some((admin) => admin.id === newAdmin.id);
+    if (isAdmin) throw new Error('user is already admin');
+    await this.prisma.channel.update({
+      where: {
+        id: channel.id,
+      },
+      data: {
+        admins: {
+          connect: {
+            id: newAdmin.id,
+          },
+        },
       },
     });
   }
