@@ -1,0 +1,19 @@
+:root {
+    --fakhti : #a435f0;
+    --white: #fff;
+    --black: #000;
+    --corona: 'Krona One';
+    /* font-family: var(--corona); */
+    font-family: sans-serif;
+}
+
+.container {
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    border-radius: 10px;
+    height: 95vh;
+    background-color: #fafafa;
+    padding: 20px;
+}
+.delimiter {
+    width: 12px;
+}
