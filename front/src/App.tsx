@@ -20,34 +20,45 @@ import TFactorAuth from "./pages/TFactorAuth";
 import GenerateQr from "./pages/GenerateQr";
 import Logout from "./components/Logout";
 import RequireNoAuth from "./components/RequireNoAuth";
+import ProtectPassword from "./components/ProtectPassword";
+import ProtectConfirmation from "./components/ProtectConfirmation";
+import Dms from "./pages/Chat/Dms";
+import Test from "./pages/Test";
+import Testt from "./pages/Test";
+import TabsTest from "./pages/Chat/Tabs";
+import { createTheme, ThemeProvider } from '@mui/material';
+import Chat from "./pages/Chat/Chat";
+import MessageUser from "./pages/Chat/MessageUser";
 
+const theme = createTheme();
 
 function App() {
   return (
-    <div>
+    <ThemeProvider theme={theme}>
     <BrowserRouter>
       <Routes>
+        {/**----------------Auth Pages ----------------------*/}
         <Route path="/" element={
-          <RequireNoAuth>
+          // <RequireNoAuth>
             <Landing/>
-          </RequireNoAuth>
+          // </RequireNoAuth>
         }>
           
         </Route>
           <Route path="login" element={
-            <RequireNoAuth>
+            // <RequireNoAuth>
                 <Login />
-            </RequireNoAuth>
+            // </RequireNoAuth>
           }/>
           <Route path="register" element={
-            <RequireNoAuth>
+            // <RequireNoAuth>
               <Register />
-            </RequireNoAuth>
+            // </RequireNoAuth>
           }/>
         <Route path="home" element={
-            <ProtectRoutes>
+            // <ProtectRoutes>
               <Home/>
-             </ProtectRoutes>
+            //  </ProtectRoutes>
           }>
         </Route>
           <Route path="complete-profile" element={
@@ -55,23 +66,43 @@ function App() {
               <CompleteProfile />
             </ProtectRoutes>
           } />
-          <Route path="confirm-email" element={<ConfirmEmail />}/>
+          <Route path="confirm-email" element={
+            // <ProtectConfirmation>
+              <ConfirmEmail />
+          // </ProtectConfirmation>
+          }/>
           <Route path="forgot-password" element={
-            <RequireNoAuth>
+            // <RequireNoAuth>
               <ForgotPassword />
-            </RequireNoAuth>}/>
+            // </RequireNoAuth>}/>
+          }/>
           <Route path="change-password" element={<ResetPassword />}/>
           <Route path="redirect-email" element={<EmailRedirection />}/>
-          <Route path="resend-email" element={<ResendEmail />}/>
-          {/* <Route path="test" element={<ProtectRoutes />}/> */}
-          <Route path="set-password" element={<SetPassword />}/>
+          <Route path="resend-email" element={
+            // <ProtectConfirmation>
+          <ResendEmail />
+          // </ProtectConfirmation>
+          }/>
+          <Route path="set-password" element=
+          {
+            <ProtectPassword>
+          <SetPassword />
+          </ProtectPassword>
+        }
+          />
           <Route path="signin42" element={<Signin42 />}/>
           <Route path="2fa" element={<TFactorAuth />}/>
           <Route path="generate-qr" element={<GenerateQr />}/>
-          <Route path="/logout" element={<Logout />}/>
+          <Route path="logout" element={<Logout />}/>
+          
+          {/**----------------Chat Pages ----------------------*/}
+          <Route path="chat">
+            <Route path="dms" element={<Dms />}/>
+          </Route>
+          <Route path="testt" element={<MessageUser profile='/assets/het-tale.jpg' name="Hasnaa" message="hello"/>}/>
       </Routes>
     </BrowserRouter>
-    </div>
+    </ThemeProvider>
   );
 }
 

@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { BsBoxArrowLeft } from "react-icons/bs";
 const Sidebar = () => {
     return (
         <aside>
@@ -6,10 +8,12 @@ const Sidebar = () => {
             <i className="fa fa-home fa-lg" aria-hidden="true"></i>
           Home
         </a>
-        <a href="">
+        <Link to="/chat/dms">
+        {/* <a href=""> */}
           <i className="fa fa-send fa-lg" aria-hidden="true"></i>
           Chat
-        </a>
+        {/* </a> */}
+        </Link>
         <a href="">
           <i className="fa fa-gamepad fa-lg" aria-hidden="true"></i>
           Play
@@ -19,8 +23,10 @@ const Sidebar = () => {
           Profile
         </a>
         <a href="" id="more">
-          <i className="fa fa-gear fa-lg" aria-hidden="true"></i>
-          More
+          {/* <i className="fa fa-gear fa-lg" aria-hidden="true"></i> */}
+          <BsBoxArrowLeft className='fa'/>
+          Log Out
+          
         </a>
       </aside>
     );

@@ -189,3 +189,12 @@ input:focus {
   width: 17px;
   margin-top: 3px;
 }
+
+.tabDesign {
+  width: 100%;
+  background-color: #EEEEFF;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  right: 0px;
+  height: 60px;
+}
