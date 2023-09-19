@@ -1,4 +1,5 @@
 
+import { Ball, Paddle } from "../../Game.types";
 import { MySocket } from "./Game";
 
 function ListenOnSocket(ws: MySocket, setPadd: any, setBall: any, setOtherpad: any) {
@@ -22,7 +23,7 @@ function ListenOnSocket(ws: MySocket, setPadd: any, setBall: any, setOtherpad: a
 		console.log('StartGame on room', message); // print the start game message	
 	});
 
-	ws.on('UPDATE', (update: any) => {
+	ws.on('UPDATE', (update: {ball: Ball, paddle: Paddle, otherPaddle: Paddle}) => {
 		setPadd(update.paddle);
 		setBall(update.ball);
 		setOtherpad(update.otherPaddle );

@@ -30,6 +30,9 @@ interface GameData {
 	rounds: number | null;
 	id: number | null;
 	padlleSpeed: number | null;
+	containerHeight: number | null;
+	containerWidth: number | null;
+
 }
 
 export type { ctxrend, cnvelem, ballstat, paddlestat , GameData};

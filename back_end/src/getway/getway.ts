@@ -7,21 +7,19 @@ import {
 	WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { interval} from 'rxjs';
+import { interval } from 'rxjs';
 import { colision } from './colision';
-import { GameData, Room, defaultBall, defaultOtherPaddle, defaultPaddle, ROUNDS, INTERVAL, INCREASE_SPEED, SPEED_INTERVAL } from '../types';
-import { ClientRequest } from 'http';
+import { GameData, Room, Ball, Paddle, INTERVAL, INCREASE_SPEED, SPEED_INTERVAL, Player } from '../types';
 
+const MAX_ANGLE_CHANGE = Math.PI / 4;
 @WebSocketGateway()
 @Injectable()
 export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
 
-//	 private players: Player[] = [];
+	//	 private players: Player[] = [];
 	private rooms: Map<string, Room> = new Map();
-	private gameInterval: any;
-	private gameActive = false;
 
 	onModuleInit() {
 	}
@@ -31,94 +29,94 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 	handleConnection(client: any) {
 		console.log('Client connected: ', client.id);
 
-		let room : Room | undefined;
-
-	for (const existRoom of this.rooms.values()) {
-		if (existRoom.players.length === 1) {
-			room = existRoom;
-			break;
+		let exist: boolean = false;
+		const padd = new Paddle(980, 500, 8, 80, 3);
+		const otherpadd = new Paddle(20, 500, 8, 80, 3);
+		
+		for (const existRoom of this.rooms.values()) {
+			console.log('at room ', existRoom.roomName, ' players ', existRoom.players.length);
+			if (existRoom.players.length === 1) {
+				exist = true;
+				const playerNumber = existRoom.players.length + 1;
+				const player = new Player(playerNumber, client, padd, existRoom.roomName, 0);
+			existRoom.players.push(player);
+			client.join(existRoom.roomName);
+			const gamedata: GameData = {
+				playerpad: player.paddle,
+				otherpad: playerNumber === 1 ? otherpadd : padd,
+				ball: existRoom.ball,
+				playerScore: 0,
+				otherScore: 0,
+				id: playerNumber,
+				containerHeight: this.containerHeight,
+				containerWidth: this.containerWidth,
+			}
+			client.emit('JoinRoom', existRoom.roomName);
+			client.emit('InitGame', gamedata);
+			this.server.to(existRoom.roomName).emit('StartGame', existRoom.roomName);
+			this.startGame(existRoom);
+				break;
+			}
 		}
-	}
-
-	if (!room) {
-		room = new Room();
-		room.roomName = Math.random().toString(36).substring(7);
-		room.lastspeedincrease = Date.now();
-		this.rooms.set(room.roomName, room);
-		room.players.push({ id: room.players.length + 1, socket: client, paddle: defaultPaddle, room: room.roomName, score: 0 });
-		client.join(room.roomName);
-		client.emit('JoinRoom', room.roomName);
-
-		let gamedata: GameData = {
-			playerpad: defaultPaddle,
-			otherpad: defaultOtherPaddle,
-			ball: defaultBall,
-			playerScore: 0,
-			otherScore: 0,
-			rounds: ROUNDS,
-			id: room.players.length + 1,
-			containerHeight: this.containerHeight,
-			containerWidth: this.containerWidth,
-		};
-		client.emit('InitGame', gamedata);
-	}
-	else
-	{
-		room.players.push({ id: room.players.length + 1, socket: client, paddle: defaultOtherPaddle, room: room.roomName , score: 0});
-		client.join(room.roomName);
-		client.emit('JoinRoom', room.roomName);
-		const gamedata: GameData = {
-			playerpad: defaultOtherPaddle,
-			otherpad: defaultPaddle,
-			ball: defaultBall,
-			playerScore: 0,
-			otherScore: 0,
-			rounds: ROUNDS,
-			id: room.players.length + 1,
-			containerHeight: this.containerHeight,
-			containerWidth: this.containerWidth,
-		};
-		client.emit('InitGame', gamedata);
-		this.server.to(room.roomName).emit('StartGame', room.roomName);
-		this.startGame(room);
-		this.gameActive = true;
-	}
-}
-
-handleDisconnect(client: any) {
-	const room = this.findRoomByPlayerSocket(client);
+		
+		if (!exist) {
+			let room = new Room(Math.random().toString(36).substring(7));
+			this.rooms.set(room.roomName, room);
+			console.log('new room created with name ', room.roomName)
+			const playerNumber = room.players.length + 1;
+			const player = new Player(playerNumber, client, otherpadd, room.roomName, 0);
+			room.players.push(player);
+			client.join(room.roomName);
 	
-	if (room) {
-		room.players = room.players.filter((player) => player.socket !== client);
-		if (room.players.length < 2) {
-			this.stopGame(room);
-			this.gameActive = false;
-			this.rooms.delete(room.roomName); // Remove the room if it's empty
+			const gamedata: GameData = {
+				playerpad: player.paddle,
+				otherpad: playerNumber === 1 ? otherpadd : padd,
+				ball: room.ball,
+				playerScore: 0,
+				otherScore: 0,
+				id: playerNumber,
+				containerHeight: this.containerHeight,
+				containerWidth: this.containerWidth,
+			}
+			client.emit('JoinRoom', room.roomName);
+			client.emit('InitGame', gamedata);
 		}
 	}
-}
 
-private findRoomByPlayerSocket(socket: any): Room | undefined {
-	for (const room of this.rooms.values()) {
-		const playerInRoom = room.players.find((player) => player.socket === socket);
-		if (playerInRoom) {
-			return room;
+	handleDisconnect(client: any) {
+		const room = this.findRoomByPlayerSocket(client);
+
+		if (room) {
+			room.players = room.players.filter((player) => player.socket !== client);
+			if (room.players.length < 2) {
+				this.stopGame(room);
+				room.gameActive = false;
+				this.rooms.delete(room.roomName); // Remove the room if it's empty
+			}
 		}
 	}
-	return undefined;
-}
+
+	private findRoomByPlayerSocket(socket: any): Room | undefined {
+		for (const room of this.rooms.values()) {
+			const playerInRoom = room.players.find((player) => player.socket === socket);
+			if (playerInRoom) {
+				return room;
+			}
+		}
+		return undefined;
+	}
 	@SubscribeMessage('UpdatePlayerPaddle')
 	handleUpdatePaddle(client: any, eventData: any) {
-	  const room = this.findRoomByPlayerSocket(client);
-	
-	  if (room) {
+		const room = this.findRoomByPlayerSocket(client);
+
+		if (room) {
 			const player = room.players.find((p) => p.socket === client);
-		
+
 			if (player) {
 				// Receive relative mouse position and container height from the client
 				const relativeMouseYPercentage = eventData.relativeMouseY;
 				const containerHeight = eventData.containerHeight;
-			
+
 				// Calculate the new paddle position based on the received data
 				const minY = 0;
 				const maxY = containerHeight - player.paddle.height;
@@ -127,45 +125,47 @@ private findRoomByPlayerSocket(socket: any): Room | undefined {
 		}
 	}
 
-private startGame(room: Room) {
-	console.log("startGame");
-	if (!this.gameActive) {
-		this.gameActive = true;
-		this.gameInterval = interval(INTERVAL).subscribe(() => {
-			if (!this.gameActive) {
-			this.gameInterval.unsubscribe();
-			return;
-			}
-			this.updateGame(room);
-		});
+	private startGame(room: Room) {
+		console.log("startGame");
+		if (!room.gameActive) {
+			room.gameActive = true;
+			room.gameInterval = interval(INTERVAL).subscribe(() => {
+				if (!room.gameActive) {
+					room.gameInterval.unsubscribe();
+					return;
+				}
+				this.updateGame(room);
+			});
+		}
 	}
-}
 
-private stopGame(room: Room) {
-	console.log("stopGame");
-	//dell room from map
-	this.rooms.delete(room.roomName);
-	this.gameActive = false;
-	if (this.gameInterval){
-		this.rooms
-		this.gameInterval.unsubscribe();
+	private stopGame(room: Room) {
+		console.log("stopGame");
+		//dell room from map
+		this.rooms.delete(room.roomName);
+		room.gameActive = false;
+		if (room.gameInterval) {
+			// this.rooms
+			room.gameInterval.unsubscribe();
+		}
 	}
-}
 
-private updateGame(room: Room) {
-	// Calculate the new ball position based on its current position and velocity
-	room.ball.x += room.ball.dx;
-	room.ball.y += room.ball.dy;
-	// Check for collisions with top and bottom walls
-	if (room.ball.y - room.ball.radius < 0 || room.ball.y + room.ball.radius > 600) {
-		room.ball.dy *= -1; // Reverse the vertical velocity of the ball
+	private updateGame(room: Room) {
+		// Calculate the new ball position based on its current position and velocity
+		if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL) {
+			room.lastspeedincrease = Date.now();
+			room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
+			room.ball.dy += room.ball.dy > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
+			
+		}
+		// room.ball.setXY(room.ball.x + room.ball.dx, room.ball.y + room.ball.dy);
+		room.ball.x += room.ball.dx
+		room.ball.y += room.ball.dy
+		// Check for collisions with top and bottom walls
+		if (room.ball.y - room.ball.radius < 0 || room.ball.y + room.ball.radius > 600) {
+			// Reverse the vertical velocity of the ball
+			room.ball.dy *= -1
+		}
+		colision(room);
 	}
-	colision(room, this.containerWidth, this.containerHeight);
-	if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL)
-	{
-		room.lastspeedincrease = Date.now();
-		room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
-		room.ball.dy += room.ball.dy > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
-	}
-}
 }
