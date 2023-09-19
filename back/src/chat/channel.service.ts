@@ -385,7 +385,7 @@ export class ChannelService {
       }),
     );
   }
-  async leaveChannel(channelName: string, username: string) {
+  async leaveChannel(data, username: string) {
     const user = await this.prisma.user.findUnique({
       where: {
         username,
@@ -396,7 +396,7 @@ export class ChannelService {
     }
     const channel = await this.prisma.channel.findUnique({
       where: {
-        name: channelName,
+        name: data.room,
       },
       include: {
         participants: true,
@@ -411,9 +411,42 @@ export class ChannelService {
     if (!isUserInChannel) {
       throw new Error('user is not in the channel');
     }
+    const isOwner = channel.ownerId === user.id;
+    if (isOwner && !data.newOwner && channel.participants.length > 1) {
+      throw new Error('new owner not specified');
+    }
+    if (isOwner) {
+      const newOwner = await this.prisma.user.findUnique({
+        where: {
+          username: data.newOwner,
+        },
+      });
+      if (!newOwner) {
+        throw new Error('new owner not found');
+      }
+      const ifNewOwnerIsParticipant = channel.participants.some(
+        (participant) => participant.id === newOwner.id,
+      );
+      if (!ifNewOwnerIsParticipant) {
+        throw new Error('new owner is not a participant');
+      }
+      await this.prisma.channel.update({
+        where: {
+          name: data.room,
+        },
+        data: {
+          ownerId: newOwner.id,
+          admins: {
+            connect: {
+              id: newOwner.id,
+            },
+          },
+        },
+      });
+    }
     await this.prisma.channel.update({
       where: {
-        name: channelName,
+        name: data.room,
       },
       data: {
         participants: {
@@ -686,5 +719,40 @@ export class ChannelService {
         },
       },
     });
+  }
+  async getMyChannelsList(user: User) {
+    const channels = await this.prisma.channel.findMany({
+      where: {
+        participants: {
+          some: {
+            id: user.id,
+          },
+        },
+      },
+    });
+
+    return channels;
+  }
+  async getBrowseChannelsList(user: User) {
+    //return all public or protected channels that the user is not in
+    const channels = await this.prisma.channel.findMany({
+      where: {
+        type: {
+          in: ['public', 'protected'],
+        },
+        participants: {
+          none: {
+            id: user.id,
+          },
+        },
+        banned: {
+          none: {
+            id: user.id,
+          },
+        },
+      },
+    });
+
+    return channels;
   }
 }
