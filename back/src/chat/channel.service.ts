@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
 import { Invitation, Message, User } from '@prisma/client';
+import { Server } from 'socket.io';
 
 @Injectable()
 export class ChannelService {
@@ -45,10 +46,10 @@ export class ChannelService {
 
   async changeOfflineInvitationsStatus(invitations: Invitation[]) {
     const updatedConversations = await Promise.all(
-      invitations.map(async (message) => {
+      invitations.map(async (invitation) => {
         const updatedConversation = await this.prisma.message.update({
           where: {
-            id: message.id,
+            id: invitation.id,
           },
           data: {
             isPending: false,
@@ -135,7 +136,7 @@ export class ChannelService {
       where: {
         senderId: userSender.id,
         receiverId: userReceiver.id,
-        room: data.room,
+        channelId: room.id,
         status: 'pending', // Check for pending invitations
       },
     });
@@ -148,7 +149,7 @@ export class ChannelService {
       data: {
         senderId: userSender.id,
         receiverId: userReceiver.id,
-        room: data.room,
+        channelId: room.id,
         isReceiverOnline: data.isReceiverOnline,
       },
     });
@@ -246,6 +247,11 @@ export class ChannelService {
         username: data.sender,
       },
     });
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: data.room,
+      },
+    });
     if (!userReceiver || !userSender) {
       throw new Error('user not found');
     }
@@ -254,7 +260,7 @@ export class ChannelService {
       where: {
         senderId: userSender.id,
         receiverId: userReceiver.id,
-        room: data.room,
+        channelId: channel.id,
       },
     });
     if (!invitation) {
@@ -754,5 +760,118 @@ export class ChannelService {
     });
 
     return channels;
+  }
+  async deleteChannel(
+    channelName: string,
+    username: string,
+    io: Server,
+    connected: { clientId: string; username: string }[],
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
+    if (!user) {
+      throw new Error('user not found');
+    }
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: {
+        participants: true,
+      },
+    });
+    if (!channel) {
+      throw new Error('channel not found');
+    }
+    const isOwner = channel.ownerId === user.id;
+    if (!isOwner) {
+      throw new Error('user is not the owner');
+    }
+    await this.prisma.message.deleteMany({
+      where: {
+        channelId: channel.id,
+      },
+    });
+    await this.prisma.invitation.deleteMany({
+      where: {
+        channelId: channel.id,
+      },
+    });
+    await this.prisma.channel.update({
+      where: {
+        id: channel.id,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
+    await Promise.all(
+      channel.participants.map(async (participant) => {
+        const user = connected.find(
+          (user) => user.username === participant.username,
+        );
+        const socket = io.of('/').sockets[user.clientId];
+        if (user) {
+          socket.leave(channelName);
+          await this.prisma.channel.update({
+            where: {
+              id: channel.id,
+            },
+            data: {
+              participants: {
+                disconnect: {
+                  id: participant.id,
+                },
+              },
+            },
+          });
+        }
+      }),
+    );
+  }
+  async getOfflineDeletedChannels(userId: number) {
+    return await this.prisma.channel.findMany({
+      where: {
+        participants: {
+          some: {
+            id: userId,
+          },
+        },
+        isDeleted: true,
+      },
+      include: {
+        participants: true,
+      },
+    });
+  }
+  async leaveOfflineDetetedChannels(offlineChannels, userId: number) {
+    return await Promise.all(
+      offlineChannels.map(async (channel) => {
+        if (channel.participants.length === 1) {
+          await this.prisma.channel.delete({
+            where: {
+              id: channel.id,
+            },
+          });
+
+          return;
+        }
+        await this.prisma.channel.update({
+          where: {
+            id: channel.id,
+          },
+          data: {
+            participants: {
+              disconnect: {
+                id: userId,
+              },
+            },
+          },
+        });
+      }),
+    );
   }
 }
