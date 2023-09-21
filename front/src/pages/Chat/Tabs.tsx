@@ -37,7 +37,7 @@ const TabsTest = () => {
           <div className='content'>
               {tabs.map((tab, i) =>
                   <div key={i}>
-                      {currentTab === `${tab.id}` && <div><p>{tab.content}</p></div>}
+                      {currentTab === `${tab.id}` && <div>{tab.content}</div>}
                   </div>
               )}
           </div>

@@ -22,6 +22,7 @@ const MessageUser = ({profile , name, message} : MessageUserProps) => {
         p={2}
         h={"100px"}
         w={"100%"}
+        style={{boxShadow: 'none'}}
 >
   <Image
     objectFit='cover'
