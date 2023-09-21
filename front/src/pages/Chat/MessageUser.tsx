@@ -8,6 +8,7 @@ interface MessageUserProps {
   profile: string;
   name: string;
   message: string;
+  children?: React.ReactNode;
 }
 
 const MessageUser = ({profile , name, message} : MessageUserProps) => {

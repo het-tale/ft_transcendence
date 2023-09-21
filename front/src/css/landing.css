@@ -198,3 +198,14 @@ input:focus {
   right: 0px;
   height: 60px;
 }
+
+.newChannel {
+  width: 50%;
+  height: 60px;
+  background-color: var(--fakhti);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  right: 0px;
+  margin-left: 10px;
+  color: var(--white);
+}
