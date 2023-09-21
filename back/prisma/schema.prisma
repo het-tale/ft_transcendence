@@ -23,21 +23,41 @@ model User {
   twoFaSecret        String?
   is2FaVerified      Boolean @default(false)
 
-  friend User? @relation("FriendList", fields: [friendId], references: [id])
-  friendId Int?
+  sentMessages           Message[]       @relation("SentMessages")
+  receivedMessages       Message[]       @relation("ReceivedMessages")
+  sentInvitations        Invitation[]    @relation("InvitationSender")
+  sentFriendRequests     FriendRequest[] @relation("FriendRequestSender")
+  receivedInvitations    Invitation[]    @relation("InvitationReceiver")
+  receivedFriendRequests FriendRequest[] @relation("FriendRequestReceiver")
+  dmsList                User[]          @relation("DMSList")
+  dmsListof              User[]          @relation("DMSList")
+  friends                User[]          @relation("FriendList")
+  friendof               User[]          @relation("FriendList")
+  blocked                User[]          @relation("Blocked")
+  blockedBy              User[]          @relation("Blocked")
+  matchHistoryA          Match[]         @relation("MatchPlayerA")
+  matchHistoryB          Match[]         @relation("MatchPlayerB")
+  winningMatches         Match[]         @relation("MatchWinner")
+  achievements           Achievement[]   @relation("Achiever")
+  channels               Channel[]       @relation("ChannelParticipants")
+  ownedChannels          Channel[]       @relation("ChannelOwner")
+  adminChannels          Channel[]       @relation("ChannelAdmins")
+  bannedChannels         Channel[]       @relation("ChannelBanned")
+  mutedChannels          Channel[]       @relation("ChannelMuted")
+}
 
-  sentMessages        Message[]     @relation("SentMessages")
-  receivedMessages    Message[]     @relation("ReceivedMessages")
-  sentInvitations     Invitation[]  @relation("InvitationSender")
-  receivedInvitations Invitation[]  @relation("InvitationReceiver")
-  friends             User[]        @relation("FriendList")
-  matchHistoryA       Match[]       @relation("MatchPlayerA")
-  matchHistoryB       Match[]       @relation("MatchPlayerB")
-  winningMatches      Match[]       @relation("MatchWinner")
-  achievements        Achievement[] @relation("Achiever")
-  channels            Channel[]     @relation("ChannelParticipants")
-  ownedChannels       Channel[]     @relation("ChannelOwner")
-  adminChannels       Channel[]     @relation("ChannelAdmins")
+model FriendRequest {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  status           String  @default("pending")
+  isReceiverOnline Boolean @default(false)
+
+  sender     User @relation("FriendRequestSender", fields: [senderId], references: [id])
+  senderId   Int
+  receiver   User @relation("FriendRequestReceiver", fields: [receiverId], references: [id])
+  receiverId Int
 }
 
 model Invitation {
@@ -45,14 +65,15 @@ model Invitation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  room             String
   isReceiverOnline Boolean @default(false)
   status           String  @default("pending")
 
-  sender     User @relation("InvitationSender", fields: [senderId], references: [id])
+  sender     User    @relation("InvitationSender", fields: [senderId], references: [id])
   senderId   Int
-  receiver   User @relation("InvitationReceiver", fields: [receiverId], references: [id])
+  receiver   User    @relation("InvitationReceiver", fields: [receiverId], references: [id])
   receiverId Int
+  channel    Channel @relation("ChannelInvitations", fields: [channelId], references: [id])
+  channelId  Int
 }
 
 model Message {
@@ -96,15 +117,19 @@ model Channel {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name    String  @unique
-  type    String  @default("public")
-  hash    String?
-  owner   User    @relation("ChannelOwner", fields: [ownerId], references: [id])
-  ownerId Int
+  name      String  @unique
+  type      String  @default("public")
+  hash      String?
+  owner     User    @relation("ChannelOwner", fields: [ownerId], references: [id])
+  ownerId   Int
+  isDeleted Boolean @default(false)
 
-  messages     Message[] @relation("ChannelMessages")
-  participants User[]    @relation("ChannelParticipants")
-  admins       User[]    @relation("ChannelAdmins")
+  messages     Message[]    @relation("ChannelMessages")
+  participants User[]       @relation("ChannelParticipants")
+  invitaions   Invitation[] @relation("ChannelInvitations")
+  admins       User[]       @relation("ChannelAdmins")
+  banned       User[]       @relation("ChannelBanned")
+  muted        User[]       @relation("ChannelMuted")
 }
 
 model Achievement {

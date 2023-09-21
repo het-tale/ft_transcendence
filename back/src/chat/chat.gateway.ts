@@ -12,6 +12,7 @@ import {
 import { Socket, Server } from 'socket.io';
 import { DMService } from './dm.service';
 import { ChannelService } from './channel.service';
+import { FriendsService } from './friends.service';
 
 @WebSocketGateway()
 export class ChatGateway
@@ -20,6 +21,7 @@ export class ChatGateway
   constructor(
     private dmService: DMService,
     private channelService: ChannelService,
+    private friendsService: FriendsService,
   ) {}
   @WebSocketServer() io: Server;
   private connectedUsers: { clientId: string; username: string }[] = [];
@@ -37,14 +39,42 @@ export class ChatGateway
         username: user.username,
       });
       console.log(this.connectedUsers);
+      const offlineChannels =
+        await this.channelService.getOfflineDeletedChannels(user.id);
+      if (offlineChannels.length > 0) {
+        const socket = this.io.sockets[client.id];
+        offlineChannels.forEach((channel) => {
+          socket.leave(channel.name);
+        });
+        this.channelService.leaveOfflineDetetedChannels(
+          offlineChannels,
+          user.id,
+        );
+      }
       const offlineMessages = await this.dmService.getOfflineMessages(user.id);
       const offlineInvitations =
         await this.channelService.getOfflineInvitations(user.id);
+      const offlineChannelMessages =
+        await this.channelService.getOfflineChannelMessages(user.id);
+      const offlineFriendRequests =
+        await this.dmService.getOfflineFriendRequests(user.id);
+      if (offlineChannelMessages.length > 0) {
+        client.emit('offline channel messages', offlineChannelMessages);
+        this.channelService.deleteOfflineChannelMessages(
+          offlineChannelMessages,
+        );
+      }
       if (offlineMessages.length > 0) {
         client.emit('offline messages', offlineMessages);
+        this.dmService.changeOfflineMessagesStatus(offlineMessages);
       }
       if (offlineInvitations.length > 0) {
         client.emit('offline invitations', offlineInvitations);
+        this.channelService.changeOfflineInvitationsStatus(offlineInvitations);
+      }
+      if (offlineFriendRequests.length > 0) {
+        client.emit('offline friend requests', offlineFriendRequests);
+        this.dmService.changeOfflineFriendRequestsStatus(offlineFriendRequests);
       }
     } catch (err) {
       client.disconnect();
@@ -64,7 +94,6 @@ export class ChatGateway
     @MessageBody() data: any,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(`client is heeeeeere ${client.id}`);
     const sender = this.connectedUsers.find(
       (user) => user.clientId === client.id,
     );
@@ -73,13 +102,7 @@ export class ChatGateway
     );
     const sentAt = new Date();
     let isPending = true;
-    if (receiver) {
-      isPending = false;
-      this.io.to(receiver.clientId).emit('private message', {
-        from: sender.username,
-        message: data.message,
-      });
-    }
+    if (receiver) isPending = false;
     await this.dmService.saveMessage({
       sender: sender.username,
       receiver: receiver.username,
@@ -87,6 +110,12 @@ export class ChatGateway
       date: sentAt,
       isPending,
     });
+    if (receiver) {
+      this.io.to(receiver.clientId).emit('private message', {
+        from: sender.username,
+        message: data.message,
+      });
+    }
   }
   @SubscribeMessage('createRoom')
   async createRoom(
@@ -153,6 +182,13 @@ export class ChatGateway
         message: data.message,
         date: sentAt,
       });
+      await this.channelService.createOfflineChannelMessages(
+        this.connectedUsers,
+        data.room,
+        data.message,
+        sender.username,
+        sentAt,
+      );
       this.io.to(data.room).emit('roomMessage', {
         from: sender.username,
         message: data.message,
@@ -219,6 +255,234 @@ export class ChatGateway
       }
     } catch (err) {
       return { event: 'roomInvitationError', error: err.message };
+    }
+  }
+  @SubscribeMessage('leaveRoom')
+  async leaveRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.leaveChannel(data, clientUsername);
+      client.leave(data.room);
+      this.io.to(data.room).emit('roomLeft', `${clientUsername} left`);
+    } catch (err) {
+      return { event: 'roomLeaveError', error: err.message };
+    }
+  }
+  @SubscribeMessage('kickUser')
+  async kickUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.kickUser(
+        data.room,
+        clientUsername,
+        data.target,
+      );
+      client.leave(data.room);
+      this.io.to(data.room).emit('userKicked', `${data.user} kicked`);
+    } catch (err) {
+      return { event: 'userKickError', error: err.message };
+    }
+  }
+  @SubscribeMessage('addAdmin')
+  async addAdmin(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.addAdmin(
+        data.room,
+        clientUsername,
+        data.target,
+      );
+      this.io.to(data.room).emit('adminAdded', `${data.target} is admin now`);
+    } catch (err) {
+      return { event: 'adminAddError', error: err.message };
+    }
+  }
+  @SubscribeMessage('banneUser')
+  async banneUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.banUser(data.room, clientUsername, data.target);
+      client.leave(data.room);
+      this.io.to(data.room).emit('userBanned', `${data.target} banned`);
+    } catch (err) {
+      return { event: 'userBanError', error: err.message };
+    }
+  }
+  @SubscribeMessage('unbanUser')
+  async unbanUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.unbanUser(
+        data.room,
+        clientUsername,
+        data.target,
+      );
+      this.io.to(data.room).emit('userUnbanned', `${data.target} unbanned`);
+    } catch (err) {
+      return { event: 'userUnbanError', error: err.message };
+    }
+  }
+  @SubscribeMessage('muteUser')
+  async muteUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    const clientUsername = this.connectedUsers.find(
+      (user) => user.clientId === client.id,
+    ).username;
+    await this.channelService.muteUser(data.room, clientUsername, data.target);
+    this.io.to(data.room).emit('userMuted', `${data.target} muted`);
+  }
+  catch(err: Error) {
+    return { event: 'userMuteError', error: err.message };
+  }
+  @SubscribeMessage('unmuteUser')
+  async unmuteUser(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.unmuteUser(
+        data.room,
+        clientUsername,
+        data.target,
+      );
+      this.io.to(data.room).emit('userUnmuted', `${data.target} unmuted`);
+    } catch (err) {
+      return { event: 'userUnmuteError', error: err.message };
+    }
+  }
+  @SubscribeMessage('sendFriendRequest')
+  async addFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      const receiver = this.connectedUsers.find(
+        (user) => user.username === data.target,
+      );
+      let isOnline = false;
+      if (receiver) isOnline = true;
+      await this.dmService.sendFriendRequest(
+        clientUsername,
+        data.target,
+        isOnline,
+      );
+      if (receiver) {
+        this.io.to(receiver.clientId).emit('frienRequest', {
+          from: clientUsername,
+        });
+      }
+    } catch (err) {
+      return { event: 'friendRequestError', error: err.message };
+    }
+  }
+  @SubscribeMessage('handleFriendRequest')
+  async handleFriendRequest(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      const receiver = this.connectedUsers.find(
+        (user) => user.username === data.from,
+      );
+      let isOnline = false;
+      if (receiver) isOnline = true;
+      await this.friendsService.handleFriendRequest(
+        clientUsername,
+        data.from,
+        data.isAccepted,
+        isOnline,
+      );
+      if (receiver) {
+        if (data.isAccepted) {
+          this.io.to(receiver.clientId).emit('friendRequestAccepted', {
+            from: clientUsername,
+          });
+        } else {
+          this.io.to(receiver.clientId).emit('friendRequestDeclined', {
+            from: clientUsername,
+          });
+        }
+      }
+    } catch (err) {
+      return { event: 'friendRequestError', error: err.message };
+    }
+  }
+  @SubscribeMessage('removeFriend')
+  async removeFriend(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.friendsService.removeFriend(clientUsername, data.target);
+      this.io.to(client.id).emit('friendRemoved');
+    } catch (err) {
+      return { event: 'friendRemoveError', error: err.message };
+    }
+  }
+  @SubscribeMessage('blockUser')
+  async blockUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.friendsService.blockUser(clientUsername, data.target);
+      this.io.to(client.id).emit('userBlocked');
+    } catch (err) {
+      return { event: 'userBlockError', error: err.message };
+    }
+  }
+  @SubscribeMessage('unblockUser')
+  async unblockUser(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.friendsService.unblockUser(clientUsername, data.target);
+      this.io.to(client.id).emit('userUnblocked');
+    } catch (err) {
+      return { event: 'userUnblockError', error: err.message };
+    }
+  }
+  @SubscribeMessage('deleteChannel')
+  async deleteChannel(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      this.io.to(data.room).emit('channelDeleted');
+      await this.channelService.deleteChannel(
+        data.room,
+        clientUsername,
+        this.io,
+        this.connectedUsers,
+      );
+      //leave room for all online participants
+    } catch (err) {
+      return { event: 'channelDeleteError', error: err.message };
     }
   }
 }
