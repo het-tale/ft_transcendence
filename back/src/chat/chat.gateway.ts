@@ -39,6 +39,18 @@ export class ChatGateway
         username: user.username,
       });
       console.log(this.connectedUsers);
+      const offlineChannels =
+        await this.channelService.getOfflineDeletedChannels(user.id);
+      if (offlineChannels.length > 0) {
+        const socket = this.io.sockets[client.id];
+        offlineChannels.forEach((channel) => {
+          socket.leave(channel.name);
+        });
+        this.channelService.leaveOfflineDetetedChannels(
+          offlineChannels,
+          user.id,
+        );
+      }
       const offlineMessages = await this.dmService.getOfflineMessages(user.id);
       const offlineInvitations =
         await this.channelService.getOfflineInvitations(user.id);
@@ -452,5 +464,25 @@ export class ChatGateway
       return { event: 'userUnblockError', error: err.message };
     }
   }
-  //todo: add delete channel
+  @SubscribeMessage('deleteChannel')
+  async deleteChannel(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      this.io.to(data.room).emit('channelDeleted');
+      await this.channelService.deleteChannel(
+        data.room,
+        clientUsername,
+        this.io,
+        this.connectedUsers,
+      );
+      //leave room for all online participants
+    } catch (err) {
+      return { event: 'channelDeleteError', error: err.message };
+    }
+  }
 }
