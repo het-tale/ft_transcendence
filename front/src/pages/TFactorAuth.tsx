@@ -5,7 +5,7 @@ const TFactorAuth = () => {
     return (
         <div>
             <h1>TFactorAuth</h1>
-            <ModalUi />
+            {/* <ModalUi /> */}
         </div>
     );
 }

@@ -29,12 +29,13 @@ import TabsTest from "./pages/Chat/Tabs";
 import { createTheme, ThemeProvider } from '@mui/material';
 import Chat from "./pages/Chat/Chat";
 import MessageUser from "./pages/Chat/MessageUser";
+import RightSide from "./pages/Chat/RightSide";
 
 const theme = createTheme();
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
+    // <ThemeProvider theme={theme}>
     <BrowserRouter>
       <Routes>
         {/**----------------Auth Pages ----------------------*/}
@@ -98,11 +99,12 @@ function App() {
           {/**----------------Chat Pages ----------------------*/}
           <Route path="chat">
             <Route path="dms" element={<Dms />}/>
+            <Route path="rightSide" element={<RightSide />}/>
           </Route>
-          <Route path="testt" element={<MessageUser profile='/assets/het-tale.jpg' name="Hasnaa" message="hello"/>}/>
+          <Route path="testt" element={<Testt/>}/>
       </Routes>
     </BrowserRouter>
-    </ThemeProvider>
+    // </ThemeProvider>
   );
 }
 
