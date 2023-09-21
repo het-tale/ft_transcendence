@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { FriendRequest, Message, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -33,14 +34,36 @@ export class DMService {
       where: {
         username: data.sender,
       },
+      include: {
+        blocked: true,
+        dmsList: true,
+      },
     });
     const user2 = await this.prisma.user.findUnique({
       where: {
         username: data.receiver,
       },
+      include: {
+        blocked: true,
+      },
     });
+    if (!user1 || !user2) {
+      throw new HttpException('user not found', 404);
+    }
+    const receiverIsBlocked = user1.blocked.find(
+      (blockedUser) => blockedUser.id === user2.id,
+    );
+    if (receiverIsBlocked) {
+      throw new Error('You blocked this user unblock to send messages.');
+    }
+    const senderIsBlocked = user2.blocked.find(
+      (blockedUser) => blockedUser.id === user1.id,
+    );
+    if (senderIsBlocked) {
+      throw new Error('You are blocked by this user.');
+    }
 
-    return await this.prisma.message.create({
+    await this.prisma.message.create({
       data: {
         content: data.message,
         sentAt: data.date,
@@ -49,8 +72,25 @@ export class DMService {
         isPending: data.isPending,
       },
     });
+    const existingDmUser = user1.dmsList.find(
+      (dm) => dm.username === user2.username,
+    );
+    if (!existingDmUser) {
+      await this.prisma.user.update({
+        where: {
+          id: user1.id,
+        },
+        data: {
+          dmsList: {
+            connect: {
+              id: user2.id,
+            },
+          },
+        },
+      });
+    }
   }
-  async getDmConversation(username: string, user) {
+  async getDmConversation(username: string, user: User) {
     const user1 = await this.prisma.user.findUnique({
       where: {
         username,
@@ -100,6 +140,9 @@ export class DMService {
       },
     });
 
+    return messages;
+  }
+  async changeOfflineMessagesStatus(messages: Message[]) {
     const updatedMessages = await Promise.all(
       messages.map(async (message) => {
         const updatedMessage = await this.prisma.message.update({
@@ -116,5 +159,84 @@ export class DMService {
     );
 
     return updatedMessages;
+  }
+  async sendFriendRequest(
+    clientUsername: string,
+    receiverUsername: string,
+    isOnline: boolean,
+  ) {
+    const client = await this.prisma.user.findUnique({
+      where: {
+        username: clientUsername,
+      },
+    });
+    const receiver = await this.prisma.user.findUnique({
+      where: {
+        username: receiverUsername,
+      },
+    });
+    if (!client || !receiver) {
+      throw new Error('User not found.');
+    }
+    const existingFriendRequest = await this.prisma.friendRequest.findFirst({
+      where: {
+        senderId: client.id,
+        receiverId: receiver.id,
+        status: 'pending',
+      },
+    });
+
+    if (existingFriendRequest) {
+      throw new Error('A pending friend request already exists.');
+    }
+
+    return await this.prisma.friendRequest.create({
+      data: {
+        senderId: client.id,
+        receiverId: receiver.id,
+        status: 'pending',
+        isReceiverOnline: isOnline,
+      },
+    });
+  }
+  async getOfflineFriendRequests(userId: number) {
+    const friendRequests = await this.prisma.friendRequest.findMany({
+      where: {
+        receiverId: userId,
+        isReceiverOnline: false,
+      },
+    });
+
+    return friendRequests;
+  }
+  async changeOfflineFriendRequestsStatus(friendRequests: FriendRequest[]) {
+    const updatedFriendRequests = await Promise.all(
+      friendRequests.map(async (friendRequest) => {
+        const updatedFriendRequest = await this.prisma.friendRequest.update({
+          where: {
+            id: friendRequest.id,
+          },
+          data: {
+            isReceiverOnline: true,
+          },
+        });
+
+        return updatedFriendRequest;
+      }),
+    );
+
+    return updatedFriendRequests;
+  }
+  async getDmsList(user: User) {
+    const dbUser = await this.prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      include: {
+        dmsList: true,
+      },
+    });
+
+    return dbUser.dmsList;
   }
 }
