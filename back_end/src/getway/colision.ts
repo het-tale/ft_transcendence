@@ -1,5 +1,5 @@
 
-import { Server } from "socket.io";
+// import { Server } from "socket.io";
 import { Room, Ball } from "../types";
 
 const MAX_ANGLE_CHANGE = Math.PI / 4;
@@ -59,16 +59,43 @@ export function colision(room: Room) {
 		// Player misses the ball
 		otherPlayer.score++;
 		room.rounds--;
-		resetBall(room.ball);
-		player.socket.emit("UPDATE SCORE", {playerScore: player.score, otherScore: otherPlayer.score, rounds: room.rounds});
-		otherPlayer.socket.emit("UPDATE SCORE", {playerScore: otherPlayer.score, otherScore: player.score, rounds: room.rounds});
+		if (room.rounds === 0) {
+			if (player.score > otherPlayer.score) {
+				player.socket.emit("GAME OVER", {winner: true});
+				otherPlayer.socket.emit("GAME OVER", {winner: false});
+			}
+			else {
+				player.socket.emit("GAME OVER", {winner: false});
+				otherPlayer.socket.emit("GAME OVER", {winner: true});
+			}
+			room.gameActive = false;
+		}
+		else {
+				resetBall(room.ball);
+				player.socket.emit("UPDATE SCORE", {playerScore: player.score, otherScore: otherPlayer.score});
+				otherPlayer.socket.emit("UPDATE SCORE", {playerScore: otherPlayer.score, otherScore: player.score});
+		}
 	} else if (room.ball.x < otherPaddle.x - otherPaddle.width) {
 		// Other player misses the ball
 		player.score++;
 		room.rounds--;
-		resetBall(room.ball);
-		player.socket.emit("UPDATE SCORE", {playerScore: player.score, otherScore: otherPlayer.score, rounds: room.rounds});
-		otherPlayer.socket.emit("UPDATE SCORE", {playerScore: otherPlayer.score, otherScore: player.score, rounds: room.rounds});
+		if (room.rounds === 0) {
+			if (player.score > otherPlayer.score) {
+				player.socket.emit("GAME OVER", {winner: true});
+				otherPlayer.socket.emit("GAME OVER", {winner: false});
+				//stop the game
+			}
+			else {
+				player.socket.emit("GAME OVER", {winner: false});
+				otherPlayer.socket.emit("GAME OVER", {winner: true});
+			}
+			room.gameActive = false;
+		}
+		else {
+			resetBall(room.ball);
+			player.socket.emit("UPDATE SCORE", {playerScore: player.score, otherScore: otherPlayer.score});
+			otherPlayer.socket.emit("UPDATE SCORE", {playerScore: otherPlayer.score, otherScore: player.score});
+		}
 	}
 	player.socket.emit("UPDATE", {
 		ball: room.ball,

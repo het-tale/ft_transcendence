@@ -6,8 +6,8 @@ type numberstate = React.Dispatch<React.SetStateAction<number>>;
 type ballstate = React.Dispatch<React.SetStateAction<Ball | null>>;
 type paddstate = React.Dispatch<React.SetStateAction<Paddle | null>>;
 
-function ListenOnSocket(socket: MySocket, setPadd: paddstate, setBall: ballstate, setOtherpad: paddstate,
-		setPlayerScore: numberstate, setOtherScore: numberstate, setRounds: numberstate) {
+function ListenOnSocket(socket: MySocket, setPadd: paddstate, setBall: ballstate,
+		setOtherpad: paddstate, setPlayerScore: numberstate, setOtherScore: numberstate ) {
 	
 	socket.on('connect', () => {
 	  console.log('connected');
@@ -33,13 +33,17 @@ function ListenOnSocket(socket: MySocket, setPadd: paddstate, setBall: ballstate
 		setBall(update.ball);
 		setOtherpad(update.otherPaddle );
 	});
-	socket.on('UPDATE SCORE', (update: {playerScore: number, otherscore: number, rounds: number}) => {
-		console.log('UPDATE SCORE', update);
+	socket.on('GAME OVER', (payload: any) => {
+		console.log('GAME OVER', payload.winner);
+		if (payload.winner)
+			alert('You win');
+		else
+			alert('You lose');
+	});
+	socket.on('UPDATE SCORE', (update: {playerScore: number, otherScore: number}) => {
 		setPlayerScore(update.playerScore);
-		setOtherScore(update.otherscore);
-		setRounds(update.rounds);
-	}
-	);
+		setOtherScore(update.otherScore);
+	});
 }
 
 export { ListenOnSocket};

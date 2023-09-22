@@ -30,7 +30,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 		console.log('Client connected: ', client.id);
 
 		let exist: boolean = false;
-		const padd = new Paddle(10, this.containerHeight / 2, 8, 80, 3);
+		const padd = new Paddle(10 , this.containerHeight / 2, 8, 80, 3);
 		const otherpadd = new Paddle(this.containerWidth - 10, this.containerHeight / 2, 8, 80, 3);
 		
 		for (const existRoom of this.rooms.values()) {
@@ -131,7 +131,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 			room.gameActive = true;
 			room.gameInterval = interval(INTERVAL).subscribe(() => {
 				if (!room.gameActive) {
-					room.gameInterval.unsubscribe();
+					this.stopGame(room);
 					return;
 				}
 				this.updateGame(room);

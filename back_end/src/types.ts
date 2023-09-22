@@ -90,6 +90,6 @@ export class Room {
 }
 
 
-export const INTERVAL = 16;
+export const INTERVAL = 16.66;
 export const INCREASE_SPEED = 0.2;
 export const SPEED_INTERVAL = 1000;

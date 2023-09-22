@@ -32,8 +32,7 @@ const Game: React.FC = () => {
 		let listning = false;
 		const [playerScore, setPlayerScore] = useState(0);
 		const [otherScore, setOtherScore] = useState(0);
-		const [rounds, setRounds] = useState(5);
-		const [id , setId] = useState<number | null>(null); // [id, setId
+		const [id , setId] = useState<number | null>(null);
 		const [padd, setPadd] = useState<Paddle | null>(null);
 		const [ball, setBall] = useState<Ball | null>(null);
 		const[otherpad, setOtherpad] = useState<Paddle | null>(null);
@@ -49,7 +48,7 @@ const Game: React.FC = () => {
 	
 	const setupSocket = () => {
 	console.log('connecting');
-	setSocket(io('http://localhost:3001', {
+	setSocket(io('http://10.14.3.6:3001', {
 		withCredentials: true,
 		forceNew: true,
 		timeout: 100000,
@@ -65,10 +64,10 @@ useEffect(() => {
 			setBall(game.ball);
 			setPadd(game.playerpad);
 			setOtherpad(game.otherpad);
+			console.log('InitGame', game.playerpad, ' other paddle ', game.otherpad);
 			setId(game.id);
 			if(game.playerScore) setPlayerScore(game.playerScore);
 			if(game.otherScore) setOtherScore(game.otherScore);
-			if(game.rounds) setRounds(game.rounds);
 			if (game.containerWidth && game.containerHeight) setDimention({ width: game.containerWidth, height: game.containerHeight});
 		});
 	}, [init, socket]);
@@ -87,7 +86,7 @@ const handleMouseMove = (event: MouseEvent) => {
 		(event: MouseEvent) => {
 			handleMouseMove(event);
 		},
-		16
+		16.66
 	  );
 
 	const setupEventListeners = () => {
@@ -99,7 +98,7 @@ const handleMouseMove = (event: MouseEvent) => {
 useEffectOnce(() => {
 	setupSocket();
 	return () => {
-		if (socket) socket.disconnect(); // Remove the canvas
+		if (socket) socket.disconnect();
 	}
 });
 
@@ -107,7 +106,7 @@ useEffect(() => {
 	if (init) setupEventListeners();
 	if (!listning && socket){
 		listning = true;
-		ListenOnSocket(socket, setPadd, setBall, setOtherpad, setPlayerScore, setOtherScore, setRounds);
+		ListenOnSocket(socket, setPadd, setBall, setOtherpad, setPlayerScore, setOtherScore);
 	}
 }, [init]);
 
@@ -131,24 +130,24 @@ return (
 		<div className="container-profile">
 			{id === 1 ? ( // Check if id is equal to 1
 				<>
-					<div className="player-profile">
-						<img src="./cat.jpg" alt="Player Profile" />
-						<div className="player-score">{playerScore}</div>
-					</div>
 					<div className="other-profile">
-						<div className="other-score">{otherScore}</div>
 						<img src="./cat1.jpg" alt="Other Profile" />
+						<div className="other-score">{otherScore} </div>
+					</div>
+					<div className="player-profile">
+						<div className="player-score">{playerScore}</div>
+						<img src="./cat.jpg" alt="Player Profile" />
 					</div>
 				</>
 			) : (
 				<>
-					<div className="player-profile">
-						<img src="./cat1.jpg" alt="Player Profile" />
-						<div className="player-score">{playerScore}</div>
-					</div>
 					<div className="other-profile">
-						<div className="other-score">{otherScore}</div>
 						<img src="./cat.jpg" alt="Other Profile" />
+						<div className="other-score">{otherScore}</div>
+					</div>
+					<div className="player-profile">
+						<div className="player-score">{playerScore}</div>
+						<img src="./cat1.jpg" alt="Player Profile" />
 					</div>
 				</>
 			)}
@@ -160,7 +159,6 @@ return (
 		</div>
 	</div>
 	);
-	
 };
 
 export default Game;
