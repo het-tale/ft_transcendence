@@ -2,32 +2,44 @@
 import { Ball, Paddle } from "../../Game.types";
 import { MySocket } from "./Game";
 
-function ListenOnSocket(ws: MySocket, setPadd: any, setBall: any, setOtherpad: any) {
-  
-	ws.on('connect', () => {
+type numberstate = React.Dispatch<React.SetStateAction<number>>;
+type ballstate = React.Dispatch<React.SetStateAction<Ball | null>>;
+type paddstate = React.Dispatch<React.SetStateAction<Paddle | null>>;
+
+function ListenOnSocket(socket: MySocket, setPadd: paddstate, setBall: ballstate, setOtherpad: paddstate,
+		setPlayerScore: numberstate, setOtherScore: numberstate, setRounds: numberstate) {
+	
+	socket.on('connect', () => {
 	  console.log('connected');
 	});
 
-	ws.on('disconnect', () => {
+	socket.on('disconnect', () => {
 	  console.log('disconnected');
 	});
   
-	ws.on('error', (error) => {
+	socket.on('error', (error) => {
 	  console.log('error', error);
 	});
-	ws.on('JoinRoom', (message: string) => {
+	socket.on('JoinRoom', (message: string) => {
 		console.log('JoinRoom', message);
 	});
   
-	ws.on('StartGame', (message: string) => {
+	socket.on('StartGame', (message: string) => {
 		console.log('StartGame on room', message); // print the start game message	
 	});
 
-	ws.on('UPDATE', (update: {ball: Ball, paddle: Paddle, otherPaddle: Paddle}) => {
+	socket.on('UPDATE', (update: {ball: Ball, paddle: Paddle, otherPaddle: Paddle}) => {
 		setPadd(update.paddle);
 		setBall(update.ball);
 		setOtherpad(update.otherPaddle );
 	});
+	socket.on('UPDATE SCORE', (update: {playerScore: number, otherscore: number, rounds: number}) => {
+		console.log('UPDATE SCORE', update);
+		setPlayerScore(update.playerScore);
+		setOtherScore(update.otherscore);
+		setRounds(update.rounds);
+	}
+	);
 }
 
 export { ListenOnSocket};

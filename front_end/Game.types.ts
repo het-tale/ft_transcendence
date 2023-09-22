@@ -28,10 +28,10 @@ interface GameData {
 	playerScore: number | null;
 	otherScore: number | null;
 	rounds: number | null;
-	id: number | null;
 	padlleSpeed: number | null;
 	containerHeight: number | null;
 	containerWidth: number | null;
+	id: number | null;
 
 }
 

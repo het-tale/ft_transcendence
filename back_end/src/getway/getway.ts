@@ -11,27 +11,27 @@ import { interval } from 'rxjs';
 import { colision } from './colision';
 import { GameData, Room, Ball, Paddle, INTERVAL, INCREASE_SPEED, SPEED_INTERVAL, Player } from '../types';
 
-const MAX_ANGLE_CHANGE = Math.PI / 4;
+// const MAX_ANGLE_CHANGE = Math.PI / 4;
+
 @WebSocketGateway()
 @Injectable()
 export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
 
-	//	 private players: Player[] = [];
 	private rooms: Map<string, Room> = new Map();
 
 	onModuleInit() {
 	}
-	private containerWidth = 1000;
-	private containerHeight = 600;
+	private containerWidth = 1080;
+	private containerHeight = 720;
 
 	handleConnection(client: any) {
 		console.log('Client connected: ', client.id);
 
 		let exist: boolean = false;
-		const padd = new Paddle(980, 500, 8, 80, 3);
-		const otherpadd = new Paddle(20, 500, 8, 80, 3);
+		const padd = new Paddle(10, this.containerHeight / 2, 8, 80, 3);
+		const otherpadd = new Paddle(this.containerWidth - 10, this.containerHeight / 2, 8, 80, 3);
 		
 		for (const existRoom of this.rooms.values()) {
 			console.log('at room ', existRoom.roomName, ' players ', existRoom.players.length);
@@ -47,9 +47,10 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 				ball: existRoom.ball,
 				playerScore: 0,
 				otherScore: 0,
-				id: playerNumber,
+				rounds: existRoom.rounds,
 				containerHeight: this.containerHeight,
 				containerWidth: this.containerWidth,
+				id: playerNumber,
 			}
 			client.emit('JoinRoom', existRoom.roomName);
 			client.emit('InitGame', gamedata);
@@ -74,9 +75,10 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 				ball: room.ball,
 				playerScore: 0,
 				otherScore: 0,
-				id: playerNumber,
+				rounds: room.rounds,
 				containerHeight: this.containerHeight,
 				containerWidth: this.containerWidth,
+				id: playerNumber,
 			}
 			client.emit('JoinRoom', room.roomName);
 			client.emit('InitGame', gamedata);
@@ -115,11 +117,9 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 			if (player) {
 				// Receive relative mouse position and container height from the client
 				const relativeMouseYPercentage = eventData.relativeMouseY;
-				const containerHeight = eventData.containerHeight;
+				const containerHeight = this.containerHeight;
 
 				// Calculate the new paddle position based on the received data
-				const minY = 0;
-				const maxY = containerHeight - player.paddle.height;
 				player.paddle.y = (relativeMouseYPercentage / 100) * containerHeight;
 			}
 		}
@@ -162,7 +162,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 		room.ball.x += room.ball.dx
 		room.ball.y += room.ball.dy
 		// Check for collisions with top and bottom walls
-		if (room.ball.y - room.ball.radius < 0 || room.ball.y + room.ball.radius > 600) {
+		if (room.ball.y - room.ball.radius <= 0 || room.ball.y + room.ball.radius > this.containerHeight) {
 			// Reverse the vertical velocity of the ball
 			room.ball.dy *= -1
 		}

@@ -14,11 +14,11 @@ function resetBall(ball: Ball) {
 export function colision(room: Room) {
 	
 	
-	// const player = room.players[0];
-	// const otherPlayer = room.players[1];
+	const player = room.players[0];
+	const otherPlayer = room.players[1];
 
-	const playerPaddle = room.players[1].paddle;
-	const otherPaddle = room.players[0].paddle;
+	const playerPaddle = player.paddle;
+	const otherPaddle = otherPlayer.paddle;
 
 	if (
 		room.ball.x + room.ball.radius >= playerPaddle.x &&
@@ -57,19 +57,25 @@ export function colision(room: Room) {
 	// Check for scoring conditions
 	if (room.ball.x + room.ball.radius > playerPaddle.x + playerPaddle.width) {
 		// Player misses the ball
-		room.players[1].score++;
+		otherPlayer.score++;
+		room.rounds--;
 		resetBall(room.ball);
-	} else if (room.ball.x - room.ball.radius < otherPaddle.x) {
+		player.socket.emit("UPDATE SCORE", {playerScore: player.score, otherScore: otherPlayer.score, rounds: room.rounds});
+		otherPlayer.socket.emit("UPDATE SCORE", {playerScore: otherPlayer.score, otherScore: player.score, rounds: room.rounds});
+	} else if (room.ball.x < otherPaddle.x - otherPaddle.width) {
 		// Other player misses the ball
-		room.players[0].score++;
+		player.score++;
+		room.rounds--;
 		resetBall(room.ball);
+		player.socket.emit("UPDATE SCORE", {playerScore: player.score, otherScore: otherPlayer.score, rounds: room.rounds});
+		otherPlayer.socket.emit("UPDATE SCORE", {playerScore: otherPlayer.score, otherScore: player.score, rounds: room.rounds});
 	}
-	room.players[0].socket.emit("UPDATE", {
+	player.socket.emit("UPDATE", {
 		ball: room.ball,
 		paddle: playerPaddle,
 		otherPaddle: otherPaddle,
 	});
-	room.players[1].socket.emit("UPDATE", {
+	otherPlayer.socket.emit("UPDATE", {
 		ball: room.ball,
 		paddle: otherPaddle,
 		otherPaddle: playerPaddle,

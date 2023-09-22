@@ -36,9 +36,10 @@ export interface GameData {
 	ball: Ball;
 	playerScore: number;
 	otherScore: number;
-	id: number;
+	rounds: number;
 	containerHeight: number;
 	containerWidth: number;
+	id: number;
 }
 
 export class Player {
@@ -77,6 +78,7 @@ export class Room {
 		this.gameInterval = null;
 		this.lastspeedincrease = Date.now();
 		this.ball = new Ball(500, 500, 10, 3, 3);
+		this.rounds = 5;
 	}
 	roomName: string;
 	players: Player[];
@@ -84,6 +86,7 @@ export class Room {
 	gameInterval: Subscription;
 	lastspeedincrease: number ;
 	ball: Ball ;
+	rounds: number;
 }
 
 
