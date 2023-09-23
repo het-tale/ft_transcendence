@@ -2,61 +2,48 @@ import {
   Body,
   Controller,
   Get,
-  Header,
   Post,
   Query,
   Req,
   Res,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { UseZodGuard } from 'nestjs-zod';
 import {
-  Add42CredentialsDto,
   AuthSignInDto,
   AuthSignUpDto,
   ForgetPassworddto,
   SetPasswordDto,
-  TAdd42CredentialsData,
   TSetPasswordData,
   TSigninData,
   TSignupData,
   TforgetPasswordData,
-  TtwofaCodeData,
-  TwofaCodeDto,
-} from 'src/auth/dto';
+} from 'src/dto';
 import { AuthService } from './auth.service';
-import { EmailConfirmationGuard } from './guards/email-confirmation.guard';
-import JwtAuthenticationGuard from './guards/jwt-authentication.guard';
-import _42AuthenticationGuard from './guards/42-authentication.guard';
-import { TwoFaVerificationGuard } from './guards/twofa-verification.guard';
+import _42AuthenticationGuard from '../guards/42-authentication.guard';
 import { Response } from 'express';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { User } from '@prisma/client';
 
+@ApiTags('Authentication non protected routes')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @ApiBody({ type: AuthSignUpDto })
   @UseZodGuard('body', AuthSignUpDto)
   @Post('signup')
   signup(@Body() dto: TSignupData) {
     return this.authService.signup(dto);
   }
 
+  @ApiQuery({ name: 'token', type: 'string' })
   @Get('confirm-email')
   confirm(@Query('token') token: string) {
-    return this.authService.confirm_register(token);
+    return this.authService.confirmRegister(token);
   }
 
-  @UseGuards(TwoFaVerificationGuard)
-  @UseGuards(JwtAuthenticationGuard)
-  @Get('resend-email')
-  resend(@Req() request: Request) {
-    return this.authService.resend_email(request.user);
-  }
-
+  @ApiBody({ type: AuthSignInDto })
   @UseZodGuard('body', AuthSignInDto)
   @Post('signin')
   signin(@Body() dto: TSigninData) {
@@ -71,26 +58,22 @@ export class AuthController {
 
   @UseGuards(_42AuthenticationGuard)
   @Get('42/callback')
-  async signin42Callback(@Req() request: Request, @Res() res: Response) {
-    const { user } = request;
-    const token = await this.authService.signin42(user);
+  async signin42Callback(@Req() request: { user: User }, @Res() res: Response) {
+    const token = await this.authService.signin42(request.user);
+    console.log(token);
+
     return res.redirect(`http://localhost:3000/signin42?token=${token}`);
   }
 
-  @UseZodGuard('body', Add42CredentialsDto)
-  @UseGuards(TwoFaVerificationGuard)
-  @UseGuards(JwtAuthenticationGuard)
-  @Post('set-new-username-password')
-  setNewPassword(@Req() request: Request, @Body() dto: TAdd42CredentialsData) {
-    return this.authService.setNewPasswordUsername(dto, request.user);
-  }
-
+  @ApiBody({ type: ForgetPassworddto })
   @UseZodGuard('body', ForgetPassworddto)
   @Post('forget-password')
   async forgetPassword(@Body() dto: TforgetPasswordData) {
     return this.authService.forgetPassword(dto);
   }
 
+  @ApiBody({ type: SetPasswordDto })
+  @ApiQuery({ name: 'token', type: 'string' })
   @UseZodGuard('body', SetPasswordDto)
   @Post('change-password')
   async confirmChangePassword(
@@ -98,65 +81,5 @@ export class AuthController {
     @Query('token') token: string,
   ) {
     return this.authService.confirmChangePassword(token, dto);
-  }
-
-  @UseGuards(EmailConfirmationGuard)
-  @UseGuards(JwtAuthenticationGuard)
-  @Get('2fa/generate')
-  @Header('Content-Type', 'image/png')
-  async generate2fa(@Req() request: Request, @Res() res: Response) {
-    const code = await this.authService.generate2fa(request.user, res);
-
-    return code;
-  }
-  @UseGuards(EmailConfirmationGuard)
-  @UseGuards(JwtAuthenticationGuard)
-  @UseZodGuard('body', TwofaCodeDto)
-  @Post('2fa/enable')
-  async enable2fa(@Req() request: Request, @Body() dto: TtwofaCodeData) {
-    return this.authService.enable2fa(dto.code, request.user);
-  }
-
-  @UseGuards(EmailConfirmationGuard)
-  @UseGuards(JwtAuthenticationGuard)
-  @UseZodGuard('body', TwofaCodeDto)
-  @Post('2fa/verify')
-  async verify2fa(@Req() request: Request, @Body() dto: TtwofaCodeData) {
-    await this.authService.verify2fa(dto.code, request.user);
-  }
-
-  @UseGuards(TwoFaVerificationGuard)
-  @UseGuards(EmailConfirmationGuard)
-  @UseGuards(JwtAuthenticationGuard)
-  @Get('2fa/disable')
-  async disable2fa(@Req() request: Request) {
-    await this.authService.disable2fa(request.user);
-  }
-
-  @UseInterceptors(FileInterceptor('file'))
-  @UseGuards(EmailConfirmationGuard)
-  @UseGuards(JwtAuthenticationGuard)
-  @Post('upload-avatar')
-  uploadAvatar(
-    @UploadedFile() file: Express.Multer.File,
-    @Req() request: Request,
-  ) {
-    if (!file || !file.originalname) {
-      return {
-        message: 'Please provide a file named "file" in the request.',
-        error: 'Bad Request',
-        statusCode: 400,
-      };
-    }
-
-    return this.authService.uploadAvatar(file, request.user);
-  }
-  // decorators resolve from bottom to top
-  @UseGuards(EmailConfirmationGuard)
-  @UseGuards(TwoFaVerificationGuard)
-  @UseGuards(JwtAuthenticationGuard)
-  @Get('me')
-  me(@Req() request: Request) {
-    return request.user;
   }
 }
