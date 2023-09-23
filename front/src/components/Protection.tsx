@@ -21,8 +21,8 @@ const [isProtected, setIsProtected] = useState(false);
         else if (props.name === "confirmation")
         {
 
-            setIsProtected(!response.IsEmailConfirmed);
-            console.log("Email", response.IsEmailConfirmed);
+            setIsProtected(!response.isEmailConfirmed);
+            console.log("Email", response.isEmailConfirmed);
         }
         } else {
           navigate('/');

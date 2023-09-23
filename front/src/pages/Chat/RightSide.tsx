@@ -8,6 +8,7 @@ const RightSide = (props: any) => {
     return (
         <div className='container'>
             {props.tabs.map((tab: any, i: any) =>
+            props.firstLoad !== '' &&
                   <div key={i}>
                       {props.currentTab === `${tab.id}` && <div>{tab.rightSide}</div>}
                   </div>
