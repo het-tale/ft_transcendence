@@ -1,25 +1,29 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BsBoxArrowLeft } from "react-icons/bs";
+import { BsBoxArrowLeft, BsBellFill, BsHouseFill, BsController, BsChatRightFill, BsChatFill, BsPersonFill } from "react-icons/bs";
 const Sidebar = () => {
     return (
         <aside>
         <a href="">
-            <i className="fa fa-home fa-lg" aria-hidden="true"></i>
+           <BsHouseFill className='fa'/>
           Home
         </a>
         <Link to="/chat/dms">
         {/* <a href=""> */}
-          <i className="fa fa-send fa-lg" aria-hidden="true"></i>
+          <BsChatRightFill className='fa'/>
           Chat
         {/* </a> */}
         </Link>
         <a href="">
-          <i className="fa fa-gamepad fa-lg" aria-hidden="true"></i>
+          <BsBellFill className='fa'/>
+          Notifications
+        </a>
+        <a href="">
+          <BsController className='fa'/>
           Play
         </a>
         <a href="">
-            <i className="fa fa-user-o fa-lg" aria-hidden="true"></i>
+            <BsPersonFill className='fa'/>
           Profile
         </a>
         <a href="" id="more">

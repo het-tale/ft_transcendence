@@ -40,12 +40,19 @@
     color: var(--white) !important;
 }
 
-.parent {
+.parentSender {
    width: 100%;
    display: flex;
     justify-content: flex-end;
 
 }
+.parentReceiver {
+    width: 100%;
+    display: flex;
+     justify-content: flex-start;
+     flex-direction: column-reverse;
+ 
+ }
 .sender {
     background-color: var(--fakhti);
     color: var(--white);
@@ -54,6 +61,7 @@
     padding: 10px 13px;
     margin-bottom: 5px;
     width: fit-content;
+    margin-top: 5px;
     
 }
 
@@ -64,7 +72,13 @@
     height: 40px;
     padding: 10px 13px;
     width: fit-content;
-    margin-bottom: 5px;
+    margin-bottom: 7px;
+}
+
+.recvRoom {
+    margin-left: 44px;
+    margin-top: -45px;
+    margin-bottom: 13px;
 }
 
 /* .chakra-menu__menu-list {
