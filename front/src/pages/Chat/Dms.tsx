@@ -17,6 +17,7 @@ import RoomsChat from "./RoomsChat";
 
 const Dms = () => {
     const [currentTab, setCurrentTab] = React.useState('1');
+    const [firstLoad, setFirstLoad] = React.useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
   const tabs = [
       {
@@ -45,6 +46,7 @@ const Dms = () => {
 
   const handleTabClick = (e :any) => {
       setCurrentTab(e.target.id);
+      setFirstLoad(e.target.tabTitle);
   }
     return (
         <div>
@@ -55,7 +57,7 @@ const Dms = () => {
                     <Flex justify="space-between">
                         <LeftSide handleTabClick={handleTabClick} tabs={tabs} currentTab={currentTab}/>
                         <div className="delimiter"></div>
-                        <RightSide handleTabClick={handleTabClick} tabs={tabs} currentTab={currentTab}/>
+                        <RightSide handleTabClick={handleTabClick} tabs={tabs} currentTab={currentTab} firstLoad={firstLoad}/>
                     </Flex>
                 </Box>
             </Flex>
