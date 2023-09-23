@@ -7,6 +7,7 @@ import { ConfirmationModule } from './confirmation/confirmation.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { TwoFaModule } from './2fa/two-fa.module';
 import { ChatModule } from './chat/chat.module';
+import { GetwayModule } from './getway/getway.modules';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ChatModule } from './chat/chat.module';
     TwoFaModule,
     CloudinaryModule,
     ChatModule,
+    GetwayModule,
   ],
 })
 export class AppModule {}
