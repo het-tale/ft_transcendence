@@ -31,16 +31,16 @@ const RightSide = () => {
                     borderRadius={20}
                     marginTop={-25}
                     >
-                        <MenuItem paddingBottom={2} icon={<BsController />}>
+                        <MenuItem paddingBottom={2} bg={'none'} icon={<BsController />}>
                         Play with me
                         </MenuItem>
-                        <MenuItem paddingBottom={2} icon={<BsPersonCircle />}>
+                        <MenuItem paddingBottom={2} bg={'none'} icon={<BsPersonCircle />}>
                         View Profile
                         </MenuItem>
-                        <MenuItem paddingBottom={2} icon={<BsTrash />}>
+                        <MenuItem paddingBottom={2} bg={'none'} icon={<BsTrash />}>
                         Delete Chat
                         </MenuItem>
-                        <MenuItem icon={<BsPersonFillSlash />}>
+                        <MenuItem bg={'none'} icon={<BsPersonFillSlash />}>
                         Block
                         </MenuItem>
                     </MenuList>
