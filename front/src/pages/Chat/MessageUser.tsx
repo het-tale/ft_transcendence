@@ -41,12 +41,13 @@ const MessageUser = ({profile , name, message} : MessageUserProps) => {
         as='h6'
         size='sm'
         fontWeight='bold'
-        marginLeft={"10px"}
-        marginTop={"25px"}
+        marginLeft={"-10px"}
+        marginTop={"8px"}
+        marginBottom={1}
       >{name}</Heading>
 
       <Text
-      marginLeft={"10px"}
+      marginLeft={"-10px"}
       color={"#808080"}
       >
         {message}
