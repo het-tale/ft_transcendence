@@ -5,6 +5,7 @@ import { BsThreeDots, BsPersonCircle, BsPersonFillSlash, BsTrash, BsController }
 import MessageContent from './MessageContent';
 import TypingBar from './TypingBar';
 import { Image } from '@chakra-ui/react';
+import ChannelInfo from './ChannelInfo';
 const RightSide = (props: any) => {
     return (
     <Flex w="100%" h="100%" bg="#E9ECEF" justify="space-between">
@@ -27,7 +28,9 @@ const RightSide = (props: any) => {
             )
             }
         </div>
-        {/* <div className='container'></div> */}
+        {
+            props.currentTab === "2" && props.renderActions && <div className='container'><ChannelInfo /></div>
+        }
         </Flex>
     )
 }

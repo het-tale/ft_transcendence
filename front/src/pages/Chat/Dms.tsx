@@ -19,12 +19,17 @@ const Dms = () => {
     const [currentTab, setCurrentTab] = React.useState('1');
     const [firstLoad, setFirstLoad] = React.useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [renderActions, setRenderActions] = React.useState(false);
+  const [name, setName] = React.useState("");
+  const handleRenderActions = () => {
+        setRenderActions(!renderActions);
+  }
   const tabs = [
       {
           id: 1,
           tabTitle: 'Direct Messages',
           content: <>
-          <Search name="tabDesign"/>
+          <Search name="tabDesign" setName={setName} filter={name}/>
           <MessageUser profile='/assets/het-tale.jpg' name="Hasnaa" message="hello" />
           </>,
           rightSide: <><DmsChat /></>
@@ -40,7 +45,7 @@ const Dms = () => {
             <ModalUi isOpen={isOpen} onOpen={onOpen} onClose={onClose} title={'Add new Channel'} body={undefined}/>
           </Flex>
           </>,
-          rightSide: <><RoomsChat /></>
+          rightSide: <><RoomsChat handleRenderActions={handleRenderActions}/></>
       }
   ];
 
@@ -57,7 +62,7 @@ const Dms = () => {
                     <Flex justify="space-between">
                         <LeftSide handleTabClick={handleTabClick} tabs={tabs} currentTab={currentTab}/>
                         <div className="delimiter"></div>
-                        <RightSide handleTabClick={handleTabClick} tabs={tabs} currentTab={currentTab} firstLoad={firstLoad}/>
+                        <RightSide handleTabClick={handleTabClick} tabs={tabs} currentTab={currentTab} firstLoad={firstLoad} renderActions={renderActions}/>
                     </Flex>
                 </Box>
             </Flex>

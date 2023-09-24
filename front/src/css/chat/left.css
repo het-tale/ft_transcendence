@@ -13,6 +13,7 @@
     height: 95vh;
     background-color: #fafafa;
     padding: 20px;
+    overflow-y: auto;
 }
 .delimiter {
     width: 2px !important;
