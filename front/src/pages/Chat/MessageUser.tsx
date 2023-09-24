@@ -10,12 +10,14 @@ interface MessageUserProps {
   message: string;
   children?: React.ReactNode;
   onClick?: () => void;
+  design?: string;
 }
 
-const MessageUser = ({profile , name, message, children} : MessageUserProps) => {
+const MessageUser = ({profile , name, message, children, design} : MessageUserProps) => {
     return (
         <div>
             <Card
+            className={design}
         direction={{ base: 'column', sm: 'row' }}
         overflow='hidden'
         variant='outline'

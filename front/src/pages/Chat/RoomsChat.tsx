@@ -4,13 +4,13 @@ import TypingBar from "./TypingBar";
 import { Box, Flex, Grid, GridItem, IconButton, Menu, MenuButton, MenuItem, MenuList, SimpleGrid, Spacer, background, useDisclosure, Image, Button } from '@chakra-ui/react'
 import MessageUser from "./MessageUser";
 
-const RoomsChat = () => {
+const RoomsChat = (props: any) => {
     return(
         <div>
             <Flex>
                 <Box width={"98%"}>
 
-                <button onClick={() => console.log("holaaa")} style={{background: "transparent", width: "100%"}}>
+                <button onClick={props.handleRenderActions} style={{background: "transparent", width: "100%"}}>
                 <MessageUser profile='/assets/het-tale.jpg' name="Hasnaa" message="online" />
                 </button>
                 </Box>

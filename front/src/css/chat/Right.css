@@ -17,8 +17,9 @@
     position: relative;
     top: 90%;
     color: var(--white) !important;
-    position: fixed;
-    width: 43%;
+    /* position: fixed; */
+    width: 100%;
+    margin-top: 30rem;
 }
 
 .typing-bar input {
