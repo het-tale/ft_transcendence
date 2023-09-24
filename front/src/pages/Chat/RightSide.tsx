@@ -4,16 +4,31 @@ import MessageUser from './MessageUser';
 import { BsThreeDots, BsPersonCircle, BsPersonFillSlash, BsTrash, BsController } from "react-icons/bs";
 import MessageContent from './MessageContent';
 import TypingBar from './TypingBar';
+import { Image } from '@chakra-ui/react';
 const RightSide = (props: any) => {
     return (
+    <Flex w="100%" h="100%" bg="#E9ECEF" justify="space-between">
         <div className='container'>
-            {props.tabs.map((tab: any, i: any) =>
-            props.firstLoad !== '' &&
-                  <div key={i}>
-                      {props.currentTab === `${tab.id}` && <div>{tab.rightSide}</div>}
-                  </div>
-              )}
+            {
+            props.tabs.map((tab: any, i: any) =>
+            props.firstLoad !== '' ?
+            <div key={i}>{props.currentTab === `${tab.id}` && <div>{tab.rightSide}</div>}</div>
+            : <div key={i}>{props.currentTab === `${tab.id}` && <div>
+                <Image src="/assets/ul_chat.png" alt="collaboration"
+                className='hero_img'
+                width={400}
+                height={350}
+                bg={'transparent'}
+                marginTop={"20%"}
+                marginLeft={"25%"}
+                style={{background: 'transparent'}}
+                />
+                </div>}</div>
+            )
+            }
         </div>
+        {/* <div className='container'></div> */}
+        </Flex>
     )
 }
 

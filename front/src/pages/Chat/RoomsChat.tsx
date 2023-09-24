@@ -1,7 +1,7 @@
-import { BsController, BsPersonCircle, BsPersonFillSlash, BsThreeDots, BsTrash } from "react-icons/bs";
+import { BsBoxArrowLeft, BsPersonCircle, BsPersonFillSlash, BsThreeDots, BsTrash } from "react-icons/bs";
 import MessageContent from "./MessageContent";
 import TypingBar from "./TypingBar";
-import { Box, Flex, Grid, GridItem, IconButton, Menu, MenuButton, MenuItem, MenuList, SimpleGrid, Spacer, background, useDisclosure, Image } from '@chakra-ui/react'
+import { Box, Flex, Grid, GridItem, IconButton, Menu, MenuButton, MenuItem, MenuList, SimpleGrid, Spacer, background, useDisclosure, Image, Button } from '@chakra-ui/react'
 import MessageUser from "./MessageUser";
 
 const RoomsChat = () => {
@@ -10,7 +10,9 @@ const RoomsChat = () => {
             <Flex>
                 <Box width={"98%"}>
 
+                <button onClick={() => console.log("holaaa")} style={{background: "transparent", width: "100%"}}>
                 <MessageUser profile='/assets/het-tale.jpg' name="Hasnaa" message="online" />
+                </button>
                 </Box>
                 <Menu>
                     <MenuButton
@@ -31,17 +33,11 @@ const RoomsChat = () => {
                     borderRadius={20}
                     marginTop={-25}
                     >
-                        <MenuItem paddingBottom={2} bg={'none'} icon={<BsController />}>
-                        Play with me
-                        </MenuItem>
-                        <MenuItem paddingBottom={2} bg={'none'} icon={<BsPersonCircle />}>
-                        View Profile
-                        </MenuItem>
                         <MenuItem paddingBottom={2} bg={'none'} icon={<BsTrash />}>
                         Delete Chat
                         </MenuItem>
-                        <MenuItem bg={'none'} icon={<BsPersonFillSlash />}>
-                        Block
+                        <MenuItem bg={'none'} icon={<BsBoxArrowLeft />}>
+                        Leave Chat
                         </MenuItem>
                     </MenuList>
                     </Menu>

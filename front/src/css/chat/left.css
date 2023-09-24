@@ -17,3 +17,26 @@
 .delimiter {
     width: 2px !important;
 }
+
+.textArea {
+    position: absolute;
+    top: 20%;
+    background-color: #a435f0;
+}
+
+.hero_img {
+    animation: MoveUpDown 5s linear infinite;
+    position: absolute;
+    left: 50rem;
+    bottom: 0;
+  }
+  
+  @keyframes MoveUpDown {
+    0%,
+    100% {
+      bottom: 300px;
+    }
+    50% {
+      bottom: 400px;
+    }
+  }

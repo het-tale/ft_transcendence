@@ -9,9 +9,10 @@ interface MessageUserProps {
   name: string;
   message: string;
   children?: React.ReactNode;
+  onClick?: () => void;
 }
 
-const MessageUser = ({profile , name, message} : MessageUserProps) => {
+const MessageUser = ({profile , name, message, children} : MessageUserProps) => {
     return (
         <div>
             <Card
@@ -54,6 +55,7 @@ const MessageUser = ({profile , name, message} : MessageUserProps) => {
       </Text>
     </CardBody>
   </Stack>
+<>{children}</>
 </Card>
         </div>
     );
