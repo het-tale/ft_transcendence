@@ -9,23 +9,21 @@ const Sidebar = () => {
           Home
         </a>
         <Link to="/chat/dms">
-        {/* <a href=""> */}
           <BsChatRightFill className='fa'/>
           Chat
-        {/* </a> */}
         </Link>
         <a href="">
           <BsBellFill className='fa'/>
           Notifications
         </a>
-        <a href="">
+        <Link to="/">
           <BsController className='fa'/>
           Play
-        </a>
-        <a href="">
+        </Link>
+        <Link to="/user-profile">
             <BsPersonFill className='fa'/>
           Profile
-        </a>
+        </Link>
         <a href="" id="more">
           {/* <i className="fa fa-gear fa-lg" aria-hidden="true"></i> */}
           <BsBoxArrowLeft className='fa'/>
