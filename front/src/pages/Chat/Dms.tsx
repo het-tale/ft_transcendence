@@ -13,6 +13,7 @@ import MessageContent from "./MessageContent";
 import TypingBar from "./TypingBar";
 import DmsChat from "./DmsChat";
 import RoomsChat from "./RoomsChat";
+import ModalBodyUi from "../../components/ModalBodyUi";
 
 
 const Dms = () => {
@@ -20,10 +21,29 @@ const Dms = () => {
     const [firstLoad, setFirstLoad] = React.useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [renderActions, setRenderActions] = React.useState(false);
+  const formRef = React.useRef(null);
+  const [selectedOption, setSelectedOption] = React.useState('');
+    const [showField, setShowField] = React.useState(false);
   const [name, setName] = React.useState("");
   const handleRenderActions = () => {
         setRenderActions(!renderActions);
   }
+  const handleRadioChange = (event : any) => {
+    setSelectedOption(event.target.value);
+    setShowField(event.target.value === 'protected');
+    console.log(event.target.value);
+  };
+
+  const handleSubmit = () => {
+    const data = new FormData(formRef.current ?? undefined);
+    const formData = {
+      name: data.get('name'),
+      avatar: data.get('avatar'),
+      type: data.get('group1'),
+      password: data.get('password'),
+    };
+    console.log(formData);
+  };
   const tabs = [
       {
           id: 1,
@@ -42,7 +62,8 @@ const Dms = () => {
           <Search name="tabDesign"/>
           
             <button className='newChannel' onClick={onOpen}>New</button>
-            <ModalUi isOpen={isOpen} onOpen={onOpen} onClose={onClose} title={'Add new Channel'} body={undefined}/>
+            <ModalUi isOpen={isOpen} onOpen={onOpen} onClose={onClose} title={'Add new Channel'} handleSubmit={handleSubmit}
+             body={<ModalBodyUi formRef={formRef} selectedOption={selectedOption} handleRadioChange={handleRadioChange} showField={showField}/>}/>
           </Flex>
           </>,
           rightSide: <><RoomsChat handleRenderActions={handleRenderActions}/></>

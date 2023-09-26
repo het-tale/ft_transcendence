@@ -30,6 +30,7 @@ import { createTheme, ThemeProvider } from '@mui/material';
 import Chat from "./pages/Chat/Chat";
 import MessageUser from "./pages/Chat/MessageUser";
 import RightSide from "./pages/Chat/RightSide";
+import Profile from "./pages/Profile/Profile";
 
 const theme = createTheme();
 
@@ -101,6 +102,8 @@ function App() {
             <Route path="dms" element={<Dms />}/>
             <Route path="rightSide" element={<RightSide />}/>
           </Route>
+          <Route path="user-profile" element={<Profile />}/>
+          {/* <Route path="game" element={<Game/>}/> */}
           <Route path="testt" element={<Testt/>}/>
       </Routes>
     </BrowserRouter>
