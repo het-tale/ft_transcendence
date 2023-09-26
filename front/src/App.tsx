@@ -16,6 +16,7 @@ import ResendEmail from "./pages/ResendEmail";
 import ModalUi from "./components/ModalUi";
 import SetPassword from "./pages/SetPassword";
 import Signin42 from "./pages/Signin42";
+import Game from "./pages/game/Game";
 
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
           {/* <Route path="test" element={<ProtectRoutes />}/> */}
           <Route path="set-password" element={<SetPassword />}/>
           <Route path="signin42" element={<Signin42 />}/>
+          <Route path="game" element={<Game />}/>
       </Routes>
     </BrowserRouter>
     </div>

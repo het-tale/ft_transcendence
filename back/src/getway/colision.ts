@@ -1,5 +1,6 @@
 // import { Server } from "socket.io";
 import { Room, Ball } from './types';
+import { Socket } from 'socket.io';
 
 const MAX_ANGLE_CHANGE = Math.PI / 4;
 
@@ -10,9 +11,11 @@ function resetBall(ball: Ball) {
   ball.dy = 3;
 }
 
-export function colision(room: Room) {
+export async function colision(room: Room, activeSockets: Map<string, Socket>) {
   const player = room.players[0];
   const otherPlayer = room.players[1];
+  const playerSocket = await activeSockets.get(player.socket_id);
+  const otherPlayerSocket = await activeSockets.get(otherPlayer.socket_id);
 
   const playerPaddle = player.paddle;
   const otherPaddle = otherPlayer.paddle;
@@ -60,20 +63,20 @@ export function colision(room: Room) {
     room.rounds--;
     if (room.rounds === 0) {
       if (player.score > otherPlayer.score) {
-        player.socket.emit('GAME OVER', { winner: true });
-        otherPlayer.socket.emit('GAME OVER', { winner: false });
+        playerSocket.emit('GAME OVER', { winner: true });
+        otherPlayerSocket.emit('GAME OVER', { winner: false });
       } else {
-        player.socket.emit('GAME OVER', { winner: false });
-        otherPlayer.socket.emit('GAME OVER', { winner: true });
+        playerSocket.emit('GAME OVER', { winner: false });
+        otherPlayerSocket.emit('GAME OVER', { winner: true });
       }
       room.gameActive = false;
     } else {
       resetBall(room.ball);
-      player.socket.emit('UPDATE SCORE', {
+      playerSocket.emit('UPDATE SCORE', {
         playerScore: player.score,
         otherScore: otherPlayer.score,
       });
-      otherPlayer.socket.emit('UPDATE SCORE', {
+      otherPlayerSocket.emit('UPDATE SCORE', {
         playerScore: otherPlayer.score,
         otherScore: player.score,
       });
@@ -84,32 +87,32 @@ export function colision(room: Room) {
     room.rounds--;
     if (room.rounds === 0) {
       if (player.score > otherPlayer.score) {
-        player.socket.emit('GAME OVER', { winner: true });
-        otherPlayer.socket.emit('GAME OVER', { winner: false });
+        playerSocket.emit('GAME OVER', { winner: true });
+        otherPlayerSocket.emit('GAME OVER', { winner: false });
         //stop the game
       } else {
-        player.socket.emit('GAME OVER', { winner: false });
-        otherPlayer.socket.emit('GAME OVER', { winner: true });
+        playerSocket.emit('GAME OVER', { winner: false });
+        otherPlayerSocket.emit('GAME OVER', { winner: true });
       }
       room.gameActive = false;
     } else {
       resetBall(room.ball);
-      player.socket.emit('UPDATE SCORE', {
+      playerSocket.emit('UPDATE SCORE', {
         playerScore: player.score,
         otherScore: otherPlayer.score,
       });
-      otherPlayer.socket.emit('UPDATE SCORE', {
+      otherPlayerSocket.emit('UPDATE SCORE', {
         playerScore: otherPlayer.score,
         otherScore: player.score,
       });
     }
   }
-  player.socket.emit('UPDATE', {
+  playerSocket.emit('UPDATE', {
     ball: room.ball,
     paddle: playerPaddle,
     otherPaddle: otherPaddle,
   });
-  otherPlayer.socket.emit('UPDATE', {
+  otherPlayerSocket.emit('UPDATE', {
     ball: room.ball,
     paddle: otherPaddle,
     otherPaddle: playerPaddle,

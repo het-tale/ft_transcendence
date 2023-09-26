@@ -6,7 +6,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server , Socket} from 'socket.io';
 import { interval } from 'rxjs';
 import { colision } from './colision';
 import {
@@ -19,22 +19,42 @@ import {
   Player,
 } from './types';
 
-// const MAX_ANGLE_CHANGE = Math.PI / 4;
+import { PrismaService } from 'src/prisma/prisma.service';
+import { User } from '@prisma/client';
+
 
 @WebSocketGateway()
 @Injectable()
 export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server: Server;
+	server: Server;
+	private prisma: PrismaService;
+	// In your WebSocket gateway class
+	private activeSockets: Map<string, Socket> = new Map();
 
-  private rooms: Map<string, Room> = new Map();
+	private rooms: Map<string, Room> = new Map();
 
   //onModuleInit() {}
   private containerWidth = 1080;
   private containerHeight = 720;
 
-  handleConnection(client: any) {
-    console.log('Client connected: ', client.id);
+ async handleConnection(client: Socket) {
+    console.log('Client connected: ', client);
+	const clientsocket = client.id;
+	this.activeSockets.set(client.id, client);
+	console.log('clientsocket: ', clientsocket);
+	try
+	{
+
+		const email = await this.prisma.user.findUnique({where: {email: "chliyah@student.1337.ma"}});
+		console.log('email: ', email);
+		const ema = await this.prisma.user.findUnique({where: {email: "mchliyah@student.1337.ma"}});
+		console.log('ema: ', ema);
+	}
+	catch (e)
+	{
+		console.log('error: canot find user');
+	}
 
     let exist = false;
     const padd = new Paddle(10, this.containerHeight / 2, 8, 80, 3);
@@ -58,7 +78,7 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const playerNumber = existRoom.players.length + 1;
         const player = new Player(
           playerNumber,
-          client,
+          client.id,
           padd,
           existRoom.roomName,
           0,
@@ -93,7 +113,7 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const playerNumber = room.players.length + 1;
       const player = new Player(
         playerNumber,
-        client,
+        client.id,
         otherpadd,
         room.roomName,
         0,
@@ -117,23 +137,24 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  handleDisconnect(client: any) {
+  handleDisconnect(client: Socket) {
     const room = this.findRoomByPlayerSocket(client);
 
     if (room) {
-      room.players = room.players.filter((player) => player.socket !== client);
+      room.players = room.players.filter((player) => player.socket_id !== client.id);
       if (room.players.length < 2) {
         this.stopGame(room);
         room.gameActive = false;
+		this.activeSockets.delete(client.id);
         this.rooms.delete(room.roomName); // Remove the room if it's empty
       }
     }
   }
 
-  private findRoomByPlayerSocket(socket: any): Room | undefined {
+  private findRoomByPlayerSocket(socket: Socket): Room | undefined {
     for (const room of this.rooms.values()) {
       const playerInRoom = room.players.find(
-        (player) => player.socket === socket,
+        (player) => player.socket_id === socket.id,
       );
       if (playerInRoom) {
         return room;
@@ -143,11 +164,11 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return undefined;
   }
   @SubscribeMessage('UpdatePlayerPaddle')
-  handleUpdatePaddle(client: any, eventData: any) {
+  handleUpdatePaddle(client: Socket, eventData: any) {
     const room = this.findRoomByPlayerSocket(client);
 
     if (room) {
-      const player = room.players.find((p) => p.socket === client);
+      const player = room.players.find((p) => p.socket_id === client.id);
 
       if (player) {
         // Receive relative mouse position and container height from the client
@@ -204,6 +225,6 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // Reverse the vertical velocity of the ball
       room.ball.dy *= -1;
     }
-    colision(room);
+    colision(room, this.activeSockets);
   }
 }

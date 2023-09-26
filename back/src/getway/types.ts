@@ -45,19 +45,19 @@ export interface GameData {
 export class Player {
   constructor(
     id: number,
-    socket: Socket,
+    socket_id: string,
     paddle: Paddle,
     room: string,
     score: number,
   ) {
     this.id = id;
-    this.socket = socket;
+    this.socket_id = socket_id;
     this.paddle = paddle;
     this.room = room;
     this.score = score;
   }
   id: number;
-  socket: Socket;
+  socket_id: string;
   paddle: Paddle;
   room: string;
   score: number;
