@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 const Sidebar = () => {
     return (
         <aside>
@@ -10,10 +11,10 @@ const Sidebar = () => {
           <i className="fa fa-send fa-lg" aria-hidden="true"></i>
           Chat
         </a>
-        <a href="">
+        <Link to="/game">
           <i className="fa fa-gamepad fa-lg" aria-hidden="true"></i>
           Play
-        </a>
+        </Link>
         <a href="">
             <i className="fa fa-user-o fa-lg" aria-hidden="true"></i>
           Profile
