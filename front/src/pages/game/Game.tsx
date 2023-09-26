@@ -4,7 +4,8 @@ import { io } from 'socket.io-client';
 import {throttle } from 'lodash';
 import { ListenOnSocket } from './Game.lisners';
 import {GameData, Paddle, Ball} from './Game.types';
-
+import { Avatar, Box, Button, Card, CardBody, CardFooter, CardHeader, Flex, Heading, IconButton, Text, Image, Center, Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
+import "../../css/game.css";
 
 export type MySocket = ReturnType<typeof io>;
 
@@ -131,23 +132,23 @@ return (
 			{id === 1 ? ( // Check if id is equal to 1
 				<>
 					<div className="other-profile">
-						<img src="./cat1.jpg" alt="Other Profile" />
+						<Image src="/assets/cat1.jpg" alt="Other Profile" />
 						<div className="other-score">{otherScore} </div>
 					</div>
 					<div className="player-profile">
 						<div className="player-score">{playerScore}</div>
-						<img src="./cat.jpg" alt="Player Profile" />
+						<img src="/assets/cat.jpg" alt="Player Profile" />
 					</div>
 				</>
 			) : (
 				<>
 					<div className="other-profile">
-						<img src="./cat.jpg" alt="Other Profile" />
+						<img src="/assets/cat.jpg" alt="Other Profile" />
 						<div className="other-score">{otherScore}</div>
 					</div>
 					<div className="player-profile">
 						<div className="player-score">{playerScore}</div>
-						<img src="./cat1.jpg" alt="Player Profile" />
+						<img src="/assets/cat1.jpg" alt="Player Profile" />
 					</div>
 				</>
 			)}
