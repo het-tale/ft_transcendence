@@ -77,7 +77,6 @@ export class SecurityController {
     return this.securityService.setNewPasswordUsername(dto, request.user);
   }
 
-  @ApiBody({ type: File })
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(TwoFaVerificationGuard)
   @Post('upload-avatar')
