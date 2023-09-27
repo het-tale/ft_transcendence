@@ -96,7 +96,7 @@ export class SecurityService {
         HttpStatus.FORBIDDEN,
       );
     const hash = await argon.hash(dto.password);
-    await this.prisma.user.update({
+    const existingUser = await this.prisma.user.update({
       where: { email: user.email },
       data: {
         hash,
@@ -104,6 +104,8 @@ export class SecurityService {
         username: dto.username,
       },
     });
+    console.log(existingUser);
+    console.log('here');
   }
   async uploadAvatar(file: Express.Multer.File, user: User) {
     const result = await this.cloudinary.uploadFile(file);
