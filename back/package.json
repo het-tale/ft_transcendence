@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "db:rm": "docker compose rm my_database -s -f -v",
+    "db:rm": "docker compose rm my_database",
     "db:up": "docker compose up my_database -d",
     "db:restart": "npm run db:rm && npm run db:up && sleep 1 && npm run prisma:generate && npm run prisma:push",
     "build": "nest build",
