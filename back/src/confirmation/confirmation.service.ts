@@ -35,7 +35,7 @@ export class ConfirmationService {
       });
     } catch (error) {
       console.log(error);
-      throw new HttpException('Sending  email failed', 500);
+      throw new HttpException('Sending email failed', 400);
     }
   }
   async confirmEmail(token: string) {
