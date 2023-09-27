@@ -14,7 +14,7 @@ import { DMService } from './dm.service';
 import { ChannelService } from './channel.service';
 import { FriendsService } from './friends.service';
 
-@WebSocketGateway()
+@WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {

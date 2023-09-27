@@ -16,7 +16,7 @@ const Sidebar = () => {
           <BsBellFill className='fa'/>
           Notifications
         </a>
-        <Link to="/">
+        <Link to="/game">
           <BsController className='fa'/>
           Play
         </Link>

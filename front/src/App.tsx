@@ -31,6 +31,7 @@ import Chat from "./pages/Chat/Chat";
 import MessageUser from "./pages/Chat/MessageUser";
 import RightSide from "./pages/Chat/RightSide";
 import Profile from "./pages/Profile/Profile";
+import GamePage from "./pages/Game/GamePage";
 
 const theme = createTheme();
 
@@ -103,7 +104,7 @@ function App() {
             <Route path="rightSide" element={<RightSide />}/>
           </Route>
           <Route path="user-profile" element={<Profile />}/>
-          {/* <Route path="game" element={<Game/>}/> */}
+          <Route path="game" element={<GamePage />}/>
           <Route path="testt" element={<Testt/>}/>
       </Routes>
     </BrowserRouter>
