@@ -12,6 +12,7 @@ import { ConfirmationService } from 'src/confirmation/confirmation.service';
 import { TAdd42CredentialsData } from 'src/dto';
 import * as argon from 'argon2';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class SecurityService {
@@ -95,15 +96,27 @@ export class SecurityService {
         'user already has a password',
         HttpStatus.FORBIDDEN,
       );
-    const hash = await argon.hash(dto.password);
-    await this.prisma.user.update({
-      where: { email: user.email },
-      data: {
-        hash,
-        isPasswordRequired: false,
-        username: dto.username,
-      },
-    });
+    try {
+      const hash = await argon.hash(dto.password);
+      await this.prisma.user.update({
+        where: { email: user.email },
+        data: {
+          hash,
+          isPasswordRequired: false,
+          username: dto.username,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002')
+          throw new HttpException(
+            'duplicate unique data',
+            HttpStatus.FORBIDDEN,
+          );
+      }
+      throw new HttpException(error.code, HttpStatus.BAD_REQUEST);
+    }
   }
   async uploadAvatar(file: Express.Multer.File, user: User) {
     const result = await this.cloudinary.uploadFile(file);
