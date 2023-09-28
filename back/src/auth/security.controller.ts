@@ -62,10 +62,6 @@ export class SecurityController {
   async disable2Fa(@Req() request: { user: User }) {
     await this.securityService.disable2Fa(request.user);
   }
-  @Get('resend-email')
-  resend(@Req() request: { user: User }) {
-    return this.securityService.resendEmail(request.user);
-  }
   @ApiBody({ type: Add42CredentialsDto })
   @UseZodGuard('body', Add42CredentialsDto)
   @UseGuards(TwoFaVerificationGuard)
