@@ -127,7 +127,7 @@ useEffect(() => {
 }, [otherpad]);
 
 return (
-	<div className="container">
+	<div className="containerGame">
 		<div className="container-profile">
 			{id === 1 ? ( // Check if id is equal to 1
 				<>
