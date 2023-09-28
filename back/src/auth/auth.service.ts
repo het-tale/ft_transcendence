@@ -80,6 +80,15 @@ export class AuthService {
 
     return jwt;
   }
+  async resendEmail(user: User) {
+    if (user.isEmailConfirmed) {
+      throw new ForbiddenException('email already confirmed');
+    }
+    this.confirmationService.sendConfirmationEmail(
+      user.email,
+      'Confirm your email',
+    );
+  }
 
   async signin(dto: TSigninData) {
     //if identifier is email then search by email else search by username
