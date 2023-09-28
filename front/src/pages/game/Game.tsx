@@ -6,6 +6,7 @@ import { ListenOnSocket } from './Game.lisners';
 import {GameData, Paddle, Ball} from './Game.types';
 import { Avatar, Box, Button, Card, CardBody, CardFooter, CardHeader, Flex, Heading, IconButton, Text, Image, Center, Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
 import "../../css/game.css";
+import { useParams } from "react-router-dom";
 
 export type MySocket = ReturnType<typeof io>;
 
@@ -31,6 +32,7 @@ function useEffectOnce(effect: React.EffectCallback) {
 
 const Game: React.FC = () => {
 		let listning = false;
+		const { identifier } = useParams<{ identifier: string }>();
 		const [playerScore, setPlayerScore] = useState(0);
 		const [otherScore, setOtherScore] = useState(0);
 		const [id , setId] = useState<number | null>(null);
@@ -46,6 +48,7 @@ const Game: React.FC = () => {
 			otherPaddle: useRef<HTMLDivElement>(null),
 			ball: useRef<HTMLDivElement>(null),
 			};
+	console.log('identifier at the game element •••••••••••     ', identifier);
 	
 	const setupSocket = () => {
 	console.log('connecting');
@@ -54,6 +57,7 @@ const Game: React.FC = () => {
 		forceNew: true,
 		timeout: 100000,
 		transports: ['websocket'],
+		query: { identifier: identifier },
 	}));
 	};
 
