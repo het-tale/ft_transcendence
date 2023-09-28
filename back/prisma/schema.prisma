@@ -101,7 +101,7 @@ model Match {
   updatedAt DateTime @updatedAt
 
   start  DateTime
-  end    DateTime
+  end    DateTime?
   result String
 
   playerA   User? @relation("MatchPlayerA", fields: [playerAId], references: [id])
