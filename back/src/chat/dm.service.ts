@@ -20,7 +20,7 @@ export class DMService {
     });
     const user = await this.prisma.user.findUnique({
       where: {
-        id: payload.email,
+        email: payload.email,
       },
     });
     if (!user) {
