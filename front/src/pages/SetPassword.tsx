@@ -46,7 +46,7 @@ const SetPassword = () => {
                                 isClosable: true,
                                 position: "bottom-right",
                               })
-                            navigate('/home');
+                            navigate('/complete-profile');
             }
         } catch (error : any)
         {
