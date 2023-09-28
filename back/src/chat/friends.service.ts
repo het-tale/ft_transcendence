@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -28,6 +28,32 @@ export class FriendsService {
     });
 
     return dbUser.blocked;
+  }
+  async getMutualFriends(username: string, user: User) {
+    const currentUser = await this.prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      include: {
+        friends: true,
+      },
+    });
+    const otherUser = await this.prisma.user.findUnique({
+      where: {
+        username,
+      },
+      include: {
+        friends: true,
+      },
+    });
+    if (!otherUser) {
+      throw new HttpException('User not found.', 404);
+    }
+    const mutualFriends = otherUser.friends.filter((friend) =>
+      currentUser.friends.find((f) => f.id === friend.id),
+    );
+
+    return mutualFriends;
   }
   async handleFriendRequest(
     clientUsername: string,
