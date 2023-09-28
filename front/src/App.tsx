@@ -31,6 +31,7 @@ import Chat from "./pages/Chat/Chat";
 import MessageUser from "./pages/Chat/MessageUser";
 import RightSide from "./pages/Chat/RightSide";
 import Game from "./pages/game/Game";
+import NavigateToGame from "./pages/game/navigatetogame";
 
 // const theme = createTheme();
 
@@ -102,8 +103,9 @@ function App() {
             <Route path="dms" element={<Dms />}/>
             <Route path="rightSide" element={<RightSide />}/>
           </Route>
-		  <Route path="game" element={<Game />}/>
-          <Route path="testt" element={<Testt/>}/>
+		  	{/*<Route path="NavigateToGame" element={<NavigateToGame />} />*/}
+		  	<Route path="game" element={<Game />} />{/* trying to use email as root paramtr*/}
+  			<Route path="testt" element={<Testt />} />
       </Routes>
     </BrowserRouter>
     // </ThemeProvider>

@@ -6,7 +6,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server , Socket} from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { interval } from 'rxjs';
 import { colision } from './colision';
 import {
@@ -21,119 +21,131 @@ import {
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
-
+import { match } from 'assert';
 
 @WebSocketGateway()
 @Injectable()
 export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-	server: Server;
-	private prisma: PrismaService;
-	// In your WebSocket gateway class
-	private activeSockets: Map<string, Socket> = new Map();
+  server: Server;
+  // In your WebSocket gateway class
+  private activeSockets: Map<string, Socket> = new Map();
 
-	private rooms: Map<string, Room> = new Map();
+  private rooms: Map<string, Room> = new Map();
+  constructor(private prisma: PrismaService) {} // Inject the PrismaService
 
   //onModuleInit() {}
   private containerWidth = 1080;
   private containerHeight = 720;
+  private async createMatch(room: Room) {
+    const match = await this.prisma.match
+      .create({
+        data: {
+          start: new Date(),
+          result: 'ongoing',
+        },
+      })
+      .then((match) => {
+        console.log(`Created match with ID: ${match.id}`);
+        // You can store the match ID or use it as needed
+		room.id = match.id;
+      })
+      .catch((error) => {
+        console.error('Error creating match:', error);
+      });
+  }
 
- async handleConnection(client: Socket) {
-    console.log('Client connected: ', client);
-	const clientsocket = client.id;
-	this.activeSockets.set(client.id, client);
-	console.log('clientsocket: ', clientsocket);
-	try
-	{
-
-		const email = await this.prisma.user.findUnique({where: {email: "chliyah@student.1337.ma"}});
-		console.log('email: ', email);
-		const ema = await this.prisma.user.findUnique({where: {email: "mchliyah@student.1337.ma"}});
-		console.log('ema: ', ema);
-	}
-	catch (e)
-	{
-		console.log('error: canot find user');
-	}
-
-    let exist = false;
-    const padd = new Paddle(10, this.containerHeight / 2, 8, 80, 3);
-    const otherpadd = new Paddle(
-      this.containerWidth - 10,
-      this.containerHeight / 2,
-      8,
-      80,
-      3,
-    );
-
-    for (const existRoom of this.rooms.values()) {
-      console.log(
-        'at room ',
-        existRoom.roomName,
-        ' players ',
-        existRoom.players.length,
+  async handleConnection(client: Socket) {
+    try {
+      this.activeSockets.set(client.id, client);
+      console.log('Client connected: ', client.id);
+      const identifier = client.handshake.query.identifier;
+      console.log('identifier: ', identifier);
+      const user = await this.prisma.user.findUnique({
+        where: { email: 'mchliyah@student.1337.ma' },
+      });
+      console.log('user: ', user);
+      let exist = false;
+      const padd = new Paddle(10, this.containerHeight / 2, 8, 80, 3);
+      const otherpadd = new Paddle(
+        this.containerWidth - 10,
+        this.containerHeight / 2,
+        8,
+        80,
+        3,
       );
-      if (existRoom.players.length === 1) {
-        exist = true;
-        const playerNumber = existRoom.players.length + 1;
+
+      for (const existRoom of this.rooms.values()) {
+        console.log(
+          'at room ',
+          existRoom.roomName,
+          ' players ',
+          existRoom.players.length,
+        );
+        if (existRoom.players.length === 1) {
+          exist = true;
+          const playerNumber = existRoom.players.length + 1;
+          const player = new Player(
+            playerNumber,
+            client.id,
+            padd,
+            existRoom.roomName,
+            0,
+          );
+          existRoom.players.push(player);
+          client.join(existRoom.roomName);
+          const gamedata: GameData = {
+            playerpad: player.paddle,
+            otherpad: playerNumber === 1 ? otherpadd : padd,
+            ball: existRoom.ball,
+            playerScore: 0,
+            otherScore: 0,
+            rounds: existRoom.rounds,
+            containerHeight: this.containerHeight,
+            containerWidth: this.containerWidth,
+            id: playerNumber,
+          };
+          client.emit('JoinRoom', existRoom.roomName);
+          client.emit('InitGame', gamedata);
+          this.server
+            .to(existRoom.roomName)
+            .emit('StartGame', existRoom.roomName);
+          this.startGame(existRoom);
+          break;
+        }
+      }
+
+      if (!exist) {
+        const room = new Room(Math.random().toString(36).substring(7));
+        this.rooms.set(room.roomName, room);
+        console.log('new room created with name ', room.roomName);
+        const playerNumber = room.players.length + 1;
         const player = new Player(
           playerNumber,
           client.id,
-          padd,
-          existRoom.roomName,
+          otherpadd,
+          room.roomName,
           0,
         );
-        existRoom.players.push(player);
-        client.join(existRoom.roomName);
+        room.players.push(player);
+        client.join(room.roomName);
+
         const gamedata: GameData = {
           playerpad: player.paddle,
           otherpad: playerNumber === 1 ? otherpadd : padd,
-          ball: existRoom.ball,
+          ball: room.ball,
           playerScore: 0,
           otherScore: 0,
-          rounds: existRoom.rounds,
+          rounds: room.rounds,
           containerHeight: this.containerHeight,
           containerWidth: this.containerWidth,
           id: playerNumber,
         };
-        client.emit('JoinRoom', existRoom.roomName);
+        client.emit('JoinRoom', room.roomName);
         client.emit('InitGame', gamedata);
-        this.server
-          .to(existRoom.roomName)
-          .emit('StartGame', existRoom.roomName);
-        this.startGame(existRoom);
-        break;
       }
-    }
-
-    if (!exist) {
-      const room = new Room(Math.random().toString(36).substring(7));
-      this.rooms.set(room.roomName, room);
-      console.log('new room created with name ', room.roomName);
-      const playerNumber = room.players.length + 1;
-      const player = new Player(
-        playerNumber,
-        client.id,
-        otherpadd,
-        room.roomName,
-        0,
-      );
-      room.players.push(player);
-      client.join(room.roomName);
-
-      const gamedata: GameData = {
-        playerpad: player.paddle,
-        otherpad: playerNumber === 1 ? otherpadd : padd,
-        ball: room.ball,
-        playerScore: 0,
-        otherScore: 0,
-        rounds: room.rounds,
-        containerHeight: this.containerHeight,
-        containerWidth: this.containerWidth,
-        id: playerNumber,
-      };
-      client.emit('JoinRoom', room.roomName);
-      client.emit('InitGame', gamedata);
+    } catch (e) {
+      console.log('error: canot find user');
     }
   }
 
@@ -141,11 +153,13 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const room = this.findRoomByPlayerSocket(client);
 
     if (room) {
-      room.players = room.players.filter((player) => player.socket_id !== client.id);
+      room.players = room.players.filter(
+        (player) => player.socket_id !== client.id,
+      );
       if (room.players.length < 2) {
         this.stopGame(room);
         room.gameActive = false;
-		this.activeSockets.delete(client.id);
+        this.activeSockets.delete(client.id);
         this.rooms.delete(room.roomName); // Remove the room if it's empty
       }
     }
@@ -193,6 +207,7 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         this.updateGame(room);
       });
+	  this.createMatch(room);
     }
   }
 
@@ -225,6 +240,6 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // Reverse the vertical velocity of the ball
       room.ball.dy *= -1;
     }
-    colision(room, this.activeSockets);
+    colision(room, this.activeSockets, this.prisma);
   }
 }

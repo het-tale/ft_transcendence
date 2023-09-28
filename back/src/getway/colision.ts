@@ -1,4 +1,5 @@
 // import { Server } from "socket.io";
+import { PrismaService } from 'src/prisma/prisma.service';
 import { Room, Ball } from './types';
 import { Socket } from 'socket.io';
 
@@ -11,11 +12,18 @@ function resetBall(ball: Ball) {
   ball.dy = 3;
 }
 
-export async function colision(room: Room, activeSockets: Map<string, Socket>) {
+// i must check tho colision again and again every time i make changes
+// some times it is not working as expected
+
+export async function colision(
+  room: Room,
+  activeSockets: Map<string, Socket>,
+  prisma: PrismaService,
+) {
   const player = room.players[0];
   const otherPlayer = room.players[1];
-  const playerSocket = await activeSockets.get(player.socket_id);
-  const otherPlayerSocket = await activeSockets.get(otherPlayer.socket_id);
+  const playerSocket = activeSockets.get(player.socket_id);
+  const otherPlayerSocket = activeSockets.get(otherPlayer.socket_id);
 
   const playerPaddle = player.paddle;
   const otherPaddle = otherPlayer.paddle;
@@ -62,6 +70,11 @@ export async function colision(room: Room, activeSockets: Map<string, Socket>) {
     otherPlayer.score++;
     room.rounds--;
     if (room.rounds === 0) {
+      await prisma.match.update({
+        where: { id: room.id },
+        data: { result: 'completed' }, //here is what should be i but i dont have a valid id
+        //   data: { result: 'completed', winnerId: player.score > otherPlayer.score ? player.id : otherPlayer.id},
+      });
       if (player.score > otherPlayer.score) {
         playerSocket.emit('GAME OVER', { winner: true });
         otherPlayerSocket.emit('GAME OVER', { winner: false });
@@ -87,6 +100,12 @@ export async function colision(room: Room, activeSockets: Map<string, Socket>) {
     room.rounds--;
     if (room.rounds === 0) {
       if (player.score > otherPlayer.score) {
+        await prisma.match.update({
+          where: { id: room.id },
+          data: { result: 'completed' },
+          //here is what should be i but i dont have a valid id
+          //   data: { result: 'completed', winnerId: player.score > otherPlayer.score ? player.id : otherPlayer.id},
+        });
         playerSocket.emit('GAME OVER', { winner: true });
         otherPlayerSocket.emit('GAME OVER', { winner: false });
         //stop the game
