@@ -31,7 +31,7 @@ export class ChatGateway
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    const token = client.handshake.query.token;
+    const token = client.handshake.auth.token;
     try {
       const user = await this.dmService.verifyToken(token);
       this.connectedUsers.push({
@@ -105,7 +105,7 @@ export class ChatGateway
     if (receiver) isPending = false;
     await this.dmService.saveMessage({
       sender: sender.username,
-      receiver: receiver.username,
+      receiver: data.to,
       message: data.message,
       date: sentAt,
       isPending,
