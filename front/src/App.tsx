@@ -32,6 +32,7 @@ import MessageUser from "./pages/Chat/MessageUser";
 import RightSide from "./pages/Chat/RightSide";
 import Profile from "./pages/Profile/Profile";
 import GamePage from "./pages/Game/GamePage";
+import {socket} from "./socket";
 
 const theme = createTheme();
 
