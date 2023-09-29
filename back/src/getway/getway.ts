@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -22,6 +22,8 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { match } from 'assert';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway()
 @Injectable()
@@ -32,7 +34,7 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private activeSockets: Map<string, Socket> = new Map();
 
   private rooms: Map<string, Room> = new Map();
-  constructor(private prisma: PrismaService) {} // Inject the PrismaService
+  constructor(private prisma: PrismaService, private conf: ConfigService, private jwt: JwtService,) {} // Inject the PrismaService
 
   //onModuleInit() {}
   private containerWidth = 1080;
@@ -56,15 +58,17 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleConnection(client: Socket) {
-    try {
-      this.activeSockets.set(client.id, client);
-      console.log('Client connected: ', client.id);
-      const identifier = client.handshake.query.identifier;
-      console.log('identifier: ', identifier);
-      const user = await this.prisma.user.findUnique({
-        where: { email: 'mchliyah@student.1337.ma' },
-      });
-      console.log('user: ', user);
+	try {
+		const token = client.handshake.query.token;
+		const user = await this.verifyToken(token);
+		console.log('user', user);
+		if (user) {
+		  this.activeSockets.set(client.id, client);
+		  client.emit('connection', 'connected');
+		} else {
+		  client.disconnect();
+		}
+
       let exist = false;
       const padd = new Paddle(10, this.containerHeight / 2, 8, 80, 3);
       const otherpadd = new Paddle(
@@ -145,7 +149,7 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.emit('InitGame', gamedata);
       }
     } catch (e) {
-      console.log('error: canot find user');
+      console.log('error', e);
     }
   }
 
@@ -241,5 +245,23 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       room.ball.dy *= -1;
     }
     colision(room, this.activeSockets, this.prisma);
+  }
+  async verifyToken(token: string | string[]) {
+    if (token instanceof Array) {
+      throw new HttpException('invalid token', 400);
+    }
+    const payload = await this.jwt.verify(token, {
+      secret: this.conf.get('ACCESS_TOKEN_JWT_SECRET'),
+    });
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: payload.email,
+      },
+    });
+    if (!user) {
+      throw new HttpException('user not found', 404);
+    }
+
+    return user;
   }
 }
