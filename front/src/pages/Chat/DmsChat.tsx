@@ -3,13 +3,23 @@ import MessageContent from "./MessageContent";
 import TypingBar from "./TypingBar";
 import { Box, Flex, Grid, GridItem, IconButton, Menu, MenuButton, MenuItem, MenuList, SimpleGrid, Spacer, background, useDisclosure } from '@chakra-ui/react'
 import MessageUser from "./MessageUser";
+import React, { useEffect } from "react";
+import { SocketContext } from "../../socket";
+import GetDms from "./GetDms";
+import { UserType } from "../../Types/User";
 
-const DmsChat = () => {
+const DmsChat = (props : any) => {
+    const [dms, setDms] = React.useState<UserType[]>([]);
+    const socket = React.useContext(SocketContext);
+   const res = GetDms().then((data) => {
+        setDms(data);
+    })
     return (<div>
         <Flex>
                 <Box width={"98%"}>
 
                 <MessageUser profile='/assets/het-tale.jpg' name="Hasnaa" message="online" />
+                {/* <MessageUser profile={props.userDm.avatar} name="Hasnaa" message="online" /> */}
                 </Box>
                 <Menu>
                     <MenuButton
@@ -45,11 +55,12 @@ const DmsChat = () => {
                     </MenuList>
                     </Menu>
             </Flex>
+           
             <MessageContent message='Hello' name='sender' room={false}/>
             <MessageContent message='Hello again' name='receiver' room={false}/>
             <MessageContent message='Hello again' name='receiver' room={false}/>
             <MessageContent message='Hello again' name='sender' room={false}/>
-            <TypingBar />
+            <TypingBar/>
     </div>);
 }
 

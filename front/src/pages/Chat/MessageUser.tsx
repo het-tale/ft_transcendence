@@ -3,6 +3,7 @@ import {
     Heading, Text, Button
 }
 from '@chakra-ui/react'
+import { UserType } from '../../Types/User';
 
 interface MessageUserProps {
   profile: string;
@@ -11,11 +12,21 @@ interface MessageUserProps {
   children?: React.ReactNode;
   onClick?: () => void;
   design?: string;
+  setId?: React.Dispatch<React.SetStateAction<number>>;
+  id?: number;
+  dm?: UserType;
+  setUserDm?: React.Dispatch<React.SetStateAction<UserType | undefined>>;
 }
 
-const MessageUser = ({profile , name, message, children, design} : MessageUserProps) => {
-    return (
-        <div>
+const MessageUser = ({profile , name, message, children, design, setUserDm, dm} : MessageUserProps) => {
+  const HandleDm = () => {
+    console.log("Hellooo");
+    if (setUserDm && dm) {
+      setUserDm(dm);
+    }
+  }
+  return (
+        <div onClick={HandleDm}>
             <Card
             className={design}
         direction={{ base: 'column', sm: 'row' }}
