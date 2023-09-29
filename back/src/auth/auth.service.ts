@@ -118,11 +118,13 @@ export class AuthService {
       throw new HttpException('wrong password', HttpStatus.FORBIDDEN);
     }
     const token = await this.getJwtToken(user.id, user.email);
+    console.log(token);
 
     return token;
   }
   async signin42(user: User) {
     const token = await this.getJwtToken(user.id, user.email);
+    console.log(token);
 
     return token;
   }
@@ -143,7 +145,7 @@ export class AuthService {
     };
 
     return this.jwt.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: '50m',
       secret: this.conf.get('ACCESS_TOKEN_JWT_SECRET'),
     });
   }

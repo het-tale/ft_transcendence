@@ -48,7 +48,7 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       .then((match) => {
         console.log(`Created match with ID: ${match.id}`);
         // You can store the match ID or use it as needed
-		room.id = match.id;
+        room.id = match.id;
       })
       .catch((error) => {
         console.error('Error creating match:', error);
@@ -207,7 +207,7 @@ export class MyGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         this.updateGame(room);
       });
-	  this.createMatch(room);
+      this.createMatch(room);
     }
   }
 

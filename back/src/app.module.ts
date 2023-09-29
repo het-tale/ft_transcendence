@@ -7,7 +7,7 @@ import { ConfirmationModule } from './confirmation/confirmation.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { TwoFaModule } from './2fa/two-fa.module';
 import { ChatModule } from './chat/chat.module';
-import { GetwayModule } from './getway/getway.modules';
+import { GetwayModule } from './game/getway.modules';
 import { UserModule } from './user/user.module';
 
 @Module({

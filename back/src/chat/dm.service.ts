@@ -48,7 +48,7 @@ export class DMService {
       },
     });
     if (!user1 || !user2) {
-      throw new HttpException('user not found', 404);
+      throw new Error('User not found.');
     }
     const receiverIsBlocked = user1.blocked.find(
       (blockedUser) => blockedUser.id === user2.id,
@@ -63,7 +63,7 @@ export class DMService {
       throw new Error('You are blocked by this user.');
     }
 
-    await this.prisma.message.create({
+    const message = await this.prisma.message.create({
       data: {
         content: data.message,
         sentAt: data.date,
@@ -72,6 +72,7 @@ export class DMService {
         isPending: data.isPending,
       },
     });
+    console.log(message);
     const existingDmUser = user1.dmsList.find(
       (dm) => dm.username === user2.username,
     );
