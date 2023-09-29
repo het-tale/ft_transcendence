@@ -4,7 +4,7 @@ import Sidebar from "../../components/Sidebar";
 import LeftSide from "./LeftSide";
 import { Box, Flex, Grid, GridItem, IconButton, Menu, MenuButton, MenuItem, MenuList, SimpleGrid, Spacer, background, useDisclosure } from '@chakra-ui/react'
 import RightSide from "./RightSide";
-import React from "react";
+import React, { useEffect } from "react";
 import Search from "../../components/Search";
 import MessageUser from "./MessageUser";
 import ModalUi from "../../components/ModalUi";
@@ -14,6 +14,8 @@ import TypingBar from "./TypingBar";
 import DmsChat from "./DmsChat";
 import RoomsChat from "./RoomsChat";
 import ModalBodyUi from "../../components/ModalBodyUi";
+import { UserType } from "../../Types/User";
+import GetDms from "./GetDms";
 
 
 const Dms = () => {
@@ -25,6 +27,14 @@ const Dms = () => {
   const [selectedOption, setSelectedOption] = React.useState('');
     const [showField, setShowField] = React.useState(false);
   const [name, setName] = React.useState("");
+  const [dms, setDms] = React.useState<UserType[]>([]);
+  const [userDm, setUserDm] = React.useState<UserType>();
+  const [id, setId] = React.useState(0);
+  useEffect(() => {
+   GetDms().then((data) => {
+        setDms(data);
+    })
+  }, []);
   const handleRenderActions = () => {
         setRenderActions(!renderActions);
   }
@@ -50,9 +60,13 @@ const Dms = () => {
           tabTitle: 'Direct Messages',
           content: <>
           <Search name="tabDesign" setName={setName} filter={name}/>
-          <MessageUser profile='/assets/het-tale.jpg' name="Hasnaa" message="hello" />
+          {dms?.map((dm) => {
+              return <MessageUser profile={dm.avatar} name={dm.username} message="last message" dm={dm} setUserDm={setUserDm}/>
+          })
+          }
+          {/* <MessageUser profile='/assets/het-tale.jpg' name="Hasnaa" message="hello" /> */}
           </>,
-          rightSide: <><DmsChat /></>
+          rightSide: <><DmsChat userDm={userDm}/></>
       },
       {
           id: 2,

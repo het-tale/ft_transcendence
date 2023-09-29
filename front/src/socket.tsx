@@ -2,8 +2,8 @@ import React from "react";
 import { io } from "socket.io-client";
 
 let  token = localStorage.getItem('token');
-
-const URL = "http://localhost:3001";
+console.log(token);
+const URL = "http://localhost:3001/chat";
 
 export const socket = io(URL, {
   withCredentials: true,
@@ -14,3 +14,5 @@ export const socket = io(URL, {
     token: token,
   },
 });
+
+export const SocketContext = React.createContext(socket);
