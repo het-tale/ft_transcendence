@@ -467,6 +467,7 @@ export class ChannelService {
     channelName: string,
     kickerUsername: string,
     kickedUsername: string,
+    isOnline: boolean,
   ) {
     const kicker = await this.prisma.user.findUnique({
       where: {
@@ -509,6 +510,20 @@ export class ChannelService {
         },
       },
     });
+    if (!isOnline) {
+      await this.prisma.channel.update({
+        where: {
+          id: channel.id,
+        },
+        data: {
+          offlineKicked: {
+            connect: {
+              id: kicked.id,
+            },
+          },
+        },
+      });
+    }
   }
   async addAdmin(
     channelName: string,
@@ -560,6 +575,7 @@ export class ChannelService {
     channelName: string,
     clientUsername: string,
     bannedUsername: string,
+    isOnline: boolean,
   ) {
     const { target, channel } = await this.checkInput(
       channelName,
@@ -595,6 +611,20 @@ export class ChannelService {
         },
       },
     });
+    if (!isOnline) {
+      await this.prisma.channel.update({
+        where: {
+          id: channel.id,
+        },
+        data: {
+          offlineKicked: {
+            connect: {
+              id: target.id,
+            },
+          },
+        },
+      });
+    }
   }
   async checkInput(
     clientUsername: string,
@@ -638,6 +668,7 @@ export class ChannelService {
     clientUsername: string,
     channelName: string,
     targetUsername: string,
+    isOnline: boolean,
   ) {
     const { target, channel } = await this.checkInput(
       clientUsername,
@@ -667,6 +698,20 @@ export class ChannelService {
         },
       },
     });
+    if (isOnline) {
+      await this.prisma.channel.update({
+        where: {
+          id: channel.id,
+        },
+        data: {
+          offlineUnbanned: {
+            connect: {
+              id: target.id,
+            },
+          },
+        },
+      });
+    }
   }
   async muteUser(
     clientUsername: string,
@@ -816,11 +861,17 @@ export class ChannelService {
         const socket = io.of('/').sockets[user.clientId];
         if (user) {
           socket.leave(channelName);
+        } else {
           await this.prisma.channel.update({
             where: {
               id: channel.id,
             },
             data: {
+              offlineKicked: {
+                connect: {
+                  id: participant.id,
+                },
+              },
               participants: {
                 disconnect: {
                   id: participant.id,
@@ -832,7 +883,7 @@ export class ChannelService {
       }),
     );
   }
-  async getOfflineDeletedChannels(userId: number) {
+  async getOfflineKickedChannels(userId: number) {
     return await this.prisma.channel.findMany({
       where: {
         participants: {
@@ -840,17 +891,18 @@ export class ChannelService {
             id: userId,
           },
         },
-        isDeleted: true,
-      },
-      include: {
-        participants: true,
+        offlineKicked: {
+          some: {
+            id: userId,
+          },
+        },
       },
     });
   }
-  async leaveOfflineDetetedChannels(offlineChannels, userId: number) {
+  async deleteEmptyChannels(offlineChannels) {
     return await Promise.all(
       offlineChannels.map(async (channel) => {
-        if (channel.participants.length === 1) {
+        if (channel.participants.length === 1 && channel.isDeleted) {
           await this.prisma.channel.delete({
             where: {
               id: channel.id,
@@ -859,12 +911,34 @@ export class ChannelService {
 
           return;
         }
+      }),
+    );
+  }
+  async getOfflineUnbannedChannels(userId: number) {
+    return await this.prisma.channel.findMany({
+      where: {
+        participants: {
+          some: {
+            id: userId,
+          },
+        },
+        offlineUnbanned: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
+  }
+  async deleteFromOfflineUnbannedChannels(offlineChannels, userId: number) {
+    return await Promise.all(
+      offlineChannels.map(async (channel) => {
         await this.prisma.channel.update({
           where: {
             id: channel.id,
           },
           data: {
-            participants: {
+            offlineUnbanned: {
               disconnect: {
                 id: userId,
               },
