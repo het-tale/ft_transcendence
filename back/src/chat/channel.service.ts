@@ -189,12 +189,7 @@ export class ChannelService {
       },
     });
   }
-  async joinChannel(
-    channelName: string,
-    username: string,
-    type: string,
-    password: string,
-  ) {
+  async joinChannel(channelName: string, username: string, password: string) {
     const user = await this.prisma.user.findUnique({
       where: {
         username,
@@ -207,15 +202,28 @@ export class ChannelService {
       where: {
         name: channelName,
       },
+      include: {
+        participants: true,
+      },
     });
     if (!channel) {
       throw new Error('channel not found');
     }
+    //check if user is already in the channel
+    const isParticipant = channel.participants.some(
+      (participant) => participant.id === user.id,
+    );
+    if (channel.type === 'private')
+      throw new Error('cannot join private channel');
     if (channel.type === 'protected') {
+      if (password === null) throw new Error('password is required');
       const isPasswordValid = await argon.verify(channel.hash, password);
       if (!isPasswordValid) {
         throw new Error('invalid password');
       }
+    }
+    if (isParticipant) {
+      throw new Error('user is already in the channel');
     }
     await this.prisma.channel.update({
       where: {
