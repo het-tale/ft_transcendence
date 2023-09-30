@@ -108,12 +108,14 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
+      console.log(data);
       const sender = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       );
       const receiver = this.connectedUsers.find(
         (user) => user.username === data.to,
       );
+      console.log(data.to);
       const sentAt = new Date();
       let isPending = true;
       if (receiver) isPending = false;
@@ -141,6 +143,13 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
+      if (
+        data.type !== 'public' &&
+        data.type !== 'protected' &&
+        data.type !== 'private'
+      ) {
+        throw new Error('invalid room type');
+      }
       if (data.type === 'protected' && !data.password) {
         throw new Error('password is required for protected rooms');
       }
@@ -155,26 +164,20 @@ export class ChatGateway
       );
       client.join(data.room);
       this.io.to(data.room).emit('roomCreated', { room: data.room });
-
-      return { event: 'roomCreated', room: data.room };
     } catch (err) {
       client.emit('roomCreateError', err.message);
     }
   }
-  @SubscribeMessage('sendRoomInvitation')
+
   @SubscribeMessage('joinRoom')
   async joinRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
     try {
-      if (data.type === 'protected' && !data.password) {
-        throw new Error('password is required for protected rooms');
-      }
       const user = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       );
       await this.channelService.joinChannel(
         data.room,
         user.username,
-        data.type,
         data.password ? data.password : null,
       );
       client.join(data.room);
@@ -207,16 +210,12 @@ export class ChatGateway
         sender.username,
         sentAt,
       );
-      this.io.to(data.room).emit('roomMessage', {
-        from: sender.username,
-        message: data.message,
-        room: data.room,
-      });
+      this.io.to(data.room).emit('roomMessage', data.message);
     } catch (err) {
       client.emit('roomMessageError', err.message);
     }
   }
-
+  @SubscribeMessage('sendRoomInvitation')
   async sendRoomInvitation(
     @MessageBody() data: any,
     @ConnectedSocket() client: Socket,
@@ -237,7 +236,7 @@ export class ChatGateway
       });
       if (receiver) {
         isReceiverOnline = true;
-        this.io.to(receiver.clientId).emit('room invitation', {
+        this.io.to(receiver.clientId).emit('roomInvitation', {
           from: sender.username,
           room: data.room,
         });
