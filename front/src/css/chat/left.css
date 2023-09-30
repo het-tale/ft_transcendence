@@ -10,10 +10,11 @@
 .container {
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     border-radius: 10px;
-    height: 95vh;
+    height: 92vh;
     background-color: #fafafa;
     padding: 20px;
     overflow-y: auto;
+    /* position: absolute; */
 }
 .delimiter {
     width: 2px !important;

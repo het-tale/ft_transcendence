@@ -7,19 +7,26 @@ import React, { useEffect } from "react";
 import { SocketContext } from "../../socket";
 import GetDms from "./GetDms";
 import { UserType } from "../../Types/User";
+import { MessageType } from "../../Types/Message";
+import GetMessages from "./GetMessages";
 
 const DmsChat = (props : any) => {
     const [dms, setDms] = React.useState<UserType[]>([]);
     const socket = React.useContext(SocketContext);
-   const res = GetDms().then((data) => {
-        setDms(data);
-    })
-    return (<div>
-        <Flex>
+    const [messages, setMessages] = React.useState<MessageType[]>([]);
+    const [render, setRender] = React.useState(false);
+    useEffect(() => {
+        const res = GetDms().then((data) => {
+             setDms(data);
+         })
+         const res2 = props.userDm ? GetMessages(props.userDm.username).then((data) => {setMessages(data)}) : null;
+    }, [render, props.userDm]);
+    return (<Flex flexDirection={"column"} justifyContent={"space-between"}>
+        <Flex h={"10%"}>
                 <Box width={"98%"}>
-
-                <MessageUser profile='/assets/het-tale.jpg' name="Hasnaa" message="online" />
-                {/* <MessageUser profile={props.userDm.avatar} name="Hasnaa" message="online" /> */}
+                {
+                    props.userDm ? <MessageUser profile={props.userDm.avatar} name={props.userDm.username} message="online" /> : <></>
+                }
                 </Box>
                 <Menu>
                     <MenuButton
@@ -54,14 +61,19 @@ const DmsChat = (props : any) => {
                         </MenuItem>
                     </MenuList>
                     </Menu>
-            </Flex>
-           
-            <MessageContent message='Hello' name='sender' room={false}/>
+        </Flex>
+            <div className="messagesContainer">
+           {messages?.map((message) => {
+                return <MessageContent message={message.content} name="sender" room={false}/>
+            })
+            }
+            </div>
+            {/* <MessageContent message='Hello' name='sender' room={false}/>
             <MessageContent message='Hello again' name='receiver' room={false}/>
             <MessageContent message='Hello again' name='receiver' room={false}/>
-            <MessageContent message='Hello again' name='sender' room={false}/>
-            <TypingBar/>
-    </div>);
+            <MessageContent message='Hello again' name='sender' room={false}/> */}
+            <TypingBar userDm={props.userDm} setRender={setRender} render={render}/>
+    </Flex>);
 }
 
 export default DmsChat;

@@ -178,7 +178,7 @@ label {
     justify-content: space-between;
   }
 
-[type="submit"] {
+[type="submit"]:not(.excludeSubmit) {
     background-color: var(--fakhti);
     border: none;
     color: var(--white);

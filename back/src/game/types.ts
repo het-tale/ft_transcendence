@@ -1,6 +1,5 @@
 // import { Socket } from 'dgram';
 import { Subscription } from 'rxjs';
-import { Socket } from 'socket.io';
 export class Paddle {
   constructor(x: number, y: number, width: number, height: number, dy: number) {
     this.x = x;
@@ -45,19 +44,19 @@ export interface GameData {
 export class Player {
   constructor(
     id: number,
-    socket: Socket,
+    socket_id: string,
     paddle: Paddle,
     room: string,
     score: number,
   ) {
     this.id = id;
-    this.socket = socket;
+    this.socket_id = socket_id;
     this.paddle = paddle;
     this.room = room;
     this.score = score;
   }
   id: number;
-  socket: Socket;
+  socket_id: string;
   paddle: Paddle;
   room: string;
   score: number;
@@ -72,6 +71,7 @@ export interface IventMouse {
 
 export class Room {
   constructor(roomName: string) {
+	this.id = null
     this.roomName = roomName;
     this.players = [];
     this.gameActive = false;
@@ -80,6 +80,7 @@ export class Room {
     this.ball = new Ball(500, 500, 10, 3, 3);
     this.rounds = 5;
   }
+  id: number;
   roomName: string;
   players: Player[];
   gameActive: boolean;
@@ -88,6 +89,15 @@ export class Room {
   ball: Ball;
   rounds: number;
 }
+
+// export interface MatchData {
+// 	start: Date;
+// 	result: string;
+// 	playerAId: number;
+// 	playerBId: number;
+// 	winnerId: number;
+// }
+
 
 export const INTERVAL = 16.66;
 export const INCREASE_SPEED = 0.2;

@@ -1,9 +1,4 @@
-import {
-  ForbiddenException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { TwoFaService } from 'src/2fa/two-fa.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -79,15 +74,6 @@ export class SecurityService {
         twoFaSecret: null,
       },
     });
-  }
-  async resendEmail(user: User) {
-    if (user.isEmailConfirmed) {
-      throw new ForbiddenException('email already confirmed');
-    }
-    this.confirmationService.sendConfirmationEmail(
-      user.email,
-      'Confirm your email',
-    );
   }
 
   async setNewPasswordUsername(dto: TAdd42CredentialsData, user: User) {

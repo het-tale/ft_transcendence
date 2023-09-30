@@ -16,18 +16,27 @@ interface MessageUserProps {
   id?: number;
   dm?: UserType;
   setUserDm?: React.Dispatch<React.SetStateAction<UserType | undefined>>;
+  setTest?: React.Dispatch<React.SetStateAction<boolean>>;
+  isUserDm?: boolean;
+  setFirstLoad?: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const MessageUser = ({profile , name, message, children, design, setUserDm, dm} : MessageUserProps) => {
+const MessageUser = ({profile , name, message, children, design, setUserDm, dm, setFirstLoad, isUserDm} : MessageUserProps) => {
   const HandleDm = () => {
     console.log("Hellooo");
-    if (setUserDm && dm) {
+    console.log("Hellooo user", isUserDm);
+    if (setUserDm && dm && setFirstLoad) {
+      setFirstLoad("firstLoad");
       setUserDm(dm);
     }
+    console.log("Hellooo userDm", dm);
   }
   return (
-        <div onClick={HandleDm}>
-            <Card
+        <div>
+          <button
+          onClick={HandleDm}
+          style={{width: "100%"}}>
+          <Card
             className={design}
         direction={{ base: 'column', sm: 'row' }}
         overflow='hidden'
@@ -70,6 +79,8 @@ const MessageUser = ({profile , name, message, children, design, setUserDm, dm} 
   </Stack>
 <>{children}</>
 </Card>
+          </button>
+           
         </div>
     );
 }

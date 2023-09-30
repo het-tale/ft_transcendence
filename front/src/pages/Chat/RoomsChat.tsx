@@ -6,7 +6,7 @@ import MessageUser from "./MessageUser";
 
 const RoomsChat = (props: any) => {
     return(
-        <div>
+        <Flex flexDirection={"column"}>
             <Flex>
                 <Box width={"98%"}>
 
@@ -42,12 +42,47 @@ const RoomsChat = (props: any) => {
                     </MenuList>
                     </Menu>
             </Flex>
+            <div className="messagesContainer" style={{"overflowY": "auto"}}>
+
+            {/* <MessageContent message='Hello' name='sender' room={true} />
+            <MessageContent message='Hello again' name='receiver' room={true}/>
+            <MessageContent message='Hello again' name='receiver' room={true}/>
+            <MessageContent message='Hello again' name='sender' room={true}/>
             <MessageContent message='Hello' name='sender' room={true} />
             <MessageContent message='Hello again' name='receiver' room={true}/>
             <MessageContent message='Hello again' name='receiver' room={true}/>
             <MessageContent message='Hello again' name='sender' room={true}/>
+            <MessageContent message='Hello' name='sender' room={true} />
+            <MessageContent message='Hello again' name='receiver' room={true}/>
+            <MessageContent message='Hello again' name='receiver' room={true}/>
+            <MessageContent message='Hello again' name='sender' room={true}/>
+            <MessageContent message='Hello' name='sender' room={true} />
+            <MessageContent message='Hello again' name='receiver' room={true}/>
+            <MessageContent message='Hello again' name='receiver' room={true}/>
+            <MessageContent message='Hello again' name='sender' room={true}/>
+
+            <MessageContent message='Hello' name='sender' room={true} />
+            <MessageContent message='Hello again' name='receiver' room={true}/>
+            <MessageContent message='Hello again' name='receiver' room={true}/>
+            <MessageContent message='Hello again' name='sender' room={true}/>
+            <MessageContent message='Hello' name='sender' room={true} />
+            <MessageContent message='Hello again' name='receiver' room={true}/>
+            <MessageContent message='Hello again' name='receiver' room={true}/>
+            <MessageContent message='Hello again' name='sender' room={true}/>
+            <MessageContent message='Hello' name='sender' room={true} />
+            <MessageContent message='Hello again' name='receiver' room={true}/>
+            <MessageContent message='Hello again' name='receiver' room={true}/>
+            <MessageContent message='Hello again' name='sender' room={true}/>
+            <MessageContent message='Hello' name='sender' room={true} />
+            <MessageContent message='Hello again' name='receiver' room={true}/> */}
+            {/* <MessageContent message='Hello again' name='receiver' room={true}/>
+            <MessageContent message='Hello again' name='sender' room={true}/> */}
+            </div>
+            <Box flex={1}>
+
             <TypingBar />
-        </div>
+            </Box>
+        </Flex>
     )
 
 }
