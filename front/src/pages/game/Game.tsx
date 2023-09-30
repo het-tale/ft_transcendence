@@ -23,10 +23,8 @@ import {
   MenuItem,
 } from "@chakra-ui/react";
 import "../../css/game.css";
-import { useParams } from "react-router-dom";
 import User from "../../components/User";
 import { UserType } from "../../Types/User";
-import { to } from "@react-spring/web";
 
 export type MySocket = ReturnType<typeof io>;
 
@@ -56,9 +54,9 @@ function useEffectOnce(effect: React.EffectCallback) {
 }
 
 const Game: React.FC = () => {
-	const token: string = localStorage.getItem("token") as string;
+  const token: string = localStorage.getItem("token") as string;
   const [user, setUser] = useState<UserType | null>(null);
-  const [user2, setUser2] = useState<UserType | null>(null);
+  const [otherAvatar, setOtherAvatar] = useState<string | null>(null);
   let listning = false;
   const [playerScore, setPlayerScore] = useState(0);
   const [otherScore, setOtherScore] = useState(0);
@@ -77,17 +75,14 @@ const Game: React.FC = () => {
   };
 
   useEffect(() => {
-	  const fetchUser = async () => {
-		  const response = await User();
-		  console.log("response from user", response);
-		  setUser(response);
-		};
-		fetchUser();
-	console.log("identifier at the game element •••••••••••     ", token);
+    const fetchUser = async () => {
+      const response = await User();
+      setUser(response);
+    };
+    fetchUser();
   }, []);
 
   const setupSocket = () => {
-    console.log("connecting");
     setSocket(
       io("http://localhost:3001", {
         withCredentials: true,
@@ -160,18 +155,23 @@ const Game: React.FC = () => {
 
   useEffect(() => {
     if (init) setupEventListeners();
-    if (!listning && socket) {
-      listning = true;
+  }, [init]);
+
+  useEffect(() => {
+    if (socket && !listning) {
       ListenOnSocket(
         socket,
         setPadd,
         setBall,
         setOtherpad,
         setPlayerScore,
-        setOtherScore
+        setOtherScore,
+		setOtherAvatar,
+		user
       );
+      listning = true;
     }
-  }, [init]);
+  }, [socket]);
 
   useEffect(() => {
     if (padd && Dimensions.width > 0 && Dimensions.height > 0)
@@ -209,7 +209,7 @@ const Game: React.FC = () => {
         {id === 1 ? ( // Check if id is equal to 1
           <>
             <div className="other-profile">
-              <Image src={user2?.avatar} alt="Other Profile" />
+              <Image src={otherAvatar??''} alt="Other Profile" />
               <div className="other-score">{otherScore} </div>
             </div>
             <div className="player-profile">
@@ -220,7 +220,7 @@ const Game: React.FC = () => {
         ) : (
           <>
             <div className="other-profile">
-              <img src={user2?.avatar} alt="Other Profile" />
+              <img src={otherAvatar??''} alt="Other Profile" />
               <div className="other-score">{otherScore}</div>
             </div>
             <div className="player-profile">

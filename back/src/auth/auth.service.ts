@@ -143,7 +143,7 @@ export class AuthService {
     };
 
     return this.jwt.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: '60m',
       secret: this.conf.get('ACCESS_TOKEN_JWT_SECRET'),
     });
   }

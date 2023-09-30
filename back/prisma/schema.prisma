@@ -22,7 +22,6 @@ model User {
   is2FaEnabled       Boolean @default(false)
   twoFaSecret        String?
   is2FaVerified      Boolean @default(false)
-  token              string?
 
   sentMessages           Message[]       @relation("SentMessages")
   receivedMessages       Message[]       @relation("ReceivedMessages")

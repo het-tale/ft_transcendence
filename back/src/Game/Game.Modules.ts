@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { MyGateway } from './getway';
+import { Game } from './Game';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
 	imports: [JwtModule.register({})],
-  providers: [MyGateway],
+  providers: [Game],
 })
-export class GetwayModule {}
+export class GameModule {}
