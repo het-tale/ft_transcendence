@@ -26,15 +26,15 @@ import Dms from "./pages/Chat/Dms";
 import Test from "./pages/Test";
 import Testt from "./pages/Test";
 import TabsTest from "./pages/Chat/Tabs";
-import { createTheme, ThemeProvider } from '@mui/material';
+// import { createTheme, ThemeProvider } from '@mui/material';
 import Chat from "./pages/Chat/Chat";
 import MessageUser from "./pages/Chat/MessageUser";
 import RightSide from "./pages/Chat/RightSide";
 import Profile from "./pages/Profile/Profile";
-import GamePage from "./pages/Game/GamePage";
+// import GamePage from "./pages/Game/GamePage";
 import {socket, SocketContext} from "./socket";
 
-const theme = createTheme();
+// const theme = createTheme();
 
 function App() {
   return (

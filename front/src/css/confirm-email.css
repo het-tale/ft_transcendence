@@ -20,14 +20,14 @@ body {
 .left {
     background-color: var(--fakhti);
     width: 50%;
-    height: 100vh;
+    /*height: 100vh;*/
     color: var(--white);
 }
 
 .right {
     background-color: var(--white);
     width: 50%;
-    height: 100vh;
+    /*height: 100vh;*/
     padding-top: 15%;
     
 }

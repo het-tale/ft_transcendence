@@ -41,6 +41,13 @@ export class ChatController {
   async getBlockedUsers(@Req() request: { user: User }) {
     return this.friendsService.getBlockedUsers(request.user);
   }
+  @Get('mutual-friends/:username')
+  async getMutualFriends(
+    @Param('username') username: string,
+    @Req() request: { user: User },
+  ) {
+    return this.friendsService.getMutualFriends(username, request.user);
+  }
   @Get('dms-list')
   async getDmsList(@Req() request: { user: User }) {
     return this.dmService.getDmsList(request.user);

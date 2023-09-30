@@ -15,7 +15,7 @@ export class ConfirmationService {
       const token = this.jwt.sign(
         { email },
         {
-          expiresIn: '15m',
+          expiresIn: '50m',
           secret: this.conf.get('EMAIL_VERIFICATION_JWT_SECRET'),
         },
       );

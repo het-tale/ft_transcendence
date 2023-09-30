@@ -3,6 +3,7 @@
     --white: #fff;
     --black: #000;
     --koki: #c56af0;
+    box-sizing: border-box;
 }
 
 .typing-bar {
@@ -13,13 +14,18 @@
     padding: 10px 20px;
     border-radius: 30px;
     background-color: var(--koki);
-    height: 50px;
+    /* height: 0px !important; */
     position: relative;
-    top: 90%;
+    /* bottom: 5%; */
+    /* top: 90%; */
     color: var(--white) !important;
-    /* position: fixed; */
+    /* position: fixed;
     width: 100%;
-    margin-top: 30rem;
+    left: 56%;
+    right: 20%; */
+    /* max-width: 100%; */
+    /* margin-top: 40rem; */
+    bottom: 14px;
 }
 
 .typing-bar input {
@@ -80,6 +86,12 @@
     margin-left: 44px;
     margin-top: -45px;
     margin-bottom: 13px;
+}
+
+.messagesContainer {
+    max-height: 72vh !important;
+    height: 72vh !important;
+    /* overflow-y: hidden; */
 }
 
 /* .chakra-menu__menu-list {

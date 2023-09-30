@@ -16,6 +16,7 @@ import RoomsChat from "./RoomsChat";
 import ModalBodyUi from "../../components/ModalBodyUi";
 import { UserType } from "../../Types/User";
 import GetDms from "./GetDms";
+import { SocketContext } from "../../socket";
 
 
 const Dms = () => {
@@ -30,11 +31,13 @@ const Dms = () => {
   const [dms, setDms] = React.useState<UserType[]>([]);
   const [userDm, setUserDm] = React.useState<UserType>();
   const [id, setId] = React.useState(0);
+  const [isUserDm, setIsUserDm] = React.useState(false);
+  const socket = React.useContext(SocketContext);
   useEffect(() => {
    GetDms().then((data) => {
         setDms(data);
     })
-  }, []);
+  }, [socket]);
   const handleRenderActions = () => {
         setRenderActions(!renderActions);
   }
@@ -52,21 +55,24 @@ const Dms = () => {
       type: data.get('group1'),
       password: data.get('password'),
     };
-    console.log(formData);
+    // console.log(formData);
   };
+  console.log("DMS", dms);
+  const [test, setTest] = React.useState(false);
   const tabs = [
       {
           id: 1,
           tabTitle: 'Direct Messages',
           content: <>
-          <Search name="tabDesign" setName={setName} filter={name}/>
-          {dms?.map((dm) => {
-              return <MessageUser profile={dm.avatar} name={dm.username} message="last message" dm={dm} setUserDm={setUserDm}/>
-          })
-          }
-          {/* <MessageUser profile='/assets/het-tale.jpg' name="Hasnaa" message="hello" /> */}
+            <Search name="tabDesign" setName={setName} filter={name}/>
+            {dms ? dms?.map((dm) => {
+                return <MessageUser profile={dm.avatar} name={dm.username} message="" dm={dm} setUserDm={setUserDm} setFirstLoad={setFirstLoad}/>
+            })
+            : <></>  
+            }
+            {console.log("USERDM", userDm)}
           </>,
-          rightSide: <><DmsChat userDm={userDm}/></>
+          rightSide: <><DmsChat userDm={userDm} test={test}/></>
       },
       {
           id: 2,
@@ -89,11 +95,11 @@ const Dms = () => {
       setFirstLoad(e.target.tabTitle);
   }
     return (
-        <div>
+        <Flex flexDirection={"column"}>
             <NavbarSearch />
             <Flex>
                 <Sidebar />
-                <Box w="100%" bg="#E9ECEF">
+                <Box w="100%" bg="#E9ECEF" h={"90%"}>
                     <Flex justify="space-between">
                         <LeftSide handleTabClick={handleTabClick} tabs={tabs} currentTab={currentTab}/>
                         <div className="delimiter"></div>
@@ -101,7 +107,7 @@ const Dms = () => {
                     </Flex>
                 </Box>
             </Flex>
-        </div>
+        </Flex>
     )
 }
 

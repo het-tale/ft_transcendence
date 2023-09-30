@@ -3,13 +3,14 @@ import '../css/sidebar.css';
 import React from 'react';
 import Sidebar from '../components/Sidebar';
 import NavbarSearch from '../components/NavbarSearch';
+import { Flex } from '@chakra-ui/react';
 
 function Home() {
     return (
-        <div>
+        <Flex flexDirection={"column"}>
             <NavbarSearch />
             <Sidebar />
-        </div>
+        </Flex>
     );
 }
 

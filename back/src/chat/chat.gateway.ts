@@ -31,27 +31,39 @@ export class ChatGateway
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    const token = client.handshake.query.token;
+    // const token = client.handshake.headers.token;
+    const token = client.handshake.auth.token;
     try {
+      this.io.emit('userOnline', client.id);
       const user = await this.dmService.verifyToken(token);
       this.connectedUsers.push({
         clientId: client.id,
         username: user.username,
       });
       console.log(this.connectedUsers);
-      const offlineChannels =
-        await this.channelService.getOfflineDeletedChannels(user.id);
-      if (offlineChannels.length > 0) {
+      const offlineKickedChannels =
+        await this.channelService.getOfflineKickedChannels(user.id);
+      if (offlineKickedChannels.length > 0) {
         const socket = this.io.sockets[client.id];
-        offlineChannels.forEach((channel) => {
+        offlineKickedChannels.forEach((channel) => {
           socket.leave(channel.name);
         });
-        this.channelService.leaveOfflineDetetedChannels(
-          offlineChannels,
+        this.channelService.deleteEmptyChannels(offlineKickedChannels);
+      }
+      const offlineUnbannedChannels =
+        await this.channelService.getOfflineUnbannedChannels(user.id);
+      if (offlineUnbannedChannels.length > 0) {
+        const socket = this.io.sockets[client.id];
+        offlineUnbannedChannels.forEach((channel) => {
+          socket.join(channel.name);
+        });
+        this.channelService.deleteFromOfflineUnbannedChannels(
+          offlineUnbannedChannels,
           user.id,
         );
       }
       const offlineMessages = await this.dmService.getOfflineMessages(user.id);
+      console.log(offlineMessages);
       const offlineInvitations =
         await this.channelService.getOfflineInvitations(user.id);
       const offlineChannelMessages =
@@ -59,21 +71,22 @@ export class ChatGateway
       const offlineFriendRequests =
         await this.dmService.getOfflineFriendRequests(user.id);
       if (offlineChannelMessages.length > 0) {
-        client.emit('offline channel messages', offlineChannelMessages);
+        client.emit('offlineChannelMessages', offlineChannelMessages);
         this.channelService.deleteOfflineChannelMessages(
           offlineChannelMessages,
         );
       }
       if (offlineMessages.length > 0) {
-        client.emit('offline messages', offlineMessages);
+        console.log('hey there you have offline messages');
+        client.emit('offlineMessages', offlineMessages);
         this.dmService.changeOfflineMessagesStatus(offlineMessages);
       }
       if (offlineInvitations.length > 0) {
-        client.emit('offline invitations', offlineInvitations);
+        client.emit('offlineInvitations', offlineInvitations);
         this.channelService.changeOfflineInvitationsStatus(offlineInvitations);
       }
       if (offlineFriendRequests.length > 0) {
-        client.emit('offline friend requests', offlineFriendRequests);
+        client.emit('offlineFriendRequests', offlineFriendRequests);
         this.dmService.changeOfflineFriendRequestsStatus(offlineFriendRequests);
       }
     } catch (err) {
@@ -86,35 +99,41 @@ export class ChatGateway
     this.connectedUsers = this.connectedUsers.filter(
       (user) => user.clientId !== client.id,
     );
+    this.io.emit('userOffline', client.id);
     console.log(`Cliend id:${client.id} disconnected`);
   }
 
-  @SubscribeMessage('private message')
+  @SubscribeMessage('privateMessage')
   async handlePrivateMessage(
     @MessageBody() data: any,
     @ConnectedSocket() client: Socket,
   ) {
-    const sender = this.connectedUsers.find(
-      (user) => user.clientId === client.id,
-    );
-    const receiver = this.connectedUsers.find(
-      (user) => user.username === data.to,
-    );
-    const sentAt = new Date();
-    let isPending = true;
-    if (receiver) isPending = false;
-    await this.dmService.saveMessage({
-      sender: sender.username,
-      receiver: receiver.username,
-      message: data.message,
-      date: sentAt,
-      isPending,
-    });
-    if (receiver) {
-      this.io.to(receiver.clientId).emit('private message', {
-        from: sender.username,
+    try {
+      const sender = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      );
+      const receiver = this.connectedUsers.find(
+        (user) => user.username === data.to,
+      );
+      const sentAt = new Date();
+      let isPending = true;
+      if (receiver) isPending = false;
+      await this.dmService.saveMessage({
+        sender: sender.username,
+        receiver: data.to,
         message: data.message,
+        date: sentAt,
+        isPending,
       });
+      if (receiver) {
+        this.io.to(receiver.clientId).emit('privateMessage', {
+          from: sender.username,
+          message: data.message,
+        });
+      }
+    } catch (err) {
+      console.log(err.message);
+      client.emit('privateMessageError', err.message);
     }
   }
   @SubscribeMessage('createRoom')
@@ -140,7 +159,7 @@ export class ChatGateway
 
       return { event: 'roomCreated', room: data.room };
     } catch (err) {
-      return { event: 'roomCreationError', error: err.message };
+      client.emit('roomCreateError', err.message);
     }
   }
   @SubscribeMessage('sendRoomInvitation')
@@ -162,7 +181,7 @@ export class ChatGateway
       client.join(data.room);
       this.io.to(data.room).emit('roomJoined', `${user.username} joined`);
     } catch (err) {
-      return { event: 'roomJoinError', error: err.message };
+      client.emit('roomJoinError', err.message);
     }
   }
 
@@ -195,7 +214,7 @@ export class ChatGateway
         room: data.room,
       });
     } catch (err) {
-      return { event: 'roomMessageError', error: err.message };
+      client.emit('roomMessageError', err.message);
     }
   }
 
@@ -225,7 +244,7 @@ export class ChatGateway
         });
       }
     } catch (err) {
-      return { event: 'roomInvitationError', error: err.message };
+      client.emit('roomInvitationError', err.message);
     }
   }
   @SubscribeMessage('handleRoomInvitation')
@@ -254,7 +273,7 @@ export class ChatGateway
           .emit('roomInvitationDeclined', { room: data.room });
       }
     } catch (err) {
-      return { event: 'roomInvitationError', error: err.message };
+      client.emit('roomInvitationError', err.message);
     }
   }
   @SubscribeMessage('leaveRoom')
@@ -267,7 +286,7 @@ export class ChatGateway
       client.leave(data.room);
       this.io.to(data.room).emit('roomLeft', `${clientUsername} left`);
     } catch (err) {
-      return { event: 'roomLeaveError', error: err.message };
+      client.emit('roomLeaveError', err.message);
     }
   }
   @SubscribeMessage('kickUser')
@@ -276,15 +295,24 @@ export class ChatGateway
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       ).username;
+      const kickedUser = this.connectedUsers.find(
+        (user) => user.username === data.target,
+      );
+      let isOnline = false;
+      if (kickedUser) isOnline = true;
       await this.channelService.kickUser(
         data.room,
         clientUsername,
         data.target,
+        isOnline,
       );
-      client.leave(data.room);
+      if (kickedUser) {
+        const socket = this.io.sockets[kickedUser.clientId];
+        socket.leave(data.room);
+      }
       this.io.to(data.room).emit('userKicked', `${data.user} kicked`);
     } catch (err) {
-      return { event: 'userKickError', error: err.message };
+      client.emit('userKickError', err.message);
     }
   }
   @SubscribeMessage('addAdmin')
@@ -309,11 +337,24 @@ export class ChatGateway
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       ).username;
-      await this.channelService.banUser(data.room, clientUsername, data.target);
-      client.leave(data.room);
+      let isOnline = false;
+      const bannedUser = this.connectedUsers.find(
+        (user) => user.username === data.target,
+      );
+      if (bannedUser) isOnline = true;
+      await this.channelService.banUser(
+        data.room,
+        clientUsername,
+        data.target,
+        isOnline,
+      );
+      if (bannedUser) {
+        const socket = this.io.sockets[bannedUser.clientId];
+        socket.leave(data.room);
+      }
       this.io.to(data.room).emit('userBanned', `${data.target} banned`);
     } catch (err) {
-      return { event: 'userBanError', error: err.message };
+      client.emit('userBanError', err.message);
     }
   }
   @SubscribeMessage('unbanUser')
@@ -322,26 +363,41 @@ export class ChatGateway
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       ).username;
+      let isOnline = false;
+      const unbannedUser = this.connectedUsers.find(
+        (user) => user.username === data.target,
+      );
+      if (unbannedUser) isOnline = true;
       await this.channelService.unbanUser(
         data.room,
         clientUsername,
         data.target,
+        isOnline,
       );
+      if (unbannedUser) {
+        const socket = this.io.sockets[unbannedUser.clientId];
+        socket.join(data.room);
+      }
       this.io.to(data.room).emit('userUnbanned', `${data.target} unbanned`);
     } catch (err) {
-      return { event: 'userUnbanError', error: err.message };
+      client.emit('userUnbanError', err.message);
     }
   }
   @SubscribeMessage('muteUser')
   async muteUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-    const clientUsername = this.connectedUsers.find(
-      (user) => user.clientId === client.id,
-    ).username;
-    await this.channelService.muteUser(data.room, clientUsername, data.target);
-    this.io.to(data.room).emit('userMuted', `${data.target} muted`);
-  }
-  catch(err: Error) {
-    return { event: 'userMuteError', error: err.message };
+    try {
+      const clientUsername = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      ).username;
+      await this.channelService.muteUser(
+        data.room,
+        clientUsername,
+        data.target,
+      );
+      this.io.to(data.room).emit('userMuted', `${data.target} muted`);
+    } catch (err) {
+      client.emit('userMuteError', err.message);
+    }
   }
   @SubscribeMessage('unmuteUser')
   async unmuteUser(
@@ -359,7 +415,7 @@ export class ChatGateway
       );
       this.io.to(data.room).emit('userUnmuted', `${data.target} unmuted`);
     } catch (err) {
-      return { event: 'userUnmuteError', error: err.message };
+      client.emit('userUnmuteError', err.message);
     }
   }
   @SubscribeMessage('sendFriendRequest')
@@ -384,7 +440,7 @@ export class ChatGateway
         });
       }
     } catch (err) {
-      return { event: 'friendRequestError', error: err.message };
+      client.emit('friendRequestError', err.message);
     }
   }
   @SubscribeMessage('handleFriendRequest')
@@ -419,7 +475,7 @@ export class ChatGateway
         }
       }
     } catch (err) {
-      return { event: 'friendRequestError', error: err.message };
+      client.emit('friendRequestError', err.message);
     }
   }
   @SubscribeMessage('removeFriend')
@@ -434,7 +490,7 @@ export class ChatGateway
       await this.friendsService.removeFriend(clientUsername, data.target);
       this.io.to(client.id).emit('friendRemoved');
     } catch (err) {
-      return { event: 'friendRemoveError', error: err.message };
+      client.emit('friendRemoveError', err.message);
     }
   }
   @SubscribeMessage('blockUser')
@@ -446,7 +502,7 @@ export class ChatGateway
       await this.friendsService.blockUser(clientUsername, data.target);
       this.io.to(client.id).emit('userBlocked');
     } catch (err) {
-      return { event: 'userBlockError', error: err.message };
+      client.emit('userBlockError', err.message);
     }
   }
   @SubscribeMessage('unblockUser')
@@ -461,7 +517,7 @@ export class ChatGateway
       await this.friendsService.unblockUser(clientUsername, data.target);
       this.io.to(client.id).emit('userUnblocked');
     } catch (err) {
-      return { event: 'userUnblockError', error: err.message };
+      client.emit('userUnblockError', err.message);
     }
   }
   @SubscribeMessage('deleteChannel')
@@ -480,9 +536,8 @@ export class ChatGateway
         this.io,
         this.connectedUsers,
       );
-      //leave room for all online participants
     } catch (err) {
-      return { event: 'channelDeleteError', error: err.message };
+      client.emit('channelDeleteError', err.message);
     }
   }
 }

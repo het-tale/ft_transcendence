@@ -7,6 +7,7 @@ const GetDms = async () => {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
             });
+            console.log("RES", res);
             if (res.status === 200) {
                 return res.data;
               }
@@ -15,6 +16,7 @@ const GetDms = async () => {
               }
         }
         catch (error) {
+            console.log("Error", error);
             return null;
         }
 }

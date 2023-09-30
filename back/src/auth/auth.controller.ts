@@ -43,6 +43,10 @@ export class AuthController {
     return this.authService.confirmRegister(token);
   }
 
+  @Get('resend-email')
+  resend(@Req() request: { user: User }) {
+    return this.authService.resendEmail(request.user);
+  }
   @ApiBody({ type: AuthSignInDto })
   @UseZodGuard('body', AuthSignInDto)
   @Post('signin')
