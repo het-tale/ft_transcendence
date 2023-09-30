@@ -44,6 +44,7 @@ export class DMService {
         username: data.receiver,
       },
       include: {
+        dmsList: true,
         blocked: true,
       },
     });
@@ -73,10 +74,13 @@ export class DMService {
       },
     });
     console.log(message);
-    const existingDmUser = user1.dmsList.find(
+    const existingDmUser1 = user1.dmsList.find(
       (dm) => dm.username === user2.username,
     );
-    if (!existingDmUser) {
+    const existingDmUser2 = user2.dmsList.find(
+      (dm) => dm.username === user1.username,
+    );
+    if (!existingDmUser1) {
       await this.prisma.user.update({
         where: {
           id: user1.id,
@@ -85,6 +89,20 @@ export class DMService {
           dmsList: {
             connect: {
               id: user2.id,
+            },
+          },
+        },
+      });
+    }
+    if (!existingDmUser2) {
+      await this.prisma.user.update({
+        where: {
+          id: user2.id,
+        },
+        data: {
+          dmsList: {
+            connect: {
+              id: user1.id,
             },
           },
         },
