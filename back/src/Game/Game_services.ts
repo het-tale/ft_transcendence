@@ -74,8 +74,3 @@ export async function updateGame(room: Room, activeSockets: Map<Socket, User>, p
   }
   colision(room, activeSockets, prisma);
 }
-
-export async function is_playing(client: Socket, user:User, activeSockets: Map<Socket, User>) {
-
-  return (activeSockets.get(client) === user)
-}

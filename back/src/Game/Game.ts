@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -7,21 +7,19 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameData, Room, Paddle, Player } from './types';
+import { Room } from './types';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { is_playing, startGame, stopGame } from './Game_services';
+import {stopGame } from './Game_services';
 import { verifyToken } from './Player-Init';
 import {
   OtherAvatar,
   StartGameEvent,
-  StartGameEventRobot,
   UpdatePaddle,
   findRoomByPlayerSocket,
 } from './game-events';
-import { subscribe } from 'diagnostics_channel';
 import { User } from '@prisma/client';
 
 @WebSocketGateway()
@@ -49,9 +47,19 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       //   console.log('token', token);
       const user = await verifyToken(token, this.prisma, this.conf, this.jwt);
       if (user) {
-        this.activeSockets.set(client, user);
-        console.log('connection established');
-        client.emit('connected', 'the user is fount and the game will start ');
+		for (const isplaying of this.activeSockets.values()) {
+			if (isplaying.id === user.id) {
+				console.log('user is already playing');
+				client.disconnect();
+				return;
+			}
+		}
+			this.activeSockets.set(client, user);
+			for (const user of this.activeSockets.values()) {
+				console.log('user pushed into activ socket  ', user);
+			}
+			console.log('connection established');
+			client.emit('connected', 'the user is fount and the game will start ');
       } else {
         console.log('connection refused');
         client.disconnect();

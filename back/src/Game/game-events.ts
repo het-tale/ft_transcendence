@@ -69,7 +69,6 @@ export async function StartGameEvent(
 
 	//find the user id by activ socket 
 	const user = activeSockets.get(client);
-	console.log('user', user);
     const PlayerId = user.id;
     const player = new Player(
       PlayerId,
