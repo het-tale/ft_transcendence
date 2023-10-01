@@ -3,6 +3,7 @@
     --white: #fff;
     --black: #000;
     --koki: #c56af0;
+    box-sizing: border-box;
 }
 
 .TwinP {
@@ -48,6 +49,7 @@
     flex-direction: row;
     justify-content: space-between;
     border-bottom: 1px solid var(--fakhti);
+    height: 10%;
 
   }
   .logo {

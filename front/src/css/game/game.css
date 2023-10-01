@@ -1,6 +1,6 @@
 /* game.css */
 
-
+/* 
 body {
 	margin: 0;
 	padding: 0;
@@ -10,21 +10,21 @@ body {
 	line-height: 1.5;
 	color: #0f0c0c;
 	background-color: #6a6767;
-}
+} */
 
-#root{
+/* #root{
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	width: 100%;
-	height: 100%;
+	height: 100%; */
 	/* max-width: 100vw; */
 	/* padding: 0; */
 	/* background-color: #674c4c; */
-	overflow: hidden;
-}
+	/* overflow: hidden; */
+/* } */
 
-.container {
+.containerGame {
 	display: flex;
 	flex-direction: column;
 	align-items: center;

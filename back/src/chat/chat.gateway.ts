@@ -31,7 +31,8 @@ export class ChatGateway
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    const token = client.handshake.headers.token;
+    // const token = client.handshake.headers.token;
+    const token = client.handshake.auth.token;
     try {
       this.io.emit('userOnline', client.id);
       const user = await this.dmService.verifyToken(token);

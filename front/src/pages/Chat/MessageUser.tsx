@@ -3,6 +3,7 @@ import {
     Heading, Text, Button
 }
 from '@chakra-ui/react'
+import { UserType } from '../../Types/User';
 
 interface MessageUserProps {
   profile: string;
@@ -11,12 +12,31 @@ interface MessageUserProps {
   children?: React.ReactNode;
   onClick?: () => void;
   design?: string;
+  setId?: React.Dispatch<React.SetStateAction<number>>;
+  id?: number;
+  dm?: UserType;
+  setUserDm?: React.Dispatch<React.SetStateAction<UserType | undefined>>;
+  setTest?: React.Dispatch<React.SetStateAction<boolean>>;
+  isUserDm?: boolean;
+  setFirstLoad?: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const MessageUser = ({profile , name, message, children, design} : MessageUserProps) => {
-    return (
+const MessageUser = ({profile , name, message, children, design, setUserDm, dm, setFirstLoad, isUserDm} : MessageUserProps) => {
+  const HandleDm = () => {
+    console.log("Hellooo");
+    console.log("Hellooo user", isUserDm);
+    if (setUserDm && dm && setFirstLoad) {
+      setFirstLoad("firstLoad");
+      setUserDm(dm);
+    }
+    console.log("Hellooo userDm", dm);
+  }
+  return (
         <div>
-            <Card
+          <button
+          onClick={HandleDm}
+          style={{width: "100%"}}>
+          <Card
             className={design}
         direction={{ base: 'column', sm: 'row' }}
         overflow='hidden'
@@ -59,6 +79,8 @@ const MessageUser = ({profile , name, message, children, design} : MessageUserPr
   </Stack>
 <>{children}</>
 </Card>
+          </button>
+           
         </div>
     );
 }
