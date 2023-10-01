@@ -1,9 +1,10 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { EmailConfirmationGuard } from 'src/guards/email-confirmation.guard';
 import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
 import { UserService } from './user.service';
 import { TwoFaVerificationGuard } from 'src/guards/two-fa-verification.guard';
+import { User } from '@prisma/client';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -18,5 +19,9 @@ export class UserController {
     const id = Number(idString);
 
     return this.userService.getUserById(id);
+  }
+  @Get('me')
+  me(@Req() request: { user: User }) {
+    return request.user;
   }
 }

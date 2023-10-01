@@ -71,7 +71,7 @@ export interface IventMouse {
 
 export class Room {
   constructor(roomName: string) {
-	this.id = null
+    this.id = null;
     this.roomName = roomName;
     this.players = [];
     this.gameActive = false;
@@ -97,7 +97,6 @@ export class Room {
 // 	playerBId: number;
 // 	winnerId: number;
 // }
-
 
 export const INTERVAL = 16.66;
 export const INCREASE_SPEED = 0.2;

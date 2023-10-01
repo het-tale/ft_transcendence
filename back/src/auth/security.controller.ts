@@ -89,10 +89,4 @@ export class SecurityController {
 
     return this.securityService.uploadAvatar(file, request.user);
   }
-
-  @UseGuards(TwoFaVerificationGuard)
-  @Get('me')
-  me(@Req() request: { user: User }) {
-    return request.user;
-  }
 }
