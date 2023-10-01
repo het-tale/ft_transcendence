@@ -30,8 +30,9 @@ import TabsTest from "./pages/Chat/Tabs";
 import Chat from "./pages/Chat/Chat";
 import MessageUser from "./pages/Chat/MessageUser";
 import RightSide from "./pages/Chat/RightSide";
-import Game from "./pages/game/Game";
-import NavigateToGame from "./pages/game/navigatetogame";
+import Profile from "./pages/Profile/Profile";
+// import GamePage from "./pages/Game/GamePage";
+import {socket, SocketContext} from "./socket";
 
 // const theme = createTheme();
 
@@ -39,6 +40,7 @@ function App() {
   return (
     // <ThemeProvider theme={theme}>
     <BrowserRouter>
+        <SocketContext.Provider value={socket}>
       <Routes>
         {/**----------------Auth Pages ----------------------*/}
         <Route path="/" element={
@@ -100,15 +102,17 @@ function App() {
           
           {/**----------------Chat Pages ----------------------*/}
           <Route path="chat">
-            <Route path="dms" element={<Dms />}/>
+            <Route path="dms" element={<Dms/>}/>
             <Route path="rightSide" element={<RightSide />}/>
           </Route>
-		  	{/*<Route path="NavigateToGame" element={<NavigateToGame />} />*/}
-		  	<Route path="game" element={<Game />} />{/* trying to use email as root paramtr*/}
-  			<Route path="testt" element={<Testt />} />
+          <Route path="user-profile" element={<Profile />}/>
+          {/* <Route path="game" element={<GamePage />}/> */}
+          <Route path="testt" element={<Testt/>}/>
       </Routes>
+          </SocketContext.Provider>
     </BrowserRouter>
-    // </ThemeProvider>
+    // </ThemeProvider>sports: ['websocket'],
+  
   );
 }
 
