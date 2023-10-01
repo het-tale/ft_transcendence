@@ -29,6 +29,18 @@ export class DMService {
 
     return user;
   }
+  async changeUserStatus(username: string, status: string) {
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        username,
+      },
+      data: {
+        status,
+      },
+    });
+
+    return updatedUser;
+  }
   async saveMessage(data) {
     const user1 = await this.prisma.user.findUnique({
       where: {
@@ -118,21 +130,16 @@ export class DMService {
     if (!user1) {
       throw new HttpException('user not found', 404);
     }
-    const user2 = await this.prisma.user.findUnique({
-      where: {
-        email: user.email,
-      },
-    });
     const messages = await this.prisma.message.findMany({
       where: {
         isDM: true,
         OR: [
           {
             senderId: user1.id,
-            receiverId: user2.id,
+            receiverId: user.id,
           },
           {
-            senderId: user2.id,
+            senderId: user.id,
             receiverId: user1.id,
           },
         ],
@@ -147,6 +154,24 @@ export class DMService {
 
     return messages;
   }
+  async deleteDm(username: string, user: User) {
+    try {
+      const messages = await this.getDmConversation(username, user);
+      await this.prisma.message.deleteMany({
+        where: {
+          id: {
+            in: messages.map((message) => message.id),
+          },
+        },
+      });
+    } catch (e) {
+      if (e instanceof HttpException) {
+        throw e;
+      }
+      throw new HttpException(e.message, 400);
+    }
+  }
+
   async getOfflineMessages(userId: number) {
     const messages = await this.prisma.message.findMany({
       where: {

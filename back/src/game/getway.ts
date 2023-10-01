@@ -20,8 +20,6 @@ import {
 } from './types';
 
 import { PrismaService } from 'src/prisma/prisma.service';
-import { User } from '@prisma/client';
-import { match } from 'assert';
 
 @WebSocketGateway()
 @Injectable()

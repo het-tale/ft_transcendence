@@ -39,6 +39,7 @@ export class ChatGateway
         clientId: client.id,
         username: user.username,
       });
+      await this.dmService.changeUserStatus(user.username, 'online');
       console.log(this.connectedUsers);
       const offlineKickedChannels =
         await this.channelService.getOfflineKickedChannels(user.id);
@@ -94,7 +95,11 @@ export class ChatGateway
     }
   }
 
-  handleDisconnect(@ConnectedSocket() client: Socket) {
+  async handleDisconnect(@ConnectedSocket() client: Socket) {
+    const user = this.connectedUsers.find(
+      (user) => user.clientId === client.id,
+    );
+    await this.dmService.changeUserStatus(user.username, 'offline');
     this.connectedUsers = this.connectedUsers.filter(
       (user) => user.clientId !== client.id,
     );

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Req, UseGuards } from '@nestjs/common';
 import { DMService } from './dm.service';
 import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
 import { EmailConfirmationGuard } from 'src/guards/email-confirmation.guard';
@@ -24,6 +24,13 @@ export class ChatController {
     @Req() request: { user: User },
   ) {
     return this.dmService.getDmConversation(username, request.user);
+  }
+  @Delete('dms/:username')
+  async deleteDm(
+    @Param('username') username: string,
+    @Req() request: { user: User },
+  ) {
+    return this.dmService.deleteDm(username, request.user);
   }
 
   @Get('channels/:channelName')
