@@ -1,16 +1,19 @@
 import { interval } from 'rxjs';
-import { GameData, INCREASE_SPEED, INTERVAL, Paddle, Player, Room, SPEED_INTERVAL } from './types';
+import { INCREASE_SPEED, INTERVAL, Paddle, Player, Room, SPEED_INTERVAL } from './types';
 import { colision } from './colision';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Socket } from 'socket.io';
+import { User } from '@prisma/client';
 
-export async function createMatch(room: Room, prisma: PrismaService, activeSockets: Map<string, Socket>) {
+export async function createMatch(room: Room, prisma: PrismaService, activeSockets: Map<Socket, User>) {
   try {
     const match = await prisma.match
       .create({
         data: {
           start: new Date(),
           result: 'ongoing',
+		  playerAId: activeSockets.get(room.players[0].socket).id,
+		  playerBId: activeSockets.get(room.players[1].socket).id,
         },
       })
       .then((match) => {
@@ -25,7 +28,7 @@ export async function createMatch(room: Room, prisma: PrismaService, activeSocke
   }
 }
 
-export async function startGame(room: Room, rooms: Map<string, Room>, activeSockets: Map<string, Socket> ,  prisma: PrismaService, containerHeight: number) {
+export async function startGame(room: Room, rooms: Map<string, Room>, activeSockets: Map<Socket, User> ,  prisma: PrismaService, containerHeight: number) {
   console.log('startGame');
   if (!room.gameActive) {
     room.gameActive = true;
@@ -51,7 +54,7 @@ export async function stopGame(room: Room, rooms: Map<string, Room>) {
   }
 }
 
-export async function updateGame(room: Room, activeSockets: Map<string, Socket>, prisma: PrismaService, containerHeight: number) {
+export async function updateGame(room: Room, activeSockets: Map<Socket, User>, prisma: PrismaService, containerHeight: number) {
   // Calculate the new ball position based on its current position and velocity
   if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL) {
     room.lastspeedincrease = Date.now();
@@ -72,15 +75,7 @@ export async function updateGame(room: Room, activeSockets: Map<string, Socket>,
   colision(room, activeSockets, prisma);
 }
 
-// export async function  findRoomByPlayerSocket(socket: Socket, rooms: Map<string, Room>): Promise<Room | undefined> {
-//     for (const room of rooms.values()) {
-//       const playerInRoom = room.players.find(
-//         (player) => player.socket_id === socket.id,
-//       );
-//       if (playerInRoom) {
-//         return room;
-//       }
-//     }
+export async function is_playing(client: Socket, user:User, activeSockets: Map<Socket, User>) {
 
-//     return undefined;
-//   }
+  return (activeSockets.get(client) === user)
+}

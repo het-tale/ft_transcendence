@@ -73,6 +73,7 @@ const Game: React.FC = () => {
     otherPaddle: useRef<HTMLDivElement>(null),
     ball: useRef<HTMLDivElement>(null),
   };
+  const [gameStarted, setGameStarted] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -116,6 +117,7 @@ const Game: React.FC = () => {
             width: game.containerWidth,
             height: game.containerHeight,
           });
+          setGameStarted(true);
       });
   }, [init, socket]);
 
@@ -172,6 +174,12 @@ const Game: React.FC = () => {
       listning = true;
     }
   }, [socket]);
+
+  const handleStartGame = () => {
+    if (socket) {
+      socket.emit("StartGame", "StartGame");
+    }
+  };
 
   useEffect(() => {
     if (padd && Dimensions.width > 0 && Dimensions.height > 0)
@@ -234,6 +242,11 @@ const Game: React.FC = () => {
         <div ref={divRefs.playerPaddle} className="paddle player-paddle"></div>
         <div ref={divRefs.otherPaddle} className="paddle other-paddle"></div>
         <div ref={divRefs.ball} className="ball"></div>
+        {!gameStarted && (
+          <Button onClick={handleStartGame} className="start-button">
+            Start Game
+          </Button>
+        )}
       </div>
     </div>
   );

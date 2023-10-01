@@ -1,4 +1,4 @@
-import { HttpException } from "@nestjs/common";
+import { ConsoleLogger, HttpException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "src/prisma/prisma.service";
@@ -18,6 +18,5 @@ export async function  verifyToken(token: string | string[] , prisma : PrismaSer
     if (!user) {
       throw new HttpException('user not found', 404);
     }
-
     return user;
   }

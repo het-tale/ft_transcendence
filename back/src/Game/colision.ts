@@ -2,14 +2,32 @@
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Room, Ball } from './types';
 import { Socket } from 'socket.io';
+import { User } from '@prisma/client';
 
 const MAX_ANGLE_CHANGE = Math.PI / 4;
 
 function resetBall(ball: Ball) {
   ball.x = 500;
   ball.y = 500;
-  ball.dx = 3;
-  ball.dy = 3;
+  const random = Math.random();
+  switch (true) {
+    case random < 0.25:
+      ball.dx = 3;
+      ball.dy = 3;
+      break;
+    case random < 0.5:
+      ball.dx = 3;
+      ball.dy = -3;
+      break;
+    case random < 0.75:
+      ball.dx = -3;
+      ball.dy = 3;
+      break;
+    default:
+      ball.dx = -3;
+      ball.dy = -3;
+      break;
+  }
 }
 
 // i must check tho colision again and again every time i make changes
@@ -17,13 +35,13 @@ function resetBall(ball: Ball) {
 
 export async function colision(
   room: Room,
-  activeSockets: Map<string, Socket>,
+  activeSockets: Map<Socket, User>,
   prisma: PrismaService,
 ) {
   const player = room.players[0];
   const otherPlayer = room.players[1];
-  const playerSocket = activeSockets.get(player.socket_id);
-  const otherPlayerSocket = activeSockets.get(otherPlayer.socket_id);
+  const playerSocket = player.socket;
+  const otherPlayerSocket = otherPlayer.socket;
 
   const playerPaddle = player.paddle;
   const otherPaddle = otherPlayer.paddle;
@@ -70,10 +88,20 @@ export async function colision(
     otherPlayer.score++;
     room.rounds--;
     if (room.rounds === 0) {
+      const winnerId =
+        player.score > otherPlayer.score ? player.id : otherPlayer.id;
       await prisma.match.update({
         where: { id: room.id },
-        data: { result: 'completed' }, //here is what should be i but i dont have a valid id
-        //   data: { result: 'completed', winnerId: player.score > otherPlayer.score ? player.id : otherPlayer.id},
+        data: {
+          result:
+            'playerA ' +
+            player.score.toString() +
+            ' ' +
+            otherPlayer.score.toString() +
+            ' playerB',
+          winnerId: winnerId,
+          end: new Date(),
+        },
       });
       if (player.score > otherPlayer.score) {
         playerSocket.emit('GAME OVER', { winner: true });
@@ -99,12 +127,21 @@ export async function colision(
     player.score++;
     room.rounds--;
     if (room.rounds === 0) {
+      const winnerId =
+        player.score > otherPlayer.score ? player.id : otherPlayer.id;
       if (player.score > otherPlayer.score) {
         await prisma.match.update({
           where: { id: room.id },
-          data: { result: 'completed' },
-          //here is what should be i but i dont have a valid id
-          //   data: { result: 'completed', winnerId: player.score > otherPlayer.score ? player.id : otherPlayer.id},
+          data: {
+            result:
+              'playerA ' +
+              player.score.toString() +
+              ' ' +
+              otherPlayer.score.toString() +
+              ' playerB',
+            winnerId: winnerId,
+            end: new Date(),
+          },
         });
         playerSocket.emit('GAME OVER', { winner: true });
         otherPlayerSocket.emit('GAME OVER', { winner: false });
