@@ -15,9 +15,9 @@ export async function StartGameEvent(
   server: Server,
 ) {
   let exist = false;
-  const padd = new Paddle(10, containerHeight / 2, 8, 80, 3);
+  const padd = new Paddle((containerWidth * 2) /100, containerHeight / 2, 8, 80, 3);
   const otherpadd = new Paddle(
-    containerWidth - 10,
+    containerWidth - (containerWidth * 2) /100,
     containerHeight / 2,
     8,
     80,

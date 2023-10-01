@@ -1,14 +1,13 @@
-// import { Server } from "socket.io";
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Room, Ball } from './types';
+import { Room, Ball, Paddle } from './types';
 import { Socket } from 'socket.io';
 import { User } from '@prisma/client';
 
 const MAX_ANGLE_CHANGE = Math.PI / 4;
 
 function resetBall(ball: Ball) {
-  ball.x = 500;
-  ball.y = 500;
+  ball.x = 720/2;
+  ball.y = 480 /2;
   const random = Math.random();
   switch (true) {
     case random < 0.25:
@@ -30,8 +29,32 @@ function resetBall(ball: Ball) {
   }
 }
 
-// i must check tho colision again and again every time i make changes
-// some times it is not working as expected
+async function intersections(room: Room, playerPaddle: Paddle, otherPaddle: Paddle)
+{
+	if (
+		room.ball.x + room.ball.radius >= playerPaddle.x &&
+		room.ball.y >= playerPaddle.y &&
+		room.ball.y <= playerPaddle.y + playerPaddle.height
+	  ) {
+		const relativeIntersectY =
+		  (room.ball.y - (playerPaddle.y + playerPaddle.height / 2)) /
+		  (playerPaddle.height / 2);
+		const bounceAngle = relativeIntersectY * MAX_ANGLE_CHANGE;
+		room.ball.dx = -room.ball.dx;
+		room.ball.dy = Math.sin(bounceAngle) * 3;
+	  } else if (
+		room.ball.x - room.ball.radius <= otherPaddle.x + otherPaddle.width &&
+		room.ball.y >= otherPaddle.y &&
+		room.ball.y <= otherPaddle.y + otherPaddle.height
+	  ) {
+		const relativeIntersectY =
+		  (room.ball.y - (otherPaddle.y + otherPaddle.height / 2)) /
+		  (otherPaddle.height / 2);
+		const bounceAngle = relativeIntersectY * MAX_ANGLE_CHANGE;
+		room.ball.dx = -room.ball.dx;
+		room.ball.dy = Math.sin(bounceAngle) * 3;
+	  }
+}
 
 export async function colision(
   room: Room,
@@ -42,49 +65,10 @@ export async function colision(
   const otherPlayer = room.players[1];
   const playerSocket = player.socket;
   const otherPlayerSocket = otherPlayer.socket;
-
   const playerPaddle = player.paddle;
   const otherPaddle = otherPlayer.paddle;
-
-  if (
-    room.ball.x + room.ball.radius >= playerPaddle.x &&
-    room.ball.y >= playerPaddle.y &&
-    room.ball.y <= playerPaddle.y + playerPaddle.height
-  ) {
-    // Calculate the relative intersection point on the paddle
-    const relativeIntersectY =
-      (room.ball.y - (playerPaddle.y + playerPaddle.height / 2)) /
-      (playerPaddle.height / 2);
-
-    // Calculate the bounce angle based on the relative intersection point
-    const bounceAngle = relativeIntersectY * MAX_ANGLE_CHANGE;
-
-    // Update ball direction based on the paddle hit
-    // room.ball.setDXDY(-room.ball.dx, Math.sin(bounceAngle) * 3);
-    room.ball.dx = -room.ball.dx;
-    room.ball.dy = Math.sin(bounceAngle) * 3;
-  } else if (
-    room.ball.x - room.ball.radius <= otherPaddle.x + otherPaddle.width &&
-    room.ball.y >= otherPaddle.y &&
-    room.ball.y <= otherPaddle.y + otherPaddle.height
-  ) {
-    // Calculate the relative intersection point on the paddle
-    const relativeIntersectY =
-      (room.ball.y - (otherPaddle.y + otherPaddle.height / 2)) /
-      (otherPaddle.height / 2);
-
-    // Calculate the bounce angle based on the relative intersection point
-    const bounceAngle = relativeIntersectY * MAX_ANGLE_CHANGE;
-
-    // Update room.ball direction based on the paddle hit
-    // room.ball.setDXDY(-room.ball.dx, Math.sin(bounceAngle) * 3);
-    room.ball.dx = -room.ball.dx;
-    room.ball.dy = Math.sin(bounceAngle) * 3;
-  }
-
-  // Check for scoring conditions
+  intersections(room, playerPaddle, otherPaddle);
   if (room.ball.x + room.ball.radius > playerPaddle.x + playerPaddle.width) {
-    // Player misses the ball
     otherPlayer.score++;
     room.rounds--;
     if (room.rounds === 0) {
@@ -123,7 +107,6 @@ export async function colision(
       });
     }
   } else if (room.ball.x < otherPaddle.x - otherPaddle.width) {
-    // Other player misses the ball
     player.score++;
     room.rounds--;
     if (room.rounds === 0) {

@@ -81,19 +81,19 @@ export class Room {
     const random = Math.random();
     switch (true) {
       case random < 0.2:
-        this.ball = new Ball(500, 300, 10, 3, 3);
+        this.ball = new Ball(720/2, 480 /2, 10, 3, 3);
         break;
       case random < 0.4:
-        this.ball = new Ball(500, 300, 10, 3, -3);
+        this.ball = new Ball(720/2, 480 /2, 10, 3, -3);
         break;
       case random < 0.6:
-        this.ball = new Ball(500, 300, 10, -3, 3);
+        this.ball = new Ball(720/2, 480 /2, 10, -3, 3);
         break;
       case random < 0.8:
-        this.ball = new Ball(500, 300, 10, -3, -3);
+        this.ball = new Ball(720/2, 480 /2, 10, -3, -3);
         break;
       default:
-        this.ball = new Ball(500, 300, 10, 3, 3);
+        this.ball = new Ball(720/2, 480 /2, 10, 3, 3);
         break;
     }
     this.rounds = 5;
@@ -109,5 +109,5 @@ export class Room {
 }
 
 export const INTERVAL = 16.66;
-export const INCREASE_SPEED = 0.2;
+export const INCREASE_SPEED = 0.4;
 export const SPEED_INTERVAL = 1000;

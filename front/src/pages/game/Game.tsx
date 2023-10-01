@@ -3,28 +3,11 @@ import { io } from "socket.io-client";
 import { throttle } from "lodash";
 import { ListenOnSocket } from "./Game.lisners";
 import { GameData, Paddle, Ball } from "./Game.types";
-import {
-  Avatar,
-  Box,
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Flex,
-  Heading,
-  IconButton,
-  Text,
-  Image,
-  Center,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-} from "@chakra-ui/react";
+import { Button, Image } from "@chakra-ui/react";
 import "../../css/game.css";
 import User from "../../components/User";
 import { UserType } from "../../Types/User";
+import client from "../../components/Client";
 
 export type MySocket = ReturnType<typeof io>;
 
@@ -74,6 +57,7 @@ const Game: React.FC = () => {
     ball: useRef<HTMLDivElement>(null),
   };
   const [gameStarted, setGameStarted] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -117,7 +101,7 @@ const Game: React.FC = () => {
             width: game.containerWidth,
             height: game.containerHeight,
           });
-          setGameStarted(true);
+        setGameStarted(true);
       });
   }, [init, socket]);
 
@@ -151,7 +135,26 @@ const Game: React.FC = () => {
   useEffectOnce(() => {
     setupSocket();
     return () => {
-      if (socket) socket.disconnect();
+      if (socket) {
+        socket.off("InitGame");
+        socket.off("UPDATE");
+        socket.off("UPDATE SCORE");
+        socket.off("GAME OVER");
+        socket.off("OTHER AVATAR");
+        socket.off("JoinRoom");
+        socket.off("StartGame");
+        socket.off("connect");
+        socket.off("error");
+        socket.off("connected");
+        socket.disconnect();
+        console.log("socket disconnected");
+      }
+      if (divRefs.gameContainer.current) {
+        divRefs.gameContainer.current.removeEventListener(
+          "mousemove",
+          throttleHandleMouseMove
+        );
+      }
     };
   });
 
@@ -168,17 +171,17 @@ const Game: React.FC = () => {
         setOtherpad,
         setPlayerScore,
         setOtherScore,
-		setOtherAvatar,
-		user
+        setOtherAvatar,
+        user,
+        setGameOver
       );
       listning = true;
     }
   }, [socket]);
 
-  const handleStartGame = () => {
-    if (socket) {
-      socket.emit("StartGame", "StartGame");
-    }
+  const handleHomeNavigation = () => {
+    window.location.href = "/home";
+    socket?.disconnect();
   };
 
   useEffect(() => {
@@ -213,11 +216,21 @@ const Game: React.FC = () => {
 
   return (
     <div className="container">
+      {gameOver ? (
+        <div className="overlay">
+          <div className="game-over-container">
+            <div className="game-over">Game Over</div>
+            <button className="home-button" onClick={handleHomeNavigation}>
+              Go to Home 
+            </button>
+          </div>
+        </div>
+      ) : null}
       <div className="container-profile">
         {id === 1 ? ( // Check if id is equal to 1
           <>
             <div className="other-profile">
-              <Image src={otherAvatar??''} alt="Other Profile" />
+              <Image src={otherAvatar ?? ""} alt="Other Profile" />
               <div className="other-score">{otherScore} </div>
             </div>
             <div className="player-profile">
@@ -228,7 +241,7 @@ const Game: React.FC = () => {
         ) : (
           <>
             <div className="other-profile">
-              <img src={otherAvatar??''} alt="Other Profile" />
+              <img src={otherAvatar ?? ""} alt="Other Profile" />
               <div className="other-score">{otherScore}</div>
             </div>
             <div className="player-profile">
@@ -242,11 +255,6 @@ const Game: React.FC = () => {
         <div ref={divRefs.playerPaddle} className="paddle player-paddle"></div>
         <div ref={divRefs.otherPaddle} className="paddle other-paddle"></div>
         <div ref={divRefs.ball} className="ball"></div>
-        {!gameStarted && (
-          <Button onClick={handleStartGame} className="start-button">
-            Start Game
-          </Button>
-        )}
       </div>
     </div>
   );

@@ -16,7 +16,8 @@ function ListenOnSocket(
   setPlayerScore: numberstate,
   setOtherScore: numberstate,
   setOtherAvatar: stringstate,
-  user: UserType | null
+  user: UserType | null,
+  setGameOver: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   socket.on("connect", () => {
     console.log("connected to server");
@@ -58,8 +59,7 @@ function ListenOnSocket(
   );
   socket.on("GAME OVER", (payload: any) => {
     console.log("GAME OVER", payload.winner);
-    if (payload.winner) alert("You win");
-    else alert("You lose");
+	setGameOver(true);
   });
   socket.on(
     "UPDATE SCORE",
