@@ -18,19 +18,13 @@ export class ChatController {
     private friendsService: FriendsService,
   ) {}
 
-  @Get('dms/:username')
-  async getDms(
-    @Param('username') username: string,
-    @Req() request: { user: User },
-  ) {
-    return this.dmService.getDmConversation(username, request.user);
+  @Get('dms/:id')
+  async getDms(@Param('id') id: number, @Req() request: { user: User }) {
+    return this.dmService.getDmConversation(id, request.user);
   }
-  @Delete('dms/:username')
-  async deleteDm(
-    @Param('username') username: string,
-    @Req() request: { user: User },
-  ) {
-    return this.dmService.deleteDm(username, request.user);
+  @Delete('dms/:id')
+  async deleteDm(@Param('id') id: number, @Req() request: { user: User }) {
+    return this.dmService.deleteDm(id, request.user);
   }
 
   @Get('channels/:channelName')
@@ -48,12 +42,12 @@ export class ChatController {
   async getBlockedUsers(@Req() request: { user: User }) {
     return this.friendsService.getBlockedUsers(request.user);
   }
-  @Get('mutual-friends/:username')
+  @Get('mutual-friends/:id')
   async getMutualFriends(
-    @Param('username') username: string,
+    @Param('id') id: number,
     @Req() request: { user: User },
   ) {
-    return this.friendsService.getMutualFriends(username, request.user);
+    return this.friendsService.getMutualFriends(id, request.user);
   }
   @Get('dms-list')
   async getDmsList(@Req() request: { user: User }) {

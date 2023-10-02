@@ -29,10 +29,10 @@ export class DMService {
 
     return user;
   }
-  async changeUserStatus(username: string, status: string) {
+  async changeUserStatus(id: number, status: string) {
     const updatedUser = await this.prisma.user.update({
       where: {
-        username,
+        id,
       },
       data: {
         status,
@@ -44,7 +44,7 @@ export class DMService {
   async saveMessage(data) {
     const user1 = await this.prisma.user.findUnique({
       where: {
-        username: data.sender,
+        id: data.senderId,
       },
       include: {
         blocked: true,
@@ -53,7 +53,7 @@ export class DMService {
     });
     const user2 = await this.prisma.user.findUnique({
       where: {
-        username: data.receiver,
+        id: data.receiverId,
       },
       include: {
         dmsList: true,
@@ -86,12 +86,8 @@ export class DMService {
       },
     });
     console.log(message);
-    const existingDmUser1 = user1.dmsList.find(
-      (dm) => dm.username === user2.username,
-    );
-    const existingDmUser2 = user2.dmsList.find(
-      (dm) => dm.username === user1.username,
-    );
+    const existingDmUser1 = user1.dmsList.find((dm) => dm.id === user2.id);
+    const existingDmUser2 = user2.dmsList.find((dm) => dm.id === user1.id);
     if (!existingDmUser1) {
       await this.prisma.user.update({
         where: {
@@ -121,10 +117,10 @@ export class DMService {
       });
     }
   }
-  async getDmConversation(username: string, user: User) {
+  async getDmConversation(id: number, user: User) {
     const user1 = await this.prisma.user.findUnique({
       where: {
-        username,
+        id,
       },
     });
     if (!user1) {
@@ -154,9 +150,9 @@ export class DMService {
 
     return messages;
   }
-  async deleteDm(username: string, user: User) {
+  async deleteDm(id: number, user: User) {
     try {
-      const messages = await this.getDmConversation(username, user);
+      const messages = await this.getDmConversation(id, user);
       await this.prisma.message.deleteMany({
         where: {
           id: {
@@ -205,18 +201,18 @@ export class DMService {
     return updatedMessages;
   }
   async sendFriendRequest(
-    clientUsername: string,
-    receiverUsername: string,
+    clientId: number,
+    receiverId: number,
     isOnline: boolean,
   ) {
     const client = await this.prisma.user.findUnique({
       where: {
-        username: clientUsername,
+        id: clientId,
       },
     });
     const receiver = await this.prisma.user.findUnique({
       where: {
-        username: receiverUsername,
+        id: receiverId,
       },
     });
     if (!client || !receiver) {
