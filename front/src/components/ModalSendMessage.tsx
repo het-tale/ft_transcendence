@@ -10,16 +10,7 @@ import User from './User';
 import { io } from 'socket.io-client';
 
 const ModalSendMessage = (props: any) => {
-    // const socket = React.useContext(SocketContext);
-    const socket = io('http://localhost:3001/chat', {
-        withCredentials: true,
-        forceNew: true,
-        timeout: 100000,
-        transports: ['websocket'],
-        auth: {
-            token: localStorage.getItem('token')
-        }
-    });
+    const socket = React.useContext(SocketContext);
     const { register, handleSubmit } = useForm<SentData>();
     const handleSendMessage: SubmitHandler<SentData> = (data) => {
         console.log('FORMDATA', data);

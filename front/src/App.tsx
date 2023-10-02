@@ -32,7 +32,7 @@ import MessageUser from './pages/Chat/MessageUser';
 import RightSide from './pages/Chat/RightSide';
 import Profile from './pages/Profile/Profile';
 // import GamePage from "./pages/Game/GamePage";
-// import { socket, SocketContext } from './socket';
+import { socket, SocketContext } from './socket';
 
 // const theme = createTheme();
 
@@ -40,91 +40,94 @@ function App() {
     return (
         // <ThemeProvider theme={theme}>
         <BrowserRouter>
-            {/* <SocketContext.Provider value={socket}> */}
-            <Routes>
-                {/**----------------Auth Pages ----------------------*/}
-                <Route
-                    path="/"
-                    element={
-                        // <RequireNoAuth>
-                        <Landing />
-                        // </RequireNoAuth>
-                    }
-                ></Route>
-                <Route
-                    path="login"
-                    element={
-                        // <RequireNoAuth>
-                        <Login />
-                        // </RequireNoAuth>
-                    }
-                />
-                <Route
-                    path="register"
-                    element={
-                        // <RequireNoAuth>
-                        <Register />
-                        // </RequireNoAuth>
-                    }
-                />
-                <Route
-                    path="home"
-                    element={
-                        // <ProtectRoutes>
-                        <Home />
-                        //  </ProtectRoutes>
-                    }
-                ></Route>
-                <Route
-                    path="complete-profile"
-                    element={
-                        <ProtectRoutes>
-                            <CompleteProfile />
-                        </ProtectRoutes>
-                    }
-                />
-                <Route
-                    path="confirm-email"
-                    element={
-                        // <ProtectConfirmation>
-                        <ConfirmEmail />
-                        // </ProtectConfirmation>
-                    }
-                />
-                <Route
-                    path="forgot-password"
-                    element={
-                        // <RequireNoAuth>
-                        <ForgotPassword />
-                        // </RequireNoAuth>}/>
-                    }
-                />
-                <Route path="change-password" element={<ResetPassword />} />
-                <Route path="redirect-email" element={<EmailRedirection />} />
-                <Route
-                    path="resend-email"
-                    element={
-                        // <ProtectConfirmation>
-                        <ResendEmail />
-                        // </ProtectConfirmation>
-                    }
-                />
-                <Route
-                    path="set-password"
-                    element={
-                        <ProtectPassword>
-                            <SetPassword />
-                        </ProtectPassword>
-                    }
-                />
-                <Route path="signin42" element={<Signin42 />} />
-                <Route path="2fa" element={<TFactorAuth />} />
-                <Route path="generate-qr" element={<GenerateQr />} />
-                <Route path="logout" element={<Logout />} />
+            <SocketContext.Provider value={socket}>
+                <Routes>
+                    {/**----------------Auth Pages ----------------------*/}
+                    <Route
+                        path="/"
+                        element={
+                            // <RequireNoAuth>
+                            <Landing />
+                            // </RequireNoAuth>
+                        }
+                    ></Route>
+                    <Route
+                        path="login"
+                        element={
+                            // <RequireNoAuth>
+                            <Login />
+                            // </RequireNoAuth>
+                        }
+                    />
+                    <Route
+                        path="register"
+                        element={
+                            // <RequireNoAuth>
+                            <Register />
+                            // </RequireNoAuth>
+                        }
+                    />
+                    <Route
+                        path="home"
+                        element={
+                            // <ProtectRoutes>
+                            <Home />
+                            //  </ProtectRoutes>
+                        }
+                    ></Route>
+                    <Route
+                        path="complete-profile"
+                        element={
+                            <ProtectRoutes>
+                                <CompleteProfile />
+                            </ProtectRoutes>
+                        }
+                    />
+                    <Route
+                        path="confirm-email"
+                        element={
+                            // <ProtectConfirmation>
+                            <ConfirmEmail />
+                            // </ProtectConfirmation>
+                        }
+                    />
+                    <Route
+                        path="forgot-password"
+                        element={
+                            // <RequireNoAuth>
+                            <ForgotPassword />
+                            // </RequireNoAuth>}/>
+                        }
+                    />
+                    <Route path="change-password" element={<ResetPassword />} />
+                    <Route
+                        path="redirect-email"
+                        element={<EmailRedirection />}
+                    />
+                    <Route
+                        path="resend-email"
+                        element={
+                            // <ProtectConfirmation>
+                            <ResendEmail />
+                            // </ProtectConfirmation>
+                        }
+                    />
+                    <Route
+                        path="set-password"
+                        element={
+                            <ProtectPassword>
+                                <SetPassword />
+                            </ProtectPassword>
+                        }
+                    />
+                    <Route path="signin42" element={<Signin42 />} />
+                    <Route path="2fa" element={<TFactorAuth />} />
+                    <Route path="generate-qr" element={<GenerateQr />} />
+                    <Route path="logout" element={<Logout />} />
 
-                {/**----------------Chat Pages ----------------------*/}
-                <Route path="chat" element={<Chat />}>
-                    {/* <Route
+                    {/**----------------Chat Pages ----------------------*/}
+                    <Route path="chat" element={<Chat />}>
+                        {/* <Route
                         path="dms"
                         element={
                             <SocketContext.Provider value={socket}>
@@ -133,12 +136,12 @@ function App() {
                         }
                     />
                     <Route path="rightSide" element={<RightSide />} /> */}
-                </Route>
-                <Route path="user-profile" element={<Profile />} />
-                {/* <Route path="game" element={<GamePage />}/> */}
-                <Route path="testt" element={<Testt />} />
-            </Routes>
-            {/* </SocketContext.Provider> */}
+                    </Route>
+                    <Route path="user-profile" element={<Profile />} />
+                    {/* <Route path="game" element={<GamePage />}/> */}
+                    <Route path="testt" element={<Testt />} />
+                </Routes>
+            </SocketContext.Provider>
         </BrowserRouter>
         // </ThemeProvider>sports: ['websocket'],
     );

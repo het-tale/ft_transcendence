@@ -8,16 +8,7 @@ import { io } from 'socket.io-client';
 
 const TypingBar = (props: any) => {
     const [message, setMessage] = useState('');
-    // const socket = React.useContext(SocketContext);
-    const socket = io('http://localhost:3001/chat', {
-        withCredentials: true,
-        forceNew: true,
-        timeout: 100000,
-        transports: ['websocket'],
-        auth: {
-            token: localStorage.getItem('token')
-        }
-    });
+    const socket = React.useContext(SocketContext);
     const toast = useToast();
     const sendMessageHandler = (e: any) => {
         e.preventDefault();
