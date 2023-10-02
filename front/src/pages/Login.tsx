@@ -18,7 +18,7 @@ function Login() {
     const toast = useToast();
     const checkAuthentication = async () => {
         try {
-            const response = await client.get('/auth/me', {
+            const response = await client.get('/user/me', {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }

@@ -41,25 +41,28 @@ export class DMService {
 
     return updatedUser;
   }
-  async saveMessage(data) {
+  async saveMessage(data: { sender?: number; receiver?: any; message: any; date: any; isPending: any; senderId?: any; receiverId?: any; }) {
+    console.log("This is the data", data);
     const user1 = await this.prisma.user.findUnique({
       where: {
-        id: data.senderId,
+        id: data.sender,
       },
       include: {
         blocked: true,
         dmsList: true,
       },
     });
+    console.log("This is the user1", user1);
     const user2 = await this.prisma.user.findUnique({
       where: {
-        id: data.receiverId,
+        id: data.receiver,
       },
       include: {
         dmsList: true,
         blocked: true,
       },
     });
+    console.log("This is the user2", user2);
     if (!user1 || !user2) {
       throw new Error('User not found.');
     }

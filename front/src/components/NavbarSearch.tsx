@@ -1,6 +1,5 @@
 import React from 'react';
 import Search from './Search';
-import NotifDm from '../pages/Chat/NotifDm';
 
 const NavbarSearch = function (props: any) {
     return (
@@ -46,7 +45,6 @@ const NavbarSearch = function (props: any) {
                 <span className="ng">ng</span>
             </div>
             <Search />
-            <NotifDm render={props.render} setRender={props.setRender} />
         </div>
     );
 };

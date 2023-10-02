@@ -1,25 +1,22 @@
-import React, { useEffect } from "react";
-import client from "../../components/Client";
-import { UserType } from "../../Types/User";
-import User from "../../components/User";
+import React, { useEffect } from 'react';
+import client from '../../components/Client';
+import { UserType } from '../../Types/User';
+import User from '../../components/User';
 
-
-const GetMessages = async (username : string) => {
-  console.log("USERNAME", username);
+const GetMessages = async (id: number) => {
+    console.log('USERNAME', id);
     try {
-        const res = await client.get(`chat/dms/${username}`, {
+        const res = await client.get(`chat/dms/${id}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
         });
         if (res.status === 200) {
             return res.data;
-          }
-          else {
+        } else {
             return null;
-          }
-    }
-    catch (error) {
+        }
+    } catch (error) {
         return null;
     }
 };
