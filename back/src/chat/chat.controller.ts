@@ -20,7 +20,9 @@ export class ChatController {
 
   @Get('dms/:id')
   async getDms(@Param('id') id: number, @Req() request: { user: User }) {
-    return this.dmService.getDmConversation(id, request.user);
+    console.log("This is the id", id);
+    console.log("This is the type", typeof id);
+    return this.dmService.getDmConversation(Number(id), request.user);
   }
   @Delete('dms/:id')
   async deleteDm(@Param('id') id: number, @Req() request: { user: User }) {

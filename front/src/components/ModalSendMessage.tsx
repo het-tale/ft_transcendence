@@ -7,15 +7,26 @@ import { Button, ButtonGroup, Flex } from '@chakra-ui/react';
 import { SocketContext } from '../socket';
 import { UserType } from '../Types/User';
 import User from './User';
+import { io } from 'socket.io-client';
 
 const ModalSendMessage = (props: any) => {
-    const socket = React.useContext(SocketContext);
+    // const socket = React.useContext(SocketContext);
+    const socket = io('http://localhost:3001/chat', {
+        withCredentials: true,
+        forceNew: true,
+        timeout: 100000,
+        transports: ['websocket'],
+        auth: {
+            token: localStorage.getItem('token')
+        }
+    });
     const { register, handleSubmit } = useForm<SentData>();
     const handleSendMessage: SubmitHandler<SentData> = (data) => {
         console.log('FORMDATA', data);
+        console.log('Socket', socket);
         socket.emit('privateMessage', {
             message: data.message,
-            to: data.to
+            to: Number(data.to)
         });
         props.onClose();
         props.setRender(!props.render);

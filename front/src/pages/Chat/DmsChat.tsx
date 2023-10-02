@@ -51,7 +51,7 @@ const DmsChat = (props: any) => {
             setDms(data);
         });
         const res2 = props.userDm
-            ? GetMessages(props.userDm.username).then((data) => {
+            ? GetMessages(props.userDm.id).then((data) => {
                   setMessages(data);
               })
             : null;
@@ -67,7 +67,7 @@ const DmsChat = (props: any) => {
                         <MessageUser
                             profile={props.userDm.avatar}
                             name={props.userDm.username}
-                            message="online"
+                            message={props.userDm.status}
                         />
                     ) : (
                         <></>

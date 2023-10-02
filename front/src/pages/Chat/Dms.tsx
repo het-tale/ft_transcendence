@@ -42,7 +42,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 
 export interface SentData {
     message: string;
-    to: string;
+    to: number;
 }
 const Dms = () => {
     const [currentTab, setCurrentTab] = React.useState('1');
@@ -197,9 +197,9 @@ const Dms = () => {
     };
     return (
         <Flex flexDirection={'column'}>
-            <NavbarSearch render={render} setRender={setRender} />
+            <NavbarSearch />
             <Flex>
-                <Sidebar />
+                <Sidebar render={render} setRender={setRender} />
                 <Box w="100%" bg="#E9ECEF" h={'90%'}>
                     <Flex justify="space-between">
                         <LeftSide
