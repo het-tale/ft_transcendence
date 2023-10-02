@@ -64,7 +64,9 @@ export class AuthController {
   @Get('42/callback')
   async signin42Callback(@Req() request: { user: User }, @Res() res: Response) {
     const token = await this.authService.signin42(request.user);
+    console.log(request.user);
     console.log(token);
+    console.log('im here');
 
     return res.redirect(`http://localhost:3000/signin42?token=${token}`);
   }
