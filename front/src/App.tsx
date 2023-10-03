@@ -33,10 +33,12 @@ import RightSide from './pages/Chat/RightSide';
 import Profile from './pages/Profile/Profile';
 // import GamePage from "./pages/Game/GamePage";
 import { socket, SocketContext } from './socket';
+import React from 'react';
 
 // const theme = createTheme();
 
 function App() {
+    const [firstLogin, setFirstLogin] = React.useState(false);
     return (
         // <ThemeProvider theme={theme}>
         <BrowserRouter>
@@ -46,63 +48,74 @@ function App() {
                     <Route
                         path="/"
                         element={
-                            // <RequireNoAuth>
-                            <Landing />
-                            // </RequireNoAuth>
+                            <RequireNoAuth>
+                                <Landing />
+                            </RequireNoAuth>
                         }
                     ></Route>
                     <Route
                         path="login"
                         element={
-                            // <RequireNoAuth>
-                            <Login />
-                            // </RequireNoAuth>
+                            <RequireNoAuth>
+                                <Login
+                                    firstLogin={firstLogin}
+                                    setFirstLogin={setFirstLogin}
+                                />
+                            </RequireNoAuth>
                         }
                     />
                     <Route
                         path="register"
                         element={
-                            // <RequireNoAuth>
-                            <Register />
-                            // </RequireNoAuth>
+                            <RequireNoAuth>
+                                <Register />
+                            </RequireNoAuth>
                         }
                     />
                     <Route
                         path="home"
                         element={
-                            // <ProtectRoutes>
-                            <Home />
-                            //  </ProtectRoutes>
+                            <ProtectRoutes>
+                                <Home />
+                            </ProtectRoutes>
                         }
                     ></Route>
                     <Route
                         path="complete-profile"
                         element={
-                            <ProtectRoutes>
-                                <CompleteProfile />
+                            <ProtectRoutes firstLogin={firstLogin}>
+                                <CompleteProfile
+                                    firstLogin={firstLogin}
+                                    setFirstLogin={setFirstLogin}
+                                />
                             </ProtectRoutes>
                         }
                     />
                     <Route
                         path="confirm-email"
                         element={
-                            // <ProtectConfirmation>
-                            <ConfirmEmail />
-                            // </ProtectConfirmation>
+                            <ProtectConfirmation>
+                                <ConfirmEmail />
+                            </ProtectConfirmation>
                         }
                     />
                     <Route
                         path="forgot-password"
                         element={
-                            // <RequireNoAuth>
-                            <ForgotPassword />
-                            // </RequireNoAuth>}/>
+                            <RequireNoAuth>
+                                <ForgotPassword />
+                            </RequireNoAuth>
                         }
                     />
                     <Route path="change-password" element={<ResetPassword />} />
                     <Route
                         path="redirect-email"
-                        element={<EmailRedirection />}
+                        element={
+                            <EmailRedirection
+                                firstLogin={firstLogin}
+                                setFirstLogin={setFirstLogin}
+                            />
+                        }
                     />
                     <Route
                         path="resend-email"
@@ -116,7 +129,10 @@ function App() {
                         path="set-password"
                         element={
                             <ProtectPassword>
-                                <SetPassword />
+                                <SetPassword
+                                    firstLogin={firstLogin}
+                                    setFirstLogin={setFirstLogin}
+                                />
                             </ProtectPassword>
                         }
                     />
@@ -126,19 +142,25 @@ function App() {
                     <Route path="logout" element={<Logout />} />
 
                     {/**----------------Chat Pages ----------------------*/}
-                    <Route path="chat" element={<Chat />}>
-                        {/* <Route
-                        path="dms"
+
+                    <Route
+                        path="chat"
                         element={
-                            <SocketContext.Provider value={socket}>
-                                <Dms />
-                            </SocketContext.Provider>
+                            <ProtectRoutes>
+                                <Chat />
+                            </ProtectRoutes>
                         }
                     />
-                    <Route path="rightSide" element={<RightSide />} /> */}
-                    </Route>
+
                     <Route path="user-profile">
-                        <Route path=":id" element={<Profile />} />
+                        <Route
+                            path=":id"
+                            element={
+                                <ProtectRoutes>
+                                    <Profile />
+                                </ProtectRoutes>
+                            }
+                        />
                     </Route>
                     {/* <Route path="game" element={<GamePage />}/> */}
                     <Route path="testt" element={<Testt />} />

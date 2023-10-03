@@ -45,7 +45,7 @@ const Sidebar = (props: any) => {
                 <BsPersonFill className="fa" />
                 Profile
             </Link>
-            <a href="" id="more" style={{ marginTop: '35rem' }}>
+            <Link to="/logout" id="more" style={{ marginTop: '35rem' }}>
                 {/* <i className="fa fa-gear fa-lg" aria-hidden="true"></i> */}
                 {/* <BsBoxArrowLeft className='fa'/> */}
                 <Image
@@ -58,7 +58,7 @@ const Sidebar = (props: any) => {
                     borderRadius={'30px'}
                 />
                 Log Out
-            </a>
+            </Link>
             {/* <NotifDm render={props.render} setRender={props.setRender} /> */}
         </aside>
     );
