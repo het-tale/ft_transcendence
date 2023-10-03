@@ -3,7 +3,8 @@ import {
     BsPersonCircle,
     BsPersonFillSlash,
     BsThreeDots,
-    BsTrash
+    BsTrash,
+    BsX
 } from 'react-icons/bs';
 import MessageContent from './MessageContent';
 import TypingBar from './TypingBar';
@@ -20,7 +21,8 @@ import {
     SimpleGrid,
     Spacer,
     background,
-    useDisclosure
+    useDisclosure,
+    useToast
 } from '@chakra-ui/react';
 import MessageUser from './MessageUser';
 import React, { useEffect } from 'react';
@@ -30,9 +32,28 @@ import { UserType } from '../../Types/User';
 import { MessageType } from '../../Types/Message';
 import GetMessages from './GetMessages';
 import User from '../../components/User';
+import ModalUi from '../../components/ModalUi';
+import ModalConfirm from './ModalConfirm';
+import client from '../../components/Client';
+import { on } from 'events';
+import Profile from '../Profile/Profile';
+import { Link } from 'react-router-dom';
 
 const DmsChat = (props: any) => {
+    const toast = useToast();
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const {
+        isOpen: isOpen2,
+        onOpen: onOpen2,
+        onClose: onClose2
+    } = useDisclosure();
+    const {
+        isOpen: isOpen3,
+        onOpen: onOpen3,
+        onClose: onClose3
+    } = useDisclosure();
     const [user, setUser] = React.useState<UserType>();
+    const [blocked, setBlocked] = React.useState(false);
     useEffect(() => {
         async function fetchUserData() {
             const userData = await User();
@@ -51,13 +72,76 @@ const DmsChat = (props: any) => {
             setDms(data);
         });
         const res2 = props.userDm
-            ? GetMessages(props.userDm.username).then((data) => {
+            ? GetMessages(props.userDm.id).then((data) => {
                   setMessages(data);
               })
             : null;
     }, [props.render, props.userDm]);
     console.log('DMS', messages);
     console.log('USERRRRR', user);
+    const handleBlockedUser = () => {
+        console.log('Blocked user', props.userDm.id);
+        socket.emit('blockUser', {
+            target: props.userDm.id
+        });
+        setBlocked(true);
+        props.setRender(!props.render);
+        onClose();
+    };
+    socket.on('userBlocked', (data: any) => {
+        console.log('BLOCK USER DATA', data);
+        props.setRender(!props.render);
+    });
+    socket.on('userBlockError', (data: any) => {
+        console.log('BLOCK USER ERROR DATA', data);
+        props.setRender(!props.render);
+    });
+    const handleUnblockUser = () => {
+        socket.emit('unblockUser', {
+            target: props.userDm.id
+        });
+        setBlocked(false);
+        props.setRender(!props.render);
+        onClose();
+    };
+    socket.on('userUnblocked', (data: any) => {
+        console.log('unBLOCK USER DATA', data);
+        props.setRender(!props.render);
+    });
+    socket.on('userUnblockError', (data: any) => {
+        console.log('unBLOCK USER ERROR DATA', data);
+        props.setRender(!props.render);
+    });
+
+    const handleClearChat = async () => {
+        console.log('Clear chat', props.userDm.id);
+        try {
+            const res = await client.delete(`chat/dms/${props.userDm.id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            console.log('RES', res);
+            if (res.status === 200) {
+                props.setRender(!props.render);
+            }
+        } catch (error: any) {
+            console.log('Error', error);
+            toast({
+                title: 'Error.',
+                description: error.response.data.message,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+        }
+        onClose2();
+    };
+    const handleProfile = () => {
+        console.log('View Profile');
+        <Link to="/user-profile" />;
+    };
     if (!dms || dms.length === 0) return <></>;
     return (
         <Flex flexDirection={'column'} justifyContent={'space-between'}>
@@ -67,7 +151,7 @@ const DmsChat = (props: any) => {
                         <MessageUser
                             profile={props.userDm.avatar}
                             name={props.userDm.username}
-                            message="online"
+                            message={props.userDm.status}
                         />
                     ) : (
                         <></>
@@ -105,22 +189,78 @@ const DmsChat = (props: any) => {
                         >
                             Play with me
                         </MenuItem>
+                        <Link to={`/user-profile/${props.userDm.id}`}>
+                            <MenuItem
+                                paddingBottom={2}
+                                bg={'none'}
+                                icon={<BsPersonCircle />}
+                                onClick={handleProfile}
+                            >
+                                View Profile
+                            </MenuItem>
+                        </Link>
                         <MenuItem
                             paddingBottom={2}
                             bg={'none'}
-                            icon={<BsPersonCircle />}
+                            icon={<BsX />}
+                            onClick={onOpen2}
                         >
-                            View Profile
+                            Clear Chat
+                            <ModalConfirm
+                                isOpen={isOpen2}
+                                onOpen={onOpen2}
+                                onClose={onClose2}
+                                title={'Clear Chat'}
+                                handleBlockedUser={handleClearChat}
+                                body={
+                                    'Are you sure you want to clear this chat?'
+                                }
+                            />
                         </MenuItem>
                         <MenuItem
                             paddingBottom={2}
                             bg={'none'}
                             icon={<BsTrash />}
+                            onClick={onOpen3}
                         >
                             Delete Chat
+                            <ModalConfirm
+                                isOpen={isOpen3}
+                                onOpen={onOpen3}
+                                onClose={onClose3}
+                                title={'Delete Chat'}
+                                handleBlockedUser={props.handleDeleteChat}
+                                body={
+                                    'Are you sure you want to delete this chat?'
+                                }
+                            />
                         </MenuItem>
-                        <MenuItem bg={'none'} icon={<BsPersonFillSlash />}>
-                            Block
+                        <MenuItem
+                            bg={'none'}
+                            icon={<BsPersonFillSlash />}
+                            onClick={onOpen}
+                        >
+                            {blocked ? 'Unblock' : 'Block'}
+                            <ModalConfirm
+                                isOpen={isOpen}
+                                onOpen={onOpen}
+                                onClose={onClose}
+                                title={'Block User'}
+                                target={props.userDm.id}
+                                blocked={blocked}
+                                setBlocked={setBlocked}
+                                socket={socket}
+                                handleBlockedUser={
+                                    blocked
+                                        ? handleUnblockUser
+                                        : handleBlockedUser
+                                }
+                                body={
+                                    blocked
+                                        ? 'Are you sure you want to unblock this user?'
+                                        : 'Are you sure you want to block this user?'
+                                }
+                            />
                         </MenuItem>
                     </MenuList>
                 </Menu>

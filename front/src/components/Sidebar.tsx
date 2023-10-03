@@ -12,7 +12,8 @@ import {
 import { UserType } from '../Types/User';
 import User from './User';
 import { Image } from '@chakra-ui/react';
-const Sidebar = () => {
+import NotifDm from '../pages/Chat/NotifDm';
+const Sidebar = (props: any) => {
     const [user, setUser] = React.useState<UserType>();
     useEffect(() => {
         async function fetchUserData() {
@@ -28,7 +29,7 @@ const Sidebar = () => {
                 <BsHouseFill className="fa" />
                 Home
             </a>
-            <Link to="/chat/dms">
+            <Link to="/chat">
                 <BsChatRightFill className="fa" />
                 Chat
             </Link>
@@ -40,10 +41,10 @@ const Sidebar = () => {
                 <BsController className="fa" />
                 Play
             </Link>
-            <a href="">
+            <Link to={`/user-profile/${user?.id}`}>
                 <BsPersonFill className="fa" />
                 Profile
-            </a>
+            </Link>
             <a href="" id="more" style={{ marginTop: '35rem' }}>
                 {/* <i className="fa fa-gear fa-lg" aria-hidden="true"></i> */}
                 {/* <BsBoxArrowLeft className='fa'/> */}
@@ -58,6 +59,7 @@ const Sidebar = () => {
                 />
                 Log Out
             </a>
+            {/* <NotifDm render={props.render} setRender={props.setRender} /> */}
         </aside>
     );
 };
