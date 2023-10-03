@@ -1,19 +1,24 @@
 import { interval } from 'rxjs';
-import { INCREASE_SPEED, INTERVAL, Paddle, Player, Room, SPEED_INTERVAL } from './types';
+import { INCREASE_SPEED, INTERVAL, Room, SPEED_INTERVAL } from './types';
 import { colision } from './colision';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Socket } from 'socket.io';
 import { User } from '@prisma/client';
+import { OtherAvatar } from './game-events';
 
-export async function createMatch(room: Room, prisma: PrismaService, activeSockets: Map<Socket, User>) {
+export async function createMatch(
+  room: Room,
+  prisma: PrismaService,
+  activeSockets: Map<Socket, User>,
+) {
   try {
-    const match = await prisma.match
+    await prisma.match
       .create({
         data: {
           start: new Date(),
           result: 'ongoing',
-		  playerAId: activeSockets.get(room.players[0].socket).id,
-		  playerBId: activeSockets.get(room.players[1].socket).id,
+          playerAId: activeSockets.get(room.players[0].socket).id,
+          playerBId: activeSockets.get(room.players[1].socket).id,
         },
       })
       .then((match) => {
@@ -28,13 +33,20 @@ export async function createMatch(room: Room, prisma: PrismaService, activeSocke
   }
 }
 
-export async function startGame(room: Room, rooms: Map<string, Room>, activeSockets: Map<Socket, User> ,  prisma: PrismaService, containerHeight: number) {
+export async function startGame(
+  room: Room,
+  rooms: Map<string, Room>,
+  activeSockets: Map<Socket, User>,
+  prisma: PrismaService,
+  containerHeight: number,
+) {
   console.log('startGame');
+  OtherAvatar(room.players[0].socket, rooms, activeSockets);
   if (!room.gameActive) {
     room.gameActive = true;
     room.gameInterval = interval(INTERVAL).subscribe(() => {
       if (!room.gameActive) {
-		stopGame(room, rooms);
+        stopGame(room, rooms);
 
         return;
       }
@@ -54,7 +66,12 @@ export async function stopGame(room: Room, rooms: Map<string, Room>) {
   }
 }
 
-export async function updateGame(room: Room, activeSockets: Map<Socket, User>, prisma: PrismaService, containerHeight: number) {
+export async function updateGame(
+  room: Room,
+  activeSockets: Map<Socket, User>,
+  prisma: PrismaService,
+  containerHeight: number,
+) {
   // Calculate the new ball position based on its current position and velocity
   if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL) {
     room.lastspeedincrease = Date.now();

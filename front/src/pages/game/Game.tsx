@@ -3,11 +3,10 @@ import { io } from "socket.io-client";
 import { throttle } from "lodash";
 import { ListenOnSocket } from "./Game.lisners";
 import { GameData, Paddle, Ball } from "./Game.types";
-import { Button, Image } from "@chakra-ui/react";
+import { Image } from "@chakra-ui/react";
 import "../../css/game.css";
 import User from "../../components/User";
 import { UserType } from "../../Types/User";
-import client from "../../components/Client";
 
 export type MySocket = ReturnType<typeof io>;
 
@@ -219,9 +218,12 @@ const Game: React.FC = () => {
       {gameOver ? (
         <div className="overlay">
           <div className="game-over-container">
-            <div className="game-over">Game Over</div>
+            <div className="game-over">
+              <p>Game Over</p>
+              <p>{playerScore > otherScore ? "you won" : "you lost"}</p>
+            </div>
             <button className="home-button" onClick={handleHomeNavigation}>
-              Go to Home 
+              Go to Home
             </button>
           </div>
         </div>

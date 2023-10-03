@@ -12,10 +12,9 @@ import { Room } from './types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import {stopGame } from './Game_services';
+import { stopGame } from './Game_services';
 import { verifyToken } from './Player-Init';
 import {
-  OtherAvatar,
   StartGameEvent,
   UpdatePaddle,
   findRoomByPlayerSocket,
@@ -47,19 +46,20 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       //   console.log('token', token);
       const user = await verifyToken(token, this.prisma, this.conf, this.jwt);
       if (user) {
-		for (const isplaying of this.activeSockets.values()) {
-			if (isplaying.id === user.id) {
-				console.log('user is already playing');
-				client.disconnect();
-				return;
-			}
-		}
-			this.activeSockets.set(client, user);
-			for (const user of this.activeSockets.values()) {
-				console.log('user pushed into activ socket  ', user);
-			}
-			console.log('connection established');
-			client.emit('connected', 'the user is fount and the game will start ');
+        for (const isplaying of this.activeSockets.values()) {
+          if (isplaying.id === user.id) {
+            console.log('user is already playing');
+            client.disconnect();
+
+            return;
+          }
+        }
+        this.activeSockets.set(client, user);
+        for (const user of this.activeSockets.values()) {
+          console.log('user pushed into activ socket  ', user);
+        }
+        console.log('connection established');
+        client.emit('connected', 'the user is fount and the game will start ');
       } else {
         console.log('connection refused');
         client.disconnect();
@@ -81,7 +81,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         stopGame(room, this.rooms);
         room.gameActive = false;
         this.activeSockets.delete(client);
-        this.rooms.delete(room.roomName); // Remove the room if it's empty
+        this.rooms.delete(room.roomName);
       }
     }
   }
@@ -98,15 +98,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         this.prisma,
         this.server,
       );
-    } catch (e) {
-      console.log('error', e);
-    }
-  }
-
-  @SubscribeMessage('OTHER AVATAR')
-  handleOtherAvatar(client: Socket, data: any) {
-    try {
-      OtherAvatar(client, data, this.rooms, this.activeSockets);
     } catch (e) {
       console.log('error', e);
     }

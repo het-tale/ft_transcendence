@@ -6,8 +6,8 @@ import { User } from '@prisma/client';
 const MAX_ANGLE_CHANGE = Math.PI / 4;
 
 function resetBall(ball: Ball) {
-  ball.x = 720/2;
-  ball.y = 480 /2;
+  ball.x = 720 / 2;
+  ball.y = 480 / 2;
   const random = Math.random();
   switch (true) {
     case random < 0.25:
@@ -29,31 +29,34 @@ function resetBall(ball: Ball) {
   }
 }
 
-async function intersections(room: Room, playerPaddle: Paddle, otherPaddle: Paddle)
-{
-	if (
-		room.ball.x + room.ball.radius >= playerPaddle.x &&
-		room.ball.y >= playerPaddle.y &&
-		room.ball.y <= playerPaddle.y + playerPaddle.height
-	  ) {
-		const relativeIntersectY =
-		  (room.ball.y - (playerPaddle.y + playerPaddle.height / 2)) /
-		  (playerPaddle.height / 2);
-		const bounceAngle = relativeIntersectY * MAX_ANGLE_CHANGE;
-		room.ball.dx = -room.ball.dx;
-		room.ball.dy = Math.sin(bounceAngle) * 3;
-	  } else if (
-		room.ball.x - room.ball.radius <= otherPaddle.x + otherPaddle.width &&
-		room.ball.y >= otherPaddle.y &&
-		room.ball.y <= otherPaddle.y + otherPaddle.height
-	  ) {
-		const relativeIntersectY =
-		  (room.ball.y - (otherPaddle.y + otherPaddle.height / 2)) /
-		  (otherPaddle.height / 2);
-		const bounceAngle = relativeIntersectY * MAX_ANGLE_CHANGE;
-		room.ball.dx = -room.ball.dx;
-		room.ball.dy = Math.sin(bounceAngle) * 3;
-	  }
+async function intersections(
+  room: Room,
+  playerPaddle: Paddle,
+  otherPaddle: Paddle,
+) {
+  if (
+    room.ball.x + room.ball.radius >= playerPaddle.x &&
+    room.ball.y >= playerPaddle.y &&
+    room.ball.y <= playerPaddle.y + playerPaddle.height
+  ) {
+    const relativeIntersectY =
+      (room.ball.y - (playerPaddle.y + playerPaddle.height / 2)) /
+      (playerPaddle.height / 2);
+    const bounceAngle = relativeIntersectY * MAX_ANGLE_CHANGE;
+    room.ball.dx = -room.ball.dx;
+    room.ball.dy = Math.sin(bounceAngle) * 3;
+  } else if (
+    room.ball.x - room.ball.radius <= otherPaddle.x + otherPaddle.width &&
+    room.ball.y >= otherPaddle.y &&
+    room.ball.y <= otherPaddle.y + otherPaddle.height
+  ) {
+    const relativeIntersectY =
+      (room.ball.y - (otherPaddle.y + otherPaddle.height / 2)) /
+      (otherPaddle.height / 2);
+    const bounceAngle = relativeIntersectY * MAX_ANGLE_CHANGE;
+    room.ball.dx = -room.ball.dx;
+    room.ball.dy = Math.sin(bounceAngle) * 3;
+  }
 }
 
 export async function colision(

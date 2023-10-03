@@ -46,7 +46,7 @@ function ListenOnSocket(
 
   socket.on("StartGame", (message: string) => {
     console.log("StartGame on room", message); // print the start game message
-	socket?.emit("OTHER AVATAR", user?.avatar);
+	// socket?.emit("OTHER AVATAR", user?.avatar);
   });
 
   socket.on(
