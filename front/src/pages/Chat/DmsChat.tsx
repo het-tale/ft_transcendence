@@ -30,9 +30,13 @@ import { UserType } from '../../Types/User';
 import { MessageType } from '../../Types/Message';
 import GetMessages from './GetMessages';
 import User from '../../components/User';
+import ModalUi from '../../components/ModalUi';
+import ModalConfirm from './ModalConfirm';
 
 const DmsChat = (props: any) => {
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const [user, setUser] = React.useState<UserType>();
+    const [blocked, setBlocked] = React.useState(false);
     useEffect(() => {
         async function fetchUserData() {
             const userData = await User();
@@ -58,6 +62,40 @@ const DmsChat = (props: any) => {
     }, [props.render, props.userDm]);
     console.log('DMS', messages);
     console.log('USERRRRR', user);
+    const handleBlockedUser = () => {
+        console.log('Blocked user', props.userDm.id);
+        socket.emit('blockUser', {
+            target: props.userDm.id
+        });
+        setBlocked(true);
+        props.setRender(!props.render);
+        onClose();
+    };
+    socket.on('userBlocked', (data: any) => {
+        console.log('BLOCK USER DATA', data);
+        props.setRender(!props.render);
+    });
+    socket.on('userBlockError', (data: any) => {
+        console.log('BLOCK USER ERROR DATA', data);
+        props.setRender(!props.render);
+    });
+    const handleUnblockUser = () => {
+        socket.emit('unblockUser', {
+            target: props.userDm.id
+        });
+        setBlocked(false);
+        props.setRender(!props.render);
+        onClose();
+    };
+    socket.on('userUnblocked', (data: any) => {
+        console.log('unBLOCK USER DATA', data);
+        props.setRender(!props.render);
+    });
+    socket.on('userUnblockError', (data: any) => {
+        console.log('unBLOCK USER ERROR DATA', data);
+        props.setRender(!props.render);
+    });
+
     if (!dms || dms.length === 0) return <></>;
     return (
         <Flex flexDirection={'column'} justifyContent={'space-between'}>
@@ -119,8 +157,32 @@ const DmsChat = (props: any) => {
                         >
                             Delete Chat
                         </MenuItem>
-                        <MenuItem bg={'none'} icon={<BsPersonFillSlash />}>
-                            Block
+                        <MenuItem
+                            bg={'none'}
+                            icon={<BsPersonFillSlash />}
+                            onClick={onOpen}
+                        >
+                            {blocked ? 'Unblock' : 'Block'}
+                            <ModalConfirm
+                                isOpen={isOpen}
+                                onOpen={onOpen}
+                                onClose={onClose}
+                                title={'Block User'}
+                                target={props.userDm.id}
+                                blocked={blocked}
+                                setBlocked={setBlocked}
+                                socket={socket}
+                                handleBlockedUser={
+                                    blocked
+                                        ? handleUnblockUser
+                                        : handleBlockedUser
+                                }
+                                body={
+                                    blocked
+                                        ? 'Are you sure you want to unblock this user?'
+                                        : 'Are you sure you want to block this user?'
+                                }
+                            />
                         </MenuItem>
                     </MenuList>
                 </Menu>
