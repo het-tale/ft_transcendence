@@ -36,6 +36,8 @@ import ModalUi from '../../components/ModalUi';
 import ModalConfirm from './ModalConfirm';
 import client from '../../components/Client';
 import { on } from 'events';
+import Profile from '../Profile/Profile';
+import { Link } from 'react-router-dom';
 
 const DmsChat = (props: any) => {
     const toast = useToast();
@@ -136,7 +138,10 @@ const DmsChat = (props: any) => {
         }
         onClose2();
     };
-
+    const handleProfile = () => {
+        console.log('View Profile');
+        <Link to="/user-profile" />;
+    };
     if (!dms || dms.length === 0) return <></>;
     return (
         <Flex flexDirection={'column'} justifyContent={'space-between'}>
@@ -184,13 +189,16 @@ const DmsChat = (props: any) => {
                         >
                             Play with me
                         </MenuItem>
-                        <MenuItem
-                            paddingBottom={2}
-                            bg={'none'}
-                            icon={<BsPersonCircle />}
-                        >
-                            View Profile
-                        </MenuItem>
+                        <Link to={`/user-profile/${props.userDm.id}`}>
+                            <MenuItem
+                                paddingBottom={2}
+                                bg={'none'}
+                                icon={<BsPersonCircle />}
+                                onClick={handleProfile}
+                            >
+                                View Profile
+                            </MenuItem>
+                        </Link>
                         <MenuItem
                             paddingBottom={2}
                             bg={'none'}

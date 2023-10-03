@@ -137,7 +137,9 @@ function App() {
                     />
                     <Route path="rightSide" element={<RightSide />} /> */}
                     </Route>
-                    <Route path="user-profile" element={<Profile />} />
+                    <Route path="user-profile">
+                        <Route path=":id" element={<Profile />} />
+                    </Route>
                     {/* <Route path="game" element={<GamePage />}/> */}
                     <Route path="testt" element={<Testt />} />
                 </Routes>

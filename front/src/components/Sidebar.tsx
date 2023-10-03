@@ -41,10 +41,10 @@ const Sidebar = (props: any) => {
                 <BsController className="fa" />
                 Play
             </Link>
-            <a href="">
+            <Link to={`/user-profile/${user?.id}`}>
                 <BsPersonFill className="fa" />
                 Profile
-            </a>
+            </Link>
             <a href="" id="more" style={{ marginTop: '35rem' }}>
                 {/* <i className="fa fa-gear fa-lg" aria-hidden="true"></i> */}
                 {/* <BsBoxArrowLeft className='fa'/> */}
