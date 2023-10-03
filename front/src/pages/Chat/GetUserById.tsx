@@ -1,8 +1,8 @@
-import client from './Client';
+import client from '../../components/Client';
 
-const User = async () => {
+const UserId = async (id: number) => {
     try {
-        const response = await client.get('/user/me', {
+        const response = await client.get(`/user/${id}`, {
             headers: {
                 Authorization: 'Bearer ' + localStorage.getItem('token')
             }
@@ -17,4 +17,4 @@ const User = async () => {
     }
 };
 
-export default User;
+export default UserId;

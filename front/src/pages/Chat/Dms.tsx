@@ -15,7 +15,8 @@ import {
     SimpleGrid,
     Spacer,
     background,
-    useDisclosure
+    useDisclosure,
+    useToast
 } from '@chakra-ui/react';
 import RightSide from './RightSide';
 import React, { useEffect } from 'react';
@@ -39,10 +40,11 @@ import GetDms from './GetDms';
 import { SocketContext } from '../../socket';
 import ModalSendMessage from '../../components/ModalSendMessage';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import client from '../../components/Client';
 
 export interface SentData {
     message: string;
-    to: string;
+    to: number;
 }
 const Dms = () => {
     const [currentTab, setCurrentTab] = React.useState('1');
@@ -59,6 +61,7 @@ const Dms = () => {
     const [isUserDm, setIsUserDm] = React.useState(false);
     const socket = React.useContext(SocketContext);
     const [render, setRender] = React.useState(false);
+    const toast = useToast();
     useEffect(() => {
         GetDms().then((data) => {
             setDms(data);
@@ -89,6 +92,63 @@ const Dms = () => {
         console.log('FORMDATA', data);
     };
     console.log('DMS', dms);
+    /**                     start listening */
+    socket.on('privateMessage', (data: any) => {
+        console.log('MESSAGE DATA', data);
+        setRender(!render);
+    });
+    const timer = setTimeout(() => {
+        socket.on('privateMessageError', (data: any) => {
+            console.log('MESSAGE ERROR DATA', data);
+
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'top-right'
+            });
+        });
+    }, 500);
+    socket.on('userOffline', (data: any) => {
+        console.log('USER OFFLINE', data);
+        setRender(!render);
+    });
+    socket.on('userOnline', (data: any) => {
+        console.log('USER ONLINE', data);
+        setRender(!render);
+    });
+
+    const handleDeleteChat = async () => {
+        if (!userDm) return;
+        console.log('Delete chat', userDm.id);
+        try {
+            const res = await client.delete(`chat/dms/${userDm.id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            console.log('RES', res);
+            if (res.status === 200) {
+                setRender(!render);
+                //delete user from dms list
+                // onClose3();
+            }
+        } catch (error: any) {
+            console.log('Error', error);
+            toast({
+                title: 'Error.',
+                description: error.response.data.message,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+        }
+    };
+
+    /**                     end listening */
     const [test, setTest] = React.useState(false);
     const tabs = [
         {
@@ -150,6 +210,7 @@ const Dms = () => {
                         test={test}
                         render={render}
                         setRender={setRender}
+                        handleDeleteChat={handleDeleteChat}
                     />
                 </>
             )
@@ -197,9 +258,9 @@ const Dms = () => {
     };
     return (
         <Flex flexDirection={'column'}>
-            <NavbarSearch render={render} setRender={setRender} />
+            <NavbarSearch />
             <Flex>
-                <Sidebar />
+                <Sidebar render={render} setRender={setRender} />
                 <Box w="100%" bg="#E9ECEF" h={'90%'}>
                     <Flex justify="space-between">
                         <LeftSide

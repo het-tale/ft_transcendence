@@ -4,21 +4,32 @@ import { SocketContext } from '../../socket';
 import { set } from 'react-hook-form';
 import { useToast } from '@chakra-ui/react';
 import { render } from '@testing-library/react';
+import { io } from 'socket.io-client';
+import SocketListen from './socketListen';
 
 const TypingBar = (props: any) => {
     const [message, setMessage] = useState('');
     const socket = React.useContext(SocketContext);
+    console.log('typing socket', socket);
     const toast = useToast();
     const sendMessageHandler = (e: any) => {
         e.preventDefault();
         console.log('message sent');
         socket.emit('privateMessage', {
             message: message,
-            to: props.userDm.username
+            to: props.userDm.id
         });
         setMessage('');
         props.setRender(!props.render);
     };
+    // useEffect(() => {
+    // socket.on('privateMessage', (data: any) => {
+    //     console.log('MESSAGE DATA', data);
+    //     props.setRender(!props.render);
+    //     // setMessage(data.message);
+    //     // from: data.from;
+    // });
+    // }, []);
     return (
         <form className="typing-bar" onSubmit={sendMessageHandler}>
             <input
