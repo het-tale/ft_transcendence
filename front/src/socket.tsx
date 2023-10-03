@@ -12,7 +12,8 @@ export const socket = io(URL, {
     transports: ['websocket'],
     auth: {
         token: token
-    }
+    },
+    autoConnect: false
 });
 
 export const SocketContext = React.createContext(socket);
