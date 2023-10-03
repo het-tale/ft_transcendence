@@ -155,7 +155,7 @@ export class DMService {
   }
   async deleteDm(id: number, user: User) {
     try {
-      const messages = await this.getDmConversation(id, user);
+      const messages = await this.getDmConversation(Number(id), user);
       await this.prisma.message.deleteMany({
         where: {
           id: {

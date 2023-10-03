@@ -40,6 +40,7 @@ import GetDms from './GetDms';
 import { SocketContext } from '../../socket';
 import ModalSendMessage from '../../components/ModalSendMessage';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import client from '../../components/Client';
 
 export interface SentData {
     message: string;
@@ -119,6 +120,34 @@ const Dms = () => {
         setRender(!render);
     });
 
+    const handleDeleteChat = async () => {
+        if (!userDm) return;
+        console.log('Delete chat', userDm.id);
+        try {
+            const res = await client.delete(`chat/dms/${userDm.id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            console.log('RES', res);
+            if (res.status === 200) {
+                setRender(!render);
+                //delete user from dms list
+                // onClose3();
+            }
+        } catch (error: any) {
+            console.log('Error', error);
+            toast({
+                title: 'Error.',
+                description: error.response.data.message,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+        }
+    };
+
     /**                     end listening */
     const [test, setTest] = React.useState(false);
     const tabs = [
@@ -181,6 +210,7 @@ const Dms = () => {
                         test={test}
                         render={render}
                         setRender={setRender}
+                        handleDeleteChat={handleDeleteChat}
                     />
                 </>
             )
