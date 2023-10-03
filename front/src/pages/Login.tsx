@@ -8,7 +8,7 @@ import ErrorToast from '../components/ErrorToast';
 import client from '../components/Client';
 import { useToast } from '@chakra-ui/react';
 // let setIsLoggedIn: boolean = false;
-function Login() {
+function Login(props: any) {
     const [errorMessage, setErrorMessage] = React.useState('');
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
