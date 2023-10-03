@@ -17,15 +17,17 @@ const ProtectRoutes = (props: any) => {
                 if (response.status === 200) {
                     setIsLoggedIn(true);
                 } else {
-                    navigate('/login');
+                    navigate('/');
                 }
             } catch (error) {
-                // console.log("Erroe",error);
-                navigate('/login');
+                navigate('/');
             }
         };
 
         checkAuthentication();
+        if (props.firstLogin === false) {
+            navigate('/home');
+        }
     }, [navigate]);
 
     if (isLoggedIn) {
