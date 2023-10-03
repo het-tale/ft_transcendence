@@ -3,7 +3,8 @@ import {
     BsPersonCircle,
     BsPersonFillSlash,
     BsThreeDots,
-    BsTrash
+    BsTrash,
+    BsX
 } from 'react-icons/bs';
 import MessageContent from './MessageContent';
 import TypingBar from './TypingBar';
@@ -20,7 +21,8 @@ import {
     SimpleGrid,
     Spacer,
     background,
-    useDisclosure
+    useDisclosure,
+    useToast
 } from '@chakra-ui/react';
 import MessageUser from './MessageUser';
 import React, { useEffect } from 'react';
@@ -32,9 +34,22 @@ import GetMessages from './GetMessages';
 import User from '../../components/User';
 import ModalUi from '../../components/ModalUi';
 import ModalConfirm from './ModalConfirm';
+import client from '../../components/Client';
+import { on } from 'events';
 
 const DmsChat = (props: any) => {
+    const toast = useToast();
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const {
+        isOpen: isOpen2,
+        onOpen: onOpen2,
+        onClose: onClose2
+    } = useDisclosure();
+    const {
+        isOpen: isOpen3,
+        onOpen: onOpen3,
+        onClose: onClose3
+    } = useDisclosure();
     const [user, setUser] = React.useState<UserType>();
     const [blocked, setBlocked] = React.useState(false);
     useEffect(() => {
@@ -96,6 +111,32 @@ const DmsChat = (props: any) => {
         props.setRender(!props.render);
     });
 
+    const handleClearChat = async () => {
+        console.log('Clear chat', props.userDm.id);
+        try {
+            const res = await client.delete(`chat/dms/${props.userDm.id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            console.log('RES', res);
+            if (res.status === 200) {
+                props.setRender(!props.render);
+            }
+        } catch (error: any) {
+            console.log('Error', error);
+            toast({
+                title: 'Error.',
+                description: error.response.data.message,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+        }
+        onClose2();
+    };
+
     if (!dms || dms.length === 0) return <></>;
     return (
         <Flex flexDirection={'column'} justifyContent={'space-between'}>
@@ -153,9 +194,38 @@ const DmsChat = (props: any) => {
                         <MenuItem
                             paddingBottom={2}
                             bg={'none'}
+                            icon={<BsX />}
+                            onClick={onOpen2}
+                        >
+                            Clear Chat
+                            <ModalConfirm
+                                isOpen={isOpen2}
+                                onOpen={onOpen2}
+                                onClose={onClose2}
+                                title={'Clear Chat'}
+                                handleBlockedUser={handleClearChat}
+                                body={
+                                    'Are you sure you want to clear this chat?'
+                                }
+                            />
+                        </MenuItem>
+                        <MenuItem
+                            paddingBottom={2}
+                            bg={'none'}
                             icon={<BsTrash />}
+                            onClick={onOpen3}
                         >
                             Delete Chat
+                            <ModalConfirm
+                                isOpen={isOpen3}
+                                onOpen={onOpen3}
+                                onClose={onClose3}
+                                title={'Delete Chat'}
+                                handleBlockedUser={props.handleDeleteChat}
+                                body={
+                                    'Are you sure you want to delete this chat?'
+                                }
+                            />
                         </MenuItem>
                         <MenuItem
                             bg={'none'}
