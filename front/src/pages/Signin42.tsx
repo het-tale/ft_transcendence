@@ -2,7 +2,7 @@ import { error } from 'console';
 import User from '../components/User';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { SocketContext } from '../socket';
+
 import React from 'react';
 
 const Signin42 = () => {
@@ -12,10 +12,6 @@ const Signin42 = () => {
     const token = location.search.split('=')[1];
     console.log(token);
     localStorage.setItem('token', token);
-    const socket = React.useContext(SocketContext);
-    useEffect(() => {
-        socket.auth = { token: token };
-    }, []);
     User()
         .then((res) => {
             console.log('User', res);
