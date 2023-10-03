@@ -10,6 +10,7 @@ import SocketListen from './socketListen';
 const TypingBar = (props: any) => {
     const [message, setMessage] = useState('');
     const socket = React.useContext(SocketContext);
+    console.log('typing socket', socket);
     const toast = useToast();
     const sendMessageHandler = (e: any) => {
         e.preventDefault();
@@ -22,29 +23,6 @@ const TypingBar = (props: any) => {
         props.setRender(!props.render);
     };
     // useEffect(() => {
-    socket.on('privateMessage', (data: any) => {
-        console.log('MESSAGE DATA', data);
-        props.setRender(!props.render);
-    });
-    socket.on('privateMessageError', (data: any) => {
-        console.log('MESSAGE ERROR DATA', data);
-        toast({
-            title: 'Error',
-            description: data,
-            status: 'error',
-            duration: 9000,
-            isClosable: true,
-            position: 'top-right'
-        });
-    });
-    socket.on('userOffline', (data: any) => {
-        console.log('USER OFFLINE', data);
-        props.setRender(!props.render);
-    });
-    socket.on('userOnline', (data: any) => {
-        console.log('USER ONLINE', data);
-        props.setRender(!props.render);
-    });
     // socket.on('privateMessage', (data: any) => {
     //     console.log('MESSAGE DATA', data);
     //     props.setRender(!props.render);
