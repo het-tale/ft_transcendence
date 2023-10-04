@@ -25,7 +25,7 @@ function ListenOnSocket(
 
   socket.on('connected', (message: string) => {
     console.log(message);
-    socket.emit("StartGame", "StartGame");
+    // socket.emit("StartGame", "StartGame");
   });
   socket.on("disconnect", () => {
     console.log("disconnected");

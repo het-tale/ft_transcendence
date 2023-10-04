@@ -7,7 +7,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Room } from './types';
+import { GameData, Paddle, Player, Room } from './types';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
@@ -27,9 +27,9 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
   private activeSockets: Map<Socket, User> = new Map();
-  //   private activeusers: Map<User, Socket> = new Map();
 
   private rooms: Map<string, Room> = new Map();
+  private invitrooms: Map<string, Room> = new Map();
   constructor(
     private prisma: PrismaService,
     private conf: ConfigService,
@@ -46,18 +46,12 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       //   console.log('token', token);
       const user = await verifyToken(token, this.prisma, this.conf, this.jwt);
       if (user) {
-        for (const isplaying of this.activeSockets.values()) {
-          if (isplaying.id === user.id) {
-            console.log('user is already playing');
-            client.disconnect();
-
-            return;
-          }
+        if (user.status === 'InGame') {
+          console.log('user is already in game');
+          return;
         }
+        console.log('user is found');
         this.activeSockets.set(client, user);
-        for (const user of this.activeSockets.values()) {
-          console.log('user pushed into activ socket  ', user);
-        }
         console.log('connection established');
         client.emit('connected', 'the user is fount and the game will start ');
       } else {
@@ -86,9 +80,148 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('InvitePlayer')
+  async handleInvitePlayer(client: Socket, targetUserId: number) {
+    const sender = this.activeSockets.get(client);
+    const receiver = Array.from(this.activeSockets.values()).find(
+      (user) => user.id === targetUserId,
+    );
+
+    if (!receiver) {
+      console.log('receiver not found');
+      return;
+    }
+
+    // Create an invitation room
+    const invitationRoom = new Room(`invite_${sender.id}_${receiver.id}`);
+	const padd = new Paddle(
+		(this.containerWidth * 2) / 100,
+		this.containerHeight / 2,
+		8,
+		80,
+		3,
+	  );
+	  const otherpadd = new Paddle(
+		this.containerWidth - (this.containerWidth * 2) / 100,
+		this.containerHeight / 2,
+		8,
+		80,
+		3,
+	  );
+
+	const playerNumber = 1;
+	const player = new Player(playerNumber, client, padd, invitationRoom.roomName, 0);
+		
+	invitationRoom.players.push(player);
+	invitationRoom.rounds = 1;
+
+	// Add the invitation room to the list
+    this.invitrooms.set(invitationRoom.roomName, invitationRoom);
+
+
+    // Update player statuses
+    sender.status = 'Invited'; // i should change change this to another variable in  database
+    receiver.status = 'Invited'; // the same here
+
+    // Send the invitation to the target user
+    const invitationData = {
+      senderId: sender.id,
+      senderName: sender.username, // You should adjust this accordingly
+      roomId: invitationRoom.roomName,
+    };
+
+	const [key, value] = Array.from(this.activeSockets.entries()).find(
+		([key, value]) => value.id === targetUserId,)
+      key.emit('ReceiveInvitation', invitationData);
+	  const gamedata: GameData = {
+		playerpad: player.paddle,
+		otherpad: otherpadd,
+		ball: invitationRoom.ball,
+		playerScore: 0,
+		otherScore: 0,
+		rounds: invitationRoom.rounds,
+		containerHeight: this.containerHeight,
+		containerWidth: this.containerWidth,
+		id: 1,
+	  };
+	  client.emit('JoinRoom', invitationRoom.roomName);
+	  client.emit('InitGame', gamedata);	  
+  }
+
+  @SubscribeMessage('AcceptInvitation')
+  async handleAcceptInvitation(client: Socket, roomId: string) {
+    const player = this.activeSockets.get(client);
+
+    // Check if the player is invited to this room
+    if (player.status === 'Invited') {
+      const invitationRoom = this.invitrooms.get(roomId);
+
+      if (invitationRoom) {
+        // Assign the player to the invitation room
+		const padd = new Paddle(
+			(this.containerWidth * 2) / 100,
+			this.containerHeight / 2,
+			8,
+			80,
+			3,
+		  );
+		  const otherpadd = new Paddle(
+			this.containerWidth - (this.containerWidth * 2) / 100,
+			this.containerHeight / 2,
+			8,
+			80,
+			3,
+		  );
+        const playerNumber = 2;
+        const player = new Player(playerNumber, client, otherpadd, roomId, 0);
+        invitationRoom.players.push(player);
+        client.join(roomId);
+
+        // Notify both players that the game is starting
+        const gamedata: GameData = {
+			playerpad: player.paddle,
+			otherpad: otherpadd,
+			ball: invitationRoom.ball,
+			playerScore: 0,
+			otherScore: 0,
+			rounds: invitationRoom.rounds,
+			containerHeight: this.containerHeight,
+			containerWidth: this.containerWidth,
+			id: 2,
+        };
+        client.emit('JoinRoom', roomId);
+        client.emit('InitGame', gamedata);
+        this.server.to(roomId).emit('StartGame', roomId);
+
+        // Remove the invitation room from the list
+        // this.invitrooms.delete(roomId); // room ned to be deleeted afert the game end 
+      }
+    }
+  }
+
+  // Add a method to handle declining invitations if needed
+  @SubscribeMessage('DeclineInvitation')
+  async handleDeclineInvitation(client: Socket, roomId: string) {
+    // Handle declining invitations here
+  }
+
   @SubscribeMessage('StartGame')
-  handleStartGame(client: Socket) {
+  async handleStartGame(client: Socket) {
     try {
+      if (this.activeSockets.get(client).status === 'InGame') {
+        console.log('user is already in game');
+        return;
+      } else {
+        await this.prisma.user.update({
+          where: {
+            id: this.activeSockets.get(client).id,
+          },
+          data: {
+            status: 'InGame',
+          },
+        });
+        this.activeSockets.get(client).status = 'InGame';
+      }
       StartGameEvent(
         client,
         this.containerHeight,

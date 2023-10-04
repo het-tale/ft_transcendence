@@ -183,6 +183,11 @@ const Game: React.FC = () => {
     socket?.disconnect();
   };
 
+  const handleStartGame = () => {
+    socket?.emit("StartGame");
+    setGameStarted(true);
+  };
+
   useEffect(() => {
     if (padd && Dimensions.width > 0 && Dimensions.height > 0)
       updateDivPosition(
@@ -253,12 +258,26 @@ const Game: React.FC = () => {
           </>
         )}
       </div>
+        {!gameStarted ? (
+			<>
+          <button className="start-button" onClick={handleStartGame}>
+            Start Game
+          </button>
+		  </>
+        ) : (
       <div className="game-container" ref={divRefs.gameContainer}>
-        <div ref={divRefs.playerPaddle} className="paddle player-paddle"></div>
-        <div ref={divRefs.otherPaddle} className="paddle other-paddle"></div>
-        <div ref={divRefs.ball} className="ball"></div>
+            <div
+              ref={divRefs.playerPaddle}
+              className="paddle player-paddle"
+            ></div>
+            <div
+              ref={divRefs.otherPaddle}
+              className="paddle other-paddle"
+            ></div>
+            <div ref={divRefs.ball} className="ball"></div>
       </div>
-    </div>
+	)}
+	</div>
   );
 };
 
