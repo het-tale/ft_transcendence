@@ -46,7 +46,7 @@ export interface SentData {
     message: string;
     to: number;
 }
-const Dms = () => {
+const Dms = (props: any) => {
     const [currentTab, setCurrentTab] = React.useState('1');
     const [firstLoad, setFirstLoad] = React.useState('');
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -59,14 +59,14 @@ const Dms = () => {
     const [userDm, setUserDm] = React.useState<UserType>();
     const [id, setId] = React.useState(0);
     const [isUserDm, setIsUserDm] = React.useState(false);
-    const socket = React.useContext(SocketContext);
-    const [render, setRender] = React.useState(false);
-    const toast = useToast();
+    // const socket = React.useContext(SocketContext);
+    // const [render, setRender] = React.useState(false);
+    // const toast = useToast();
     useEffect(() => {
         GetDms().then((data) => {
             setDms(data);
         });
-    }, [render]);
+    }, [props.render]);
     const handleRenderActions = () => {
         setRenderActions(!renderActions);
     };
@@ -92,34 +92,6 @@ const Dms = () => {
         console.log('FORMDATA', data);
     };
     console.log('DMS', dms);
-    /**                     start listening */
-    socket.on('privateMessage', (data: any) => {
-        console.log('MESSAGE DATA', data);
-        setRender(!render);
-    });
-    const timer = setTimeout(() => {
-        socket.on('privateMessageError', (data: any) => {
-            console.log('MESSAGE ERROR DATA', data);
-
-            toast({
-                title: 'Error',
-                description: data,
-                status: 'error',
-                duration: 9000,
-                isClosable: true,
-                position: 'top-right'
-            });
-        });
-    }, 500);
-    socket.on('userOffline', (data: any) => {
-        console.log('USER OFFLINE', data);
-        setRender(!render);
-    });
-    socket.on('userOnline', (data: any) => {
-        console.log('USER ONLINE', data);
-        setRender(!render);
-    });
-
     const handleDeleteChat = async () => {
         if (!userDm) return;
         console.log('Delete chat', userDm.id);
@@ -131,13 +103,13 @@ const Dms = () => {
             });
             console.log('RES', res);
             if (res.status === 200) {
-                setRender(!render);
+                props.setRender(!props.render);
                 //delete user from dms list
                 // onClose3();
             }
         } catch (error: any) {
             console.log('Error', error);
-            toast({
+            props.toast({
                 title: 'Error.',
                 description: error.response.data.message,
                 status: 'error',
@@ -178,8 +150,8 @@ const Dms = () => {
                                     sendMessage={register}
                                     handleSubmit={handleSubmit}
                                     handleSendMessage={handleSendMessage}
-                                    setRender={setRender}
-                                    render={render}
+                                    setRender={props.setRender}
+                                    render={props.render}
                                 />
                             }
                         />
@@ -208,8 +180,8 @@ const Dms = () => {
                     <DmsChat
                         userDm={userDm}
                         test={test}
-                        render={render}
-                        setRender={setRender}
+                        render={props.render}
+                        setRender={props.setRender}
                         handleDeleteChat={handleDeleteChat}
                     />
                 </>
@@ -260,7 +232,7 @@ const Dms = () => {
         <Flex flexDirection={'column'}>
             <NavbarSearch />
             <Flex>
-                <Sidebar render={render} setRender={setRender} />
+                <Sidebar render={props.render} setRender={props.setRender} />
                 <Box w="100%" bg="#E9ECEF" h={'90%'}>
                     <Flex justify="space-between">
                         <LeftSide
