@@ -46,6 +46,13 @@ export interface SentData {
     message: string;
     to: number;
 }
+export interface CreateChannelData {
+    room: string;
+    avatar: string;
+    type: string;
+    password: string;
+}
+
 const Dms = (props: any) => {
     const [currentTab, setCurrentTab] = React.useState('1');
     const [firstLoad, setFirstLoad] = React.useState('');
@@ -72,8 +79,8 @@ const Dms = (props: any) => {
     };
     const handleRadioChange = (event: any) => {
         setSelectedOption(event.target.value);
-        setShowField(event.target.value === 'protected');
-        console.log(event.target.value);
+        setShowField(event.target.value === 'Protected');
+        console.log('RADIOOOOOOO CHAAAANGE', event.target.value);
     };
 
     const handleSubmit1 = () => {
@@ -210,6 +217,7 @@ const Dms = (props: any) => {
                                     selectedOption={selectedOption}
                                     handleRadioChange={handleRadioChange}
                                     showField={showField}
+                                    onClose={onClose}
                                 />
                             }
                         />

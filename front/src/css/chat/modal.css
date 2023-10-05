@@ -6,7 +6,7 @@
     display: none !important;
 }
 
-.radioInput .form-check-input[type="radio"]:checked, .form-check-input[type="checkbox"]:checked{
+.radioInput .form-check-input[type="radio"]:checked, .form-check-input[type="checkbox"]:checked, .chakra-radio__input {
     background-color: #a435f0 !important;
     border-color: #a435f0 !important;
 }
