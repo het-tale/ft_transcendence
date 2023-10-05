@@ -72,7 +72,7 @@ const DmsChat = (props: any) => {
             setDms(data);
         });
         const res2 = props.userDm
-            ? GetMessages(props.userDm?.id).then((data) => {
+            ? GetMessages(props.userDm?.username).then((data) => {
                   setMessages(data);
               })
             : null;
@@ -80,9 +80,9 @@ const DmsChat = (props: any) => {
     console.log('DMS', messages);
     console.log('USERRRRR', user);
     const handleBlockedUser = () => {
-        console.log('Blocked user', props.userDm?.id);
+        console.log('Blocked user', props.userDm?.username);
         socket.emit('blockUser', {
-            target: props.userDm?.id
+            target: props.userDm?.username
         });
         setBlocked(true);
         props.setRender(!props.render);
@@ -98,7 +98,7 @@ const DmsChat = (props: any) => {
     });
     const handleUnblockUser = () => {
         socket.emit('unblockUser', {
-            target: props.userDm?.id
+            target: props.userDm?.username
         });
         setBlocked(false);
         props.setRender(!props.render);
@@ -116,11 +116,14 @@ const DmsChat = (props: any) => {
     const handleClearChat = async () => {
         console.log('Clear chat', props.userDm?.id);
         try {
-            const res = await client.delete(`chat/dms/${props.userDm?.id}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+            const res = await client.delete(
+                `chat/dms/${props.userDm?.username}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
                 }
-            });
+            );
             console.log('RES', res);
             if (res.status === 200) {
                 props.setRender(!props.render);

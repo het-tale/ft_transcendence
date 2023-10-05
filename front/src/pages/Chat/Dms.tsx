@@ -44,7 +44,7 @@ import client from '../../components/Client';
 
 export interface SentData {
     message: string;
-    to: number;
+    to: string;
 }
 export interface CreateChannelData {
     room: string;
@@ -101,9 +101,9 @@ const Dms = (props: any) => {
     console.log('DMS', dms);
     const handleDeleteChat = async () => {
         if (!userDm) return;
-        console.log('Delete chat', userDm.id);
+        console.log('Delete chat', userDm.username);
         try {
-            const res = await client.delete(`chat/dms/${userDm.id}`, {
+            const res = await client.delete(`chat/dms/${userDm.username}`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
