@@ -6,7 +6,9 @@ import { TwoFaVerificationGuard } from 'src/guards/two-fa-verification.guard';
 import { ChannelService } from './channel.service';
 import { User } from '@prisma/client';
 import { FriendsService } from './friends.service';
+import { ApiTags } from '@nestjs/swagger';
 
+ApiTags('Chat');
 @Controller('chat')
 @UseGuards(EmailConfirmationGuard)
 @UseGuards(TwoFaVerificationGuard)
@@ -33,6 +35,21 @@ export class ChatController {
     return this.dmService.deleteDm(username, request.user);
   }
 
+  @Get('search-conversations/:startsWith')
+  async searchConversations(
+    @Param('startsWith') startsWith: string,
+    @Req() request: { user: User },
+  ) {
+    return this.dmService.searchConversations(startsWith, request.user);
+  }
+
+  @Delete('delete-conversation/:username')
+  async deleteConversation(
+    @Param('username') username: string,
+    @Req() request: { user: User },
+  ) {
+    return this.dmService.deleteConversation(username, request.user);
+  }
   @Get('channels/:channelName')
   async getChannelMessages(
     @Param('channelName') channelName: string,

@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Conversation, FriendRequest, Message, User } from '@prisma/client';
+import { FriendRequest, Message, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -41,33 +41,25 @@ export class DMService {
 
     return updatedUser;
   }
-  async getConversationByParticipants(
-    id1: number,
-    id2: number,
-  ): Promise<Conversation> {
-    {
-      return this.prisma.conversation.findFirst({
+  async getConversationByParticipants(name1: string, name2: string) {
+    let name = `${name1} and ${name2}`;
+    let conversation = await this.prisma.conversation.findUnique({
+      where: {
+        name,
+      },
+    });
+    if (!conversation) {
+      name = `${name2} and ${name1}`;
+      conversation = await this.prisma.conversation.findUnique({
         where: {
-          AND: [
-            {
-              participants: {
-                some: {
-                  id: id1,
-                },
-              },
-            },
-            {
-              participants: {
-                some: {
-                  id: id2,
-                },
-              },
-            },
-          ],
+          name,
         },
       });
     }
+
+    return { conversation, name };
   }
+
   async saveMessage(data) {
     const user1 = await this.prisma.user.findUnique({
       where: {
@@ -100,11 +92,16 @@ export class DMService {
     if (senderIsBlocked) {
       throw new Error('You are blocked by this user.');
     }
-    let conversation: Conversation;
-    conversation = await this.getConversationByParticipants(user1.id, user2.id);
+    console.log(user1, user2);
+
+    let { conversation, name } = await this.getConversationByParticipants(
+      user1.username,
+      user2.username,
+    );
     if (!conversation) {
       conversation = await this.prisma.conversation.create({
         data: {
+          name,
           participants: {
             connect: [
               {
@@ -118,6 +115,16 @@ export class DMService {
         },
       });
     }
+    name = `${user1.username} and ${user2.username}`;
+    await this.prisma.conversation.update({
+      where: {
+        id: conversation.id,
+      },
+      data: {
+        updatedAt: new Date(),
+        isDeletedBy: 0,
+      },
+    });
     const message = await this.prisma.message.create({
       data: {
         content: data.message,
@@ -128,7 +135,9 @@ export class DMService {
         isPending: data.isPending,
       },
     });
-    console.log(message);
+    if (!message) {
+      throw new HttpException('message not saved', 400);
+    }
   }
   async getDmConversation(username: string, user: User) {
     const user1 = await this.prisma.user.findUnique({
@@ -139,12 +148,20 @@ export class DMService {
     if (!user1) {
       throw new HttpException('user not found', 404);
     }
-    const conversation = await this.getConversationByParticipants(
-      user.id,
-      user1.id,
+    const { conversation } = await this.getConversationByParticipants(
+      user.username,
+      username,
     );
+    if (!conversation) {
+      throw new HttpException('no conversation found', 404);
+    }
     const messages = await this.prisma.message.findMany({
       where: {
+        //MessageIsDeletedby not user id
+        MessageIsDeletedBy: {
+          not: user.id,
+        },
+
         isDM: true,
         conversationId: conversation.id,
       },
@@ -160,14 +177,78 @@ export class DMService {
   }
   async deleteDm(username: string, user: User) {
     try {
-      const messages = await this.getDmConversation(username, user);
-      await this.prisma.message.deleteMany({
+      const { conversation } = await this.getConversationByParticipants(
+        user.username,
+        username,
+      );
+      if (!conversation) {
+        throw new HttpException('no conversation found', 404);
+      }
+      const messages = await this.prisma.message.findMany({
         where: {
-          id: {
-            in: messages.map((message) => message.id),
-          },
+          conversationId: conversation.id,
         },
       });
+      if (!messages || messages.length === 0) {
+        throw new HttpException('no messages found', 404);
+      }
+      await Promise.all(
+        messages.map(async (message) => {
+          if (
+            message.MessageIsDeletedBy !== user.id &&
+            message.MessageIsDeletedBy !== 0
+          ) {
+            await this.prisma.message.delete({
+              where: {
+                id: message.id,
+              },
+            });
+
+            return;
+          }
+          await this.prisma.message.update({
+            where: {
+              id: message.id,
+            },
+            data: {
+              MessageIsDeletedBy: user.id,
+            },
+          });
+        }),
+      );
+    } catch (e) {
+      if (e instanceof HttpException) {
+        throw e;
+      }
+      throw new HttpException(e.message, 400);
+    }
+  }
+
+  async deleteConversation(username: string, user: User) {
+    try {
+      await this.deleteDm(username, user);
+      const { conversation } = await this.getConversationByParticipants(
+        user.username,
+        username,
+      );
+      if (
+        conversation.isDeletedBy !== user.id &&
+        conversation.isDeletedBy !== 0
+      )
+        await this.prisma.conversation.delete({
+          where: {
+            id: conversation.id,
+          },
+        });
+      else
+        await this.prisma.conversation.update({
+          where: {
+            id: conversation.id,
+          },
+          data: {
+            isDeletedBy: user.id,
+          },
+        });
     } catch (e) {
       if (e instanceof HttpException) {
         throw e;
@@ -273,13 +354,15 @@ export class DMService {
     return updatedFriendRequests;
   }
   async getDmsList(user: User) {
-    //return all conversations where user is a participant
     const conversations = await this.prisma.conversation.findMany({
       where: {
         participants: {
           some: {
             id: user.id,
           },
+        },
+        isDeletedBy: {
+          not: user.id,
         },
       },
       include: {
@@ -292,14 +375,21 @@ export class DMService {
     if (!conversations || conversations.length === 0) {
       throw new HttpException('no conversations found', 404);
     }
-    //return array of users that are not the current user ordered by updatedAt of the conversation
     const users = conversations.map((conversation) => {
-      const user = conversation.participants.find(
+      const user1 = conversation.participants.find(
         (participant) => participant.id !== user.id,
       );
+      if (conversation.name === `${user.username} and ${user.username}`)
+        return conversation.participants[0];
 
-      return user;
+      return user1;
     });
+
+    return users;
+  }
+  async searchConversations(beginWith: string, user: User) {
+    const list = await this.getDmsList(user);
+    const users = list.filter((one) => one.username.startsWith(beginWith));
 
     return users;
   }
