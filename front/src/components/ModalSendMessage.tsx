@@ -17,7 +17,7 @@ const ModalSendMessage = (props: any) => {
         console.log('Socket', socket);
         socket.emit('privateMessage', {
             message: data.message,
-            to: Number(data.to)
+            to: data.to
         });
         props.onClose();
         props.setRender(!props.render);

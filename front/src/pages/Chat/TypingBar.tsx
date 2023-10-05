@@ -16,7 +16,7 @@ const TypingBar = (props: any) => {
         console.log('message sent');
         socket.emit('privateMessage', {
             message: message,
-            to: props.userDm.id
+            to: props.userDm.username
         });
         setMessage('');
         props.setRender(!props.render);
