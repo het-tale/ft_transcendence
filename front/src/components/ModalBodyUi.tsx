@@ -1,65 +1,84 @@
 import React from 'react';
-import { Form } from 'react-bootstrap';
-import "../css/chat/modal.css";
+import '../css/chat/modal.css';
+import { Button, ButtonGroup, Input } from '@chakra-ui/react';
+import {
+    FormControl,
+    FormLabel,
+    FormErrorMessage,
+    FormHelperText,
+    Radio,
+    RadioGroup,
+    HStack
+} from '@chakra-ui/react';
+import { CreateChannelData } from '../pages/Chat/Dms';
+import { useForm } from 'react-hook-form';
 
 const ModalBodyUi = (props: any) => {
+    const { register, handleSubmit } = useForm<CreateChannelData>();
     return (
-        <div>
-            <Form ref={props.formRef}>
-    <Form.Group className="mb-3 fileField">
-        <Form.Label style={{'color': '#a435f0'}}>Channel Avatar</Form.Label>
-        <Form.Control type="file" name='avatar'/>
-      </Form.Group>
-    <Form.Group className="mb-3">
-        <Form.Label style={{'color': '#a435f0'}}>Channel Name</Form.Label>
-        <Form.Control type="text" placeholder="Type the name here..." name='name' />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label style={{'color': '#a435f0'}}>Channel Type</Form.Label>
-        <div key={`inline-radio`} className="mb-3">
-        <Form.Check
-        className='radioInput'
-          inline
-            type='radio'
-            id='public'
-            label='Public'
-            value='public'
-            name='group1'
-            checked={props.selectedOption === 'public'}
-            onChange={props.handleRadioChange}
-          />
-          <Form.Check
-          className='radioInput'
-          inline
-            type='radio'
-            id='private'
-            label='Private'
-            value='private'
-            name='group1'
-            checked={props.selectedOption === 'private'}
-            onChange={props.handleRadioChange}
-          />
-           <Form.Check
-           className='radioInput'
-          inline
-            type='radio'
-            id='protected'
-            label='Protected'
-            value='protected'
-            name='group1'
-            checked={props.selectedOption === 'protected'}
-            onChange={props.handleRadioChange}
-          />
-          </div>
-      </Form.Group>
-      {props.showField && (
-        <Form.Group className="mb-3">
-        <Form.Label style={{'color': '#a435f0'}}>Password</Form.Label>
-        <Form.Control type="password" placeholder="Type password" name='password'/>
-      </Form.Group>
-      )}
-</Form>
-        </div>
+        <form style={{ padding: '5px' }}>
+            <FormControl>
+                <FormLabel>Channel Avatar</FormLabel>
+                <Input type="file" w={'400px'} required />
+            </FormControl>
+            <FormControl>
+                <FormLabel>Channel Name</FormLabel>
+                <Input type="text" w={'400px'} required />
+            </FormControl>
+            <FormControl as="fieldset">
+                <FormLabel>Channel Type</FormLabel>
+                <RadioGroup defaultValue="Public">
+                    <HStack spacing="24px">
+                        <Radio
+                            value="Public"
+                            checked={props.selectedOption === 'public'}
+                            onChange={props.handleRadioChange}
+                        >
+                            Public
+                        </Radio>
+                        <Radio
+                            value="Private"
+                            checked={props.selectedOption === 'private'}
+                            onChange={props.handleRadioChange}
+                        >
+                            Private
+                        </Radio>
+                        <Radio
+                            value="Protected"
+                            checked={props.selectedOption === 'protected'}
+                            onChange={props.handleRadioChange}
+                        >
+                            Protected
+                        </Radio>
+                    </HStack>
+                </RadioGroup>
+            </FormControl>
+            {props.showField && (
+                <FormControl>
+                    <FormLabel>Password</FormLabel>
+                    <Input type="password" w={'400px'} required />
+                </FormControl>
+            )}
+            <ButtonGroup display={'Flex'} justifyContent={'flex-end'} p={3}>
+                <Button
+                    bg={'#E9ECEF'}
+                    color={'white'}
+                    mr={3}
+                    onClick={props.onClose}
+                >
+                    Close
+                </Button>
+                <Button
+                    variant="ghost"
+                    bg={'#a435f0'}
+                    color={'white'}
+                    type="submit"
+                    className="excludeSubmit"
+                >
+                    Create
+                </Button>
+            </ButtonGroup>
+        </form>
     );
 };
 
