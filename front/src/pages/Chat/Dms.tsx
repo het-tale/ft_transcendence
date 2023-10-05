@@ -41,6 +41,7 @@ import { SocketContext } from '../../socket';
 import ModalSendMessage from '../../components/ModalSendMessage';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import client from '../../components/Client';
+import { Channel } from '../../Types/Channel';
 
 export interface SentData {
     message: string;
@@ -48,9 +49,9 @@ export interface SentData {
 }
 export interface CreateChannelData {
     room: string;
-    avatar: string;
+    avatar?: string;
     type: string;
-    password: string;
+    password?: string;
 }
 
 const Dms = (props: any) => {
@@ -74,7 +75,7 @@ const Dms = (props: any) => {
     };
     const handleRadioChange = (event: any) => {
         setSelectedOption(event.target.value);
-        setShowField(event.target.value === 'Protected');
+        setShowField(event.target.value === 'protected');
         console.log('RADIOOOOOOO CHAAAANGE', event.target.value);
     };
 
