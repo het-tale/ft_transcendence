@@ -61,7 +61,7 @@ const SetPassword = (props: any) => {
                 isClosable: true,
                 position: 'bottom-right'
             });
-            if (error.response.status === 403) navigate('/login');
+            // if (error.response.status === 403) navigate('/login');
         }
     };
     return (

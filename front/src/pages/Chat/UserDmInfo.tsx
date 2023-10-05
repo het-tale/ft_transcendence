@@ -14,18 +14,22 @@ import { UserType } from '../../Types/User';
 import React from 'react';
 import UserId from './GetUserById';
 import { SocketContext } from '../../socket';
+import { render } from '@testing-library/react';
 
 interface MessageUserProps {
     children?: React.ReactNode;
     design?: string;
     id: number;
     render: boolean;
+    updateUser?: boolean;
+    setUpdateUser?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const UserDmInfo = (props: MessageUserProps) => {
     const [user, setUser] = React.useState<UserType>();
     const socket = React.useContext(SocketContext);
     const [update, setUpdate] = React.useState(false);
+
     socket.on('userOffline', (data: any) => {
         console.log('USER OFFLINE', data);
         console.log('RENDER Before', update);
@@ -36,14 +40,14 @@ const UserDmInfo = (props: MessageUserProps) => {
         console.log('USER ONLINE', data);
         setUpdate(!update);
     });
+    console.log('User ID', props.id);
     React.useEffect(() => {
         async function fetchUserData() {
             const userData = await UserId(Number(props.id));
             setUser(userData);
         }
-
         fetchUserData();
-    }, [update]);
+    }, [update, props.updateUser]);
     return (
         <div>
             <button style={{ width: '100%' }}>
