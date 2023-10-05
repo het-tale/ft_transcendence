@@ -15,6 +15,7 @@ export class UserService {
         login: true,
         createdAt: true,
         updatedAt: true,
+        status: true,
       },
     });
     if (!user) {
