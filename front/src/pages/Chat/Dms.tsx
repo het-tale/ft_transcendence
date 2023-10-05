@@ -44,8 +44,15 @@ import client from '../../components/Client';
 
 export interface SentData {
     message: string;
-    to: number;
+    to: string;
 }
+export interface CreateChannelData {
+    room: string;
+    avatar: string;
+    type: string;
+    password: string;
+}
+
 const Dms = (props: any) => {
     const [currentTab, setCurrentTab] = React.useState('1');
     const [firstLoad, setFirstLoad] = React.useState('');
@@ -72,8 +79,8 @@ const Dms = (props: any) => {
     };
     const handleRadioChange = (event: any) => {
         setSelectedOption(event.target.value);
-        setShowField(event.target.value === 'protected');
-        console.log(event.target.value);
+        setShowField(event.target.value === 'Protected');
+        console.log('RADIOOOOOOO CHAAAANGE', event.target.value);
     };
 
     const handleSubmit1 = () => {
@@ -94,9 +101,9 @@ const Dms = (props: any) => {
     console.log('DMS', dms);
     const handleDeleteChat = async () => {
         if (!userDm) return;
-        console.log('Delete chat', userDm.id);
+        console.log('Delete chat', userDm.username);
         try {
-            const res = await client.delete(`chat/dms/${userDm.id}`, {
+            const res = await client.delete(`chat/dms/${userDm.username}`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
@@ -210,6 +217,7 @@ const Dms = (props: any) => {
                                     selectedOption={selectedOption}
                                     handleRadioChange={handleRadioChange}
                                     showField={showField}
+                                    onClose={onClose}
                                 />
                             }
                         />
