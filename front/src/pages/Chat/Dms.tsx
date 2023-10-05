@@ -62,18 +62,18 @@ const Dms = (props: any) => {
     const [selectedOption, setSelectedOption] = React.useState('');
     const [showField, setShowField] = React.useState(false);
     const [name, setName] = React.useState('');
-    const [dms, setDms] = React.useState<UserType[]>([]);
+    // const [dms, setDms] = React.useState<UserType[]>([]);
     const [userDm, setUserDm] = React.useState<UserType>();
     const [id, setId] = React.useState(0);
     const [isUserDm, setIsUserDm] = React.useState(false);
     // const socket = React.useContext(SocketContext);
     // const [render, setRender] = React.useState(false);
     // const toast = useToast();
-    useEffect(() => {
-        GetDms().then((data) => {
-            setDms(data);
-        });
-    }, [props.render]);
+    // useEffect(() => {
+    //     GetDms().then((data) => {
+    //         setDms(data);
+    //     });
+    // }, [props.render]);
     const handleRenderActions = () => {
         setRenderActions(!renderActions);
     };
@@ -98,7 +98,7 @@ const Dms = (props: any) => {
     const handleSendMessage: SubmitHandler<SentData> = (data) => {
         console.log('FORMDATA', data);
     };
-    console.log('DMS', dms);
+    console.log('DMSSSSSSSSSSSSSS', props.dms);
     const handleDeleteChat = async () => {
         if (!userDm) return;
         console.log('Delete chat', userDm.username);
@@ -163,16 +163,16 @@ const Dms = (props: any) => {
                             }
                         />
                     </Flex>
-                    {dms ? (
-                        dms?.map((dm) => {
+                    {props.dms ? (
+                        props.dms?.map((dm: UserType) => {
                             return (
                                 <MessageUser
                                     profile={dm.avatar}
                                     name={dm.username}
-                                    message=""
                                     dm={dm}
                                     setUserDm={setUserDm}
                                     setFirstLoad={setFirstLoad}
+                                    message={dm.status}
                                 />
                             );
                         })

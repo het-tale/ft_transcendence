@@ -12,5 +12,5 @@ export type UserType = {
     is2FaEnabled: boolean;
     twoFaSecret: string;
     is2FaVerified: boolean;
-
-}
+    status: string;
+};
