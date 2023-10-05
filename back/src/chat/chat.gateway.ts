@@ -112,6 +112,7 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
+      if (data.message === '') return;
       console.log(data);
       const sender = this.connectedUsers.find(
         (user) => user.clientId === client.id,
