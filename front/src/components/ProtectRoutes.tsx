@@ -24,6 +24,7 @@ const ProtectRoutes = (props: any) => {
                     navigate('/');
                 }
             } catch (error) {
+                socket.disconnect();
                 navigate('/');
             }
         };
