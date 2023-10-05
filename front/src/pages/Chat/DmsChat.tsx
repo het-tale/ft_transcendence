@@ -38,6 +38,7 @@ import client from '../../components/Client';
 import { on } from 'events';
 import Profile from '../Profile/Profile';
 import { Link } from 'react-router-dom';
+import UserDmInfo from './UserDmInfo';
 
 const DmsChat = (props: any) => {
     const toast = useToast();
@@ -151,10 +152,9 @@ const DmsChat = (props: any) => {
             <Flex h={'10%'}>
                 <Box width={'98%'}>
                     {props.userDm ? (
-                        <MessageUser
-                            profile={props.userDm.avatar}
-                            name={props.userDm.username}
-                            message={props.userDm.status}
+                        <UserDmInfo
+                            id={props.userDm.id}
+                            render={props.render}
                         />
                     ) : (
                         <></>

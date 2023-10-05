@@ -94,6 +94,10 @@
     /* overflow-y: hidden; */
 }
 
+.chakra-input {
+    border: none !important;
+    outline: none !important;
+}
 /* .chakra-menu__menu-list {
     background-color: var(--fakhti);
     color: var(--white);
