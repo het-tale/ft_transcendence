@@ -29,7 +29,7 @@ export class FriendsService {
 
     return dbUser.blocked;
   }
-  async getMutualFriends(id: number, user: User) {
+  async getMutualFriends(username: string, user: User) {
     const currentUser = await this.prisma.user.findUnique({
       where: {
         id: user.id,
@@ -40,7 +40,7 @@ export class FriendsService {
     });
     const otherUser = await this.prisma.user.findUnique({
       where: {
-        id,
+        username,
       },
       include: {
         friends: true,
@@ -56,20 +56,20 @@ export class FriendsService {
     return mutualFriends;
   }
   async handleFriendRequest(
-    clientId: number,
-    receiverId: number,
+    clientUsername: string,
+    receiverUsername: string,
     isAccepted: boolean,
     isOnline: boolean,
   ) {
     const status = isAccepted ? 'accepted' : 'rejected';
     const client = await this.prisma.user.findUnique({
       where: {
-        id: clientId,
+        username: clientUsername,
       },
     });
     const receiver = await this.prisma.user.findUnique({
       where: {
-        id: receiverId,
+        username: receiverUsername,
       },
     });
     if (!client || !receiver) {
@@ -110,10 +110,10 @@ export class FriendsService {
       });
     }
   }
-  async removeFriend(clientId: number, friendId: number) {
+  async removeFriend(clientUsername: string, friendUsername: string) {
     const client = await this.prisma.user.findUnique({
       where: {
-        id: clientId,
+        username: clientUsername,
       },
       include: {
         friends: true,
@@ -121,7 +121,7 @@ export class FriendsService {
     });
     const friend = await this.prisma.user.findUnique({
       where: {
-        id: friendId,
+        username: friendUsername,
       },
     });
     if (!client || !friend) {
@@ -144,10 +144,10 @@ export class FriendsService {
       },
     });
   }
-  async blockUser(clientId: number, blockedId: number) {
+  async blockUser(clientUsername: string, blockedUsername: string) {
     const client = await this.prisma.user.findUnique({
       where: {
-        id: clientId,
+        username: clientUsername,
       },
       include: {
         blocked: true,
@@ -156,7 +156,7 @@ export class FriendsService {
     });
     const blocked = await this.prisma.user.findUnique({
       where: {
-        id: blockedId,
+        username: blockedUsername,
       },
     });
     if (!client || !blocked) {
@@ -194,10 +194,10 @@ export class FriendsService {
       });
     }
   }
-  async unblockUser(clientId: number, blockedId: number) {
+  async unblockUser(clientUsername: string, blockedUsername: string) {
     const client = await this.prisma.user.findUnique({
       where: {
-        id: clientId,
+        username: clientUsername,
       },
       include: {
         blocked: true,
@@ -205,7 +205,7 @@ export class FriendsService {
     });
     const blocked = await this.prisma.user.findUnique({
       where: {
-        id: blockedId,
+        username: blockedUsername,
       },
     });
     if (!client || !blocked) {
