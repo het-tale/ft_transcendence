@@ -100,6 +100,26 @@ export async function colision(
         otherPlayerSocket.emit('GAME OVER', { winner: true });
       }
       room.gameActive = false;
+	//   const user1 = activeSockets.get(playerSocket);
+	//   const user2 = activeSockets.get(otherPlayerSocket);
+	//   console.log('users in colision ', user1, user2);
+    // await prisma.user.update({
+	// 	where: {
+	// 		id: user1.id,
+	// 	},
+	// 	data: {
+	// 		status: 'online',
+	// 	},
+	// });
+	// await prisma.user.update({
+	// 	where: {
+	// 		id: user2.id,
+	// 	},
+	// 	data: {
+	// 		status: 'online',
+	// 	},
+	// });
+
 	  stopGame(room, rooms, activeSockets, prisma);
     } else {
       resetBall(room.ball);

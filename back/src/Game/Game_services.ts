@@ -79,29 +79,11 @@ export async function stopGame(room: Room, rooms: Map<string, Room>, activeSocke
 	  console.log('user not found');
 	  return;
 	}
-	
-	prisma.user.update({
-		where: {
-			id: playerUser.id,
-		},
-		data: {
-			status: 'online',
-		},
-	});
-	prisma.user.update({
-		where: {
-			id: otherPlayerUser.id,
-		},
-		data: {
-			status: 'online',
-		},
-	});
-	console.log('users updated status', playerUser, otherPlayerUser);
 	if (room.gameInterval) {
 		room.gameInterval.unsubscribe();
 	  }
 	room.gameActive = false;
-	rooms.delete(room.roomName);
+	// rooms.delete(room.roomName);
 }
 
 export async function updateGame(
