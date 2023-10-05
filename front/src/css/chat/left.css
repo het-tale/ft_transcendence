@@ -3,6 +3,7 @@
     --white: #fff;
     --black: #000;
     --corona: 'Krona One';
+    --kokii: #eac3fc;
     /* font-family: var(--corona); */
     font-family: sans-serif;
 }
@@ -41,4 +42,17 @@
     50% {
       bottom: 400px;
     }
+  }
+
+  .clickedDm {
+    box-shadow: var(--fakhti) 0px 15px 100px -22px !important;
+    margin-bottom: 10px;
+  }
+
+  .noDms {
+    text-align: center;
+    margin-top: 12rem;
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #555454;
   }

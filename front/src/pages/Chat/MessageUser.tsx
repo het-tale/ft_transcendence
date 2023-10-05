@@ -10,6 +10,8 @@ import {
     Button
 } from '@chakra-ui/react';
 import { UserType } from '../../Types/User';
+import { useEffect, useState } from 'react';
+import { set } from 'react-hook-form';
 
 interface MessageUserProps {
     profile: string;
@@ -25,6 +27,13 @@ interface MessageUserProps {
     setTest?: React.Dispatch<React.SetStateAction<boolean>>;
     isUserDm?: boolean;
     setFirstLoad?: React.Dispatch<React.SetStateAction<string>>;
+    render?: boolean;
+    setRender?: React.Dispatch<React.SetStateAction<boolean>>;
+    updateUser?: boolean;
+    setUpdateUser?: React.Dispatch<React.SetStateAction<boolean>>;
+    updateClass?: number;
+    setUpdateClass?: React.Dispatch<React.SetStateAction<number | undefined>>;
+    activeCard?: string;
 }
 
 const MessageUser = ({
@@ -36,22 +45,40 @@ const MessageUser = ({
     setUserDm,
     dm,
     setFirstLoad,
-    isUserDm
+    isUserDm,
+    render,
+    setRender,
+    updateUser,
+    setUpdateUser,
+    updateClass,
+    setUpdateClass,
+    activeCard
 }: MessageUserProps) => {
-    const HandleDm = () => {
-        console.log('Hellooo');
+    const HandleDm = (id: number | undefined) => {
         console.log('Hellooo user', isUserDm);
-        if (setUserDm && dm && setFirstLoad) {
+        if (
+            setUserDm &&
+            dm &&
+            setFirstLoad &&
+            setUpdateUser &&
+            setUpdateClass
+        ) {
+            console.log('Helloooooooooooooooo');
             setFirstLoad('firstLoad');
             setUserDm(dm);
+            setUpdateUser(!updateUser);
+            setUpdateClass(id);
         }
         console.log('Hellooo userDm', dm);
     };
+    useEffect(() => {
+        console.log('The update class', updateClass);
+    }, [updateClass]);
     return (
         <div>
-            <button onClick={HandleDm} style={{ width: '100%' }}>
+            <button onClick={() => HandleDm(dm?.id)} style={{ width: '100%' }}>
                 <Card
-                    className={design}
+                    className={activeCard}
                     direction={{ base: 'column', sm: 'row' }}
                     overflow="hidden"
                     variant="outline"
@@ -61,6 +88,7 @@ const MessageUser = ({
                     h={'100px'}
                     w={'100%'}
                     style={{ boxShadow: 'none' }}
+                    marginBottom={'0.5rem'}
                 >
                     <Image
                         objectFit="cover"
