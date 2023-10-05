@@ -31,7 +31,6 @@ export class ChatGateway
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    // const token = client.handshake.headers.token;
     const token = client.handshake.auth.token;
     try {
       this.io.emit('userOnline', client.id);
@@ -78,7 +77,6 @@ export class ChatGateway
         );
       }
       if (offlineMessages.length > 0) {
-        console.log('hey there you have offline messages');
         client.emit('offlineMessages', offlineMessages);
         this.dmService.changeOfflineMessagesStatus(offlineMessages);
       }
@@ -97,6 +95,7 @@ export class ChatGateway
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
+    this.io.emit('userOffline', client.id);
     const user = this.connectedUsers.find(
       (user) => user.clientId === client.id,
     );
@@ -104,7 +103,6 @@ export class ChatGateway
     this.connectedUsers = this.connectedUsers.filter(
       (user) => user.clientId !== client.id,
     );
-    this.io.emit('userOffline', client.id);
     console.log(`Cliend id:${client.id} disconnected`);
   }
 
