@@ -63,7 +63,6 @@ export class ChatGateway
         );
       }
       const offlineMessages = await this.dmService.getOfflineMessages(user.id);
-      console.log(offlineMessages);
       const offlineInvitations =
         await this.channelService.getOfflineInvitations(user.id);
       const offlineChannelMessages =
@@ -113,14 +112,12 @@ export class ChatGateway
   ) {
     try {
       if (data.message === '') return;
-      console.log(data);
       const sender = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       );
       const receiver = this.connectedUsers.find(
         (user) => user.username === data.to,
       );
-      console.log(data.to);
       const sentAt = new Date();
       let isPending = true;
       if (receiver) isPending = false;
@@ -138,7 +135,7 @@ export class ChatGateway
         });
       }
     } catch (err) {
-      console.log(err.message);
+      console.log(err.message, 'privateMessageError');
       client.emit('privateMessageError', err.message);
     }
   }
