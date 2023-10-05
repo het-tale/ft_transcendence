@@ -14,14 +14,14 @@ import { User } from '@prisma/client';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
+  @Get('me')
+  me(@Req() request: { user: User }) {
+    return request.user;
+  }
   @Get(':id')
   async getUserById(@Param('id') idString: string) {
     const id = Number(idString);
 
     return this.userService.getUserById(id);
-  }
-  @Get('me')
-  me(@Req() request: { user: User }) {
-    return request.user;
   }
 }
