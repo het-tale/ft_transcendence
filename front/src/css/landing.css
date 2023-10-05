@@ -183,7 +183,6 @@ input:focus {
 .reset {
   border: none;
   background: none;
-  opacity: 1;
   visibility: visible;
 }
 

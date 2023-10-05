@@ -68,14 +68,7 @@ const Dms = (props: any) => {
     const [isUserDm, setIsUserDm] = React.useState(false);
     const [updateUser, setUpdateUser] = React.useState(false);
     const [updateClass, setUpdateClass] = useState<number>();
-    // const socket = React.useContext(SocketContext);
-    // const [render, setRender] = React.useState(false);
-    // const toast = useToast();
-    // useEffect(() => {
-    //     GetDms().then((data) => {
-    //         setDms(data);
-    //     });
-    // }, [props.render]);
+
     const handleRenderActions = () => {
         setRenderActions(!renderActions);
     };
@@ -101,20 +94,19 @@ const Dms = (props: any) => {
         console.log('FORMDATA', data);
     };
     console.log('DMSSSSSSSSSSSSSS', props.dms);
-    const handleDeleteChat = async () => {
-        if (!userDm) return;
-        console.log('Delete chat', userDm.username);
+    const deleteConversation = async () => {
         try {
-            const res = await client.delete(`chat/dms/${userDm.username}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+            const res = await client.delete(
+                `chat/delete-conversation/${userDm?.username}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
                 }
-            });
+            );
             console.log('RES', res);
             if (res.status === 200) {
                 props.setRender(!props.render);
-                //delete user from dms list
-                // onClose3();
             }
         } catch (error: any) {
             console.log('Error', error);
@@ -128,9 +120,35 @@ const Dms = (props: any) => {
             });
         }
     };
-
-    /**                     end listening */
+    const handleDeleteChat = async () => {
+        if (!userDm) return;
+        console.log('Delete chat', userDm.username);
+        try {
+            const res = await client.delete(`chat/dms/${userDm.username}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            console.log('RES', res);
+            if (res.status === 200) {
+                deleteConversation();
+                props.setRender(!props.render);
+                setFirstLoad('');
+            }
+        } catch (error: any) {
+            console.log('Error', error);
+            props.toast({
+                title: 'Error.',
+                description: error.response.data.message,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+        }
+    };
     const [test, setTest] = React.useState(false);
+
     const tabs = [
         {
             id: 1,
@@ -142,6 +160,10 @@ const Dms = (props: any) => {
                             name="tabDesign"
                             setName={setName}
                             filter={name}
+                            dms={props.dms}
+                            setDms={props.setDms}
+                            setFirstLoad={setFirstLoad}
+                            tempDm={props.dms}
                         />
                         <button className="newChannel" onClick={onOpen}>
                             New Message
@@ -166,29 +188,33 @@ const Dms = (props: any) => {
                         />
                     </Flex>
                     {props.dms ? (
-                        props.dms?.map((dm: UserType) => {
-                            return (
-                                <MessageUser
-                                    profile={dm.avatar}
-                                    name={dm.username}
-                                    dm={dm}
-                                    setUserDm={setUserDm}
-                                    setFirstLoad={setFirstLoad}
-                                    message={dm.status}
-                                    render={props.render}
-                                    setRender={props.setRender}
-                                    updateUser={updateUser}
-                                    setUpdateUser={setUpdateUser}
-                                    updateClass={updateClass}
-                                    setUpdateClass={setUpdateClass}
-                                    activeCard={
-                                        updateClass === dm?.id
-                                            ? 'clickedDm'
-                                            : ''
-                                    }
-                                />
-                            );
-                        })
+                        props.dms.length > 0 ? (
+                            props.dms?.map((dm: UserType) => {
+                                return (
+                                    <MessageUser
+                                        profile={dm.avatar}
+                                        name={dm.username}
+                                        dm={dm}
+                                        setUserDm={setUserDm}
+                                        setFirstLoad={setFirstLoad}
+                                        message={dm.status}
+                                        render={props.render}
+                                        setRender={props.setRender}
+                                        updateUser={updateUser}
+                                        setUpdateUser={setUpdateUser}
+                                        updateClass={updateClass}
+                                        setUpdateClass={setUpdateClass}
+                                        activeCard={
+                                            updateClass === dm?.id
+                                                ? 'clickedDm'
+                                                : ''
+                                        }
+                                    />
+                                );
+                            })
+                        ) : (
+                            <div className="noDms">No messages</div>
+                        )
                     ) : (
                         <></>
                     )}
