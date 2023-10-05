@@ -155,6 +155,8 @@ const DmsChat = (props: any) => {
                         <UserDmInfo
                             id={props.userDm.id}
                             render={props.render}
+                            updateUser={props.updateUser}
+                            setUpdateUser={props.setUpdateUser}
                         />
                     ) : (
                         <></>

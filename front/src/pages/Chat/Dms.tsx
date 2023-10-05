@@ -19,7 +19,7 @@ import {
     useToast
 } from '@chakra-ui/react';
 import RightSide from './RightSide';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Search from '../../components/Search';
 import MessageUser from './MessageUser';
 import ModalUi from '../../components/ModalUi';
@@ -66,6 +66,8 @@ const Dms = (props: any) => {
     const [userDm, setUserDm] = React.useState<UserType>();
     const [id, setId] = React.useState(0);
     const [isUserDm, setIsUserDm] = React.useState(false);
+    const [updateUser, setUpdateUser] = React.useState(false);
+    const [updateClass, setUpdateClass] = useState<number>();
     // const socket = React.useContext(SocketContext);
     // const [render, setRender] = React.useState(false);
     // const toast = useToast();
@@ -173,6 +175,17 @@ const Dms = (props: any) => {
                                     setUserDm={setUserDm}
                                     setFirstLoad={setFirstLoad}
                                     message={dm.status}
+                                    render={props.render}
+                                    setRender={props.setRender}
+                                    updateUser={updateUser}
+                                    setUpdateUser={setUpdateUser}
+                                    updateClass={updateClass}
+                                    setUpdateClass={setUpdateClass}
+                                    activeCard={
+                                        updateClass === dm?.id
+                                            ? 'clickedDm'
+                                            : ''
+                                    }
                                 />
                             );
                         })
@@ -190,6 +203,8 @@ const Dms = (props: any) => {
                         render={props.render}
                         setRender={props.setRender}
                         handleDeleteChat={handleDeleteChat}
+                        updateUser={updateUser}
+                        setUpdateUser={setUpdateUser}
                     />
                 </>
             )
