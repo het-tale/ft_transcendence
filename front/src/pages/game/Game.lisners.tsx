@@ -1,14 +1,12 @@
-import { Ball, Paddle } from "./Game.types";
+import { Ball, GameData, Paddle } from "./Game.types";
 import { MySocket } from "./Game";
-import { type } from "os";
-import { UserType } from "../../Types/User";
 
 type numberstate = React.Dispatch<React.SetStateAction<number>>;
 type ballstate = React.Dispatch<React.SetStateAction<Ball | null>>;
 type paddstate = React.Dispatch<React.SetStateAction<Paddle | null>>;
 type stringstate = React.Dispatch<React.SetStateAction<string | null>>;
 
-function ListenOnSocket(
+export function ListenOnSocket(
   socket: MySocket,
   setPadd: paddstate,
   setBall: ballstate,
@@ -16,8 +14,10 @@ function ListenOnSocket(
   setPlayerScore: numberstate,
   setOtherScore: numberstate,
   setOtherAvatar: stringstate,
-  user: UserType | null,
-  setGameOver: React.Dispatch<React.SetStateAction<boolean>>
+  setGameOver: React.Dispatch<React.SetStateAction<boolean>>,
+  setId: React.Dispatch<React.SetStateAction<number | null>>,
+  setDimention: React.Dispatch<React.SetStateAction<{ width: number; height: number }>>,
+  setInit: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   socket.on("connect", () => {
     console.log("connected to server");
@@ -68,6 +68,58 @@ function ListenOnSocket(
       setOtherScore(update.otherScore);
     }
   );
+
+  socket.on("InitGame", (game: GameData) => {
+	setInit(true);
+	setBall(game.ball);
+	setPadd(game.playerpad);
+	setOtherpad(game.otherpad);
+	console.log(
+	  "InitGame",
+	  game.playerpad,
+	  " other paddle ",
+	  game.otherpad
+	);
+	if (game.id) setId(game.id);
+	if (game.playerScore) setPlayerScore(game.playerScore);
+	if (game.otherScore) setOtherScore(game.otherScore);
+	if (game.containerWidth && game.containerHeight)
+	  setDimention({
+		width: game.containerWidth,
+		height: game.containerHeight,
+	  });
+	});
 }
 
-export { ListenOnSocket };
+// export function InitGame(socket: MySocket,
+// 	setInit: React.Dispatch<React.SetStateAction<boolean>>, 
+// 	setBall: ballstate, setPadd: paddstate, 
+// 	setOtherpad:paddstate, setId: React.Dispatch<React.SetStateAction<number | null>>, 
+// 	setPlayerScore: numberstate, setOtherScore: numberstate, 
+// 	setDimention: React.Dispatch<React.SetStateAction<{ width: number; height: number; }>>, 
+// 	setGameStarted: React.Dispatch<React.SetStateAction<boolean>>
+// 	) {
+// 	socket.on("InitGame", (game: GameData) => {
+// 	  setInit(true);
+// 	  setBall(game.ball);
+// 	  setPadd(game.playerpad);
+// 	  setOtherpad(game.otherpad);
+// 	  console.log(
+// 		"InitGame",
+// 		game.playerpad,
+// 		" other paddle ",
+// 		game.otherpad
+// 	  );
+// 	  if (game.id) setId(game.id);
+// 	  if (game.playerScore) setPlayerScore(game.playerScore);
+// 	  if (game.otherScore) setOtherScore(game.otherScore);
+// 	  if (game.containerWidth && game.containerHeight)
+// 		setDimention({
+// 		  width: game.containerWidth,
+// 		  height: game.containerHeight,
+// 		});
+// 	  setGameStarted(true);
+// 	});
+// }
+
+

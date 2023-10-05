@@ -46,28 +46,67 @@ export async function startGame(
     room.gameActive = true;
     room.gameInterval = interval(INTERVAL).subscribe(() => {
       if (!room.gameActive) {
-        stopGame(room, rooms);
+        cancelgamesart(room, rooms);
 
         return;
       }
-      updateGame(room, activeSockets, prisma, containerHeight);
+      updateGame(room,rooms, activeSockets, prisma, containerHeight);
     });
     createMatch(room, prisma, activeSockets);
   }
 }
 
-export async function stopGame(room: Room, rooms: Map<string, Room>) {
-  console.log('stopGame');
+
+export function cancelgamesart(room: Room, rooms: Map<string, Room>) {
+  console.log('cancelgamesart');
   //dell room from map
   rooms.delete(room.roomName);
   room.gameActive = false;
   if (room.gameInterval) {
-    room.gameInterval.unsubscribe();
+	room.gameInterval.unsubscribe();
   }
+}
+
+export async function stopGame(room: Room, rooms: Map<string, Room>, activeSockets: Map<Socket, User>, prisma: PrismaService) {
+  console.log('stopGame');
+  const player = room.players[0];
+  const otherPlayer = room.players[1];
+  const playerSocket = player.socket;
+  const otherPlayerSocket = otherPlayer.socket;
+  const playerUser = activeSockets.get(playerSocket);
+  const otherPlayerUser = activeSockets.get(otherPlayerSocket);
+  if (!playerUser || !otherPlayerUser) {
+	  console.log('user not found');
+	  return;
+	}
+	
+	prisma.user.update({
+		where: {
+			id: playerUser.id,
+		},
+		data: {
+			status: 'online',
+		},
+	});
+	prisma.user.update({
+		where: {
+			id: otherPlayerUser.id,
+		},
+		data: {
+			status: 'online',
+		},
+	});
+	console.log('users updated status', playerUser, otherPlayerUser);
+	if (room.gameInterval) {
+		room.gameInterval.unsubscribe();
+	  }
+	room.gameActive = false;
+	rooms.delete(room.roomName);
 }
 
 export async function updateGame(
   room: Room,
+  rooms: Map<string, Room>,
   activeSockets: Map<Socket, User>,
   prisma: PrismaService,
   containerHeight: number,
@@ -89,5 +128,15 @@ export async function updateGame(
     // Reverse the vertical velocity of the ball
     room.ball.dy *= -1;
   }
-  colision(room, activeSockets, prisma);
+  colision(room, rooms, activeSockets, prisma);
+}
+
+export async function getclient(client: Socket, activeSockets: Map<Socket, User>) {
+  const user = activeSockets.get(client);
+  if (!user) {
+	console.log('user not found');
+	return;
+  }
+  return user;
+
 }

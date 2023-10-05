@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react"; // Clear the canvas
 import { io } from "socket.io-client";
 import { throttle } from "lodash";
-import { ListenOnSocket } from "./Game.lisners";
-import { GameData, Paddle, Ball } from "./Game.types";
+import { Paddle, Ball } from "./Game.types";
 import { Image } from "@chakra-ui/react";
 import "../../css/game.css";
 import User from "../../components/User";
 import { UserType } from "../../Types/User";
+import { ListenOnSocket } from "./Game.lisners";
 
 export type MySocket = ReturnType<typeof io>;
 
@@ -78,31 +78,24 @@ const Game: React.FC = () => {
     );
   };
 
-  useEffect(() => {
-    // console.log('useEffect callsed ');
-    if (socket && !init)
-      socket.on("InitGame", (game: GameData) => {
-        setInit(true);
-        setBall(game.ball);
-        setPadd(game.playerpad);
-        setOtherpad(game.otherpad);
-        console.log(
-          "InitGame",
-          game.playerpad,
-          " other paddle ",
-          game.otherpad
-        );
-        setId(game.id);
-        if (game.playerScore) setPlayerScore(game.playerScore);
-        if (game.otherScore) setOtherScore(game.otherScore);
-        if (game.containerWidth && game.containerHeight)
-          setDimention({
-            width: game.containerWidth,
-            height: game.containerHeight,
-          });
-        setGameStarted(true);
-      });
-  }, [init, socket]);
+//   useEffect(() => {
+//     // console.log('useEffect callsed ');
+//     if (socket && !init) {
+//       InitGame(
+//         socket,
+//         setInit,
+//         setBall,
+//         setPadd,
+//         setOtherpad,
+//         setId,
+//         setPlayerScore,
+//         setOtherScore,
+//         setDimention,
+//         setGameStarted
+//       );
+//       setInit(true);
+//     }
+//   }, [init, socket]);
 
   const handleMouseMove = (event: MouseEvent) => {
     if (socket && padd && divRefs.gameContainer.current) {
@@ -171,8 +164,10 @@ const Game: React.FC = () => {
         setPlayerScore,
         setOtherScore,
         setOtherAvatar,
-        user,
-        setGameOver
+        setGameOver,
+		setId,
+		setDimention,
+		setInit,
       );
       listning = true;
     }
@@ -185,6 +180,10 @@ const Game: React.FC = () => {
 
   const handleStartGame = () => {
     socket?.emit("StartGame");
+    setGameStarted(true);
+  };
+  const handleStartGamerobot = () => {
+    socket?.emit("StartGameRobot");
     setGameStarted(true);
   };
 
@@ -258,26 +257,26 @@ const Game: React.FC = () => {
           </>
         )}
       </div>
-        {!gameStarted ? (
-			<>
+      {!gameStarted ? (
+        <>
           <button className="start-button" onClick={handleStartGame}>
             Start Game
           </button>
-		  </>
-        ) : (
-      <div className="game-container" ref={divRefs.gameContainer}>
-            <div
-              ref={divRefs.playerPaddle}
-              className="paddle player-paddle"
-            ></div>
-            <div
-              ref={divRefs.otherPaddle}
-              className="paddle other-paddle"
-            ></div>
-            <div ref={divRefs.ball} className="ball"></div>
-      </div>
-	)}
-	</div>
+          <button className="start-button" onClick={handleStartGamerobot}>
+            Start Game with robot
+          </button>
+        </>
+      ) : (
+        <div className="game-container" ref={divRefs.gameContainer}>
+          <div
+            ref={divRefs.playerPaddle}
+            className="paddle player-paddle"
+          ></div>
+          <div ref={divRefs.otherPaddle} className="paddle other-paddle"></div>
+          <div ref={divRefs.ball} className="ball"></div>
+        </div>
+      )}
+    </div>
   );
 };
 

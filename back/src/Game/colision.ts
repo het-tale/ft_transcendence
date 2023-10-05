@@ -2,6 +2,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Room, Ball, Paddle } from './types';
 import { Socket } from 'socket.io';
 import { User } from '@prisma/client';
+import { stopGame } from './Game_services';
 
 const MAX_ANGLE_CHANGE = Math.PI / 4;
 
@@ -61,6 +62,7 @@ async function intersections(
 
 export async function colision(
   room: Room,
+  rooms: Map<string, Room>,
   activeSockets: Map<Socket, User>,
   prisma: PrismaService,
 ) {
@@ -98,6 +100,7 @@ export async function colision(
         otherPlayerSocket.emit('GAME OVER', { winner: true });
       }
       room.gameActive = false;
+	  stopGame(room, rooms, activeSockets, prisma);
     } else {
       resetBall(room.ball);
       playerSocket.emit('UPDATE SCORE', {
@@ -137,6 +140,7 @@ export async function colision(
         otherPlayerSocket.emit('GAME OVER', { winner: true });
       }
       room.gameActive = false;
+	  stopGame(room, rooms, activeSockets, prisma);
     } else {
       resetBall(room.ball);
       playerSocket.emit('UPDATE SCORE', {
