@@ -24,14 +24,13 @@ model User {
   is2FaVerified      Boolean @default(false)
   status             String  @default("offline")
 
-  sentMessages           Message[]       @relation("SentMessages")
-  receivedMessages       Message[]       @relation("ReceivedMessages")
+  conversations          Conversation[]  @relation("ConversationParticipants")
+  sentMessages           Message[]       @relation("MessageSender")
+  receivedMessages       Message[]       @relation("MessageReceiver")
   sentInvitations        Invitation[]    @relation("InvitationSender")
   sentFriendRequests     FriendRequest[] @relation("FriendRequestSender")
   receivedInvitations    Invitation[]    @relation("InvitationReceiver")
   receivedFriendRequests FriendRequest[] @relation("FriendRequestReceiver")
-  dmsList                User[]          @relation("DMSList")
-  dmsListof              User[]          @relation("DMSList")
   friends                User[]          @relation("FriendList")
   friendof               User[]          @relation("FriendList")
   blocked                User[]          @relation("Blocked")
@@ -47,6 +46,18 @@ model User {
   mutedChannels          Channel[]       @relation("ChannelMuted")
   offlineKickedChannels  Channel[]       @relation("ChannelOfflineKicked")
   offlineUnbannedChannel Channel[]       @relation("ChannelOfflineUnbanned")
+}
+
+model Conversation {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String @unique
+  isDeletedBy Int @default(0)
+
+  participants User[] @relation("ConversationParticipants")
+
+  messages     Message[] @relation("ConversationMessages")
 }
 
 model FriendRequest {
@@ -90,10 +101,15 @@ model Message {
   isDM      Boolean  @default(true)
   isPending Boolean? @default(true)
 
-  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
-  senderId   Int
-  receiver   User?    @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  MessageIsDeletedBy Int @default(0)
+
+  sender     User? @relation("MessageSender", fields: [senderId], references: [id])
+  senderId   Int?
+  receiver   User? @relation("MessageReceiver", fields: [receiverId], references: [id])
   receiverId Int?
+
+  Conversation Conversation? @relation("ConversationMessages", fields: [conversationId], references: [id])
+  conversationId Int?
   channel    Channel? @relation("ChannelMessages", fields: [channelId], references: [id])
   channelId  Int?
 }
