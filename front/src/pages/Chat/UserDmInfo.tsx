@@ -47,7 +47,7 @@ const UserDmInfo = (props: MessageUserProps) => {
             setUser(userData);
         }
         fetchUserData();
-    }, [update, props.updateUser]);
+    }, [update, props.updateUser, props.render]);
     return (
         <div>
             <button style={{ width: '100%' }}>

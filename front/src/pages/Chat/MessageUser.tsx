@@ -54,7 +54,6 @@ const MessageUser = ({
     setUpdateClass,
     activeCard
 }: MessageUserProps) => {
-    // const [updateClass, setUpdateClass] = useState<number>();
     const HandleDm = (id: number | undefined) => {
         console.log('Hellooo user', isUserDm);
         if (
@@ -89,6 +88,7 @@ const MessageUser = ({
                     h={'100px'}
                     w={'100%'}
                     style={{ boxShadow: 'none' }}
+                    marginBottom={'0.5rem'}
                 >
                     <Image
                         objectFit="cover"

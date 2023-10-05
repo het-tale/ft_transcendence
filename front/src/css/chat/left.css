@@ -48,3 +48,11 @@
     box-shadow: var(--fakhti) 0px 15px 100px -22px !important;
     margin-bottom: 10px;
   }
+
+  .noDms {
+    text-align: center;
+    margin-top: 12rem;
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #555454;
+  }
