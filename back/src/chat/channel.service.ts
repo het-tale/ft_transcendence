@@ -92,19 +92,19 @@ export class ChannelService {
     return deletedMessages;
   }
   async saveInvitation(data: {
-    senderId: number;
-    receiverId: number;
+    sender: string;
+    receiver: string;
     room: string;
     isReceiverOnline: boolean;
   }) {
     const userSender = await this.prisma.user.findUnique({
       where: {
-        id: data.senderId,
+        username: data.sender,
       },
     });
     const userReceiver = await this.prisma.user.findUnique({
       where: {
-        id: data.receiverId,
+        username: data.receiver,
       },
     });
     const room = await this.prisma.channel.findUnique({
@@ -156,13 +156,13 @@ export class ChannelService {
   }
   async createChannel(
     channelName: string,
-    id: number,
+    username: string,
     type: string,
     password: string,
   ) {
     const user = await this.prisma.user.findUnique({
       where: {
-        id,
+        username,
       },
     });
     if (!user) {
@@ -189,10 +189,10 @@ export class ChannelService {
       },
     });
   }
-  async joinChannel(channelName: string, id: number, password: string) {
+  async joinChannel(channelName: string, username: string, password: string) {
     const user = await this.prisma.user.findUnique({
       where: {
-        id,
+        username,
       },
     });
     if (!user) {
@@ -240,19 +240,19 @@ export class ChannelService {
   }
 
   async handleChannelInvitation(data: {
-    senderId: number;
-    receiverId: number;
+    sender: string;
+    receiver: string;
     room: string;
     isAccepted: boolean;
   }) {
     const userReceiver = await this.prisma.user.findUnique({
       where: {
-        id: data.receiverId,
+        username: data.receiver,
       },
     });
     const userSender = await this.prisma.user.findUnique({
       where: {
-        id: data.senderId,
+        username: data.sender,
       },
     });
     const channel = await this.prisma.channel.findUnique({
@@ -302,14 +302,14 @@ export class ChannelService {
     }
   }
   async saveMessagetoChannel(data: {
-    senderId: number;
+    sender: string;
     room: string;
     message: string;
     date: Date;
   }) {
     const user = await this.prisma.user.findUnique({
       where: {
-        id: data.senderId,
+        username: data.sender,
       },
     });
     const channel = await this.prisma.channel.findUnique({
@@ -351,15 +351,15 @@ export class ChannelService {
     return channel.id;
   }
   async createOfflineChannelMessages(
-    connected: { clientId: string; id: number }[],
+    connected: { clientId: string; username: string }[],
     channelName: string,
     message: string,
-    senderId: number,
+    senderUsername: string,
     sentAt: Date,
   ) {
     const sender = await this.prisma.user.findUnique({
       where: {
-        id: senderId,
+        username: senderUsername,
       },
     });
     const channel = await this.prisma.channel.findUnique({
@@ -379,7 +379,9 @@ export class ChannelService {
 
     await Promise.all(
       participants.map(async (participant: User) => {
-        const user = connected.find((user) => user.id === participant.id);
+        const user = connected.find(
+          (user) => user.username === participant.username,
+        );
 
         if (!user) {
           await this.prisma.message.create({
@@ -397,10 +399,10 @@ export class ChannelService {
       }),
     );
   }
-  async leaveChannel(data: { room: string; newOwner: number }, id: number) {
+  async leaveChannel(data, username: string) {
     const user = await this.prisma.user.findUnique({
       where: {
-        id,
+        username,
       },
     });
     if (!user) {
@@ -430,7 +432,7 @@ export class ChannelService {
     if (isOwner) {
       const newOwner = await this.prisma.user.findUnique({
         where: {
-          id: data.newOwner,
+          username: data.newOwner,
         },
       });
       if (!newOwner) {
@@ -471,18 +473,18 @@ export class ChannelService {
   }
   async kickUser(
     channelName: string,
-    kickerId: number,
-    kickedId: number,
+    kickerUsername: string,
+    kickedUsername: string,
     isOnline: boolean,
   ) {
     const kicker = await this.prisma.user.findUnique({
       where: {
-        id: kickerId,
+        username: kickerUsername,
       },
     });
     const kicked = await this.prisma.user.findUnique({
       where: {
-        id: kickedId,
+        username: kickedUsername,
       },
     });
     const channel = await this.prisma.channel.findUnique({
@@ -531,15 +533,19 @@ export class ChannelService {
       });
     }
   }
-  async addAdmin(channelName: string, adderId: number, newAdminId: number) {
+  async addAdmin(
+    channelName: string,
+    adderUsername: string,
+    newAdminUsername: string,
+  ) {
     const adder = await this.prisma.user.findUnique({
       where: {
-        id: adderId,
+        username: adderUsername,
       },
     });
     const newAdmin = await this.prisma.user.findUnique({
       where: {
-        id: newAdminId,
+        username: newAdminUsername,
       },
     });
     const channel = await this.prisma.channel.findUnique({
@@ -575,14 +581,14 @@ export class ChannelService {
   }
   async banUser(
     channelName: string,
-    clientId: number,
-    bannedId: number,
+    clientUsername: string,
+    bannedUsername: string,
     isOnline: boolean,
   ) {
     const { target, channel } = await this.checkInput(
       channelName,
-      clientId,
-      bannedId,
+      clientUsername,
+      bannedUsername,
     );
     const isParticipant = channel.participants.some(
       (participant) => participant.id === target.id,
@@ -628,16 +634,20 @@ export class ChannelService {
       });
     }
   }
-  async checkInput(channelName: string, clientId: number, targetId: number) {
+  async checkInput(
+    clientUsername: string,
+    channelName: string,
+    targetUsername: string,
+  ) {
     {
       const client = await this.prisma.user.findUnique({
         where: {
-          id: clientId,
+          username: clientUsername,
         },
       });
       const target = await this.prisma.user.findUnique({
         where: {
-          id: targetId,
+          username: targetUsername,
         },
       });
       const channel = await this.prisma.channel.findUnique({
@@ -663,15 +673,15 @@ export class ChannelService {
     }
   }
   async unbanUser(
+    clientUsername: string,
     channelName: string,
-    clientId: number,
-    targetId: number,
+    targetUsername: string,
     isOnline: boolean,
   ) {
     const { target, channel } = await this.checkInput(
+      clientUsername,
       channelName,
-      clientId,
-      targetId,
+      targetUsername,
     );
     const isBanned = channel.banned.some(
       (bannedUser) => bannedUser.id === target.id,
@@ -711,11 +721,15 @@ export class ChannelService {
       });
     }
   }
-  async muteUser(clientId: number, channelName: string, targetId: number) {
+  async muteUser(
+    clientUsername: string,
+    channelName: string,
+    targetUsername: string,
+  ) {
     const { target, channel } = await this.checkInput(
+      clientUsername,
       channelName,
-      clientId,
-      targetId,
+      targetUsername,
     );
     const ismuted = channel.muted.some(
       (mutedUser) => mutedUser.id === target.id,
@@ -736,11 +750,15 @@ export class ChannelService {
       },
     });
   }
-  async unmuteUser(clientId: number, channelName: string, targetId: number) {
+  async unmuteUser(
+    clientUsername: string,
+    channelName: string,
+    targetUsername: string,
+  ) {
     const { target, channel } = await this.checkInput(
+      clientUsername,
       channelName,
-      clientId,
-      targetId,
+      targetUsername,
     );
     const ismuted = channel.muted.some(
       (mutedUser) => mutedUser.id === target.id,
@@ -798,13 +816,13 @@ export class ChannelService {
   }
   async deleteChannel(
     channelName: string,
-    id: number,
+    username: string,
     io: Server,
-    connected: { clientId: string; id: number }[],
+    connected: { clientId: string; username: string }[],
   ) {
     const user = await this.prisma.user.findUnique({
       where: {
-        id,
+        username,
       },
     });
     if (!user) {
@@ -845,7 +863,9 @@ export class ChannelService {
     });
     await Promise.all(
       channel.participants.map(async (participant) => {
-        const user = connected.find((user) => user.id === participant.id);
+        const user = connected.find(
+          (user) => user.username === participant.username,
+        );
         const socket = io.of('/').sockets[user.clientId];
         if (user) {
           socket.leave(channelName);

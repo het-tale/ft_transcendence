@@ -18,15 +18,19 @@ export class ChatController {
     private friendsService: FriendsService,
   ) {}
 
-  @Get('dms/:id')
-  async getDms(@Param('id') id: number, @Req() request: { user: User }) {
-    console.log("This is the id", id);
-    console.log("This is the type", typeof id);
-    return this.dmService.getDmConversation(Number(id), request.user);
+  @Get('dms/:username')
+  async getDms(
+    @Param('username') username: string,
+    @Req() request: { user: User },
+  ) {
+    return this.dmService.getDmConversation(username, request.user);
   }
-  @Delete('dms/:id')
-  async deleteDm(@Param('id') id: number, @Req() request: { user: User }) {
-    return this.dmService.deleteDm(id, request.user);
+  @Delete('dms/:username')
+  async deleteDm(
+    @Param('username') username: string,
+    @Req() request: { user: User },
+  ) {
+    return this.dmService.deleteDm(username, request.user);
   }
 
   @Get('channels/:channelName')
@@ -44,12 +48,12 @@ export class ChatController {
   async getBlockedUsers(@Req() request: { user: User }) {
     return this.friendsService.getBlockedUsers(request.user);
   }
-  @Get('mutual-friends/:id')
+  @Get('mutual-friends/:username')
   async getMutualFriends(
-    @Param('id') id: number,
+    @Param('username') username: string,
     @Req() request: { user: User },
   ) {
-    return this.friendsService.getMutualFriends(id, request.user);
+    return this.friendsService.getMutualFriends(username, request.user);
   }
   @Get('dms-list')
   async getDmsList(@Req() request: { user: User }) {
