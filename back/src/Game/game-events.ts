@@ -197,7 +197,7 @@ export async function StartGameEventRobot(
   console.log('new room created with name ', room.roomName);
   const playerNumber = activeSockets.get(client).id;
   const player = new Player(playerNumber, client, otherpadd, room.roomName, 0);
-  const robot = new Player(0, client, padd, room.roomName, 0);
+  const robot = new Player(1, client, padd, room.roomName, 0);
   room.players.push(player);
   room.players.push(robot);
   client.join(room.roomName);
@@ -253,6 +253,7 @@ export async function createMatchrobot(
 			  start: new Date(),
 			  result: 'ongoing',
 			  playerAId: activeSockets.get(room.players[0].socket).id,
+			  playerBId: 1,
 			},
 		  })
 		  .then((match) => {
@@ -322,7 +323,7 @@ export async function colisionrobot(
   activeSockets: Map<Socket, User>,
   prisma: PrismaService,
 ) {
-	  const player = room.players[0];
+	const player = room.players[0];
   const otherPlayer = room.players[1];
   const playerSocket = player.socket;
   const playerPaddle = player.paddle;
