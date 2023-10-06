@@ -8,7 +8,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { TwoFaModule } from './2fa/two-fa.module';
 import { ChatModule } from './chat/chat.module';
 import { UserModule } from './user/user.module';
-import { GameModule } from './Game/Game.Modules';
+import { GameModule } from './Game/Game.Module';
 
 @Module({
   imports: [
