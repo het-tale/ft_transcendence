@@ -23,7 +23,7 @@ export class RobotUserService {
         username: "ROBOT",
         email: "robot.fake@gmail.com",
         isEmailConfirmed: true,
-        avatar,
+        avatar: avatar,
         status: "online",
       },
     });
