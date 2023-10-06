@@ -3,10 +3,12 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { patchNestJsSwagger } from 'nestjs-zod';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import { RobotUserService } from './utils/robot-user.service';
 
 async function bootstrap() {
   patchNestJsSwagger();
   const app = await NestFactory.create(AppModule);
+  await app.get(RobotUserService).createRobotUser();
   app.enableCors({
     origin: ['http://localhost:5173', 'http://localhost:3000'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
