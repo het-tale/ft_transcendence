@@ -13,6 +13,18 @@ import { Socket, Server } from 'socket.io';
 import { DMService } from './dm.service';
 import { ChannelService } from './channel.service';
 import { FriendsService } from './friends.service';
+import {
+  TCreateRoom,
+  TDM,
+  TFriendReq,
+  TInvitation,
+  TLeaveRoom,
+  TRoom,
+  TRoomMessage,
+  TRoomTarget,
+  TUserTarget,
+} from 'src/dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway
@@ -31,7 +43,8 @@ export class ChatGateway
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    const token = client.handshake.auth.token;
+    //const token = client.handshake.auth.token;
+    const token = client.handshake.headers.token;
     try {
       this.io.emit('userOnline', client.id);
       const user = await this.dmService.verifyToken(token);
@@ -98,6 +111,7 @@ export class ChatGateway
     const user = this.connectedUsers.find(
       (user) => user.clientId === client.id,
     );
+    if (!user) return;
     await this.dmService.changeUserStatus(user.username, 'offline');
     this.connectedUsers = this.connectedUsers.filter(
       (user) => user.clientId !== client.id,
@@ -107,7 +121,7 @@ export class ChatGateway
 
   @SubscribeMessage('privateMessage')
   async handlePrivateMessage(
-    @MessageBody() data: any,
+    @MessageBody() data: TDM,
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -141,7 +155,7 @@ export class ChatGateway
   }
   @SubscribeMessage('createRoom')
   async createRoom(
-    @MessageBody() data: any,
+    @MessageBody() data: TCreateRoom,
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -167,12 +181,19 @@ export class ChatGateway
       client.join(data.room);
       this.io.to(data.room).emit('roomCreated', { room: data.room });
     } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === 'P2002')
+          err.message = 'duplicate unique data: room name';
+      }
       client.emit('roomCreateError', err.message);
     }
   }
 
   @SubscribeMessage('joinRoom')
-  async joinRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+  async joinRoom(
+    @MessageBody() data: TRoom,
+    @ConnectedSocket() client: Socket,
+  ) {
     try {
       const user = this.connectedUsers.find(
         (user) => user.clientId === client.id,
@@ -191,7 +212,7 @@ export class ChatGateway
 
   @SubscribeMessage('sendRoomMessage')
   async sendRoomMessage(
-    @MessageBody() data: any,
+    @MessageBody() data: TRoomMessage,
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -212,14 +233,26 @@ export class ChatGateway
         sender.username,
         sentAt,
       );
-      this.io.to(data.room).emit('roomMessage', data.message);
+      //dont emit to blocked online users
+      const recipients = await this.channelService.getRecipients(
+        data.room,
+        sender.username,
+      );
+      for (const recipient of recipients) {
+        const user = this.connectedUsers.find(
+          (user) => user.username === recipient.username,
+        );
+        if (user) {
+          this.io.to(user.clientId).emit('roomMessage', data.message);
+        }
+      }
     } catch (err) {
       client.emit('roomMessageError', err.message);
     }
   }
   @SubscribeMessage('sendRoomInvitation')
   async sendRoomInvitation(
-    @MessageBody() data: any,
+    @MessageBody() data: TRoomTarget,
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -227,12 +260,12 @@ export class ChatGateway
         (user) => user.clientId === client.id,
       );
       const receiver = this.connectedUsers.find(
-        (user) => user.username === data.to,
+        (user) => user.username === data.target,
       );
       let isReceiverOnline = false;
       await this.channelService.saveInvitation({
         sender: sender.username,
-        receiver: data.to,
+        receiver: data.target,
         room: data.room,
         isReceiverOnline,
       });
@@ -249,7 +282,7 @@ export class ChatGateway
   }
   @SubscribeMessage('handleRoomInvitation')
   async handleRoomInvitation(
-    @MessageBody() data: any,
+    @MessageBody() data: TInvitation,
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -277,7 +310,10 @@ export class ChatGateway
     }
   }
   @SubscribeMessage('leaveRoom')
-  async leaveRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+  async leaveRoom(
+    @MessageBody() data: TLeaveRoom,
+    @ConnectedSocket() client: Socket,
+  ) {
     try {
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
@@ -290,7 +326,10 @@ export class ChatGateway
     }
   }
   @SubscribeMessage('kickUser')
-  async kickUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+  async kickUser(
+    @MessageBody() data: TRoomTarget,
+    @ConnectedSocket() client: Socket,
+  ) {
     try {
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
@@ -310,13 +349,16 @@ export class ChatGateway
         const socket = this.io.sockets[kickedUser.clientId];
         socket.leave(data.room);
       }
-      this.io.to(data.room).emit('userKicked', `${data.user} kicked`);
+      this.io.to(data.room).emit('userKicked', `${data.target} kicked`);
     } catch (err) {
       client.emit('userKickError', err.message);
     }
   }
   @SubscribeMessage('addAdmin')
-  async addAdmin(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+  async addAdmin(
+    @MessageBody() data: TRoomTarget,
+    @ConnectedSocket() client: Socket,
+  ) {
     try {
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
@@ -332,7 +374,10 @@ export class ChatGateway
     }
   }
   @SubscribeMessage('banneUser')
-  async banneUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+  async banneUser(
+    @MessageBody() data: TRoomTarget,
+    @ConnectedSocket() client: Socket,
+  ) {
     try {
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
@@ -358,7 +403,10 @@ export class ChatGateway
     }
   }
   @SubscribeMessage('unbanUser')
-  async unbanUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+  async unbanUser(
+    @MessageBody() data: TRoomTarget,
+    @ConnectedSocket() client: Socket,
+  ) {
     try {
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
@@ -384,7 +432,10 @@ export class ChatGateway
     }
   }
   @SubscribeMessage('muteUser')
-  async muteUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+  async muteUser(
+    @MessageBody() data: TRoomTarget,
+    @ConnectedSocket() client: Socket,
+  ) {
     try {
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
@@ -401,7 +452,7 @@ export class ChatGateway
   }
   @SubscribeMessage('unmuteUser')
   async unmuteUser(
-    @MessageBody() data: any,
+    @MessageBody() data: TRoomTarget,
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -419,7 +470,10 @@ export class ChatGateway
     }
   }
   @SubscribeMessage('sendFriendRequest')
-  async addFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+  async addFriend(
+    @MessageBody() data: TUserTarget,
+    @ConnectedSocket() client: Socket,
+  ) {
     try {
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
@@ -445,7 +499,7 @@ export class ChatGateway
   }
   @SubscribeMessage('handleFriendRequest')
   async handleFriendRequest(
-    @MessageBody() data: any,
+    @MessageBody() data: TFriendReq,
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -480,7 +534,7 @@ export class ChatGateway
   }
   @SubscribeMessage('removeFriend')
   async removeFriend(
-    @MessageBody() data: any,
+    @MessageBody() data: TUserTarget,
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -494,7 +548,10 @@ export class ChatGateway
     }
   }
   @SubscribeMessage('blockUser')
-  async blockUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+  async blockUser(
+    @MessageBody() data: TUserTarget,
+    @ConnectedSocket() client: Socket,
+  ) {
     try {
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
@@ -507,7 +564,7 @@ export class ChatGateway
   }
   @SubscribeMessage('unblockUser')
   async unblockUser(
-    @MessageBody() data: any,
+    @MessageBody() data: TUserTarget,
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -522,7 +579,7 @@ export class ChatGateway
   }
   @SubscribeMessage('deleteChannel')
   async deleteChannel(
-    @MessageBody() data: any,
+    @MessageBody() data: TRoom,
     @ConnectedSocket() client: Socket,
   ) {
     try {

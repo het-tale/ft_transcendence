@@ -9,6 +9,7 @@ import { TwoFaModule } from './2fa/two-fa.module';
 import { ChatModule } from './chat/chat.module';
 import { GameModule } from './Game/Game.Module';
 import { UserModule } from './user/user.module';
+import { RobotUserService } from './utils/robot-user.service';
 
 @Module({
   imports: [
@@ -25,5 +26,6 @@ import { UserModule } from './user/user.module';
     GameModule,
     UserModule,
   ],
+  providers: [RobotUserService],
 })
 export class AppModule {}
