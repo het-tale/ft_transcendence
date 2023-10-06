@@ -10,8 +10,8 @@ const Signin42 = () => {
     const location = useLocation();
     console.log(location);
     const token = location.search.split('=')[1];
-    console.log(token);
     localStorage.setItem('token', token);
+    console.log("THE TOKEN ", token);
     User()
         .then((res) => {
             console.log('User', res);
