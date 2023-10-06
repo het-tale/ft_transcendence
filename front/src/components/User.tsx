@@ -8,11 +8,13 @@ const User = async () => {
             }
         });
         if (response.status === 200) {
+			console.log(" the User", response);
             return response.data;
         } else {
             return null;
         }
     } catch (error) {
+		console.log(" the Error", error);
         return null;
     }
 };

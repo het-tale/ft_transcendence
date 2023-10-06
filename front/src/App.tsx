@@ -34,6 +34,7 @@ import Profile from './pages/Profile/Profile';
 // import GamePage from "./pages/Game/GamePage";
 import { socket, SocketContext } from './socket';
 import React from 'react';
+import GamePage from './pages/game/GamePage';
 
 // const theme = createTheme();
 
@@ -162,7 +163,7 @@ function App() {
                             }
                         />
                     </Route>
-                    {/* <Route path="game" element={<GamePage />}/> */}
+                    <Route path="game" element={<GamePage />}/>
                     <Route path="testt" element={<Testt />} />
                 </Routes>
             </SocketContext.Provider>

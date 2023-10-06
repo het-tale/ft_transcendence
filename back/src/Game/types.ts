@@ -1,5 +1,6 @@
 // import { Socket } from 'dgram';
 import { Subscription } from 'rxjs';
+import { Socket } from 'socket.io';
 export class Paddle {
   constructor(x: number, y: number, width: number, height: number, dy: number) {
     this.x = x;
@@ -44,19 +45,19 @@ export interface GameData {
 export class Player {
   constructor(
     id: number,
-    socket_id: string,
+    socket: Socket,
     paddle: Paddle,
     room: string,
     score: number,
   ) {
     this.id = id;
-    this.socket_id = socket_id;
+    this.socket = socket;
     this.paddle = paddle;
     this.room = room;
     this.score = score;
   }
   id: number;
-  socket_id: string;
+  socket: Socket;
   paddle: Paddle;
   room: string;
   score: number;
@@ -77,7 +78,24 @@ export class Room {
     this.gameActive = false;
     this.gameInterval = null;
     this.lastspeedincrease = Date.now();
-    this.ball = new Ball(500, 500, 10, 3, 3);
+    const random = Math.random();
+    switch (true) {
+      case random < 0.2:
+        this.ball = new Ball(720 / 2, 480 / 2, 10, 3, 3);
+        break;
+      case random < 0.4:
+        this.ball = new Ball(720 / 2, 480 / 2, 10, 3, -3);
+        break;
+      case random < 0.6:
+        this.ball = new Ball(720 / 2, 480 / 2, 10, -3, 3);
+        break;
+      case random < 0.8:
+        this.ball = new Ball(720 / 2, 480 / 2, 10, -3, -3);
+        break;
+      default:
+        this.ball = new Ball(720 / 2, 480 / 2, 10, 3, 3);
+        break;
+    }
     this.rounds = 5;
   }
   id: number;
@@ -90,14 +108,6 @@ export class Room {
   rounds: number;
 }
 
-// export interface MatchData {
-// 	start: Date;
-// 	result: string;
-// 	playerAId: number;
-// 	playerBId: number;
-// 	winnerId: number;
-// }
-
 export const INTERVAL = 16.66;
-export const INCREASE_SPEED = 0.2;
+export const INCREASE_SPEED = 0.4;
 export const SPEED_INTERVAL = 1000;
