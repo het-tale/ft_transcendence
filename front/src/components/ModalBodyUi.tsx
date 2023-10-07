@@ -11,41 +11,67 @@ import {
     HStack
 } from '@chakra-ui/react';
 import { CreateChannelData } from '../pages/Chat/Dms';
-import { useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { SocketContext } from '../socket';
 
 const ModalBodyUi = (props: any) => {
+    const socket = React.useContext(SocketContext);
     const { register, handleSubmit } = useForm<CreateChannelData>();
+    const handleCreateChannel: SubmitHandler<CreateChannelData> = (data) => {
+        console.log('Create Channel Data', data);
+        console.log('password', data.password);
+        socket.emit('createRoom', {
+            room: data.room,
+            type: data.type,
+            password: data.password,
+            avatar: data.avatar
+        });
+    };
     return (
-        <form style={{ padding: '5px' }}>
+        <form
+            style={{ padding: '5px' }}
+            onSubmit={handleSubmit(handleCreateChannel)}
+        >
             <FormControl>
                 <FormLabel>Channel Avatar</FormLabel>
-                <Input type="file" w={'400px'} required />
+                <Input
+                    type="file"
+                    w={'400px'}
+                    {...register('avatar', { required: false })}
+                />
             </FormControl>
             <FormControl>
                 <FormLabel>Channel Name</FormLabel>
-                <Input type="text" w={'400px'} required />
+                <Input
+                    type="text"
+                    w={'400px'}
+                    {...register('room', { required: true })}
+                />
             </FormControl>
             <FormControl as="fieldset">
                 <FormLabel>Channel Type</FormLabel>
-                <RadioGroup defaultValue="Public">
+                <RadioGroup defaultValue="public">
                     <HStack spacing="24px">
                         <Radio
-                            value="Public"
+                            value="public"
                             checked={props.selectedOption === 'public'}
+                            {...register('type')}
                             onChange={props.handleRadioChange}
                         >
                             Public
                         </Radio>
                         <Radio
-                            value="Private"
+                            value="private"
                             checked={props.selectedOption === 'private'}
+                            {...register('type')}
                             onChange={props.handleRadioChange}
                         >
                             Private
                         </Radio>
                         <Radio
-                            value="Protected"
+                            value="protected"
                             checked={props.selectedOption === 'protected'}
+                            {...register('type')}
                             onChange={props.handleRadioChange}
                         >
                             Protected
@@ -53,12 +79,17 @@ const ModalBodyUi = (props: any) => {
                     </HStack>
                 </RadioGroup>
             </FormControl>
-            {props.showField && (
+            {props.showField ? (
                 <FormControl>
                     <FormLabel>Password</FormLabel>
-                    <Input type="password" w={'400px'} required />
+                    <Input
+                        type="password"
+                        w={'400px'}
+                        required
+                        {...register('password')}
+                    />
                 </FormControl>
-            )}
+            ) : null}
             <ButtonGroup display={'Flex'} justifyContent={'flex-end'} p={3}>
                 <Button
                     bg={'#E9ECEF'}
