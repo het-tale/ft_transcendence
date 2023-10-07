@@ -33,25 +33,25 @@ export class AuthController {
   @ApiBody({ type: AuthSignUpDto })
   @UseZodGuard('body', AuthSignUpDto)
   @Post('signup')
-  signup(@Body() dto: TSignupData) {
-    return this.authService.signup(dto);
+  async signup(@Body() dto: TSignupData) {
+    return await this.authService.signup(dto);
   }
 
   @ApiQuery({ name: 'token', type: 'string' })
   @Get('confirm-email')
-  confirm(@Query('token') token: string) {
-    return this.authService.confirmRegister(token);
+  async confirm(@Query('token') token: string) {
+    return await this.authService.confirmRegister(token);
   }
 
   @Get('resend-email')
-  resend(@Req() request: { user: User }) {
-    return this.authService.resendEmail(request.user);
+  async resend(@Req() request: { user: User }) {
+    return await this.authService.resendEmail(request.user);
   }
   @ApiBody({ type: AuthSignInDto })
   @UseZodGuard('body', AuthSignInDto)
   @Post('signin')
-  signin(@Body() dto: TSigninData) {
-    return this.authService.signin(dto);
+  async signin(@Body() dto: TSigninData) {
+    return await this.authService.signin(dto);
   }
 
   @UseGuards(_42AuthenticationGuard)
@@ -66,14 +66,14 @@ export class AuthController {
     const token = await this.authService.signin42(request.user);
     console.log(token);
 
-    return res.redirect(`http://localhost:3000/signin42?token=${token}`);
+    return await res.redirect(`http://localhost:3000/signin42?token=${token}`);
   }
 
   @ApiBody({ type: ForgetPassworddto })
   @UseZodGuard('body', ForgetPassworddto)
   @Post('forget-password')
   async forgetPassword(@Body() dto: TforgetPasswordData) {
-    return this.authService.forgetPassword(dto);
+    return await this.authService.forgetPassword(dto);
   }
 
   @ApiBody({ type: SetPasswordDto })
@@ -84,6 +84,6 @@ export class AuthController {
     @Body() dto: TSetPasswordData,
     @Query('token') token: string,
   ) {
-    return this.authService.confirmChangePassword(token, dto);
+    return await this.authService.confirmChangePassword(token, dto);
   }
 }

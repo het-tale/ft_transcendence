@@ -3,10 +3,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
 import { Invitation, Message, User } from '@prisma/client';
 import { Server } from 'socket.io';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ChannelService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private config: ConfigService) {}
   async getChannelMessages(channelName: string, user: User) {
     const actualUser = await this.prisma.user.findUnique({
       where: {
@@ -192,10 +193,12 @@ export class ChannelService {
     if (!user) {
       throw new Error('user not found');
     }
+    const avatar = this.config.get('CHANNEL_AVATAR');
     let hash = null;
     if (type == 'protected') hash = await argon.hash(password);
     await this.prisma.channel.create({
       data: {
+        avatar,
         name: channelName,
         ownerId: user.id,
         type,

@@ -25,14 +25,14 @@ export class ChatController {
     @Param('username') username: string,
     @Req() request: { user: User },
   ) {
-    return this.dmService.getDmConversation(username, request.user);
+    return await this.dmService.getDmConversation(username, request.user);
   }
-  @Delete('dms/:username')
+  @Delete('clear-conversation/:username')
   async deleteDm(
     @Param('username') username: string,
     @Req() request: { user: User },
   ) {
-    return this.dmService.deleteDm(username, request.user);
+    return await this.dmService.deleteDm(username, request.user);
   }
 
   @Get('search-conversations/:startsWith')
@@ -40,7 +40,7 @@ export class ChatController {
     @Param('startsWith') startsWith: string,
     @Req() request: { user: User },
   ) {
-    return this.dmService.searchConversations(startsWith, request.user);
+    return await this.dmService.searchConversations(startsWith, request.user);
   }
 
   @Delete('delete-conversation/:username')
@@ -48,40 +48,43 @@ export class ChatController {
     @Param('username') username: string,
     @Req() request: { user: User },
   ) {
-    return this.dmService.deleteConversation(username, request.user);
+    return await this.dmService.deleteConversation(username, request.user);
   }
   @Get('channels/:channelName')
   async getChannelMessages(
     @Param('channelName') channelName: string,
     @Req() request: { user: User },
   ) {
-    return this.channelService.getChannelMessages(channelName, request.user);
+    return await this.channelService.getChannelMessages(
+      channelName,
+      request.user,
+    );
   }
   @Get('friends')
   async getFriends(@Req() request: { user: User }) {
-    return this.friendsService.getFriends(request.user);
+    return await this.friendsService.getFriends(request.user);
   }
   @Get('blocked')
   async getBlockedUsers(@Req() request: { user: User }) {
-    return this.friendsService.getBlockedUsers(request.user);
+    return await this.friendsService.getBlockedUsers(request.user);
   }
   @Get('mutual-friends/:username')
   async getMutualFriends(
     @Param('username') username: string,
     @Req() request: { user: User },
   ) {
-    return this.friendsService.getMutualFriends(username, request.user);
+    return await this.friendsService.getMutualFriends(username, request.user);
   }
   @Get('dms-list')
   async getDmsList(@Req() request: { user: User }) {
-    return this.dmService.getDmsList(request.user);
+    return await this.dmService.getDmsList(request.user);
   }
   @Get('my-channels-list')
   async getMyChannelsList(@Req() request: { user: User }) {
-    return this.channelService.getMyChannelsList(request.user);
+    return await this.channelService.getMyChannelsList(request.user);
   }
   @Get('browse-channels-list')
   async getBrowseChannelsList(@Req() request: { user: User }) {
-    return this.channelService.getBrowseChannelsList(request.user);
+    return await this.channelService.getBrowseChannelsList(request.user);
   }
 }

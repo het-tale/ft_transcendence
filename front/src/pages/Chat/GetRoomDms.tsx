@@ -1,8 +1,8 @@
 import client from '../../components/Client';
 
-const GetDms = async () => {
+const GetRoomDms = async () => {
     try {
-        const res = await client.get('chat/dms-list', {
+        const res = await client.get('chat/my-channels-list', {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
@@ -20,4 +20,4 @@ const GetDms = async () => {
     }
 };
 
-export default GetDms;
+export default GetRoomDms;

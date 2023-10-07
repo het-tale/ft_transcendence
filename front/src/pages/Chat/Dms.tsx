@@ -41,6 +41,7 @@ import { SocketContext } from '../../socket';
 import ModalSendMessage from '../../components/ModalSendMessage';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import client from '../../components/Client';
+import { Channel } from '../../Types/Channel';
 
 export interface SentData {
     message: string;
@@ -48,9 +49,9 @@ export interface SentData {
 }
 export interface CreateChannelData {
     room: string;
-    avatar: string;
+    avatar?: string;
     type: string;
-    password: string;
+    password?: string;
 }
 
 const Dms = (props: any) => {
@@ -74,7 +75,7 @@ const Dms = (props: any) => {
     };
     const handleRadioChange = (event: any) => {
         setSelectedOption(event.target.value);
-        setShowField(event.target.value === 'Protected');
+        setShowField(event.target.value === 'protected');
         console.log('RADIOOOOOOO CHAAAANGE', event.target.value);
     };
 
@@ -120,33 +121,7 @@ const Dms = (props: any) => {
             });
         }
     };
-    const handleDeleteChat = async () => {
-        if (!userDm) return;
-        console.log('Delete chat', userDm.username);
-        try {
-            const res = await client.delete(`chat/dms/${userDm.username}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            console.log('RES', res);
-            if (res.status === 200) {
-                deleteConversation();
-                props.setRender(!props.render);
-                setFirstLoad('');
-            }
-        } catch (error: any) {
-            console.log('Error', error);
-            props.toast({
-                title: 'Error.',
-                description: error.response.data.message,
-                status: 'error',
-                duration: 9000,
-                isClosable: true,
-                position: 'bottom-right'
-            });
-        }
-    };
+
     const [test, setTest] = React.useState(false);
 
     const tabs = [
@@ -228,7 +203,6 @@ const Dms = (props: any) => {
                         test={test}
                         render={props.render}
                         setRender={props.setRender}
-                        handleDeleteChat={handleDeleteChat}
                         updateUser={updateUser}
                         setUpdateUser={setUpdateUser}
                     />

@@ -43,8 +43,8 @@ export class ChatGateway
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    //const token = client.handshake.auth.token;
-    const token = client.handshake.headers.token;
+    const token = client.handshake.auth.token;
+    // const token = client.handshake.headers.token;
     try {
       this.io.emit('userOnline', client.id);
       const user = await this.dmService.verifyToken(token);
@@ -111,12 +111,12 @@ export class ChatGateway
     const user = this.connectedUsers.find(
       (user) => user.clientId === client.id,
     );
+    console.log(`Cliend id:${client.id} disconnected`);
     if (!user) return;
     await this.dmService.changeUserStatus(user.username, 'offline');
     this.connectedUsers = this.connectedUsers.filter(
       (user) => user.clientId !== client.id,
     );
-    console.log(`Cliend id:${client.id} disconnected`);
   }
 
   @SubscribeMessage('privateMessage')
@@ -125,6 +125,7 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
+      console.log(data);
       if (data.message === '') return;
       const sender = this.connectedUsers.find(
         (user) => user.clientId === client.id,
@@ -148,6 +149,10 @@ export class ChatGateway
           message: data.message,
         });
       }
+      this.io.to(client.id).emit('privateMessage', {
+        from: sender.username,
+        message: data.message,
+      });
     } catch (err) {
       console.log(err.message, 'privateMessageError');
       client.emit('privateMessageError', err.message);
