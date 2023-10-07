@@ -18,7 +18,7 @@ export default function Chat() {
     useEffect(() => {
         GetDms().then((data) => {
             setDms(data);
-            console.log('UPDATE DM', render);
+            console.log('UPDATE DM');
         });
         GetRoomDms().then((data) => {
             setRoomDms(data);

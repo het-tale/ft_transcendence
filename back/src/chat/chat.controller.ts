@@ -27,7 +27,7 @@ export class ChatController {
   ) {
     return this.dmService.getDmConversation(username, request.user);
   }
-  @Delete('dms/:username')
+  @Delete('clear-conversation/:username')
   async deleteDm(
     @Param('username') username: string,
     @Req() request: { user: User },
