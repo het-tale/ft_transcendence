@@ -6,8 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "db:rm": "docker compose rm my_database -s -f -v",
-    "db:up": "docker compose up my_database -d",
+    "db:rm": "docker-compose rm -s -f -v my_database ",
+    "db:up": "docker-compose up -d my_database",
     "db:restart": "npm run db:rm && npm run db:up && sleep 1 && npm run prisma:generate && npm run prisma:push",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

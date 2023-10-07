@@ -100,7 +100,7 @@ export async function colision(
         otherPlayerSocket.emit('GAME OVER', { winner: true });
       }
       room.gameActive = false;
-	  stopGame(room, rooms, activeSockets, prisma);
+	  stopGame(room, activeSockets);
     } else {
       resetBall(room.ball);
       playerSocket.emit('UPDATE SCORE', {
@@ -140,7 +140,7 @@ export async function colision(
         otherPlayerSocket.emit('GAME OVER', { winner: true });
       }
       room.gameActive = false;
-	  stopGame(room, rooms, activeSockets, prisma);
+	  stopGame(room, activeSockets);
     } else {
       resetBall(room.ball);
       playerSocket.emit('UPDATE SCORE', {
