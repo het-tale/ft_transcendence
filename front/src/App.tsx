@@ -163,7 +163,7 @@ function App() {
                             }
                         />
                     </Route>
-                    <Route path="game" element={<GamePage />}/>
+                    {/* <Route path="game" element={<GamePage />}/> */}
                     <Route path="testt" element={<Testt />} />
                 </Routes>
             </SocketContext.Provider>
