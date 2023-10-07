@@ -111,12 +111,12 @@ export class ChatGateway
     const user = this.connectedUsers.find(
       (user) => user.clientId === client.id,
     );
+    console.log(`Cliend id:${client.id} disconnected`);
     if (!user) return;
     await this.dmService.changeUserStatus(user.username, 'offline');
     this.connectedUsers = this.connectedUsers.filter(
       (user) => user.clientId !== client.id,
     );
-    console.log(`Cliend id:${client.id} disconnected`);
   }
 
   @SubscribeMessage('privateMessage')
@@ -149,6 +149,10 @@ export class ChatGateway
           message: data.message,
         });
       }
+      this.io.to(client.id).emit('privateMessage', {
+        from: sender.username,
+        message: data.message,
+      });
     } catch (err) {
       console.log(err.message, 'privateMessageError');
       client.emit('privateMessageError', err.message);
