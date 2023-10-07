@@ -145,6 +145,7 @@ const DmsChat = (props: any) => {
             });
         }
         onClose2();
+        onClose3();
     };
     const handleProfile = () => {
         console.log('View Profile');
