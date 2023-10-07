@@ -141,6 +141,7 @@ model Channel {
   hash      String?
   owner     User    @relation("ChannelOwner", fields: [ownerId], references: [id])
   ownerId   Int
+  avatar    String
   isDeleted Boolean @default(false)
 
   messages     Message[]    @relation("ChannelMessages")

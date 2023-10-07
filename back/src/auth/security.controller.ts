@@ -47,7 +47,7 @@ export class SecurityController {
   @UseZodGuard('body', TwofaCodeDto)
   @Post('2fa/enable')
   async enable2Fa(@Req() request: { user: User }, @Body() dto: TtwofaCodeData) {
-    return this.securityService.enable2Fa(dto.code, request.user);
+    return await this.securityService.enable2Fa(dto.code, request.user);
   }
 
   @ApiBody({ type: TwofaCodeDto })
@@ -66,17 +66,17 @@ export class SecurityController {
   @UseZodGuard('body', Add42CredentialsDto)
   @UseGuards(TwoFaVerificationGuard)
   @Post('set-new-username-password')
-  setNewPassword(
+  async setNewPassword(
     @Req() request: { user: User },
     @Body() dto: TAdd42CredentialsData,
   ) {
-    return this.securityService.setNewPasswordUsername(dto, request.user);
+    return await this.securityService.setNewPasswordUsername(dto, request.user);
   }
 
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(TwoFaVerificationGuard)
   @Post('upload-avatar')
-  uploadAvatar(
+  async uploadAvatar(
     @UploadedFile() file: Express.Multer.File,
     @Req() request: { user: User },
   ) {
@@ -87,6 +87,6 @@ export class SecurityController {
       );
     }
 
-    return this.securityService.uploadAvatar(file, request.user);
+    return await this.securityService.uploadAvatar(file, request.user);
   }
 }

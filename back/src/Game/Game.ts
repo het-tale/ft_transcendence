@@ -18,7 +18,7 @@ import { User } from '@prisma/client';
 import { UpdatePaddle, findRoomByPlayerSocket } from './Game-Update';
 import { cancelgamesart } from './start-game';
 
-@WebSocketGateway()
+@WebSocketGateway({ namespace: 'game' })
 @Injectable()
 export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()

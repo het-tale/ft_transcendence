@@ -114,11 +114,15 @@ const DmsChat = (props: any) => {
         props.setRender(!props.render);
     });
 
-    const handleClearChat = async () => {
+    const handleClearDeleteChat = async (clearOrDelete: string) => {
+        const str =
+            clearOrDelete === 'clear'
+                ? 'clear-conversation'
+                : 'delete-conversation';
         console.log('Clear chat', props.userDm?.id);
         try {
             const res = await client.delete(
-                `chat/dms/${props.userDm?.username}`,
+                `chat/${str}/${props.userDm?.username}`,
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -141,6 +145,7 @@ const DmsChat = (props: any) => {
             });
         }
         onClose2();
+        onClose3();
     };
     const handleProfile = () => {
         console.log('View Profile');
@@ -216,7 +221,9 @@ const DmsChat = (props: any) => {
                                 onOpen={onOpen2}
                                 onClose={onClose2}
                                 title={'Clear Chat'}
-                                handleBlockedUser={handleClearChat}
+                                handleBlockedUser={async () =>
+                                    await handleClearDeleteChat('clear')
+                                }
                                 body={
                                     'Are you sure you want to clear this chat?'
                                 }
@@ -234,7 +241,9 @@ const DmsChat = (props: any) => {
                                 onOpen={onOpen3}
                                 onClose={onClose3}
                                 title={'Delete Chat'}
-                                handleBlockedUser={props.handleDeleteChat}
+                                handleBlockedUser={async () =>
+                                    await handleClearDeleteChat('delete')
+                                }
                                 body={
                                     'Are you sure you want to delete this chat?'
                                 }
