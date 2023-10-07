@@ -6,6 +6,12 @@ export function generateRandomAvatar(config: ConfigService): string {
     config.get<string>('AVATAR2'),
     config.get<string>('AVATAR3'),
     config.get<string>('AVATAR4'),
+    config.get<string>('AVATAR5'),
+    config.get<string>('AVATAR6'),
+    config.get<string>('AVATAR7'),
+    config.get<string>('AVATAR8'),
+    config.get<string>('AVATAR9'),
+    config.get<string>('AVATAR10'),
   ];
 
   // Generate a random index using Math.random()
