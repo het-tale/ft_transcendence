@@ -7,8 +7,9 @@ import { ConfirmationModule } from './confirmation/confirmation.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { TwoFaModule } from './2fa/two-fa.module';
 import { ChatModule } from './chat/chat.module';
-import { GetwayModule } from './game/getway.modules';
+import { GameModule } from './Game/Game.Module';
 import { UserModule } from './user/user.module';
+import { RobotUserService } from './utils/robot-user.service';
 
 @Module({
   imports: [
@@ -22,8 +23,9 @@ import { UserModule } from './user/user.module';
     TwoFaModule,
     CloudinaryModule,
     ChatModule,
-    GetwayModule,
+    GameModule,
     UserModule,
   ],
+  providers: [RobotUserService],
 })
 export class AppModule {}

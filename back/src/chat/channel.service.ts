@@ -3,11 +3,21 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
 import { Invitation, Message, User } from '@prisma/client';
 import { Server } from 'socket.io';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ChannelService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private config: ConfigService) {}
   async getChannelMessages(channelName: string, user: User) {
+    const actualUser = await this.prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      include: {
+        blocked: true,
+        blockedBy: true,
+      },
+    });
     const channel = await this.prisma.channel.findUnique({
       where: {
         name: channelName,
@@ -18,17 +28,32 @@ export class ChannelService {
         participants: true,
       },
     });
+    if (!channel)
+      throw new HttpException('channel not found', HttpStatus.NOT_FOUND);
     const isParticipant = channel.participants.some(
-      (participant) => participant.id === user.id,
+      (participant) => participant.id === actualUser.id,
     );
     const isBanned = channel.banned.some(
-      (bannedUser) => bannedUser.id === user.id,
+      (bannedUser) => bannedUser.id === actualUser.id,
     );
-    if (!channel || isBanned || !isParticipant) {
-      throw new HttpException('channel not found', HttpStatus.NOT_FOUND);
+    if (isBanned || !isParticipant) {
+      throw new HttpException(
+        'user is not a participant',
+        HttpStatus.NOT_FOUND,
+      );
     }
+    //filter messages that sender is either blocked or blocked by the user
+    const messages = channel.messages.filter(
+      (message) =>
+        !actualUser.blocked.some(
+          (blockedUser) => blockedUser.id === message.senderId,
+        ) &&
+        !actualUser.blockedBy.some(
+          (blockedUser) => blockedUser.id === message.senderId,
+        ),
+    );
 
-    return channel.messages;
+    return messages;
   }
   async getOfflineInvitations(userId: number) {
     const invitations = await this.prisma.invitation.findMany({
@@ -168,10 +193,12 @@ export class ChannelService {
     if (!user) {
       throw new Error('user not found');
     }
+    const avatar = this.config.get('CHANNEL_AVATAR');
     let hash = null;
     if (type == 'protected') hash = await argon.hash(password);
     await this.prisma.channel.create({
       data: {
+        avatar,
         name: channelName,
         ownerId: user.id,
         type,
@@ -347,6 +374,14 @@ export class ChannelService {
         isDM: false,
       },
     });
+    await this.prisma.channel.update({
+      where: {
+        id: channel.id,
+      },
+      data: {
+        updatedAt: data.date,
+      },
+    });
 
     return channel.id;
   }
@@ -379,10 +414,27 @@ export class ChannelService {
 
     await Promise.all(
       participants.map(async (participant: User) => {
+        const partticipantWithBlocked = await this.prisma.user.findUnique({
+          where: {
+            id: participant.id,
+          },
+          include: {
+            blocked: true,
+            blockedBy: true,
+          },
+        });
+        const isBlocked = partticipantWithBlocked.blocked.some(
+          (blockedUser) => blockedUser.id === sender.id,
+        );
+        const isBlockedBy = partticipantWithBlocked.blockedBy.some(
+          (blockedUser) => blockedUser.id === sender.id,
+        );
+        if (isBlocked || isBlockedBy) {
+          return;
+        }
         const user = connected.find(
           (user) => user.username === participant.username,
         );
-
         if (!user) {
           await this.prisma.message.create({
             data: {
@@ -426,10 +478,14 @@ export class ChannelService {
       throw new Error('user is not in the channel');
     }
     const isOwner = channel.ownerId === user.id;
-    if (isOwner && !data.newOwner && channel.participants.length > 1) {
-      throw new Error('new owner not specified');
+    console.log(channel.participants.length);
+    if (
+      (data.newOwner === undefined || data.newOwner === null) &&
+      channel.participants.length > 1
+    ) {
+      throw new Error('new owner is required');
     }
-    if (isOwner) {
+    if (isOwner && channel.participants.length > 1) {
       const newOwner = await this.prisma.user.findUnique({
         where: {
           username: data.newOwner,
@@ -673,8 +729,8 @@ export class ChannelService {
     }
   }
   async unbanUser(
-    clientUsername: string,
     channelName: string,
+    clientUsername: string,
     targetUsername: string,
     isOnline: boolean,
   ) {
@@ -722,8 +778,8 @@ export class ChannelService {
     }
   }
   async muteUser(
-    clientUsername: string,
     channelName: string,
+    clientUsername: string,
     targetUsername: string,
   ) {
     const { target, channel } = await this.checkInput(
@@ -751,8 +807,8 @@ export class ChannelService {
     });
   }
   async unmuteUser(
-    clientUsername: string,
     channelName: string,
+    clientUsername: string,
     targetUsername: string,
   ) {
     const { target, channel } = await this.checkInput(
@@ -787,6 +843,9 @@ export class ChannelService {
             id: user.id,
           },
         },
+      },
+      orderBy: {
+        updatedAt: 'desc',
       },
     });
 
@@ -955,5 +1014,39 @@ export class ChannelService {
         });
       }),
     );
+  }
+  async getRecipients(channelName: string, username: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username,
+      },
+      include: {
+        blocked: true,
+        blockedBy: true,
+      },
+    });
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: {
+        participants: true,
+      },
+    });
+    if (!user || !channel) {
+      throw new Error('user or channel not found');
+    }
+    //filter participants that sender is either blocked or blocked by the user
+    const recipients = channel.participants.filter(
+      (participant) =>
+        !user.blocked.some(
+          (blockedUser) => blockedUser.id === participant.id,
+        ) &&
+        !user.blockedBy.some(
+          (blockedUser) => blockedUser.id === participant.id,
+        ),
+    );
+
+    return recipients;
   }
 }
