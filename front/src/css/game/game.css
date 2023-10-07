@@ -149,7 +149,7 @@
   }
   
   .overlay .home-button:hover {
-	background-color: #c56af0; /* Darker red on hover */
+	background-color: #c56af0;
   }
   
   .game-over-container {
@@ -173,7 +173,7 @@
 	text-align: center;
   }
   
-  p {
+  .paraInfo {
 	font-size: 1.5rem;
 	margin: 10px;
   }
