@@ -1,73 +1,13 @@
-import { interval } from 'rxjs';
-import { INCREASE_SPEED, INTERVAL, Room, SPEED_INTERVAL } from './types';
-import { colision } from './colision';
+import { INCREASE_SPEED, Room, SPEED_INTERVAL } from './types';
+import { colision } from './movments';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Socket } from 'socket.io';
 import { User } from '@prisma/client';
-import { OtherAvatar } from './game-events';
 
-export async function createMatch(
+export async function stopGame(
   room: Room,
-  prisma: PrismaService,
   activeSockets: Map<Socket, User>,
 ) {
-  try {
-    await prisma.match
-      .create({
-        data: {
-          start: new Date(),
-          result: 'ongoing',
-          playerAId: activeSockets.get(room.players[0].socket).id,
-          playerBId: activeSockets.get(room.players[1].socket).id,
-        },
-      })
-      .then((match) => {
-        console.log(`Created match with ID: ${match.id}`);
-        room.id = match.id;
-      })
-      .catch((error) => {
-        console.error('Error creating match:', error);
-      });
-  } catch (e) {
-    console.log(e);
-  }
-}
-
-export async function startGame(
-  room: Room,
-  rooms: Map<string, Room>,
-  activeSockets: Map<Socket, User>,
-  prisma: PrismaService,
-  containerHeight: number,
-) {
-  console.log('startGame');
-  OtherAvatar(room.players[0].socket, rooms, activeSockets);
-  if (!room.gameActive) {
-    room.gameActive = true;
-    room.gameInterval = interval(INTERVAL).subscribe(() => {
-      if (!room.gameActive) {
-        cancelgamesart(room, rooms);
-
-        return;
-      }
-      updateGame(room,rooms, activeSockets, prisma, containerHeight);
-    });
-    createMatch(room, prisma, activeSockets);
-  }
-}
-
-
-export function cancelgamesart(room: Room, rooms: Map<string, Room>) {
-  console.log('cancelgamesart');
-  //dell room from map
-  rooms.delete(room.roomName);
-  room.gameActive = false;
-  if (room.gameInterval) {
-	room.gameInterval.unsubscribe();
-  }
-}
-
-export async function stopGame(room: Room, rooms: Map<string, Room>, activeSockets: Map<Socket, User>, prisma: PrismaService) {
   console.log('stopGame');
   const player = room.players[0];
   const otherPlayer = room.players[1];
@@ -76,14 +16,14 @@ export async function stopGame(room: Room, rooms: Map<string, Room>, activeSocke
   const playerUser = activeSockets.get(playerSocket);
   const otherPlayerUser = activeSockets.get(otherPlayerSocket);
   if (!playerUser || !otherPlayerUser) {
-	  console.log('user not found');
-	  return;
-	}
-	if (room.gameInterval) {
-		room.gameInterval.unsubscribe();
-	  }
-	room.gameActive = false;
-	// rooms.delete(room.roomName);
+    console.log('user not found');
+    return;
+  }
+  if (room.gameInterval) {
+    room.gameInterval.unsubscribe();
+  }
+  room.gameActive = false;
+  // rooms.delete(room.roomName);
 }
 
 export async function updateGame(
@@ -113,12 +53,14 @@ export async function updateGame(
   colision(room, rooms, activeSockets, prisma);
 }
 
-export async function getclient(client: Socket, activeSockets: Map<Socket, User>) {
+export async function getclient(
+  client: Socket,
+  activeSockets: Map<Socket, User>,
+) {
   const user = activeSockets.get(client);
   if (!user) {
-	console.log('user not found');
-	return;
+    console.log('user not found');
+    return;
   }
   return user;
-
 }
