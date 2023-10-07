@@ -250,7 +250,7 @@ const Game: React.FC = () => {
                     <>
                         <div className="other-profile">
                             <Image
-                                src={otherAvatar ?? ''}
+                                src="/assets/het-tale.jpg"
                                 alt="Other Profile"
                             />
                             <div className="other-score">{otherScore} </div>
@@ -263,7 +263,10 @@ const Game: React.FC = () => {
                 ) : (
                     <>
                         <div className="other-profile">
-                            <img src={otherAvatar ?? ''} alt="Other Profile" />
+                            <img
+                                src="/assets/het-tale.jpg"
+                                alt="Other Profile"
+                            />
                             <div className="other-score">{otherScore}</div>
                         </div>
                         <div className="player-profile">
@@ -275,7 +278,11 @@ const Game: React.FC = () => {
             </div>
             {!gameStarted ? (
                 <>
-                    <button className="start-button" onClick={handleStartGame}>
+                    <button
+                        className="start-button"
+                        id="firstButton"
+                        onClick={handleStartGame}
+                    >
                         Start Game
                     </button>
                     <button

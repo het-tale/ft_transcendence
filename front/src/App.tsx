@@ -163,7 +163,14 @@ function App() {
                             }
                         />
                     </Route>
-                    <Route path="game" element={<GamePage />}/>
+                    <Route
+                        path="game"
+                        element={
+                            <ProtectRoutes>
+                                <GamePage />
+                            </ProtectRoutes>
+                        }
+                    />
                     <Route path="testt" element={<Testt />} />
                 </Routes>
             </SocketContext.Provider>
