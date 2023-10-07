@@ -22,7 +22,7 @@ import {
 } from './game-events';
 import { User } from '@prisma/client';
 
-@WebSocketGateway()
+@WebSocketGateway({ namespace: 'game' })
 @Injectable()
 export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
