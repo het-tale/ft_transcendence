@@ -201,7 +201,7 @@ input:focus {
 }
 
 .newChannel {
-  width: 50%;
+  width: 9%;
   height: 60px;
   background-color: var(--fakhti);
   border-radius: 12px;
@@ -209,4 +209,5 @@ input:focus {
   right: 0px;
   margin-left: 10px;
   color: var(--white);
+  border-radius: 50%;
 }

@@ -6,8 +6,9 @@ import GetDms from './GetDms';
 import { UserType } from '../../Types/User';
 import GetRoomDms from './GetRoomDms';
 import { Channel } from '../../Types/Channel';
+import { BrowseChannelsProps } from './Channels/BrowseChannels';
 
-export default function Chat() {
+export default function Chat(props: BrowseChannelsProps) {
     const socket = React.useContext(SocketContext);
     const [render, setRender] = React.useState(false);
     const toast = useToast();
@@ -73,6 +74,8 @@ export default function Chat() {
                 setDms={setDms}
                 roomDms={roomDms}
                 setRoomDms={setRoomDms}
+                update={props.update}
+                setUpdate={props.setUpdate}
             />
         </>
     );

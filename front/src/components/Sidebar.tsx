@@ -29,7 +29,7 @@ const Sidebar = (props: any) => {
                 <BsHouseFill className="fa" />
                 Home
             </a>
-            <Link to="/chat">
+            <Link to="/chat/rooms-dms">
                 <BsChatRightFill className="fa" />
                 Chat
             </Link>
