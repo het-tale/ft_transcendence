@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  my_database:
+    image: postgres:13
+    container_name: my_postgres_db
+    working_dir: /app/back
+    env_file:
+      - ./back/.env
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./back/Dockerfile
+    container_name: my_backend_container
+    working_dir: /app/back
+    volumes:
+      - ./back:/app/back
+    ports:
+      - "3001:3001"
+    depends_on:
+      - my_database
+    environment:
+      DATABASE_URL: postgresql://myuser:mypassword@my_database:5432/mydb?schema=public&host=my_database
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./front/Dockerfile
+    container_name: my_frontend_container
+    working_dir: /app/front
+    volumes:
+      - ./front:/app/front
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      DATABASE_URL: postgresql://myuser:mypassword@my_database:5432/mydb?schema=public&host=my_database
