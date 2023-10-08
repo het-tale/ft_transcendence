@@ -33,15 +33,16 @@ import {
 import MessageContent from './MessageContent';
 import TypingBar from './TypingBar';
 import DmsChat from './DmsChat';
-import RoomsChat from './RoomsChat';
+import RoomsChat from './Channels/RoomsChat';
 import ModalBodyUi from '../../components/ModalBodyUi';
 import { UserType } from '../../Types/User';
 import GetDms from './GetDms';
 import { SocketContext } from '../../socket';
 import ModalSendMessage from '../../components/ModalSendMessage';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { SubmitHandler, set, useForm } from 'react-hook-form';
 import client from '../../components/Client';
 import { Channel } from '../../Types/Channel';
+import ChannelDisplay from './Channels/ChannelDisplay';
 
 export interface SentData {
     message: string;
@@ -49,7 +50,6 @@ export interface SentData {
 }
 export interface CreateChannelData {
     room: string;
-    avatar?: string;
     type: string;
     password?: string;
 }
@@ -65,10 +65,12 @@ const Dms = (props: any) => {
     const [name, setName] = React.useState('');
     // const [dms, setDms] = React.useState<UserType[]>([]);
     const [userDm, setUserDm] = React.useState<UserType>();
+    const [channelDm, setChannelDm] = React.useState<Channel>();
     const [id, setId] = React.useState(0);
     const [isUserDm, setIsUserDm] = React.useState(false);
     const [updateUser, setUpdateUser] = React.useState(false);
     const [updateClass, setUpdateClass] = useState<number>();
+    const [updateRoomClass, setUpdateRoomClass] = useState<number>();
 
     const handleRenderActions = () => {
         setRenderActions(!renderActions);
@@ -233,15 +235,48 @@ const Dms = (props: any) => {
                                     handleRadioChange={handleRadioChange}
                                     showField={showField}
                                     onClose={onClose}
+                                    render={props.render}
+                                    setRender={props.setRender}
                                 />
                             }
                         />
                     </Flex>
+                    {props.roomDms ? (
+                        props.roomDms.length > 0 ? (
+                            props.roomDms?.map((room: Channel) => {
+                                return (
+                                    <ChannelDisplay
+                                        profile={room.avatar}
+                                        type={room.type}
+                                        name={room.name}
+                                        setChannelDm={setChannelDm}
+                                        channelDm={channelDm}
+                                        roomDm={room}
+                                        id={room.id}
+                                        updateRoomClas={updateRoomClass}
+                                        setUpdateRoomClass={setUpdateRoomClass}
+                                        activeCard={
+                                            updateRoomClass === room?.id
+                                                ? 'clickedDm'
+                                                : ''
+                                        }
+                                    />
+                                );
+                            })
+                        ) : (
+                            <div className="noDms">No Channels</div>
+                        )
+                    ) : (
+                        <></>
+                    )}
                 </>
             ),
             rightSide: (
                 <>
-                    <RoomsChat handleRenderActions={handleRenderActions} />
+                    <RoomsChat
+                        handleRenderActions={handleRenderActions}
+                        channelDm={channelDm}
+                    />
                 </>
             )
         }

@@ -151,7 +151,7 @@ const DmsChat = (props: any) => {
         console.log('View Profile');
         <Link to="/user-profile" />;
     };
-    if (!dms || dms.length === 0) return <></>;
+    if (!dms || dms.length === 0 || !props.userDm) return <></>;
     return (
         <Flex flexDirection={'column'} justifyContent={'space-between'}>
             <Flex h={'10%'}>
