@@ -17,7 +17,8 @@ export function ListenOnSocket(
   setGameOver: React.Dispatch<React.SetStateAction<boolean>>,
   setId: React.Dispatch<React.SetStateAction<number | null>>,
   setDimention: React.Dispatch<React.SetStateAction<{ width: number; height: number }>>,
-  setInit: React.Dispatch<React.SetStateAction<boolean>>
+  setInit: React.Dispatch<React.SetStateAction<boolean>>,
+  setOtherUsername: React.Dispatch<React.SetStateAction<string | null>>
 ) {
   socket.on("connect", () => {
     console.log("connected to server");
@@ -35,9 +36,10 @@ export function ListenOnSocket(
     console.log("error", error);
   });
 
-  socket.on("OTHER AVATAR", (avatar: string) => {
+  socket.on("OTHER AVATAR", (avatar: string, username: string) => {
 	console.log("OTHER AVATAR", avatar);
 	setOtherAvatar(avatar);
+	setOtherUsername(username);
 	  });
 	
   socket.on("JoinRoom", (message: string) => {

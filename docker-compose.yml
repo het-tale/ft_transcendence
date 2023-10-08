@@ -6,7 +6,7 @@ services:
     container_name: my_postgres_db
     working_dir: /app/back
     env_file:
-      - ./back/.env
+      - .env
     environment:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
@@ -26,9 +26,8 @@ services:
       - "3001:3001"
     depends_on:
       - my_database
-    environment:
-      DATABASE_URL: postgresql://myuser:mypassword@my_database:5432/mydb?schema=public&host=my_database
-
+    env_file:
+      - .env
   frontend:
     build:
       context: .
@@ -41,5 +40,5 @@ services:
       - "3000:3000"
     depends_on:
       - backend
-    environment:
-      DATABASE_URL: postgresql://myuser:mypassword@my_database:5432/mydb?schema=public&host=my_database
+    env_file:
+      - .env
