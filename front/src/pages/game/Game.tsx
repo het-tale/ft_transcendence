@@ -78,25 +78,6 @@ const Game: React.FC = () => {
         );
     };
 
-    //   useEffect(() => {
-    //     // console.log('useEffect callsed ');
-    //     if (socket && !init) {
-    //       InitGame(
-    //         socket,
-    //         setInit,
-    //         setBall,
-    //         setPadd,
-    //         setOtherpad,
-    //         setId,
-    //         setPlayerScore,
-    //         setOtherScore,
-    //         setDimention,
-    //         setGameStarted
-    //       );
-    //       setInit(true);
-    //     }
-    //   }, [init, socket]);
-
     const handleMouseMove = (event: MouseEvent) => {
         if (socket && padd && divRefs.gameContainer.current) {
             const gameContainerRect =
@@ -239,18 +220,18 @@ const Game: React.FC = () => {
                         <button
                             className="home-button"
                             onClick={handleHomeNavigation}
-                        >
+                            >
                             Go to Home
                         </button>
                     </div>
                 </div>
             ) : null}
             <div className="container-profile">
-                {id === 1 ? ( // Check if id is equal to 1
+                {id === 1 ? (
                     <>
                         <div className="other-profile">
                             <Image
-                                src="/assets/het-tale.jpg"
+                                src={otherAvatar? otherAvatar : "/assets/circles-menu-1.gif"}
                                 alt="Other Profile"
                             />
                             <div className="other-score">{otherScore} </div>
@@ -264,7 +245,7 @@ const Game: React.FC = () => {
                     <>
                         <div className="other-profile">
                             <img
-                                src="/assets/het-tale.jpg"
+                                src={otherAvatar? otherAvatar : "assets/circles-menu-1.gif"}
                                 alt="Other Profile"
                             />
                             <div className="other-score">{otherScore}</div>
