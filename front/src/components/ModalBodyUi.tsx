@@ -29,6 +29,7 @@ const ModalBodyUi = (props: any) => {
         });
         props.onClose();
         props.setRender(!props.render);
+        props.setUpdate(!props.update);
     };
     return (
         <form

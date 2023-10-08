@@ -28,7 +28,9 @@ import {
     BsPersonCircle,
     BsPersonFillSlash,
     BsThreeDots,
-    BsTrash
+    BsTrash,
+    BsPlusLg,
+    BsBrowserChrome
 } from 'react-icons/bs';
 import MessageContent from './MessageContent';
 import TypingBar from './TypingBar';
@@ -43,6 +45,7 @@ import { SubmitHandler, set, useForm } from 'react-hook-form';
 import client from '../../components/Client';
 import { Channel } from '../../Types/Channel';
 import ChannelDisplay from './Channels/ChannelDisplay';
+import { Link } from 'react-router-dom';
 
 export interface SentData {
     message: string;
@@ -143,7 +146,11 @@ const Dms = (props: any) => {
                             tempDm={props.dms}
                         />
                         <button className="newChannel" onClick={onOpen}>
-                            New Message
+                            <BsPlusLg
+                                size={'2rem'}
+                                style={{ marginLeft: '1.2rem' }}
+                                title="Create New Message"
+                            />
                         </button>
                         <ModalUi
                             isOpen={isOpen}
@@ -220,7 +227,20 @@ const Dms = (props: any) => {
                         <Search name="tabDesign" />
 
                         <button className="newChannel" onClick={onOpen}>
-                            New
+                            <BsPlusLg
+                                size={'2rem'}
+                                style={{ marginLeft: '1rem' }}
+                                title="Add new Channel"
+                            />
+                        </button>
+                        <button className="newChannel">
+                            <Link to="/chat/browse-channels">
+                                <BsBrowserChrome
+                                    size={'2rem'}
+                                    style={{ marginLeft: '1rem' }}
+                                    title="Explore Channels"
+                                />
+                            </Link>
                         </button>
                         <ModalUi
                             isOpen={isOpen}
@@ -237,6 +257,8 @@ const Dms = (props: any) => {
                                     onClose={onClose}
                                     render={props.render}
                                     setRender={props.setRender}
+                                    update={props.update}
+                                    setUpdate={props.setUpdate}
                                 />
                             }
                         />

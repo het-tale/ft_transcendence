@@ -35,11 +35,13 @@ import Profile from './pages/Profile/Profile';
 import { socket, SocketContext } from './socket';
 import React from 'react';
 import GamePage from './pages/game/GamePage';
+import BrowseChannels from './pages/Chat/Channels/BrowseChannels';
 
 // const theme = createTheme();
 
 function App() {
     const [firstLogin, setFirstLogin] = React.useState(false);
+    const [update, setUpdate] = React.useState(false);
     return (
         // <ThemeProvider theme={theme}>
         <BrowserRouter>
@@ -143,15 +145,30 @@ function App() {
                     <Route path="logout" element={<Logout />} />
 
                     {/**----------------Chat Pages ----------------------*/}
-
-                    <Route
-                        path="chat"
-                        element={
-                            <ProtectRoutes>
-                                <Chat />
-                            </ProtectRoutes>
-                        }
-                    />
+                    <Route path="chat">
+                        <Route
+                            path="rooms-dms"
+                            element={
+                                <ProtectRoutes>
+                                    <Chat
+                                        update={update}
+                                        setUpdate={setUpdate}
+                                    />
+                                </ProtectRoutes>
+                            }
+                        />
+                        <Route
+                            path="browse-channels"
+                            element={
+                                <ProtectRoutes>
+                                    <BrowseChannels
+                                        update={update}
+                                        setUpdate={setUpdate}
+                                    />
+                                </ProtectRoutes>
+                            }
+                        />
+                    </Route>
 
                     <Route path="user-profile">
                         <Route
