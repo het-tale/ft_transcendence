@@ -20,59 +20,60 @@ const ModalBodyUi = (props: any) => {
     const handleCreateChannel: SubmitHandler<CreateChannelData> = (data) => {
         console.log('Create Channel Data', data);
         console.log('password', data.password);
+        if (!props.showField) data.password = undefined;
+        console.log('password after', data.password);
         socket.emit('createRoom', {
             room: data.room,
             type: data.type,
-            password: data.password,
-            avatar: data.avatar
+            password: data.password
         });
+        props.onClose();
+        props.setRender(!props.render);
     };
     return (
         <form
             style={{ padding: '5px' }}
             onSubmit={handleSubmit(handleCreateChannel)}
         >
-            <FormControl>
-                <FormLabel>Channel Avatar</FormLabel>
-                <Input
-                    type="file"
-                    w={'400px'}
-                    {...register('avatar', { required: false })}
-                />
-            </FormControl>
-            <FormControl>
-                <FormLabel>Channel Name</FormLabel>
-                <Input
+            <div className="form-group">
+                <label htmlFor="name">Channel Name</label>
+                <input
+                    className="form-control"
                     type="text"
-                    w={'400px'}
+                    placeholder="Type name"
+                    id="name"
+                    required
                     {...register('room', { required: true })}
                 />
-            </FormControl>
+            </div>
             <FormControl as="fieldset">
                 <FormLabel>Channel Type</FormLabel>
-                <RadioGroup defaultValue="public">
+                <RadioGroup>
                     <HStack spacing="24px">
                         <Radio
                             value="public"
                             checked={props.selectedOption === 'public'}
-                            {...register('type')}
-                            onChange={props.handleRadioChange}
+                            {...register('type', {
+                                onChange: props.handleRadioChange
+                            })}
                         >
                             Public
                         </Radio>
                         <Radio
                             value="private"
                             checked={props.selectedOption === 'private'}
-                            {...register('type')}
-                            onChange={props.handleRadioChange}
+                            {...register('type', {
+                                onChange: props.handleRadioChange
+                            })}
                         >
                             Private
                         </Radio>
                         <Radio
                             value="protected"
                             checked={props.selectedOption === 'protected'}
-                            {...register('type')}
-                            onChange={props.handleRadioChange}
+                            {...register('type', {
+                                onChange: props.handleRadioChange
+                            })}
                         >
                             Protected
                         </Radio>
@@ -80,15 +81,17 @@ const ModalBodyUi = (props: any) => {
                 </RadioGroup>
             </FormControl>
             {props.showField ? (
-                <FormControl>
-                    <FormLabel>Password</FormLabel>
-                    <Input
+                <div className="form-group">
+                    <label htmlFor="password">Channel Password</label>
+                    <input
+                        className="form-control"
                         type="password"
-                        w={'400px'}
+                        placeholder="Type password"
+                        id="password"
                         required
                         {...register('password')}
                     />
-                </FormControl>
+                </div>
             ) : null}
             <ButtonGroup display={'Flex'} justifyContent={'flex-end'} p={3}>
                 <Button
