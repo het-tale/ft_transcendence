@@ -298,6 +298,8 @@ const Dms = (props: any) => {
                     <RoomsChat
                         handleRenderActions={handleRenderActions}
                         channelDm={channelDm}
+                        render={props.render}
+                        setRender={props.setRender}
                     />
                 </>
             )
