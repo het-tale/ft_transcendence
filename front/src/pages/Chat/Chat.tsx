@@ -57,12 +57,28 @@ export default function Chat(props: BrowseChannelsProps) {
                     position: 'top-right'
                 });
             });
+            socket.on('roomMessageError', (data: any) => {
+                console.log('ROOM MESSAGE ERROR DATAAA', data);
+
+                toast({
+                    title: 'Error',
+                    description: data,
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'top-right'
+                });
+            });
         }, 500);
 
         return () => {
             clearTimeout(timer);
         };
     }, []);
+    socket.on('roomMessage', (data: any) => {
+        console.log('ROOM MESSAGE DATA', data);
+        setRender(!render);
+    });
     return (
         <>
             <Dms

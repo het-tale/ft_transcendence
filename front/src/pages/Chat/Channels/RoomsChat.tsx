@@ -27,13 +27,38 @@ import {
 import MessageUser from '../MessageUser';
 import { Channel } from '../../../Types/Channel';
 import ChannelDmInfo from './ChannelDmInfo';
+import ChannelTypingBar from './ChannelTypingBar';
+import React, { useEffect } from 'react';
+import { UserType } from '../../../Types/User';
+import User from '../../../components/User';
+import { MessageType } from '../../../Types/Message';
+import GetChannelMessages from './GetChannelMessages';
 
 export interface RoomsChatProps {
     handleRenderActions: () => void;
     channelDm?: Channel;
+    render: boolean;
+    setRender: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const RoomsChat = (props: RoomsChatProps) => {
+    const [user, setUser] = React.useState<UserType>();
+    const [messages, setMessages] = React.useState<MessageType[]>([]);
+    useEffect(() => {
+        async function fetchUserData() {
+            const userData = await User();
+            setUser(userData);
+        }
+
+        fetchUserData();
+    }, []);
+    useEffect(() => {
+        const res = props.channelDm
+            ? GetChannelMessages(props.channelDm.name).then((data) => {
+                  setMessages(data);
+              })
+            : null;
+    }, [props.render, props.channelDm]);
     if (!props.channelDm) return <></>;
     return (
         <Flex flexDirection={'column'}>
@@ -93,42 +118,29 @@ const RoomsChat = (props: RoomsChatProps) => {
                 </Menu>
             </Flex>
             <div className="messagesContainer" style={{ overflowY: 'auto' }}>
-                {/* <MessageContent message='Hello' name='sender' room={true} />
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='sender' room={true}/>
-            <MessageContent message='Hello' name='sender' room={true} />
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='sender' room={true}/>
-            <MessageContent message='Hello' name='sender' room={true} />
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='sender' room={true}/>
-            <MessageContent message='Hello' name='sender' room={true} />
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='sender' room={true}/>
-
-            <MessageContent message='Hello' name='sender' room={true} />
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='sender' room={true}/>
-            <MessageContent message='Hello' name='sender' room={true} />
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='sender' room={true}/>
-            <MessageContent message='Hello' name='sender' room={true} />
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='sender' room={true}/>
-            <MessageContent message='Hello' name='sender' room={true} />
-            <MessageContent message='Hello again' name='receiver' room={true}/> */}
-                {/* <MessageContent message='Hello again' name='receiver' room={true}/>
-            <MessageContent message='Hello again' name='sender' room={true}/> */}
+                {messages?.map((message) => {
+                    return (
+                        <MessageContent
+                            key={message?.id}
+                            message={message?.content}
+                            name={
+                                message?.senderId === user?.id
+                                    ? 'sender'
+                                    : 'receiver'
+                            }
+                            room={true}
+                            userSendId={message?.senderId}
+                        />
+                    );
+                })}
             </div>
             <Box flex={1}>
-                <TypingBar />
+                <ChannelTypingBar
+                    ChannelDm={props.channelDm}
+                    render={props.render}
+                    setRender={props.setRender}
+                    user={user}
+                />
             </Box>
         </Flex>
     );
