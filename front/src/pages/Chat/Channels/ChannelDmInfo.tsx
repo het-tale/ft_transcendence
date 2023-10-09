@@ -13,8 +13,13 @@ import { Channel } from '../../../Types/Channel';
 import { ChannelDisplayProps } from './ChannelDisplay';
 
 const ChannelDmInfo = (props: ChannelDisplayProps) => {
+    const renderChannelInfo = () => {
+        if (props.setShowChannelInfo)
+            props.setShowChannelInfo(!props.showChannelInfo);
+    };
     return (
         <button
+            onClick={renderChannelInfo}
             style={{
                 boxSizing: 'border-box',
                 width: '100%',

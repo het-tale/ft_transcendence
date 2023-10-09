@@ -59,11 +59,11 @@ const RightSide = (props: any) => {
                     )
                 )}
             </div>
-            {props.currentTab === '2' && props.renderActions && (
+            {/* {props.currentTab === '2' && props.renderActions && (
                 <div className="container">
                     <ChannelInfo />
                 </div>
-            )}
+            )} */}
         </Flex>
     );
 };
