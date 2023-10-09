@@ -25,6 +25,8 @@ export interface ChannelDisplayProps {
     >;
     updateRoomClas?: number;
     id?: number;
+    showChannelInfo?: boolean;
+    setShowChannelInfo?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ChannelDisplay = (props: ChannelDisplayProps) => {

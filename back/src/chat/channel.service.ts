@@ -847,6 +847,34 @@ export class ChannelService {
       orderBy: {
         updatedAt: 'desc',
       },
+      select: {
+        name: true,
+        avatar: true,
+        type: true,
+        ownerId: true,
+        participants: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        owner: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        admins: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        updatedAt: true,
+      },
     });
 
     return channels;
