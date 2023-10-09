@@ -6,7 +6,6 @@ WORKDIR /app/front
 
 COPY ./front .
 
+RUN chmod +x ./script.sh
 
-RUN npm install
-
-CMD [ "npm", "start"]
+CMD ["sh", "./script.sh" ]
