@@ -1,5 +1,5 @@
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Room, Ball, Paddle } from './types';
+import { Room, Ball, Paddle, Player } from './types';
 import { Socket } from 'socket.io';
 import { User } from '@prisma/client';
 import { stopGame } from './Game_services';
@@ -28,6 +28,52 @@ export function resetBall(ball: Ball) {
       ball.dy = -3;
       break;
   }
+}
+
+export async function dataupdatetostop(player: Player, otherPlayer: Player, room: Room, activeSockets: Map<Socket, User>, prisma: PrismaService)
+{
+  const winnerId =
+  player.score > otherPlayer.score ? player.id : otherPlayer.id;
+  const looserId = player.score < otherPlayer.score ? player.id : otherPlayer.id;
+  await prisma.match.update({
+    where: { id: room.id },
+    data: {
+      result:
+        'playerA ' +
+        player.score.toString() +
+        ' ' +
+        otherPlayer.score.toString() +
+        ' playerB',
+      winnerId: winnerId,
+      end: new Date(),
+    },
+  });
+  await prisma.user.update({
+    where: { id: winnerId },
+    data: {
+      matchwin: {
+        increment: 1,
+      },
+    },
+  });
+  await prisma.user.update({
+    where: { id: looserId },
+    data: {
+      matchlose: {
+        increment: 1,
+      },
+    },
+  });
+  if (player.score > otherPlayer.score) {
+    player.socket?.emit('GAME OVER', { winner: true });
+    otherPlayer.socket?.emit('GAME OVER', { winner: false });
+  } else {
+    player.socket?.emit('GAME OVER', { winner: false });
+    otherPlayer.socket?.emit('GAME OVER', { winner: true });
+  }
+  room.gameActive = false;
+stopGame(room, activeSockets);
+
 }
 
 export async function intersections(
@@ -77,30 +123,7 @@ export async function colision(
     otherPlayer.score++;
     room.rounds--;
     if (room.rounds === 0) {
-      const winnerId =
-        player.score > otherPlayer.score ? player.id : otherPlayer.id;
-      await prisma.match.update({
-        where: { id: room.id },
-        data: {
-          result:
-            'playerA ' +
-            player.score.toString() +
-            ' ' +
-            otherPlayer.score.toString() +
-            ' playerB',
-          winnerId: winnerId,
-          end: new Date(),
-        },
-      });
-      if (player.score > otherPlayer.score) {
-        playerSocket.emit('GAME OVER', { winner: true });
-        otherPlayerSocket.emit('GAME OVER', { winner: false });
-      } else {
-        playerSocket.emit('GAME OVER', { winner: false });
-        otherPlayerSocket.emit('GAME OVER', { winner: true });
-      }
-      room.gameActive = false;
-	  stopGame(room, activeSockets);
+      dataupdatetostop(player, otherPlayer, room, activeSockets, prisma);
     } else {
       resetBall(room.ball);
       playerSocket.emit('UPDATE SCORE', {
@@ -116,31 +139,7 @@ export async function colision(
     player.score++;
     room.rounds--;
     if (room.rounds === 0) {
-      const winnerId =
-        player.score > otherPlayer.score ? player.id : otherPlayer.id;
-      if (player.score > otherPlayer.score) {
-        await prisma.match.update({
-          where: { id: room.id },
-          data: {
-            result:
-              'playerA ' +
-              player.score.toString() +
-              ' ' +
-              otherPlayer.score.toString() +
-              ' playerB',
-            winnerId: winnerId,
-            end: new Date(),
-          },
-        });
-        playerSocket.emit('GAME OVER', { winner: true });
-        otherPlayerSocket.emit('GAME OVER', { winner: false });
-        //stop the game
-      } else {
-        playerSocket.emit('GAME OVER', { winner: false });
-        otherPlayerSocket.emit('GAME OVER', { winner: true });
-      }
-      room.gameActive = false;
-	  stopGame(room, activeSockets);
+      dataupdatetostop(player, otherPlayer, room, activeSockets, prisma);
     } else {
       resetBall(room.ball);
       playerSocket.emit('UPDATE SCORE', {

@@ -236,7 +236,7 @@ const Game: React.FC = () => {
                          src={otherAvatar ? otherAvatar : "/assets/circles-menu-1.gif"}
                          alt="Other Profile"
                      />
-                     <div className="other-username">{otherUsername}</div>
+                     <div className="other-username">{otherUsername? otherUsername : " waiting "}</div>
                      <div className="other-score">{otherScore}</div>
                  </div>
                  <div className="vs-image">
@@ -260,7 +260,7 @@ const Game: React.FC = () => {
 					</div>
 					<div className="other-profile">
 						<Image src={otherAvatar ? otherAvatar : "/assets/circles-menu-1.gif"} alt="Other Profile" />
-						<div className="other-username">{otherUsername}</div>
+						<div className="other-username">{otherUsername? otherUsername : " waiting "}</div>
 						<div className="other-score">{otherScore}</div>
 					</div>
                     </>
