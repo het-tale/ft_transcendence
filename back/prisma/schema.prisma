@@ -23,6 +23,9 @@ model User {
   twoFaSecret        String?
   is2FaVerified      Boolean @default(false)
   status             String  @default("offline")
+  matchnumber        Int     @default(0)
+  matchwin           Int     @default(0)
+  matchlose          Int     @default(0)
 
   conversations          Conversation[]  @relation("ConversationParticipants")
   sentMessages           Message[]       @relation("MessageSender")
