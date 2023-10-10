@@ -12,6 +12,8 @@ export function generateRandomAvatar(config: ConfigService): string {
     config.get<string>('AVATAR8'),
     config.get<string>('AVATAR9'),
     config.get<string>('AVATAR10'),
+    config.get<string>('AVATAR11'),
+    config.get<string>('AVATAR12'),
   ];
 
   // Generate a random index using Math.random()
