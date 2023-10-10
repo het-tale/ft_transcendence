@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { interval } from 'rxjs';
 import { OtherAvatar, updateGamerobot } from './Game-Update';
 import { updateGame } from './Game_services';
+import { use } from 'passport';
 
 export async function startGame(
   room: Room,
@@ -20,7 +21,6 @@ export async function startGame(
     room.gameInterval = interval(INTERVAL).subscribe(() => {
       if (!room.gameActive) {
         cancelgamesart(room, rooms);
-
         return;
       }
       updateGame(room, rooms, activeSockets, prisma, containerHeight);
@@ -38,7 +38,7 @@ export async function startGamerobot(
   containerHeight: number,
 ) {
   console.log('startGame');
-  room.players[0].socket.emit('OTHER AVATAR', robotUser.avatar);
+  room.players[0].socket.emit('OTHER AVATAR', robotUser.avatar, robotUser.username);
   if (!room.gameActive) {
     room.gameActive = true;
     room.gameInterval = interval(INTERVAL).subscribe(() => {
@@ -78,13 +78,15 @@ export async function createMatch(
   activeSockets: Map<Socket, User>,
 ) {
   try {
+    const playerid = activeSockets.get(room.players[0].socket).id;
+    const playerid2 = activeSockets.get(room.players[1].socket).id;
     await prisma.match
       .create({
         data: {
           start: new Date(),
           result: 'ongoing',
-          playerAId: activeSockets.get(room.players[0].socket).id,
-          playerBId: activeSockets.get(room.players[1].socket).id,
+          playerAId: playerid,
+          playerBId: playerid2,
         },
       })
       .then((match) => {
@@ -94,6 +96,22 @@ export async function createMatch(
       .catch((error) => {
         console.error('Error creating match:', error);
       });
+    await prisma.user.update({
+      where: { id: playerid },
+      data: {
+        matchnumber: {
+          increment: 1,
+        },
+      },
+    });
+    await prisma.user.update({
+      where: { id: playerid2 },
+      data: {
+        matchnumber: {
+          increment: 1,
+        },
+      },
+    });
   } catch (e) {
     console.log(e);
   }
@@ -105,12 +123,13 @@ export async function createMatchrobot(
   activeSockets: Map<Socket, User>,
 ) {
   try {
+    const playerid = activeSockets.get(room.players[0].socket).id;
     await prisma.match
       .create({
         data: {
           start: new Date(),
           result: 'ongoing',
-          playerAId: activeSockets.get(room.players[0].socket).id,
+          playerAId: playerid,
           playerBId: 1,
         },
       })
@@ -120,6 +139,22 @@ export async function createMatchrobot(
       })
       .catch((error) => {
         console.error('Error creating match:', error);
+      });
+      await prisma.user.update({
+        where: { id: playerid },
+        data: {
+          matchnumber: {
+            increment: 1,
+          },
+        },
+      });
+      await prisma.user.update({
+        where: { id: 1 },
+        data: {
+          matchnumber: {
+            increment: 1,
+          },
+        },
       });
   } catch (e) {
     console.log(e);

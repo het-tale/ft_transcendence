@@ -3,6 +3,7 @@ import { INCREASE_SPEED, Room, SPEED_INTERVAL } from './types';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { colisionrobot } from './robotmouvments';
+import { use } from 'passport';
 
 export async function updateGamerobot(
   room: Room,
@@ -72,14 +73,12 @@ export async function OtherAvatar(
     const otherPlayer = room.players.find((player) => player.socket !== client);
     const user = activeSockets.get(player.socket);
     const otherUser = activeSockets.get(otherPlayer.socket);
-    const avatar = user.avatar;
-    const otherAvatar = otherUser.avatar;
 
     if (player.socket) {
-      otherPlayer.socket.emit('OTHER AVATAR', avatar);
+      otherPlayer.socket.emit('OTHER AVATAR', user.avatar, user.username);
     }
     if (otherPlayer.socket) {
-      player.socket.emit('OTHER AVATAR', otherAvatar);
+      player.socket.emit('OTHER AVATAR', otherUser.avatar, otherUser.username);
     }
   }
 }
