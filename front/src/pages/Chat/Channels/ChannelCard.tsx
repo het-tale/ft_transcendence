@@ -48,6 +48,7 @@ const ChannelCard = (props: BrowseChannelsCardProps) => {
             username: user?.username,
             password: message
         });
+        props.setUpdateChannel && props.setUpdateChannel(!props.updateChannel);
     };
     const handleJoinRoom = (e: any) => {
         e.preventDefault();

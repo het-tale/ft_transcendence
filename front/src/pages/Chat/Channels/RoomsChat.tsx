@@ -79,6 +79,8 @@ const RoomsChat = (props: RoomsChatProps) => {
                                     name={props.channelDm.name}
                                     showChannelInfo={showChannelInfo}
                                     setShowChannelInfo={setShowChannelInfo}
+                                    setRender={props.setRender}
+                                    render={props.render}
                                 />
                             ) : (
                                 <></>
@@ -154,7 +156,12 @@ const RoomsChat = (props: RoomsChatProps) => {
             </Flex>
             {showChannelInfo ? (
                 <div className="container">
-                    <ChannelInfo ChannelDm={props.channelDm} user={user} />
+                    <ChannelInfo
+                        ChannelDm={props.channelDm}
+                        user={user}
+                        render={props.render}
+                        setRender={props.setRender}
+                    />
                 </div>
             ) : null}
         </Flex>

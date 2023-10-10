@@ -16,6 +16,7 @@ const ChannelDmInfo = (props: ChannelDisplayProps) => {
     const renderChannelInfo = () => {
         if (props.setShowChannelInfo)
             props.setShowChannelInfo(!props.showChannelInfo);
+        props.setRender && props.setRender(!props.render);
     };
     return (
         <button

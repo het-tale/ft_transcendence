@@ -15,7 +15,8 @@ import {
     Menu,
     MenuButton,
     MenuList,
-    MenuItem
+    MenuItem,
+    useDisclosure
 } from '@chakra-ui/react';
 import {
     BsThreeDotsVertical,
@@ -31,15 +32,29 @@ import MessageUser from '../MessageUser';
 import { Channel } from '../../../Types/Channel';
 import MemberInfo from './MemberInfo';
 import { UserType } from '../../../Types/User';
+import React from 'react';
+import { SocketContext } from '../../../socket';
+import ModalConfirm from '../ModalConfirm';
 
 export interface ChannelInfoProps {
     ChannelDm?: Channel;
     user?: UserType;
     participant?: UserType;
+    render?: boolean;
+    setRender?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ChannelInfo = (props: ChannelInfoProps) => {
-    // console.log('user', props.user);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const socket = React.useContext(SocketContext);
+    const handleLeaveChannel = (id: number | undefined) => {
+        console.log('Hello From Leave Channel');
+        socket.emit('leaveRoom', {
+            room: props.ChannelDm?.name,
+            newOwner: id
+        });
+        props.setRender && props.setRender(!props.render);
+    };
     return (
         <div>
             <Card maxW="md" marginBottom={2}>
@@ -100,6 +115,8 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                             ChannelDm={props.ChannelDm}
                             user={props.user}
                             participant={participant}
+                            render={props.render}
+                            setRender={props.setRender}
                         />
                     ))}
                 </CardBody>
@@ -115,9 +132,30 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                             size="lg"
                             icon={<BsBoxArrowRight />}
                         />
-                        <Text fontSize={18} marginTop={3}>
-                            Leave Channel
-                        </Text>
+                        <Button
+                            style={{ background: 'none', color: 'red' }}
+                            onClick={
+                                props.user?.id === props.ChannelDm?.ownerId
+                                    ? onOpen
+                                    : () => handleLeaveChannel(undefined)
+                            }
+                        >
+                            <ModalConfirm
+                                isOpen={isOpen}
+                                onClose={onClose}
+                                onOpen={onOpen}
+                                title={'Set new Channel Owner'}
+                                body={
+                                    'Please choose a new owner for this channel'
+                                }
+                                handleBlockedUser={() =>
+                                    handleLeaveChannel(props.user?.id)
+                                }
+                            />
+                            <Text fontSize={18} marginTop={5} marginLeft={-7}>
+                                Leave Channel
+                            </Text>
+                        </Button>
                     </Flex>
                 </CardHeader>
             </Card>

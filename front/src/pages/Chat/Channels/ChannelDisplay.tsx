@@ -27,6 +27,8 @@ export interface ChannelDisplayProps {
     id?: number;
     showChannelInfo?: boolean;
     setShowChannelInfo?: React.Dispatch<React.SetStateAction<boolean>>;
+    render?: boolean;
+    setRender?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ChannelDisplay = (props: ChannelDisplayProps) => {
