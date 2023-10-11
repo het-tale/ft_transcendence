@@ -156,7 +156,7 @@ const Game: React.FC = () => {
                 setId,
                 setDimention,
                 setInit,
-				setOtherUsername
+                setOtherUsername
             );
             listning = true;
         }
@@ -222,7 +222,7 @@ const Game: React.FC = () => {
                         <button
                             className="home-button"
                             onClick={handleHomeNavigation}
-                            >
+                        >
                             Go to Home
                         </button>
                     </div>
@@ -231,38 +231,61 @@ const Game: React.FC = () => {
             <div className="container-profile">
                 {id === 1 ? (
                     <>
-                     <div className="other-profile">
-                     <Image
-                         src={otherAvatar ? otherAvatar : "/assets/circles-menu-1.gif"}
-                         alt="Other Profile"
-                     />
-                     <div className="other-username">{otherUsername? otherUsername : " waiting "}</div>
-                     <div className="other-score">{otherScore}</div>
-                 </div>
-                 <div className="vs-image">
-                     <img src="/assets/versus.png" alt="VS" />
-                 </div>
-                 <div className="player-profile">
-                     <div className="player-score">{playerScore}</div>
-                     <img src={user?.avatar} alt="Player Profile" />
-                     <div className="player-username">{user?.username}</div>
-                 </div>
-                 </>
+                        <div className="player-profile">
+                            <img
+                                src={
+                                    otherAvatar
+                                        ? otherAvatar
+                                        : '/assets/circles-menu-1.gif'
+                                }
+                                alt="Other Profile"
+                            />
+                            <div className="player-username">
+                                {otherUsername
+                                    ? otherUsername
+                                    : ' waiting ... '}
+                            <div className="player-score">{otherScore}</div>
+                            </div>
+                        </div>
+                        <div className="vs-image">
+                            <img src="/assets/versus.png" alt="VS" />
+                        </div>
+                        <div className="player-profile">
+                            <div className="player-username">
+                                {user?.username}
+                            <div className="player-score">{playerScore}</div>
+                            </div>
+                            <img src={user?.avatar} alt="Player Profile" />
+                        </div>
+                    </>
                 ) : (
                     <>
-					<div className="player-profile">
-						<div className="player-score">{playerScore}</div>
-						<img src={user?.avatar} alt="Player Profile" />
-						<div className="player-username">{user?.username}</div>
-					</div>
-					<div className="vs-image">
-						<img src="/assets/versus.png" alt="VS" />
-					</div>
-					<div className="other-profile">
-						<Image src={otherAvatar ? otherAvatar : "/assets/circles-menu-1.gif"} alt="Other Profile" />
-						<div className="other-username">{otherUsername? otherUsername : " waiting "}</div>
-						<div className="other-score">{otherScore}</div>
-					</div>
+                        <div className="player-profile">
+                            <img src={user?.avatar} alt="Player Profile" />
+                            <div className="player-username">
+                                {user?.username}
+                            <div className="player-score">{playerScore}</div>
+                            </div>
+                        </div>
+                        <div className="vs-image">
+                            <img src="/assets/versus.png" alt="VS" />
+                        </div>
+                        <div className="player-profile">
+                            <div className="player-username">
+                                {otherUsername
+                                    ? otherUsername
+                                    : ' waiting ... '}
+                            <div className="player-score">{otherScore}</div>
+                            </div>
+                                    <img
+                                        src={
+                                            otherAvatar
+                                                ? otherAvatar
+                                                : '/assets/circles-menu-1.gif'
+                                        }
+                                        alt="Other Profile"
+                                    />
+                        </div>
                     </>
                 )}
             </div>
