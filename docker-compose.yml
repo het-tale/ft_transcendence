@@ -7,10 +7,6 @@ services:
     working_dir: /app/back
     env_file:
       - .env
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydb
     ports:
       - "5432:5432"
 
@@ -28,6 +24,7 @@ services:
       - my_database
     env_file:
       - .env
+
   frontend:
     build:
       context: .
@@ -42,3 +39,11 @@ services:
       - backend
     env_file:
       - .env
+
+  adminer:
+    image: adminer
+    container_name: my_adminer_container
+    ports:
+      - "8080:8080"
+    depends_on:
+      - my_database
