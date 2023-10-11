@@ -22,7 +22,7 @@ export async function colisionrobot(
     if (room.rounds === 0) {
       dataupdatetostop(player, otherPlayer, room, activeSockets, prisma);
     } else {
-      resetBall(room.ball);
+      resetBall(room.ball, player, otherPlayer);
       playerSocket.emit('UPDATE SCORE', {
         playerScore: player.score,
         otherScore: otherPlayer.score,

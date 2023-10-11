@@ -6,7 +6,16 @@ import { stopGame } from './Game_services';
 
 const MAX_ANGLE_CHANGE = Math.PI / 4;
 
-export function resetBall(ball: Ball) {
+export function resetBall(ball: Ball, player: Player, otherPlayer: Player) {
+
+  player.socket.emit('UPDATE SCORE', {
+    playerScore: player.score,
+    otherScore: otherPlayer.score,
+  });
+  otherPlayer.socket.emit('UPDATE SCORE', {
+    playerScore: otherPlayer.score,
+    otherScore: player.score,
+  });
   ball.x = 720 / 2;
   ball.y = 480 / 2;
   const random = Math.random();
@@ -122,35 +131,13 @@ export async function colision(
   if (room.ball.x + room.ball.radius > playerPaddle.x + playerPaddle.width) {
     otherPlayer.score++;
     room.rounds--;
-    if (room.rounds === 0) {
-      dataupdatetostop(player, otherPlayer, room, activeSockets, prisma);
-    } else {
-      resetBall(room.ball);
-      playerSocket.emit('UPDATE SCORE', {
-        playerScore: player.score,
-        otherScore: otherPlayer.score,
-      });
-      otherPlayerSocket.emit('UPDATE SCORE', {
-        playerScore: otherPlayer.score,
-        otherScore: player.score,
-      });
-    }
+    if (room.rounds === 0) dataupdatetostop(player, otherPlayer, room, activeSockets, prisma);
+    else resetBall(room.ball, player, otherPlayer);
   } else if (room.ball.x < otherPaddle.x - otherPaddle.width) {
     player.score++;
     room.rounds--;
-    if (room.rounds === 0) {
-      dataupdatetostop(player, otherPlayer, room, activeSockets, prisma);
-    } else {
-      resetBall(room.ball);
-      playerSocket.emit('UPDATE SCORE', {
-        playerScore: player.score,
-        otherScore: otherPlayer.score,
-      });
-      otherPlayerSocket.emit('UPDATE SCORE', {
-        playerScore: otherPlayer.score,
-        otherScore: player.score,
-      });
-    }
+    if (room.rounds === 0) dataupdatetostop(player, otherPlayer, room, activeSockets, prisma);
+    else resetBall(room.ball, player, otherPlayer);
   }
   playerSocket.emit('UPDATE', {
     ball: room.ball,
