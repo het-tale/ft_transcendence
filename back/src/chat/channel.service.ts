@@ -790,8 +790,8 @@ export class ChannelService {
     const ismuted = channel.muted.some(
       (mutedUser) => mutedUser.id === target.id,
     );
-    if (!ismuted) {
-      throw new Error('user is not muted');
+    if (ismuted) {
+      throw new Error('user is already muted');
     }
     await this.prisma.channel.update({
       where: {
@@ -819,7 +819,7 @@ export class ChannelService {
     const ismuted = channel.muted.some(
       (mutedUser) => mutedUser.id === target.id,
     );
-    if (ismuted) {
+    if (!ismuted) {
       throw new Error('user is not muted');
     }
     await this.prisma.channel.update({
