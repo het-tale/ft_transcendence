@@ -6,8 +6,9 @@ import GetDms from './GetDms';
 import { UserType } from '../../Types/User';
 import GetRoomDms from './GetRoomDms';
 import { Channel } from '../../Types/Channel';
+import { BrowseChannelsProps } from './Channels/BrowseChannels';
 
-export default function Chat() {
+export default function Chat(props: BrowseChannelsProps) {
     const socket = React.useContext(SocketContext);
     const [render, setRender] = React.useState(false);
     const toast = useToast();
@@ -23,7 +24,7 @@ export default function Chat() {
         GetRoomDms().then((data) => {
             setRoomDms(data);
         });
-    }, [render]);
+    }, [render, props.update]);
     socket.on('privateMessage', (data: any) => {
         console.log('MESSAGE DATA', data);
         setRender(!render);
@@ -56,12 +57,28 @@ export default function Chat() {
                     position: 'top-right'
                 });
             });
+            socket.on('roomMessageError', (data: any) => {
+                console.log('ROOM MESSAGE ERROR DATAAA', data);
+
+                toast({
+                    title: 'Error',
+                    description: data,
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'top-right'
+                });
+            });
         }, 500);
 
         return () => {
             clearTimeout(timer);
         };
     }, []);
+    socket.on('roomMessage', (data: any) => {
+        console.log('ROOM MESSAGE DATA', data);
+        setRender(!render);
+    });
     return (
         <>
             <Dms
@@ -73,6 +90,8 @@ export default function Chat() {
                 setDms={setDms}
                 roomDms={roomDms}
                 setRoomDms={setRoomDms}
+                update={props.update}
+                setUpdate={props.setUpdate}
             />
         </>
     );
