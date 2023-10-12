@@ -22,7 +22,7 @@ import { FriendsService } from './friends.service';
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UseZodGuard } from 'nestjs-zod';
-import { NameDto, RoomDto, TRoom, Tname } from 'src/dto';
+import { AdminDto, NameDto, RoomDto, TRoom, Tadmin, Tname } from 'src/dto';
 
 ApiTags('Chat');
 @Controller('chat')
@@ -141,5 +141,11 @@ export class ChatController {
   @Post('change-channel-type/')
   async changeChannelType(@Req() request: { user: User }, @Body() dto: TRoom) {
     return await this.channelService.changeChannelType(dto, request.user);
+  }
+
+  @UseZodGuard('body', AdminDto)
+  @Post('remove-admin')
+  async removeAdmin(@Req() request: { user: User }, @Body() dto: Tadmin) {
+    return await this.channelService.removeAdmin(request.user, dto);
   }
 }

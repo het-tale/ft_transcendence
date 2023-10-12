@@ -5,7 +5,7 @@ import { Invitation, Message, User } from '@prisma/client';
 import { Server } from 'socket.io';
 import { ConfigService } from '@nestjs/config';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { Troom } from 'src/dto';
+import { Tadmin, Troom } from 'src/dto';
 
 @Injectable()
 export class ChannelService {
@@ -1188,6 +1188,39 @@ export class ChannelService {
       data: {
         type: dto.type,
         hash,
+      },
+    });
+  }
+  async removeAdmin(user: User, dto: Tadmin) {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: dto.name,
+      },
+      include: {
+        admins: true,
+      },
+    });
+    if (!channel) {
+      throw new Error('channel not found');
+    }
+    if (channel.ownerId !== user.id)
+      throw new HttpException('user is not the owner', 400);
+    const isAdmin = channel.admins.some(
+      (admin) => admin.username === dto.admin,
+    );
+    if (!isAdmin) {
+      throw new Error('user provided is not an admin');
+    }
+    await this.prisma.channel.update({
+      where: {
+        name: dto.name,
+      },
+      data: {
+        admins: {
+          disconnect: {
+            username: dto.admin,
+          },
+        },
       },
     });
   }
