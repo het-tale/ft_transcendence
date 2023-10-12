@@ -21,4 +21,5 @@ export type Channel = {
     offlineUnbanned: UserType[];
     muted: UserType[];
     invitations: Invitation[];
+    avatar: string;
 };
