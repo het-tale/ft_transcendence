@@ -47,6 +47,11 @@ const MemberInfo = (props: ChannelInfoProps) => {
         onOpen: onOpen2,
         onClose: onClose2
     } = useDisclosure();
+    const {
+        isOpen: isOpen3,
+        onOpen: onOpen3,
+        onClose: onClose3
+    } = useDisclosure();
     const toast = useToast();
     const handleSetAdmin = () => {
         socket.emit('addAdmin', {
@@ -74,6 +79,15 @@ const MemberInfo = (props: ChannelInfoProps) => {
         onClose2();
         setMute(false);
     };
+    const handleKickUser = () => {
+        console.log('kick user logic');
+        socket.emit('kickUser', {
+            room: props.ChannelDm?.name,
+            target: props.participant?.username
+        });
+        props.setRender && props.setRender(!props.render);
+        onClose3();
+    };
     useEffect(() => {
         const timer = setTimeout(() => {
             socket.on('adminAddError', (data: any) => {
@@ -86,6 +100,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                     isClosable: true,
                     position: 'bottom-right'
                 });
+                props.setRender && props.setRender(!props.render);
             });
             socket.on('adminAdded', (data: any) => {
                 console.log('adminAdded', data);
@@ -97,6 +112,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                     isClosable: true,
                     position: 'bottom-right'
                 });
+                props.setRender && props.setRender(!props.render);
             });
             socket.on('userMuted', (data: any) => {
                 console.log('userMuted', data);
@@ -108,6 +124,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                     isClosable: true,
                     position: 'bottom-right'
                 });
+                props.setRender && props.setRender(!props.render);
             });
             socket.on('userMuteError', (data: any) => {
                 console.log('userMuteError', data);
@@ -119,6 +136,56 @@ const MemberInfo = (props: ChannelInfoProps) => {
                     isClosable: true,
                     position: 'bottom-right'
                 });
+                props.setRender && props.setRender(!props.render);
+            });
+            socket.on('userKicked', (data: any) => {
+                console.log('userKicked', data);
+                toast({
+                    title: 'success',
+                    description: data,
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                props.setRender && props.setRender(!props.render);
+            });
+            socket.on('userKickError', (data: any) => {
+                console.log('userKickError', data);
+                toast({
+                    title: 'Error',
+                    description: data,
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                // props.setRender && props.setRender(!props.render);
+            });
+
+            socket.on('userUnmuted', (data: any) => {
+                console.log('userUnMuted', data);
+                toast({
+                    title: 'success',
+                    description: data,
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                props.setRender && props.setRender(!props.render);
+            });
+            socket.on('userUnmuteError', (data: any) => {
+                console.log('userUnmuteError', data);
+                toast({
+                    title: 'Error',
+                    description: data,
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                props.setRender && props.setRender(!props.render);
             });
         }, 500);
 
@@ -209,27 +276,54 @@ const MemberInfo = (props: ChannelInfoProps) => {
                                         icon={<BsVolumeMuteFill />}
                                         onClick={onOpen2}
                                     >
-                                        {mute ? 'Unmute' : 'Mute'}
+                                        {props.ChannelDm?.muted?.some(
+                                            (muted) =>
+                                                muted.id ===
+                                                props.participant?.id
+                                        )
+                                            ? 'Unmute'
+                                            : 'Mute'}
                                         <ModalConfirm
                                             isOpen={isOpen2}
                                             onClose={onClose2}
                                             onOpen={onOpen2}
                                             title={'Mute User'}
                                             body={
-                                                'Are you sure you want to mute this user?'
+                                                props.ChannelDm?.muted?.some(
+                                                    (muted) =>
+                                                        muted.id ===
+                                                        props.participant?.id
+                                                )
+                                                    ? 'Are you sure you want to unmute this user?'
+                                                    : 'Are you sure you want to mute this user?'
                                             }
                                             handleBlockedUser={
-                                                mute
-                                                    ? handleMuteUser
-                                                    : handleUnMuteUser
+                                                props.ChannelDm?.muted?.some(
+                                                    (muted) =>
+                                                        muted.id ===
+                                                        props.participant?.id
+                                                )
+                                                    ? handleUnMuteUser
+                                                    : handleMuteUser
                                             }
                                         />
                                     </MenuItem>
                                     <MenuItem
                                         bg={'none'}
                                         icon={<BsPersonXFill />}
+                                        onClick={onOpen3}
                                     >
                                         Kick
+                                        <ModalConfirm
+                                            isOpen={isOpen3}
+                                            onClose={onClose3}
+                                            onOpen={onOpen3}
+                                            title={'Kick User'}
+                                            body={
+                                                'Are you sure you want to kick this user?'
+                                            }
+                                            handleBlockedUser={handleKickUser}
+                                        />
                                     </MenuItem>
                                     <MenuItem
                                         bg={'none'}
