@@ -1,14 +1,20 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'nestjs-zod/z';
 
-export const UsernameSchema = z.object({
-  username: z
+export const nameSchema = z.object({
+  name: z.string().trim().min(1, { message: 'Required' }).describe('name'),
+});
+
+export const roomSchema = z.object({
+  name: z.string().trim().min(1, { message: 'Required' }).describe('name'),
+  password: z
     .string()
     .trim()
     .min(1, { message: 'Required' })
-    .describe('Username'),
+    .describe('name')
+    .optional(),
+  type: z.enum(['public', 'private', 'protected']),
 });
-
 export const changePasswordSchema = z
   .object({
     oldPassword: z
@@ -32,8 +38,10 @@ export const changePasswordSchema = z
     path: ['newPasswordConfirm'],
   });
 
-export class UsernameDto extends createZodDto(UsernameSchema) {}
+export class NameDto extends createZodDto(nameSchema) {}
 export class ChangePasswordDto extends createZodDto(changePasswordSchema) {}
+export class RoomDto extends createZodDto(roomSchema) {}
 
-export type TUsername = z.infer<typeof UsernameSchema>;
+export type Tname = z.infer<typeof nameSchema>;
 export type TChangePassword = z.infer<typeof changePasswordSchema>;
+export type Troom = z.infer<typeof roomSchema>;

@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -20,6 +21,8 @@ import { User } from '@prisma/client';
 import { FriendsService } from './friends.service';
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UseZodGuard } from 'nestjs-zod';
+import { NameDto, RoomDto, TRoom, Tname } from 'src/dto';
 
 ApiTags('Chat');
 @Controller('chat')
@@ -119,5 +122,24 @@ export class ChatController {
       request.user,
       channelName,
     );
+  }
+  @UseZodGuard('body', NameDto)
+  @Post('change-channel-name/:channelName')
+  async changeChannelName(
+    @Req() request: { user: User },
+    @Body() dto: Tname,
+    @Param('channelName') channelName: string,
+  ) {
+    return await this.channelService.changeChannelName(
+      channelName,
+      dto.name,
+      request.user,
+    );
+  }
+
+  @UseZodGuard('body', RoomDto)
+  @Post('change-channel-type/')
+  async changeChannelType(@Req() request: { user: User }, @Body() dto: TRoom) {
+    return await this.channelService.changeChannelType(dto, request.user);
   }
 }
