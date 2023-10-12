@@ -110,7 +110,7 @@ export async function StartGameEventRobot(
   const room = new Room(Math.random().toString(36).substring(7));
   rooms.set(room.roomName, room);
   console.log('new room created with name ', room.roomName);
-  const playerNumber = activeSockets.get(client).id;
+  const playerNumber = 1;
   const player = new Player(playerNumber, client, otherpadd, room.roomName, 0);
   const robotUser = await prisma.user.findUnique({
     where: {
