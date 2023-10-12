@@ -15,6 +15,15 @@ export const roomSchema = z.object({
     .optional(),
   type: z.enum(['public', 'private', 'protected']),
 });
+
+export const adminSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: 'Required' })
+    .describe('channel name'),
+  admin: z.string().trim().min(8, { message: 'Required' }).describe('admin'),
+});
 export const changePasswordSchema = z
   .object({
     oldPassword: z
@@ -41,7 +50,9 @@ export const changePasswordSchema = z
 export class NameDto extends createZodDto(nameSchema) {}
 export class ChangePasswordDto extends createZodDto(changePasswordSchema) {}
 export class RoomDto extends createZodDto(roomSchema) {}
+export class AdminDto extends createZodDto(adminSchema) {}
 
 export type Tname = z.infer<typeof nameSchema>;
 export type TChangePassword = z.infer<typeof changePasswordSchema>;
 export type Troom = z.infer<typeof roomSchema>;
+export type Tadmin = z.infer<typeof adminSchema>;
