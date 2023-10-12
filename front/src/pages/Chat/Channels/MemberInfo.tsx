@@ -62,6 +62,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
         onClose();
     };
     const handleMuteUser = () => {
+        console.log('mute user logic', props.room?.muted[0]);
         socket.emit('muteUser', {
             room: props.ChannelDm?.name,
             target: props.participant?.username
@@ -128,6 +129,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
             });
             socket.on('userMuteError', (data: any) => {
                 console.log('userMuteError', data);
+                console.log('mute usererror logic', props.room?.name);
                 toast({
                     title: 'Error',
                     description: data,
@@ -193,7 +195,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
             clearTimeout(timer);
         };
     }, []);
-
+    console.log('ROOMMMMMMM', props.room);
     return (
         <Flex bg={'#F5F5F5'} p={'10px'} marginBottom={8} marginTop={-6}>
             <Box w={'90%'}>
@@ -241,8 +243,8 @@ const MemberInfo = (props: ChannelInfoProps) => {
                             borderRadius={20}
                             marginTop={-25}
                         >
-                            {props.user?.id === props.ChannelDm?.ownerId &&
-                            !props.ChannelDm?.admins?.some(
+                            {props.user?.id === props.room?.ownerId &&
+                            !props.room?.admins?.some(
                                 (admin) => admin.id === props.participant?.id
                             ) ? (
                                 <MenuItem
@@ -265,18 +267,17 @@ const MemberInfo = (props: ChannelInfoProps) => {
                                 </MenuItem>
                             ) : null}
                             {props.user &&
-                            props.ChannelDm?.admins?.some(
+                            props.room?.admins?.some(
                                 (admin) => admin.id === props.user?.id
                             ) &&
-                            props.ChannelDm?.ownerId !==
-                                props.participant?.id ? (
+                            props.room?.ownerId !== props.participant?.id ? (
                                 <Box>
                                     <MenuItem
                                         bg={'none'}
                                         icon={<BsVolumeMuteFill />}
                                         onClick={onOpen2}
                                     >
-                                        {props.ChannelDm?.muted?.some(
+                                        {props.room?.muted.some(
                                             (muted) =>
                                                 muted.id ===
                                                 props.participant?.id
@@ -289,7 +290,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                                             onOpen={onOpen2}
                                             title={'Mute User'}
                                             body={
-                                                props.ChannelDm?.muted?.some(
+                                                props.room?.muted?.some(
                                                     (muted) =>
                                                         muted.id ===
                                                         props.participant?.id
@@ -298,7 +299,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                                                     : 'Are you sure you want to mute this user?'
                                             }
                                             handleBlockedUser={
-                                                props.ChannelDm?.muted?.some(
+                                                props.room?.muted?.some(
                                                     (muted) =>
                                                         muted.id ===
                                                         props.participant?.id
