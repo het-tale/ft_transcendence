@@ -4,10 +4,15 @@ import * as argon from 'argon2';
 import { Invitation, Message, User } from '@prisma/client';
 import { Server } from 'socket.io';
 import { ConfigService } from '@nestjs/config';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class ChannelService {
-  constructor(private prisma: PrismaService, private config: ConfigService) {}
+  constructor(
+    private prisma: PrismaService,
+    private config: ConfigService,
+    private cloud: CloudinaryService,
+  ) {}
   async getChannelMessages(channelName: string, user: User) {
     const actualUser = await this.prisma.user.findUnique({
       where: {
@@ -1103,5 +1108,35 @@ export class ChannelService {
     );
 
     return recipients;
+  }
+  async uploadAvatar(
+    file: Express.Multer.File,
+    user: User,
+    channelName: string,
+  ) {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: {
+        admins: true,
+      },
+    });
+    if (!channel) {
+      throw new Error('channel not found');
+    }
+    const isAdmin = channel.admins.some((admin) => admin.id === user.id);
+    if (!isAdmin) {
+      throw new Error('user is not an admin');
+    }
+    const avatar = await this.cloud.uploadFile(file);
+    await this.prisma.channel.update({
+      where: {
+        name: channelName,
+      },
+      data: {
+        avatar,
+      },
+    });
   }
 }

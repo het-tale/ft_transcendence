@@ -1,4 +1,16 @@
-import { Controller, Delete, Get, Param, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { DMService } from './dm.service';
 import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
 import { EmailConfirmationGuard } from 'src/guards/email-confirmation.guard';
@@ -7,6 +19,7 @@ import { ChannelService } from './channel.service';
 import { User } from '@prisma/client';
 import { FriendsService } from './friends.service';
 import { ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 ApiTags('Chat');
 @Controller('chat')
@@ -86,5 +99,25 @@ export class ChatController {
   @Get('browse-channels-list')
   async getBrowseChannelsList(@Req() request: { user: User }) {
     return await this.channelService.getBrowseChannelsList(request.user);
+  }
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('channel-avatar/:channelName')
+  async uploadAvatar(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('channelName') channelName: string,
+    @Req() request: { user: User },
+  ) {
+    if (!file || !file.originalname) {
+      throw new HttpException(
+        'Please provide a file named "file" in the request.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.channelService.uploadAvatar(
+      file,
+      request.user,
+      channelName,
+    );
   }
 }
