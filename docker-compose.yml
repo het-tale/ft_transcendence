@@ -40,10 +40,14 @@ services:
     env_file:
       - .env
 
-  adminer:
-    image: adminer
-    container_name: my_adminer_container
+  prisma_studio:
+    build:
+      context: .
+      dockerfile: ./database/Dockerfile  
+    container_name: prisma_container
+    env_file:
+      - .env
     ports:
-      - "8080:8080"
+      - "5555:5555"  
     depends_on:
       - my_database
