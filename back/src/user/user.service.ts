@@ -16,6 +16,7 @@ export class UserService {
         createdAt: true,
         updatedAt: true,
         status: true,
+        blocked: true,
       },
     });
     if (!user) {
@@ -24,4 +25,5 @@ export class UserService {
 
     return user;
   }
+
 }

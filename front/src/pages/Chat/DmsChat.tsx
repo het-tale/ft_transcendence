@@ -63,7 +63,7 @@ const DmsChat = (props: any) => {
         }
 
         fetchUserData();
-    }, []);
+    }, [props.render]);
     const [dms, setDms] = React.useState<UserType[]>([]);
     const socket = React.useContext(SocketContext);
     const [messages, setMessages] = React.useState<MessageType[]>([]);
@@ -254,7 +254,11 @@ const DmsChat = (props: any) => {
                             icon={<BsPersonFillSlash />}
                             onClick={onOpen}
                         >
-                            {blocked ? 'Unblock' : 'Block'}
+                            {user?.blocked.some(
+                                (user) => user.id === props.userDm?.id
+                            )
+                                ? 'Unblock'
+                                : 'Block'}
                             <ModalConfirm
                                 isOpen={isOpen}
                                 onOpen={onOpen}
@@ -265,12 +269,16 @@ const DmsChat = (props: any) => {
                                 setBlocked={setBlocked}
                                 socket={socket}
                                 handleBlockedUser={
-                                    blocked
+                                    user?.blocked.some(
+                                        (user) => user.id === props.userDm?.id
+                                    )
                                         ? handleUnblockUser
                                         : handleBlockedUser
                                 }
                                 body={
-                                    blocked
+                                    user?.blocked.some(
+                                        (user) => user.id === props.userDm?.id
+                                    )
                                         ? 'Are you sure you want to unblock this user?'
                                         : 'Are you sure you want to block this user?'
                                 }
