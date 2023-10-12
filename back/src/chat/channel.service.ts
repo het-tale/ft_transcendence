@@ -55,6 +55,34 @@ export class ChannelService {
 
     return messages;
   }
+
+  async getChannel(channelName: string, user:User)
+  {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: {
+        participants: true,
+        muted: true,
+        admins: true,
+        banned: true,
+        owner: true,
+      },
+    });
+    if (!channel)
+      throw new HttpException('channel not found', HttpStatus.NOT_FOUND);
+    const isParticipant = channel.participants.some(
+      (participant) => participant.id === user.id,
+    );
+    if (!isParticipant) {
+      throw new HttpException(
+        'user is not a participant',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return channel;
+  }
   async getOfflineInvitations(userId: number) {
     const invitations = await this.prisma.invitation.findMany({
       where: {

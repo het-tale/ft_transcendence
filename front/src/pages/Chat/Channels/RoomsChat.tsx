@@ -34,6 +34,7 @@ import User from '../../../components/User';
 import { MessageType } from '../../../Types/Message';
 import GetChannelMessages from './GetChannelMessages';
 import ChannelInfo from './ChannelInfo';
+import Room from './Channel';
 
 export interface RoomsChatProps {
     handleRenderActions: () => void;
@@ -44,6 +45,7 @@ export interface RoomsChatProps {
 
 const RoomsChat = (props: RoomsChatProps) => {
     const [user, setUser] = React.useState<UserType>();
+    const [room, setRoom] = React.useState<Channel>();
     const [messages, setMessages] = React.useState<MessageType[]>([]);
     const [showChannelInfo, setShowChannelInfo] =
         React.useState<boolean>(false);
@@ -62,6 +64,13 @@ const RoomsChat = (props: RoomsChatProps) => {
               })
             : null;
     }, [props.render, props.channelDm]);
+    useEffect(() => {
+        async function fetchRoomData() {
+            const roomData = await Room(props.channelDm?.name);
+            setRoom(roomData);
+        }
+        fetchRoomData();
+    }, [props.render]);
     if (!props.channelDm) return <></>;
     return (
         <Flex flexDirection={'row'}>
@@ -161,6 +170,8 @@ const RoomsChat = (props: RoomsChatProps) => {
                         user={user}
                         render={props.render}
                         setRender={props.setRender}
+                        room={room}
+                        setRoom={setRoom}
                     />
                 </div>
             ) : null}

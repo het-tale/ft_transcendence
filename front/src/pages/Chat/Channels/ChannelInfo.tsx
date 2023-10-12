@@ -32,9 +32,10 @@ import MessageUser from '../MessageUser';
 import { Channel } from '../../../Types/Channel';
 import MemberInfo from './MemberInfo';
 import { UserType } from '../../../Types/User';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SocketContext } from '../../../socket';
 import ModalConfirm from '../ModalConfirm';
+import Room from './Channel';
 
 export interface ChannelInfoProps {
     ChannelDm?: Channel;
@@ -42,11 +43,14 @@ export interface ChannelInfoProps {
     participant?: UserType;
     render?: boolean;
     setRender?: React.Dispatch<React.SetStateAction<boolean>>;
+    room?: Channel;
+    setRoom?: React.Dispatch<React.SetStateAction<Channel | undefined>>;
 }
 
 const ChannelInfo = (props: ChannelInfoProps) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const socket = React.useContext(SocketContext);
+    const [room, setRoom] = React.useState<Channel>();
     const handleLeaveChannel = (id: number | undefined) => {
         console.log('Hello From Leave Channel');
         socket.emit('leaveRoom', {
@@ -55,6 +59,13 @@ const ChannelInfo = (props: ChannelInfoProps) => {
         });
         props.setRender && props.setRender(!props.render);
     };
+    // useEffect(() => {
+    //     async function fetchRoomData() {
+    //         const roomData = await Room(props.ChannelDm?.name);
+    //         setRoom(roomData);
+    //     }
+    //     fetchRoomData();
+    // }, [props.render]);
     return (
         <div>
             <Card maxW="md" marginBottom={2}>
@@ -104,12 +115,10 @@ const ChannelInfo = (props: ChannelInfoProps) => {
 
             <Card maxW="md">
                 <CardHeader>
-                    <Text>
-                        {props.ChannelDm?.participants?.length} Participants
-                    </Text>
+                    <Text>{props.room?.participants?.length} Participants</Text>
                 </CardHeader>
                 <CardBody>
-                    {props.ChannelDm?.participants?.map((participant) => (
+                    {props.room?.participants?.map((participant) => (
                         <MemberInfo
                             key={participant.id}
                             ChannelDm={props.ChannelDm}
@@ -117,6 +126,8 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                             participant={participant}
                             render={props.render}
                             setRender={props.setRender}
+                            room={props.room}
+                            setRoom={props.setRoom}
                         />
                     ))}
                 </CardBody>
