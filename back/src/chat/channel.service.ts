@@ -524,6 +524,16 @@ export class ChannelService {
             id: user.id,
           },
         },
+        muted: {
+          disconnect: {
+            id: user.id,
+          },
+        },
+        banned: {
+          disconnect: {
+            id: user.id,
+          },
+        },
       },
     });
   }
@@ -568,6 +578,16 @@ export class ChannelService {
       },
       data: {
         participants: {
+          disconnect: {
+            id: kicked.id,
+          },
+        },
+        muted: {
+          disconnect: {
+            id: kicked.id,
+          },
+        },
+        banned: {
           disconnect: {
             id: kicked.id,
           },
@@ -960,7 +980,7 @@ export class ChannelService {
         const user = connected.find(
           (user) => user.username === participant.username,
         );
-        const socket = io.of('/').sockets[user.clientId];
+        const socket = io.of('/chat').sockets[user.clientId];
         if (user) {
           socket.leave(channelName);
         } else {
