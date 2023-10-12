@@ -57,9 +57,13 @@ export class ChatGateway
       const offlineKickedChannels =
         await this.channelService.getOfflineKickedChannels(user.id);
       if (offlineKickedChannels.length > 0) {
-        const socket = this.io.sockets[client.id];
+        const sockets = await this.io.in(client.id).fetchSockets();
         offlineKickedChannels.forEach((channel) => {
-          socket.leave(channel.name);
+          if (sockets) {
+            sockets.forEach((socket) => {
+              socket.leave(channel.name);
+            });
+          }
         });
         this.channelService.deleteEmptyChannels(offlineKickedChannels);
       }
@@ -351,8 +355,12 @@ export class ChatGateway
         isOnline,
       );
       if (kickedUser) {
-        const socket = this.io.sockets[kickedUser.clientId];
-        socket.leave(data.room);
+        const sockets = await this.io.in(client.id).fetchSockets();
+        if (sockets) {
+          sockets.forEach((socket) => {
+            socket.leave(data.room);
+          });
+        }
       }
       this.io.to(data.room).emit('userKicked', `${data.target} kicked`);
     } catch (err) {
@@ -399,8 +407,12 @@ export class ChatGateway
         isOnline,
       );
       if (bannedUser) {
-        const socket = this.io.sockets[bannedUser.clientId];
-        socket.leave(data.room);
+        const sockets = await this.io.in(client.id).fetchSockets();
+        if (sockets) {
+          sockets.forEach((socket) => {
+            socket.leave(data.room);
+          });
+        }
       }
       this.io.to(data.room).emit('userBanned', `${data.target} banned`);
     } catch (err) {
