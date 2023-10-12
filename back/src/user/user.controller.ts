@@ -19,12 +19,7 @@ import { TwoFaVerificationGuard } from 'src/guards/two-fa-verification.guard';
 import { User } from '@prisma/client';
 import { SecurityService } from 'src/auth/security.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-  ChangePasswordDto,
-  TChangePassword,
-  TUsername,
-  UsernameDto,
-} from 'src/dto';
+import { ChangePasswordDto, TChangePassword, Tname, NameDto } from 'src/dto';
 import { UseZodGuard } from 'nestjs-zod';
 
 @ApiTags('User')
@@ -72,10 +67,10 @@ export class UserController {
     return this.authService.uploadAvatar(file, request.user);
   }
 
-  @UseZodGuard('body', UsernameDto)
+  @UseZodGuard('body', NameDto)
   @Post('change-username')
-  async changeUsername(@Req() request: { user: User }, @Body() dto: TUsername) {
-    return this.userService.changeUsername(dto.username, request.user);
+  async changeUsername(@Req() request: { user: User }, @Body() dto: Tname) {
+    return this.userService.changeUsername(dto.name, request.user);
   }
 
   @UseZodGuard('body', ChangePasswordDto)

@@ -5,6 +5,7 @@ import { Invitation, Message, User } from '@prisma/client';
 import { Server } from 'socket.io';
 import { ConfigService } from '@nestjs/config';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Troom } from 'src/dto';
 
 @Injectable()
 export class ChannelService {
@@ -641,9 +642,8 @@ export class ChannelService {
     if (!adder || !newAdmin || !channel) {
       throw new Error('user or channel not found');
     }
-    const isAdderAdmin = channel.admins.some((admin) => admin.id === adder.id);
-    if (!isAdderAdmin) {
-      throw new Error('user is not an admin');
+    if (channel.ownerId !== adder.id) {
+      throw new Error('user is not the owner');
     }
     const isAdmin = channel.admins.some((admin) => admin.id === newAdmin.id);
     if (isAdmin) throw new Error('user is already admin');
@@ -1136,6 +1136,58 @@ export class ChannelService {
       },
       data: {
         avatar,
+      },
+    });
+  }
+  async changeChannelName(oldName: string, newName: string, user: User) {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: oldName,
+      },
+      include: {
+        admins: true,
+      },
+    });
+    if (!channel) {
+      throw new Error('channel not found');
+    }
+    const isAdmin = channel.admins.some((admin) => admin.id === user.id);
+    if (!isAdmin) {
+      throw new Error('user is not an admin');
+    }
+    await this.prisma.channel.update({
+      where: {
+        name: oldName,
+      },
+      data: {
+        name: newName,
+      },
+    });
+  }
+  async changeChannelType(dto: Troom, user: User) {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: dto.name,
+      },
+    });
+    if (!channel) {
+      throw new Error('channel not found');
+    }
+    if (channel.type === dto.type)
+      throw new HttpException(`channel is already ${dto.type}`, 400);
+    if (channel.ownerId !== user.id)
+      throw new HttpException('user is not the owner', 400);
+    if (dto.type === 'protected' && dto.password === null)
+      throw new HttpException('password is required', 400);
+    let hash = null;
+    if (dto.type == 'protected') hash = await argon.hash(dto.password);
+    await this.prisma.channel.update({
+      where: {
+        name: dto.name,
+      },
+      data: {
+        type: dto.type,
+        hash,
       },
     });
   }
