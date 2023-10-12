@@ -873,6 +873,13 @@ export class ChannelService {
             avatar: true,
           },
         },
+        muted: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
         updatedAt: true,
       },
     });
