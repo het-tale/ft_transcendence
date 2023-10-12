@@ -4,10 +4,16 @@ import * as argon from 'argon2';
 import { Invitation, Message, User } from '@prisma/client';
 import { Server } from 'socket.io';
 import { ConfigService } from '@nestjs/config';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Tadmin, Troom } from 'src/dto';
 
 @Injectable()
 export class ChannelService {
-  constructor(private prisma: PrismaService, private config: ConfigService) {}
+  constructor(
+    private prisma: PrismaService,
+    private config: ConfigService,
+    private cloud: CloudinaryService,
+  ) {}
   async getChannelMessages(channelName: string, user: User) {
     const actualUser = await this.prisma.user.findUnique({
       where: {
@@ -524,6 +530,16 @@ export class ChannelService {
             id: user.id,
           },
         },
+        muted: {
+          disconnect: {
+            id: user.id,
+          },
+        },
+        banned: {
+          disconnect: {
+            id: user.id,
+          },
+        },
       },
     });
   }
@@ -572,6 +588,16 @@ export class ChannelService {
             id: kicked.id,
           },
         },
+        muted: {
+          disconnect: {
+            id: kicked.id,
+          },
+        },
+        banned: {
+          disconnect: {
+            id: kicked.id,
+          },
+        },
       },
     });
     if (!isOnline) {
@@ -616,9 +642,8 @@ export class ChannelService {
     if (!adder || !newAdmin || !channel) {
       throw new Error('user or channel not found');
     }
-    const isAdderAdmin = channel.admins.some((admin) => admin.id === adder.id);
-    if (!isAdderAdmin) {
-      throw new Error('user is not an admin');
+    if (channel.ownerId !== adder.id) {
+      throw new Error('user is not the owner');
     }
     const isAdmin = channel.admins.some((admin) => admin.id === newAdmin.id);
     if (isAdmin) throw new Error('user is already admin');
@@ -960,7 +985,7 @@ export class ChannelService {
         const user = connected.find(
           (user) => user.username === participant.username,
         );
-        const socket = io.of('/').sockets[user.clientId];
+        const socket = io.of('/chat').sockets[user.clientId];
         if (user) {
           socket.leave(channelName);
         } else {
@@ -1083,5 +1108,120 @@ export class ChannelService {
     );
 
     return recipients;
+  }
+  async uploadAvatar(
+    file: Express.Multer.File,
+    user: User,
+    channelName: string,
+  ) {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: {
+        admins: true,
+      },
+    });
+    if (!channel) {
+      throw new Error('channel not found');
+    }
+    const isAdmin = channel.admins.some((admin) => admin.id === user.id);
+    if (!isAdmin) {
+      throw new Error('user is not an admin');
+    }
+    const avatar = await this.cloud.uploadFile(file);
+    await this.prisma.channel.update({
+      where: {
+        name: channelName,
+      },
+      data: {
+        avatar,
+      },
+    });
+  }
+  async changeChannelName(oldName: string, newName: string, user: User) {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: oldName,
+      },
+      include: {
+        admins: true,
+      },
+    });
+    if (!channel) {
+      throw new Error('channel not found');
+    }
+    const isAdmin = channel.admins.some((admin) => admin.id === user.id);
+    if (!isAdmin) {
+      throw new Error('user is not an admin');
+    }
+    await this.prisma.channel.update({
+      where: {
+        name: oldName,
+      },
+      data: {
+        name: newName,
+      },
+    });
+  }
+  async changeChannelType(dto: Troom, user: User) {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: dto.name,
+      },
+    });
+    if (!channel) {
+      throw new Error('channel not found');
+    }
+    if (channel.type === dto.type)
+      throw new HttpException(`channel is already ${dto.type}`, 400);
+    if (channel.ownerId !== user.id)
+      throw new HttpException('user is not the owner', 400);
+    if (dto.type === 'protected' && dto.password === null)
+      throw new HttpException('password is required', 400);
+    let hash = null;
+    if (dto.type == 'protected') hash = await argon.hash(dto.password);
+    await this.prisma.channel.update({
+      where: {
+        name: dto.name,
+      },
+      data: {
+        type: dto.type,
+        hash,
+      },
+    });
+  }
+  async removeAdmin(user: User, dto: Tadmin) {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: dto.name,
+      },
+      include: {
+        admins: true,
+      },
+    });
+    if (!channel) {
+      throw new Error('channel not found');
+    }
+    if (channel.ownerId !== user.id)
+      throw new HttpException('user is not the owner', 400);
+    const isAdmin = channel.admins.some(
+      (admin) => admin.username === dto.admin,
+    );
+    if (!isAdmin) {
+      throw new Error('user provided is not an admin');
+    }
+    await this.prisma.channel.update({
+      where: {
+        name: dto.name,
+      },
+      data: {
+        admins: {
+          disconnect: {
+            username: dto.admin,
+          },
+        },
+      },
+    });
   }
 }
