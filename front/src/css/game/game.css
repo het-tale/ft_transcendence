@@ -73,9 +73,9 @@
 
 .ball {
     position: absolute;
-    width: 10px;
-    height: 10px;
-    background-color: rgb(222, 214, 214); /* Color of the ball */
+    width: 15px;
+    height: 15px;
+    background-color: rgb(170, 251, 57); /* Color of the ball */
     border-radius: 50%; /* Make the ball round */
 }
 
