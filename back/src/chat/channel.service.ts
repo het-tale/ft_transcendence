@@ -1036,7 +1036,6 @@ export class ChannelService {
       },
       data: {
         isDeleted: true,
-        name: null,
       },
     });
     await Promise.all(
@@ -1274,14 +1273,24 @@ export class ChannelService {
     if (!channel) {
       throw new Error('channel not found');
     }
-    if (channel.type === dto.type)
-      throw new HttpException(`channel is already ${dto.type}`, 400);
     if (channel.ownerId !== user.id)
       throw new HttpException('user is not the owner', 400);
-    if (dto.type === 'protected' && dto.password === null)
+    if (
+      dto.type === 'protected' &&
+      (dto.password === undefined || dto.password === null)
+    )
       throw new HttpException('password is required', 400);
     let hash = null;
-    if (dto.type == 'protected') hash = await argon.hash(dto.password);
+    if (dto.type === 'protected') {
+      if (channel.type === 'protected') {
+        console.log(channel.hash);
+        if (channel.hash !== null) {
+          const isSame = await argon.verify(channel.hash, dto.password);
+          if (isSame) throw new HttpException('same password', 400);
+        }
+        hash = await argon.hash(dto.password);
+      }
+    }
     await this.prisma.channel.update({
       where: {
         name: dto.name,
