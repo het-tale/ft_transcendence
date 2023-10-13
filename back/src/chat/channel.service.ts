@@ -1275,6 +1275,7 @@ export class ChannelService {
     }
     if (channel.ownerId !== user.id)
       throw new HttpException('user is not the owner', 400);
+    console.log(dto);
     if (
       dto.type === 'protected' &&
       (dto.password === undefined || dto.password === null)
@@ -1288,8 +1289,8 @@ export class ChannelService {
           const isSame = await argon.verify(channel.hash, dto.password);
           if (isSame) throw new HttpException('same password', 400);
         }
-        hash = await argon.hash(dto.password);
       }
+      hash = await argon.hash(dto.password);
     }
     await this.prisma.channel.update({
       where: {
