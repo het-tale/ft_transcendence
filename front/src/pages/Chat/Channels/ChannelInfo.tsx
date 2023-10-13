@@ -41,6 +41,8 @@ import ModalUi from '../../../components/ModalUi';
 import BodySetOwnerModal from './BodySetOwnerModal';
 import ChangeChannelNameModal from './ChangeChannelNameModal';
 import ChangeChannelAvatarModal from './ChangeChannelAvatarModal';
+import ChangeChannelTypeModal from './ChangeChannelTypeModal';
+import BannedMemberInfo from './BannedMemberInfo';
 
 export interface ChannelInfoProps {
     ChannelDm?: Channel;
@@ -63,6 +65,11 @@ const ChannelInfo = (props: ChannelInfoProps) => {
         isOpen: isOpen3,
         onOpen: onOpen3,
         onClose: onClose3
+    } = useDisclosure();
+    const {
+        isOpen: isOpen4,
+        onOpen: onOpen4,
+        onClose: onClose4
     } = useDisclosure();
     const socket = React.useContext(SocketContext);
     const [room, setRoom] = React.useState<Channel>();
@@ -150,6 +157,42 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                             />
                         </Button>
                     </Flex>
+
+                    <Flex justifyContent={'space-between'} marginTop={2}>
+                        <Text
+                            textAlign={'center'}
+                            fontSize={16}
+                            fontFamily={'Krona One'}
+                            marginTop={2}
+                            color={'#a435f0'}
+                        >
+                            Change Channel Type
+                        </Text>
+                        <Button onClick={onOpen4}>
+                            <IconButton
+                                variant="ghost"
+                                colorScheme="gray"
+                                aria-label=""
+                                icon={<BsPencilFill />}
+                                color={'#a435f0'}
+                            />
+                            <ModalUi
+                                isOpen={isOpen4}
+                                onOpen={onOpen4}
+                                onClose={onClose4}
+                                title={'Change Channel Type'}
+                                body={
+                                    <ChangeChannelTypeModal
+                                        onClose={onClose4}
+                                        setRender={props.setRender}
+                                        render={props.render}
+                                        channelDm={props.room}
+                                        user={props.user}
+                                    />
+                                }
+                            />
+                        </Button>
+                    </Flex>
                 </CardBody>
                 <CardFooter
                     justify="space-between"
@@ -181,6 +224,23 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                     ))}
                 </CardBody>
             </Card>
+            {props.room?.banned && props.room?.banned?.length > 0 ? (
+                <Card maxW="md">
+                    <CardHeader>
+                        <Text>{props.room?.banned?.length} Banned Users</Text>
+                    </CardHeader>
+                    <CardBody>
+                        {props.room?.banned?.map((ban) => (
+                            <BannedMemberInfo
+                                bannedMember={ban}
+                                render={props.render}
+                                setRender={props.setRender}
+                                room={props.room}
+                            />
+                        ))}
+                    </CardBody>
+                </Card>
+            ) : null}
 
             <Card maxW="md">
                 <CardHeader>
@@ -195,7 +255,9 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                         <Button
                             style={{ background: 'none', color: 'red' }}
                             onClick={
-                                props.user?.id === props.ChannelDm?.ownerId
+                                props.user?.id === props.room?.ownerId &&
+                                props.room?.participants &&
+                                props.room?.participants?.length > 1
                                     ? onOpen
                                     : handleLeaveChannel
                             }
@@ -207,7 +269,7 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                                 title={'Set new Channel Owner'}
                                 body={
                                     <BodySetOwnerModal
-                                        channelDm={props.ChannelDm}
+                                        channelDm={props.room}
                                         user={props.user}
                                         render={props.render}
                                         setRender={props.setRender}
