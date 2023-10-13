@@ -82,10 +82,7 @@ export class ChatController {
     @Param('channelName') channelName: string,
     @Req() request: { user: User },
   ) {
-    return await this.channelService.getChannel(
-      channelName,
-      request.user,
-    );
+    return await this.channelService.getChannel(channelName, request.user);
   }
   @Get('friends')
   async getFriends(@Req() request: { user: User }) {

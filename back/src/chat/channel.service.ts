@@ -62,11 +62,11 @@ export class ChannelService {
     return messages;
   }
 
-  async getChannel(channelName: string, user:User)
-  {
+  async getChannel(channelName: string, user: User) {
     const channel = await this.prisma.channel.findUnique({
       where: {
         name: channelName,
+        isDeleted: false,
       },
       include: {
         participants: true,
@@ -87,6 +87,7 @@ export class ChannelService {
         HttpStatus.NOT_FOUND,
       );
     }
+
     return channel;
   }
   async getOfflineInvitations(userId: number) {
@@ -513,7 +514,8 @@ export class ChannelService {
     }
     const isOwner = channel.ownerId === user.id;
     console.log(channel.participants.length);
-    if (isOwner &&
+    if (
+      isOwner &&
       (data.newOwner === undefined || data.newOwner === null) &&
       channel.participants.length > 1
     ) {
@@ -527,6 +529,9 @@ export class ChannelService {
       });
       if (!newOwner) {
         throw new Error('new owner not found');
+      }
+      if (newOwner.id === user.id) {
+        throw new Error('new owner cannot be the same as the old one');
       }
       const ifNewOwnerIsParticipant = channel.participants.some(
         (participant) => participant.id === newOwner.id,
@@ -548,6 +553,15 @@ export class ChannelService {
         },
       });
     }
+    if (isOwner && channel.participants.length === 1) {
+      await this.prisma.channel.delete({
+        where: {
+          id: channel.id,
+        },
+      });
+
+      return;
+    }
     await this.prisma.channel.update({
       where: {
         name: data.room,
@@ -564,6 +578,11 @@ export class ChannelService {
           },
         },
         banned: {
+          disconnect: {
+            id: user.id,
+          },
+        },
+        admins: {
           disconnect: {
             id: user.id,
           },
@@ -722,11 +741,11 @@ export class ChannelService {
             id: target.id,
           },
         },
-        // participants: {
-        //   disconnect: {
-        //     id: target.id,
-        //   },
-        // },
+        participants: {
+          disconnect: {
+            id: target.id,
+          },
+        },
       },
     });
     if (!isOnline) {
@@ -771,9 +790,6 @@ export class ChannelService {
           muted: true,
         },
       });
-      console.log("channel name heree", channelName);
-      console.log("Banned Channel here", channel);
-      console.log("Banned target here", target);
       if (!channel || !client || !target) {
         throw new Error('channel not found or user not found');
       }
@@ -895,6 +911,7 @@ export class ChannelService {
   async getMyChannelsList(user: User) {
     const channels = await this.prisma.channel.findMany({
       where: {
+        isDeleted: false,
         participants: {
           some: {
             id: user.id,
@@ -955,6 +972,7 @@ export class ChannelService {
     //return all public or protected channels that the user is not in
     const channels = await this.prisma.channel.findMany({
       where: {
+        isDeleted: false,
         type: {
           in: ['public', 'protected'],
         },
@@ -1025,9 +1043,25 @@ export class ChannelService {
         const user = connected.find(
           (user) => user.username === participant.username,
         );
-        const socket = io.of('/chat').sockets[user.clientId];
         if (user) {
-          socket.leave(channelName);
+          const sockets = await io.in(user.clientId).fetchSockets();
+          if (sockets) {
+            sockets.forEach((socket) => {
+              socket.leave(channel.name);
+            });
+          }
+          await this.prisma.channel.update({
+            where: {
+              id: channel.id,
+            },
+            data: {
+              participants: {
+                disconnect: {
+                  id: participant.id,
+                },
+              },
+            },
+          });
         } else {
           await this.prisma.channel.update({
             where: {
@@ -1049,6 +1083,32 @@ export class ChannelService {
         }
       }),
     );
+  }
+  async deleteIfEmpty(channelName: string) {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: {
+        participants: true,
+        offlineKicked: true,
+      },
+    });
+    if (!channel) {
+      throw new Error('channel not found');
+    }
+    console.log(channel.participants.length, channel.offlineKicked.length);
+    if (
+      channel.participants.length === 0 &&
+      channel.isDeleted &&
+      channel.offlineKicked.length === 0
+    ) {
+      await this.prisma.channel.delete({
+        where: {
+          id: channel.id,
+        },
+      });
+    }
   }
   async getOfflineKickedChannels(userId: number) {
     return await this.prisma.channel.findMany({
@@ -1213,14 +1273,24 @@ export class ChannelService {
     if (!channel) {
       throw new Error('channel not found');
     }
-    if (channel.type === dto.type)
-      throw new HttpException(`channel is already ${dto.type}`, 400);
     if (channel.ownerId !== user.id)
       throw new HttpException('user is not the owner', 400);
-    if (dto.type === 'protected' && dto.password === null)
+    if (
+      dto.type === 'protected' &&
+      (dto.password === undefined || dto.password === null)
+    )
       throw new HttpException('password is required', 400);
     let hash = null;
-    if (dto.type == 'protected') hash = await argon.hash(dto.password);
+    if (dto.type === 'protected') {
+      if (channel.type === 'protected') {
+        console.log(channel.hash);
+        if (channel.hash !== null) {
+          const isSame = await argon.verify(channel.hash, dto.password);
+          if (isSame) throw new HttpException('same password', 400);
+        }
+        hash = await argon.hash(dto.password);
+      }
+    }
     await this.prisma.channel.update({
       where: {
         name: dto.name,
