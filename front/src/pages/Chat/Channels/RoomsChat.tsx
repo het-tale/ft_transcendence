@@ -35,6 +35,9 @@ import { MessageType } from '../../../Types/Message';
 import GetChannelMessages from './GetChannelMessages';
 import ChannelInfo from './ChannelInfo';
 import Room from './Channel';
+import { on } from 'events';
+import ModalUi from '../../../components/ModalUi';
+import InviteUsersModal from './InviteUsersModal';
 
 export interface RoomsChatProps {
     handleRenderActions: () => void;
@@ -49,6 +52,7 @@ const RoomsChat = (props: RoomsChatProps) => {
     const [user, setUser] = React.useState<UserType>();
     const [room, setRoom] = React.useState<Channel>();
     const [messages, setMessages] = React.useState<MessageType[]>([]);
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const [showChannelInfo, setShowChannelInfo] =
         React.useState<boolean>(false);
     useEffect(() => {
@@ -103,40 +107,71 @@ const RoomsChat = (props: RoomsChatProps) => {
                                     />
                                 </button>
                             </Box>
-                            <Menu>
-                                <MenuButton
-                                    as={IconButton}
-                                    aria-label="Options"
-                                    icon={
-                                        <BsThreeDots
-                                            color="#a435f0"
-                                            size={60}
-                                            transform="rotate(90)"
-                                        />
-                                    }
-                                    variant="outline"
-                                    bg={'#F5F5F5'}
-                                    h={100}
-                                />
-                                <MenuList
-                                    marginRight={0}
-                                    bg={'#c56af0'}
-                                    color={'white'}
-                                    w={250}
-                                    p={6}
-                                    fontFamily={'krona one'}
-                                    borderRadius={20}
-                                    marginTop={-25}
-                                >
-                                    <MenuItem
-                                        paddingBottom={2}
-                                        bg={'none'}
-                                        icon={<BsTrash />}
+                            {room.admins.some(
+                                (admin) => admin.id === user?.id
+                            ) ? (
+                                <Menu>
+                                    <MenuButton
+                                        as={IconButton}
+                                        aria-label="Options"
+                                        icon={
+                                            <BsThreeDots
+                                                color="#a435f0"
+                                                size={60}
+                                                transform="rotate(90)"
+                                            />
+                                        }
+                                        variant="outline"
+                                        bg={'#F5F5F5'}
+                                        h={100}
+                                    />
+                                    <MenuList
+                                        marginRight={0}
+                                        bg={'#c56af0'}
+                                        color={'white'}
+                                        w={250}
+                                        p={6}
+                                        fontFamily={'krona one'}
+                                        borderRadius={20}
+                                        marginTop={-25}
                                     >
-                                        Invite Users
-                                    </MenuItem>
-                                </MenuList>
-                            </Menu>
+                                        <MenuItem
+                                            paddingBottom={2}
+                                            bg={'none'}
+                                            icon={<BsTrash />}
+                                            onClick={onOpen}
+                                        >
+                                            <ModalUi
+                                                isOpen={isOpen}
+                                                onOpen={onOpen}
+                                                onClose={onClose}
+                                                title={'Invite new Users'}
+                                                body={
+                                                    <InviteUsersModal
+                                                        onClose={onClose}
+                                                        channelDm={room}
+                                                        user={user}
+                                                        render={props.render}
+                                                        setRender={
+                                                            props.setRender
+                                                        }
+                                                    />
+                                                }
+                                            />
+                                            Invite Users
+                                        </MenuItem>
+
+                                        {room?.ownerId === user?.id ? (
+                                            <MenuItem
+                                                bg={'none'}
+                                                icon={<BsBoxArrowLeft />}
+                                            >
+                                                Delete Channel
+                                            </MenuItem>
+                                        ) : null}
+                                    </MenuList>
+                                </Menu>
+                            ) : null}
                         </Flex>
                         <div
                             className="messagesContainer"
