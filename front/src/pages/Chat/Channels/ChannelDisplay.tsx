@@ -38,6 +38,7 @@ const ChannelDisplay = (props: ChannelDisplayProps) => {
             props.setChannelDm(props.roomDm);
             props.setUpdateRoomClass(props.id);
         }
+        props.setRender && props.setRender(!props.render);
     };
     return (
         <div>

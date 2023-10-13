@@ -26,7 +26,7 @@ export class UserController {
   constructor(private userService: UserService) {}
   @Get('me')
   me(@Req() request: { user: User }) {
-    return request.user;
+    return this.userService.getUserById(request.user.id);
   }
   @Get(':id')
   async getUserById(@Param('id') idString: string) {
