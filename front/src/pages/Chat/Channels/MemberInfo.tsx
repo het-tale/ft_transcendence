@@ -70,7 +70,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
         };
         console.log('remove admin logic');
         try {
-            const response = await client.post('chat/remove-admi', data, {
+            const response = await client.post('chat/remove-admin', data, {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
@@ -112,7 +112,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
     const handleKickUser = () => {
         console.log('kick user logic');
         socket.emit('kickUser', {
-            room: props.ChannelDm?.name,
+            room: props.room?.name,
             target: props.participant?.username
         });
         props.setRender && props.setRender(!props.render);

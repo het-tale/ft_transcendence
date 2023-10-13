@@ -901,6 +901,7 @@ export class ChannelService {
         updatedAt: 'desc',
       },
       select: {
+        id: true,
         name: true,
         avatar: true,
         type: true,

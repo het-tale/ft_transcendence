@@ -41,6 +41,8 @@ export interface RoomsChatProps {
     channelDm?: Channel;
     render: boolean;
     setRender: React.Dispatch<React.SetStateAction<boolean>>;
+    update: boolean;
+    setUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const RoomsChat = (props: RoomsChatProps) => {
@@ -70,100 +72,114 @@ const RoomsChat = (props: RoomsChatProps) => {
             setRoom(roomData);
         }
         fetchRoomData();
-    }, [props.render]);
+    }, [props.render, props.update, props.channelDm]);
+    console.log('THIS IS ROOM1', room);
+    console.log('THIS IS ROOM2', props.channelDm);
     if (!props.channelDm) return <></>;
     return (
         <Flex flexDirection={'row'}>
-            <Flex flexDirection={'column'} width={'100%'}>
-                <Flex>
-                    <Box width={'98%'}>
-                        <button
-                            onClick={props.handleRenderActions}
-                            style={{ background: 'transparent', width: '100%' }}
-                        >
-                            {props.channelDm ? (
-                                <ChannelDmInfo
-                                    profile={props.channelDm.avatar}
-                                    type={props.channelDm.type}
-                                    name={props.channelDm.name}
-                                    showChannelInfo={showChannelInfo}
-                                    setShowChannelInfo={setShowChannelInfo}
-                                    setRender={props.setRender}
-                                    render={props.render}
+            {room?.participants.some(
+                (participant) => participant.id === user?.id
+            ) ? (
+                <>
+                    <Flex flexDirection={'column'} width={'100%'}>
+                        <Flex>
+                            <Box width={'98%'}>
+                                <button
+                                    onClick={props.handleRenderActions}
+                                    style={{
+                                        background: 'transparent',
+                                        width: '100%'
+                                    }}
+                                >
+                                    <ChannelDmInfo
+                                        profile={props.channelDm.avatar}
+                                        type={props.channelDm.type}
+                                        name={props.channelDm.name}
+                                        showChannelInfo={showChannelInfo}
+                                        setShowChannelInfo={setShowChannelInfo}
+                                        setRender={props.setRender}
+                                        render={props.render}
+                                    />
+                                </button>
+                            </Box>
+                            <Menu>
+                                <MenuButton
+                                    as={IconButton}
+                                    aria-label="Options"
+                                    icon={
+                                        <BsThreeDots
+                                            color="#a435f0"
+                                            size={60}
+                                            transform="rotate(90)"
+                                        />
+                                    }
+                                    variant="outline"
+                                    bg={'#F5F5F5'}
+                                    h={100}
                                 />
-                            ) : (
-                                <></>
-                            )}
-                        </button>
-                    </Box>
-                    <Menu>
-                        <MenuButton
-                            as={IconButton}
-                            aria-label="Options"
-                            icon={
-                                <BsThreeDots
-                                    color="#a435f0"
-                                    size={60}
-                                    transform="rotate(90)"
-                                />
-                            }
-                            variant="outline"
-                            bg={'#F5F5F5'}
-                            h={100}
-                        />
-                        <MenuList
-                            marginRight={0}
-                            bg={'#c56af0'}
-                            color={'white'}
-                            w={250}
-                            p={6}
-                            fontFamily={'krona one'}
-                            borderRadius={20}
-                            marginTop={-25}
+                                <MenuList
+                                    marginRight={0}
+                                    bg={'#c56af0'}
+                                    color={'white'}
+                                    w={250}
+                                    p={6}
+                                    fontFamily={'krona one'}
+                                    borderRadius={20}
+                                    marginTop={-25}
+                                >
+                                    <MenuItem
+                                        paddingBottom={2}
+                                        bg={'none'}
+                                        icon={<BsTrash />}
+                                    >
+                                        Delete Chat
+                                    </MenuItem>
+                                    <MenuItem
+                                        bg={'none'}
+                                        icon={<BsBoxArrowLeft />}
+                                    >
+                                        Leave Chat
+                                    </MenuItem>
+                                </MenuList>
+                            </Menu>
+                        </Flex>
+                        <div
+                            className="messagesContainer"
+                            style={{ overflowY: 'auto' }}
                         >
-                            <MenuItem
-                                paddingBottom={2}
-                                bg={'none'}
-                                icon={<BsTrash />}
-                            >
-                                Delete Chat
-                            </MenuItem>
-                            <MenuItem bg={'none'} icon={<BsBoxArrowLeft />}>
-                                Leave Chat
-                            </MenuItem>
-                        </MenuList>
-                    </Menu>
-                </Flex>
-                <div
-                    className="messagesContainer"
-                    style={{ overflowY: 'auto' }}
-                >
-                    {messages?.map((message) => {
-                        return (
-                            <MessageContent
-                                key={message?.id}
-                                message={message?.content}
-                                name={
-                                    message?.senderId === user?.id
-                                        ? 'sender'
-                                        : 'receiver'
-                                }
-                                room={true}
-                                userSendId={message?.senderId}
+                            {messages?.map((message) => {
+                                return (
+                                    <MessageContent
+                                        key={message?.id}
+                                        message={message?.content}
+                                        name={
+                                            message?.senderId === user?.id
+                                                ? 'sender'
+                                                : 'receiver'
+                                        }
+                                        room={true}
+                                        userSendId={message?.senderId}
+                                    />
+                                );
+                            })}
+                        </div>
+                        <Box flex={1}>
+                            <ChannelTypingBar
+                                ChannelDm={props.channelDm}
+                                render={props.render}
+                                setRender={props.setRender}
+                                user={user}
                             />
-                        );
-                    })}
-                </div>
-                <Box flex={1}>
-                    <ChannelTypingBar
-                        ChannelDm={props.channelDm}
-                        render={props.render}
-                        setRender={props.setRender}
-                        user={user}
-                    />
-                </Box>
-            </Flex>
-            {showChannelInfo ? (
+                        </Box>
+                    </Flex>
+                </>
+            ) : (
+                <></>
+            )}
+            {room?.participants.some(
+                (participant) => participant.id === user?.id
+            ) && showChannelInfo ? (
                 <div className="container">
                     <ChannelInfo
                         ChannelDm={props.channelDm}
