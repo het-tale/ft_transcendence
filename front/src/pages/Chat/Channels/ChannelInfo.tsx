@@ -39,6 +39,8 @@ import Room from './Channel';
 import { on } from 'events';
 import ModalUi from '../../../components/ModalUi';
 import BodySetOwnerModal from './BodySetOwnerModal';
+import ChangeChannelNameModal from './ChangeChannelNameModal';
+import ChangeChannelAvatarModal from './ChangeChannelAvatarModal';
 
 export interface ChannelInfoProps {
     ChannelDm?: Channel;
@@ -52,6 +54,16 @@ export interface ChannelInfoProps {
 
 const ChannelInfo = (props: ChannelInfoProps) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const {
+        isOpen: isOpen2,
+        onOpen: onOpen2,
+        onClose: onClose2
+    } = useDisclosure();
+    const {
+        isOpen: isOpen3,
+        onOpen: onOpen3,
+        onClose: onClose3
+    } = useDisclosure();
     const socket = React.useContext(SocketContext);
     const [room, setRoom] = React.useState<Channel>();
     const handleLeaveChannel = () => {
@@ -60,6 +72,9 @@ const ChannelInfo = (props: ChannelInfoProps) => {
             room: props.ChannelDm?.name
         });
         props.setRender && props.setRender(!props.render);
+    };
+    const handleChangeAvatar = () => {
+        console.log('Hello From Change Avatar');
     };
 
     return (
@@ -70,14 +85,35 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                 </CardHeader>
                 <CardBody>
                     <Center>
-                        <Image
-                            objectFit="cover"
-                            src={props.ChannelDm?.avatar}
-                            alt="profile"
-                            borderRadius={'50%'}
-                            w={200}
-                            alignItems={'center'}
-                        />
+                        <Button
+                            onClick={onOpen3}
+                            backgroundColor={'transparent'}
+                            h={'150px'}
+                        >
+                            <Image
+                                objectFit="cover"
+                                src={props.ChannelDm?.avatar}
+                                alt="profile"
+                                borderRadius={'50%'}
+                                w={200}
+                                alignItems={'center'}
+                            />
+                            <ModalUi
+                                isOpen={isOpen3}
+                                onOpen={onOpen3}
+                                onClose={onClose3}
+                                title={'Change Channel Avatar'}
+                                body={
+                                    <ChangeChannelAvatarModal
+                                        onClose={onClose3}
+                                        setRender={props.setRender}
+                                        render={props.render}
+                                        channelDm={props.room}
+                                        user={props.user}
+                                    />
+                                }
+                            />
+                        </Button>
                     </Center>
                     <Flex justifyContent={'space-between'} marginTop={2}>
                         <Text
@@ -89,13 +125,30 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                         >
                             {props.ChannelDm?.name}
                         </Text>
-                        <IconButton
-                            variant="ghost"
-                            colorScheme="gray"
-                            aria-label=""
-                            icon={<BsPencilFill />}
-                            color={'#a435f0'}
-                        />
+                        <Button onClick={onOpen2}>
+                            <IconButton
+                                variant="ghost"
+                                colorScheme="gray"
+                                aria-label=""
+                                icon={<BsPencilFill />}
+                                color={'#a435f0'}
+                            />
+                            <ModalUi
+                                isOpen={isOpen2}
+                                onOpen={onOpen2}
+                                onClose={onClose2}
+                                title={'Change Channel Name'}
+                                body={
+                                    <ChangeChannelNameModal
+                                        onClose={onClose2}
+                                        setRender={props.setRender}
+                                        render={props.render}
+                                        channelDm={props.room}
+                                        user={props.user}
+                                    />
+                                }
+                            />
+                        </Button>
                     </Flex>
                 </CardBody>
                 <CardFooter
