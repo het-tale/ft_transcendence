@@ -17,7 +17,7 @@ interface deleteChannelProps {
     user?: UserType;
 }
 
-const InviteUsersModal = (props: deleteChannelProps) => {
+const DeletChannelModal = (props: deleteChannelProps) => {
     const socket = React.useContext(SocketContext);
     const toast = useToast();
     const { register, handleSubmit } = useForm<deleteChannel>();
@@ -69,4 +69,4 @@ const InviteUsersModal = (props: deleteChannelProps) => {
         </form>
     );
 };
-export default InviteUsersModal;
+export default DeletChannelModal;
