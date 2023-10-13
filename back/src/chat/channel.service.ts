@@ -61,6 +61,34 @@ export class ChannelService {
 
     return messages;
   }
+
+  async getChannel(channelName: string, user:User)
+  {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: {
+        participants: true,
+        muted: true,
+        admins: true,
+        banned: true,
+        owner: true,
+      },
+    });
+    if (!channel)
+      throw new HttpException('channel not found', HttpStatus.NOT_FOUND);
+    const isParticipant = channel.participants.some(
+      (participant) => participant.id === user.id,
+    );
+    if (!isParticipant) {
+      throw new HttpException(
+        'user is not a participant',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return channel;
+  }
   async getOfflineInvitations(userId: number) {
     const invitations = await this.prisma.invitation.findMany({
       where: {
@@ -485,7 +513,7 @@ export class ChannelService {
     }
     const isOwner = channel.ownerId === user.id;
     console.log(channel.participants.length);
-    if (
+    if (isOwner &&
       (data.newOwner === undefined || data.newOwner === null) &&
       channel.participants.length > 1
     ) {
@@ -666,6 +694,7 @@ export class ChannelService {
     bannedUsername: string,
     isOnline: boolean,
   ) {
+    console.log('First channel name', channelName);
     const { target, channel } = await this.checkInput(
       channelName,
       clientUsername,
@@ -693,11 +722,11 @@ export class ChannelService {
             id: target.id,
           },
         },
-        participants: {
-          disconnect: {
-            id: target.id,
-          },
-        },
+        // participants: {
+        //   disconnect: {
+        //     id: target.id,
+        //   },
+        // },
       },
     });
     if (!isOnline) {
@@ -716,8 +745,8 @@ export class ChannelService {
     }
   }
   async checkInput(
-    clientUsername: string,
     channelName: string,
+    clientUsername: string,
     targetUsername: string,
   ) {
     {
@@ -742,6 +771,9 @@ export class ChannelService {
           muted: true,
         },
       });
+      console.log("channel name heree", channelName);
+      console.log("Banned Channel here", channel);
+      console.log("Banned target here", target);
       if (!channel || !client || !target) {
         throw new Error('channel not found or user not found');
       }
@@ -760,8 +792,8 @@ export class ChannelService {
     isOnline: boolean,
   ) {
     const { target, channel } = await this.checkInput(
-      clientUsername,
       channelName,
+      clientUsername,
       targetUsername,
     );
     const isBanned = channel.banned.some(
@@ -873,6 +905,7 @@ export class ChannelService {
         updatedAt: 'desc',
       },
       select: {
+        id: true,
         name: true,
         avatar: true,
         type: true,
@@ -899,6 +932,13 @@ export class ChannelService {
           },
         },
         muted: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        banned: {
           select: {
             id: true,
             username: true,

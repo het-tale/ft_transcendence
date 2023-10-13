@@ -266,6 +266,7 @@ const Dms = (props: any) => {
                     {props.roomDms ? (
                         props.roomDms.length > 0 ? (
                             props.roomDms?.map((room: Channel) => {
+                                console.log('Room looop', room);
                                 return (
                                     <ChannelDisplay
                                         profile={room.avatar}
@@ -300,6 +301,8 @@ const Dms = (props: any) => {
                         channelDm={channelDm}
                         render={props.render}
                         setRender={props.setRender}
+                        update={props.update}
+                        setUpdate={props.setUpdate}
                     />
                 </>
             )
