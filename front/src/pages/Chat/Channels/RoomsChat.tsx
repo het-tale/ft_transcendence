@@ -133,13 +133,7 @@ const RoomsChat = (props: RoomsChatProps) => {
                                         bg={'none'}
                                         icon={<BsTrash />}
                                     >
-                                        Delete Chat
-                                    </MenuItem>
-                                    <MenuItem
-                                        bg={'none'}
-                                        icon={<BsBoxArrowLeft />}
-                                    >
-                                        Leave Chat
+                                        Invite Users
                                     </MenuItem>
                                 </MenuList>
                             </Menu>

@@ -36,6 +36,9 @@ import React, { useEffect } from 'react';
 import { SocketContext } from '../../../socket';
 import ModalConfirm from '../ModalConfirm';
 import Room from './Channel';
+import { on } from 'events';
+import ModalUi from '../../../components/ModalUi';
+import BodySetOwnerModal from './BodySetOwnerModal';
 
 export interface ChannelInfoProps {
     ChannelDm?: Channel;
@@ -51,21 +54,14 @@ const ChannelInfo = (props: ChannelInfoProps) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const socket = React.useContext(SocketContext);
     const [room, setRoom] = React.useState<Channel>();
-    const handleLeaveChannel = (id: number | undefined) => {
+    const handleLeaveChannel = () => {
         console.log('Hello From Leave Channel');
         socket.emit('leaveRoom', {
-            room: props.ChannelDm?.name,
-            newOwner: id
+            room: props.ChannelDm?.name
         });
         props.setRender && props.setRender(!props.render);
     };
-    // useEffect(() => {
-    //     async function fetchRoomData() {
-    //         const roomData = await Room(props.ChannelDm?.name);
-    //         setRoom(roomData);
-    //     }
-    //     fetchRoomData();
-    // }, [props.render]);
+
     return (
         <div>
             <Card maxW="md" marginBottom={2}>
@@ -148,19 +144,22 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                             onClick={
                                 props.user?.id === props.ChannelDm?.ownerId
                                     ? onOpen
-                                    : () => handleLeaveChannel(undefined)
+                                    : handleLeaveChannel
                             }
                         >
-                            <ModalConfirm
+                            <ModalUi
                                 isOpen={isOpen}
-                                onClose={onClose}
                                 onOpen={onOpen}
+                                onClose={onClose}
                                 title={'Set new Channel Owner'}
                                 body={
-                                    'Please choose a new owner for this channel'
-                                }
-                                handleBlockedUser={() =>
-                                    handleLeaveChannel(props.user?.id)
+                                    <BodySetOwnerModal
+                                        channelDm={props.ChannelDm}
+                                        user={props.user}
+                                        render={props.render}
+                                        setRender={props.setRender}
+                                        onClose={onClose}
+                                    />
                                 }
                             />
                             <Text fontSize={18} marginTop={5} marginLeft={-7}>
