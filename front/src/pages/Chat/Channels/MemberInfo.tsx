@@ -36,6 +36,8 @@ import ModalConfirm from '../ModalConfirm';
 import { on } from 'events';
 import { SocketContext } from '../../../socket';
 import React, { useEffect } from 'react';
+import client from '../../../components/Client';
+import { AxiosError } from 'axios';
 
 const MemberInfo = (props: ChannelInfoProps) => {
     const socket = React.useContext(SocketContext);
@@ -60,6 +62,33 @@ const MemberInfo = (props: ChannelInfoProps) => {
         });
         props.setRender && props.setRender(!props.render);
         onClose();
+    };
+    const handleRemoveAdmin = async () => {
+        const data = {
+            name: props.room?.name,
+            admin: props.participant?.username
+        };
+        console.log('remove admin logic');
+        try {
+            const response = await client.post('chat/remove-admi', data, {
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('token')
+                }
+            });
+            props.setRender && props.setRender(!props.render);
+            onClose();
+        } catch (error: any) {
+            console.log('error', error);
+            toast({
+                title: 'Error',
+                description: error.response.data.message,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            onClose();
+        }
     };
     const handleMuteUser = () => {
         console.log('mute user logic', props.room?.muted[0]);
@@ -243,26 +272,42 @@ const MemberInfo = (props: ChannelInfoProps) => {
                             borderRadius={20}
                             marginTop={-25}
                         >
-                            {props.user?.id === props.room?.ownerId &&
-                            !props.room?.admins?.some(
-                                (admin) => admin.id === props.participant?.id
-                            ) ? (
+                            {props.user?.id === props.room?.ownerId ? (
                                 <MenuItem
                                     paddingBottom={2}
                                     bg={'none'}
                                     icon={<BsGearFill />}
                                     onClick={onOpen}
                                 >
-                                    Set Admin
+                                    {props.room?.admins?.some(
+                                        (admin) =>
+                                            admin.id === props.participant?.id
+                                    )
+                                        ? 'Remove Admin'
+                                        : 'Set Admin'}
                                     <ModalConfirm
                                         isOpen={isOpen}
                                         onClose={onClose}
                                         onOpen={onOpen}
                                         title={'Set Admin'}
                                         body={
-                                            'Are you sure you want to set this user as admin?'
+                                            props.room?.admins?.some(
+                                                (admin) =>
+                                                    admin.id ===
+                                                    props.participant?.id
+                                            )
+                                                ? 'Are you sure you want to remove this user as admin?'
+                                                : 'Are you sure you want to set this user as admin?'
                                         }
-                                        handleBlockedUser={handleSetAdmin}
+                                        handleBlockedUser={
+                                            props.room?.admins?.some(
+                                                (admin) =>
+                                                    admin.id ===
+                                                    props.participant?.id
+                                            )
+                                                ? handleRemoveAdmin
+                                                : handleSetAdmin
+                                        }
                                     />
                                 </MenuItem>
                             ) : null}
