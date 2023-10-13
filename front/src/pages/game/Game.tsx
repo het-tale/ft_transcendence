@@ -69,7 +69,7 @@ const Game: React.FC = () => {
 
     const setupSocket = () => {
         setSocket(
-            io('http://localhost:3001/game', {
+            io(`${process.env.BACKEND_URL}/chat`, {
                 withCredentials: true,
                 forceNew: true,
                 timeout: 100000,

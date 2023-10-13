@@ -34,8 +34,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   //   onModuleInit() {}
-  private containerWidth = 720;
-  private containerHeight = 480;
+  private containerWidth = 1000;
+  private containerHeight = 720;
 
   async handleConnection(client: Socket) {
     try {

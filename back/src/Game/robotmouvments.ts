@@ -19,15 +19,8 @@ export async function colisionrobot(
   if (room.ball.x + room.ball.radius > playerPaddle.x + playerPaddle.width) {
     otherPlayer.score++;
     room.rounds--;
-    if (room.rounds === 0) {
-      dataupdatetostop(player, otherPlayer, room, activeSockets, prisma);
-    } else {
-      resetBall(room.ball, player, otherPlayer);
-      playerSocket.emit('UPDATE SCORE', {
-        playerScore: player.score,
-        otherScore: otherPlayer.score,
-      });
-    }
+    if (room.rounds === 0) dataupdatetostop(player, otherPlayer, room, activeSockets, prisma);
+    else resetBall(room.ball, player, otherPlayer);
   }
   playerSocket.emit('UPDATE', {
     ball: room.ball,
