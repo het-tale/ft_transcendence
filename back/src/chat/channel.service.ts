@@ -694,6 +694,7 @@ export class ChannelService {
     bannedUsername: string,
     isOnline: boolean,
   ) {
+    console.log('First channel name', channelName);
     const { target, channel } = await this.checkInput(
       channelName,
       clientUsername,
@@ -721,11 +722,11 @@ export class ChannelService {
             id: target.id,
           },
         },
-        participants: {
-          disconnect: {
-            id: target.id,
-          },
-        },
+        // participants: {
+        //   disconnect: {
+        //     id: target.id,
+        //   },
+        // },
       },
     });
     if (!isOnline) {
@@ -744,8 +745,8 @@ export class ChannelService {
     }
   }
   async checkInput(
-    clientUsername: string,
     channelName: string,
+    clientUsername: string,
     targetUsername: string,
   ) {
     {
@@ -770,6 +771,9 @@ export class ChannelService {
           muted: true,
         },
       });
+      console.log("channel name heree", channelName);
+      console.log("Banned Channel here", channel);
+      console.log("Banned target here", target);
       if (!channel || !client || !target) {
         throw new Error('channel not found or user not found');
       }
@@ -788,8 +792,8 @@ export class ChannelService {
     isOnline: boolean,
   ) {
     const { target, channel } = await this.checkInput(
-      clientUsername,
       channelName,
+      clientUsername,
       targetUsername,
     );
     const isBanned = channel.banned.some(
@@ -928,6 +932,13 @@ export class ChannelService {
           },
         },
         muted: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        banned: {
           select: {
             id: true,
             username: true,

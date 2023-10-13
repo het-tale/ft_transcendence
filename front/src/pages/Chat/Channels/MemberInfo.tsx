@@ -54,6 +54,11 @@ const MemberInfo = (props: ChannelInfoProps) => {
         onOpen: onOpen3,
         onClose: onClose3
     } = useDisclosure();
+    const {
+        isOpen: isOpen4,
+        onOpen: onOpen4,
+        onClose: onClose4
+    } = useDisclosure();
     const toast = useToast();
     const handleSetAdmin = () => {
         socket.emit('addAdmin', {
@@ -117,6 +122,24 @@ const MemberInfo = (props: ChannelInfoProps) => {
         });
         props.setRender && props.setRender(!props.render);
         onClose3();
+    };
+    const handleBanUser = () => {
+        console.log('ban user logic', props.room?.name);
+        socket.emit('banneUser', {
+            room: props.room?.name,
+            target: props.participant?.username
+        });
+        props.setRender && props.setRender(!props.render);
+        onClose4();
+    };
+    const handleUnbanUser = () => {
+        console.log('unban user logic');
+        socket.emit('unbanUser', {
+            room: props.room?.name,
+            target: props.participant?.username
+        });
+        props.setRender && props.setRender(!props.render);
+        onClose4();
     };
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -191,7 +214,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                     isClosable: true,
                     position: 'bottom-right'
                 });
-                // props.setRender && props.setRender(!props.render);
+                props.setRender && props.setRender(!props.render);
             });
 
             socket.on('userUnmuted', (data: any) => {
@@ -208,6 +231,55 @@ const MemberInfo = (props: ChannelInfoProps) => {
             });
             socket.on('userUnmuteError', (data: any) => {
                 console.log('userUnmuteError', data);
+                toast({
+                    title: 'Error',
+                    description: data,
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                props.setRender && props.setRender(!props.render);
+            });
+            socket.on('userBanned', (data: any) => {
+                console.log('userBanned', data);
+                toast({
+                    title: 'success',
+                    description: data,
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                props.setRender && props.setRender(!props.render);
+            });
+            socket.on('userBanError', (data: any) => {
+                console.log('userBanError', data);
+                toast({
+                    title: 'Error',
+                    description: data,
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                props.setRender && props.setRender(!props.render);
+            });
+
+            socket.on('userUnbanned', (data: any) => {
+                console.log('userUnbanned', data);
+                toast({
+                    title: 'success',
+                    description: data,
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                props.setRender && props.setRender(!props.render);
+            });
+            socket.on('userUnbanError', (data: any) => {
+                console.log('userUnbanError', data);
                 toast({
                     title: 'Error',
                     description: data,
@@ -374,8 +446,39 @@ const MemberInfo = (props: ChannelInfoProps) => {
                                     <MenuItem
                                         bg={'none'}
                                         icon={<BsPersonDashFill />}
+                                        onClick={onOpen4}
                                     >
-                                        Ban
+                                        {props.room.banned.some(
+                                            (banned) =>
+                                                banned.id ===
+                                                props.participant?.id
+                                        )
+                                            ? 'Unban'
+                                            : 'Ban'}
+                                        <ModalConfirm
+                                            isOpen={isOpen4}
+                                            onClose={onClose4}
+                                            onOpen={onOpen4}
+                                            title={'Ban User'}
+                                            body={
+                                                props.room.banned.some(
+                                                    (banned) =>
+                                                        banned.id ===
+                                                        props.participant?.id
+                                                )
+                                                    ? 'Are you sure you want to unban this user?'
+                                                    : 'Are you sure you want to ban this user?'
+                                            }
+                                            handleBlockedUser={
+                                                props.room.banned.some(
+                                                    (banned) =>
+                                                        banned.id ===
+                                                        props.participant?.id
+                                                )
+                                                    ? handleUnbanUser
+                                                    : handleBanUser
+                                            }
+                                        />
                                     </MenuItem>
                                 </Box>
                             ) : null}
