@@ -513,7 +513,7 @@ export class ChannelService {
     }
     const isOwner = channel.ownerId === user.id;
     console.log(channel.participants.length);
-    if (
+    if (isOwner &&
       (data.newOwner === undefined || data.newOwner === null) &&
       channel.participants.length > 1
     ) {

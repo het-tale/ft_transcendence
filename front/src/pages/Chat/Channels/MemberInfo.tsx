@@ -290,6 +290,30 @@ const MemberInfo = (props: ChannelInfoProps) => {
                 });
                 props.setRender && props.setRender(!props.render);
             });
+            socket.on('roomLeft', (data: any) => {
+                console.log('roomLeft', data);
+                toast({
+                    title: 'success',
+                    description: data,
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                props.setRender && props.setRender(!props.render);
+            });
+            socket.on('roomLeaveError', (data: any) => {
+                console.log('roomLeaveError', data);
+                toast({
+                    title: 'Error',
+                    description: data,
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                props.setRender && props.setRender(!props.render);
+            });
         }, 500);
 
         return () => {
