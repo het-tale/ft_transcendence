@@ -47,8 +47,6 @@ model User {
   adminChannels          Channel[]       @relation("ChannelAdmins")
   bannedChannels         Channel[]       @relation("ChannelBanned")
   mutedChannels          Channel[]       @relation("ChannelMuted")
-  offlineKickedChannels  Channel[]       @relation("ChannelOfflineKicked")
-  offlineUnbannedChannel Channel[]       @relation("ChannelOfflineUnbanned")
 }
 
 model Conversation {
@@ -145,15 +143,12 @@ model Channel {
   owner     User    @relation("ChannelOwner", fields: [ownerId], references: [id])
   ownerId   Int
   avatar    String
-  isDeleted Boolean @default(false)
 
   messages     Message[]    @relation("ChannelMessages")
   participants User[]       @relation("ChannelParticipants")
-  offlineKicked User[]      @relation("ChannelOfflineKicked")
   invitaions   Invitation[] @relation("ChannelInvitations")
   admins       User[]       @relation("ChannelAdmins")
   banned       User[]       @relation("ChannelBanned")
-  offlineUnbanned User[]    @relation("ChannelOfflineUnbanned")
   muted        User[]       @relation("ChannelMuted")
 }
 

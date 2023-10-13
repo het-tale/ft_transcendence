@@ -54,31 +54,7 @@ export class ChatGateway
       });
       await this.dmService.changeUserStatus(user.username, 'online');
       console.log(this.connectedUsers);
-      const offlineKickedChannels =
-        await this.channelService.getOfflineKickedChannels(user.id);
-      if (offlineKickedChannels.length > 0) {
-        const sockets = await this.io.in(client.id).fetchSockets();
-        offlineKickedChannels.forEach((channel) => {
-          if (sockets) {
-            sockets.forEach((socket) => {
-              socket.leave(channel.name);
-            });
-          }
-        });
-        this.channelService.deleteEmptyChannels(offlineKickedChannels);
-      }
-      const offlineUnbannedChannels =
-        await this.channelService.getOfflineUnbannedChannels(user.id);
-      if (offlineUnbannedChannels.length > 0) {
-        const socket = this.io.sockets[client.id];
-        offlineUnbannedChannels.forEach((channel) => {
-          socket.join(channel.name);
-        });
-        this.channelService.deleteFromOfflineUnbannedChannels(
-          offlineUnbannedChannels,
-          user.id,
-        );
-      }
+      await this.channelService.rejoinRooms(user.id, client);
       const offlineMessages = await this.dmService.getOfflineMessages(user.id);
       const offlineInvitations =
         await this.channelService.getOfflineInvitations(user.id);
@@ -346,23 +322,20 @@ export class ChatGateway
       const kickedUser = this.connectedUsers.find(
         (user) => user.username === data.target,
       );
-      let isOnline = false;
-      if (kickedUser) isOnline = true;
       await this.channelService.kickUser(
         data.room,
         clientUsername,
         data.target,
-        isOnline,
       );
+      this.io.to(data.room).emit('userKicked', `${data.target} kicked`);
       if (kickedUser) {
-        const sockets = await this.io.in(client.id).fetchSockets();
+        const sockets = await this.io.in(kickedUser.clientId).fetchSockets();
         if (sockets) {
           sockets.forEach((socket) => {
             socket.leave(data.room);
           });
         }
       }
-      this.io.to(data.room).emit('userKicked', `${data.target} kicked`);
     } catch (err) {
       client.emit('userKickError', err.message);
     }
@@ -395,26 +368,19 @@ export class ChatGateway
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       ).username;
-      let isOnline = false;
       const bannedUser = this.connectedUsers.find(
         (user) => user.username === data.target,
       );
-      if (bannedUser) isOnline = true;
-      await this.channelService.banUser(
-        data.room,
-        clientUsername,
-        data.target,
-        isOnline,
-      );
+      await this.channelService.banUser(data.room, clientUsername, data.target);
+      this.io.to(data.room).emit('userBanned', `${data.target} banned`);
       if (bannedUser) {
-        const sockets = await this.io.in(client.id).fetchSockets();
+        const sockets = await this.io.in(bannedUser.clientId).fetchSockets();
         if (sockets) {
           sockets.forEach((socket) => {
             socket.leave(data.room);
           });
         }
       }
-      this.io.to(data.room).emit('userBanned', `${data.target} banned`);
     } catch (err) {
       client.emit('userBanError', err.message);
     }
@@ -428,20 +394,21 @@ export class ChatGateway
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       ).username;
-      let isOnline = false;
       const unbannedUser = this.connectedUsers.find(
         (user) => user.username === data.target,
       );
-      if (unbannedUser) isOnline = true;
       await this.channelService.unbanUser(
         data.room,
         clientUsername,
         data.target,
-        isOnline,
       );
       if (unbannedUser) {
-        const socket = this.io.sockets[unbannedUser.clientId];
-        socket.join(data.room);
+        const sockets = await this.io.in(unbannedUser.clientId).fetchSockets();
+        if (sockets) {
+          sockets.forEach((socket) => {
+            socket.join(data.room);
+          });
+        }
       }
       this.io.to(data.room).emit('userUnbanned', `${data.target} unbanned`);
     } catch (err) {
@@ -510,6 +477,7 @@ export class ChatGateway
           from: clientUsername,
         });
       }
+      this.io.to(client.id).emit('friendRequestSent');
     } catch (err) {
       client.emit('friendRequestError', err.message);
     }
@@ -534,12 +502,20 @@ export class ChatGateway
         data.isAccepted,
         isOnline,
       );
-      if (receiver) {
-        if (data.isAccepted) {
+      if (data.isAccepted) {
+        this.io.to(client.id).emit('friendRequestAccepted', {
+          from: data.from,
+        });
+        if (receiver) {
           this.io.to(receiver.clientId).emit('friendRequestAccepted', {
             from: clientUsername,
           });
-        } else {
+        }
+      } else {
+        this.io.to(client.id).emit('friendRequestDeclined', {
+          from: data.from,
+        });
+        if (receiver) {
           this.io.to(receiver.clientId).emit('friendRequestDeclined', {
             from: clientUsername,
           });
@@ -600,7 +576,6 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      console.log('delete is called');
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       ).username;
@@ -611,7 +586,6 @@ export class ChatGateway
         this.io,
         this.connectedUsers,
       );
-      await this.channelService.deleteIfEmpty(data.room);
     } catch (err) {
       client.emit('channelDeleteError', err.message);
     }
