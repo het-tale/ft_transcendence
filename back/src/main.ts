@@ -9,8 +9,9 @@ async function bootstrap() {
   patchNestJsSwagger();
   const app = await NestFactory.create(AppModule);
   await app.get(RobotUserService).createRobotUser();
+  
   app.enableCors({
-    origin: ['http://localhost:5173', 'http://localhost:3000'],
+    origin: [process.env.FRONTEND_URL, process.env.BACKEND_URL],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     optionsSuccessStatus: 200,
