@@ -600,6 +600,7 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
+      console.log('delete is called');
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       ).username;
@@ -610,6 +611,7 @@ export class ChatGateway
         this.io,
         this.connectedUsers,
       );
+      await this.channelService.deleteIfEmpty(data.room);
     } catch (err) {
       client.emit('channelDeleteError', err.message);
     }
