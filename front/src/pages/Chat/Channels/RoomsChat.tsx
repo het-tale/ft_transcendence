@@ -22,7 +22,8 @@ import {
     background,
     useDisclosure,
     Image,
-    Button
+    Button,
+    useToast
 } from '@chakra-ui/react';
 import MessageUser from '../MessageUser';
 import { Channel } from '../../../Types/Channel';
@@ -38,6 +39,9 @@ import Room from './Channel';
 import { on } from 'events';
 import ModalUi from '../../../components/ModalUi';
 import InviteUsersModal from './InviteUsersModal';
+import ModalConfirm from '../ModalConfirm';
+import { SocketContext } from '../../../socket';
+import DeletChannelModal from './DeletChannelModal';
 
 export interface RoomsChatProps {
     handleRenderActions: () => void;
@@ -49,10 +53,17 @@ export interface RoomsChatProps {
 }
 
 const RoomsChat = (props: RoomsChatProps) => {
+    const socket = React.useContext(SocketContext);
+    const toast = useToast();
     const [user, setUser] = React.useState<UserType>();
     const [room, setRoom] = React.useState<Channel>();
     const [messages, setMessages] = React.useState<MessageType[]>([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const {
+        isOpen: isOpen2,
+        onOpen: onOpen2,
+        onClose: onClose2
+    } = useDisclosure();
     const [showChannelInfo, setShowChannelInfo] =
         React.useState<boolean>(false);
     useEffect(() => {
@@ -77,8 +88,36 @@ const RoomsChat = (props: RoomsChatProps) => {
         }
         fetchRoomData();
     }, [props.render, props.update, props.channelDm]);
-    console.log('THIS IS ROOM1', room);
-    console.log('THIS IS ROOM2', props.channelDm);
+    const handleDeleteChannel = () => {
+        console.log('delete channel');
+        socket.emit('deleteChannel', {
+            room: props.channelDm?.name
+        });
+    };
+    socket.on('channelDeleted', (data: any) => {
+        console.log('channelDeleted', data);
+        toast({
+            title: 'Success',
+            description: data,
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+            position: 'bottom-right'
+        });
+        props.setRender && props.setRender(!props.render);
+    });
+    socket.on('channelDeleteError', (data: any) => {
+        console.log('channelDeleteError', data);
+        toast({
+            title: 'Error',
+            description: data,
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+            position: 'bottom-right'
+        });
+        props.setRender && props.setRender(!props.render);
+    });
     if (!props.channelDm) return <></>;
     return (
         <Flex flexDirection={'row'}>
@@ -165,8 +204,34 @@ const RoomsChat = (props: RoomsChatProps) => {
                                             <MenuItem
                                                 bg={'none'}
                                                 icon={<BsBoxArrowLeft />}
+                                                onClick={
+                                                    room.type === 'protected'
+                                                        ? onOpen2
+                                                        : handleDeleteChannel
+                                                }
                                             >
                                                 Delete Channel
+                                                <ModalUi
+                                                    isOpen={isOpen2}
+                                                    onOpen={onOpen2}
+                                                    onClose={onClose2}
+                                                    title={
+                                                        'Please Provide a password'
+                                                    }
+                                                    body={
+                                                        <DeletChannelModal
+                                                            onClose={onClose2}
+                                                            channelDm={room}
+                                                            render={
+                                                                props.render
+                                                            }
+                                                            setRender={
+                                                                props.setRender
+                                                            }
+                                                            user={user}
+                                                        />
+                                                    }
+                                                />
                                             </MenuItem>
                                         ) : null}
                                     </MenuList>
