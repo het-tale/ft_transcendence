@@ -3,7 +3,6 @@ import { INCREASE_SPEED, Room, SPEED_INTERVAL } from './types';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { colisionrobot } from './robotmouvments';
-import { use } from 'passport';
 
 export async function updateGamerobot(
   room: Room,

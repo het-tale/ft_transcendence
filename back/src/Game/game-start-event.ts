@@ -99,9 +99,9 @@ export async function StartGameEventRobot(
   containerWidth: number,
 ) {
   // the same as StartGameEvent but with a robot as second player
-  const padd = new Paddle(10, containerHeight / 2, 8, 80, 3);
+  const padd = new Paddle(containerWidth * 0.02, containerHeight / 2, 8, 80, 3);
   const otherpadd = new Paddle(
-    containerWidth - 10,
+    containerWidth - containerWidth * 0.02,
     containerHeight / 2,
     8,
     80,

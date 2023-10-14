@@ -16,7 +16,7 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
     super({
       clientID: configService.get('UID_42'),
       clientSecret: configService.get('SECRET_42'),
-      callbackURL: 'http://localhost:3001/auth/42/callback',
+      callbackURL: `http://localhost:3001/auth/42/callback`,
       profileFields: {
         login: 'login',
         email: 'email',
