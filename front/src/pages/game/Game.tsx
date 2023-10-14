@@ -123,8 +123,8 @@ const Game: React.FC = () => {
     }, 16.66);
 
     const setupEventListeners = () => {
-        if (divRefs.gameContainer.current) {
-            divRefs.gameContainer.current.addEventListener(
+        if (canvasRef.current) {
+            canvasRef.current.addEventListener(
                 'mousemove',
                 throttleHandleMouseMove
             );
@@ -221,6 +221,7 @@ const Game: React.FC = () => {
                 Dimensions.width,
                 Dimensions.height
             );
+            console.log('padd', padd);
     }, [padd]);
 
     // useEffect(() => {
@@ -348,7 +349,7 @@ const Game: React.FC = () => {
                 </>
             ) : (
                 <div className="game-container" ref={divRefs.gameContainer}>
-                    <canvas ref={canvasRef} width={1920} height={1080}/>
+                    <canvas ref={canvasRef} width={720} height={480}/>
                 </div>
             )}
         </div>

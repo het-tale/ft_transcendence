@@ -18,14 +18,14 @@ export async function StartGameEvent(
     (containerWidth * 2) / 100,
     containerHeight / 2,
     8,
-    80,
+    containerHeight * 0.15,
     3,
   );
   const otherpadd = new Paddle(
     containerWidth - (containerWidth * 2) / 100,
     containerHeight / 2,
     8,
-    80,
+    containerHeight * 0.15,
     3,
   );
 
@@ -99,12 +99,12 @@ export async function StartGameEventRobot(
   containerWidth: number,
 ) {
   // the same as StartGameEvent but with a robot as second player
-  const padd = new Paddle(containerWidth * 0.02, containerHeight / 2, 8, 80, 3);
+  const padd = new Paddle(containerWidth * 0.02, containerHeight / 2, 8, containerHeight * 0.15, 3);
   const otherpadd = new Paddle(
     containerWidth - containerWidth * 0.02,
     containerHeight / 2,
     8,
-    80,
+    containerHeight * 0.15,
     3,
   );
   const room = new Room(Math.random().toString(36).substring(7));
