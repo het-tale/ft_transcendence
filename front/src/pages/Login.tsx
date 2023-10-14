@@ -40,7 +40,7 @@ function Login(props: any) {
         setErrorMessage('');
         const configuration = {
             method: 'post',
-            url: `${process.env.BACKEND_URL}/auth/signin`,
+            url: 'http://localhost:3001/auth/signin',
             data: {
                 identifier: email,
                 password
