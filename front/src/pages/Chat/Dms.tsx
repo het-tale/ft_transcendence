@@ -175,25 +175,27 @@ const Dms = (props: any) => {
                         props.dms.length > 0 ? (
                             props.dms?.map((dm: UserType) => {
                                 return (
-                                    <MessageUser
-                                        profile={dm.avatar}
-                                        name={dm.username}
-                                        dm={dm}
-                                        setUserDm={setUserDm}
-                                        setFirstLoad={setFirstLoad}
-                                        message={dm.status}
-                                        render={props.render}
-                                        setRender={props.setRender}
-                                        updateUser={updateUser}
-                                        setUpdateUser={setUpdateUser}
-                                        updateClass={updateClass}
-                                        setUpdateClass={setUpdateClass}
-                                        activeCard={
-                                            updateClass === dm?.id
-                                                ? 'clickedDm'
-                                                : ''
-                                        }
-                                    />
+                                    <Link to={`/chat/rooms-dms/${dm.id}`}>
+                                        <MessageUser
+                                            profile={dm.avatar}
+                                            name={dm.username}
+                                            dm={dm}
+                                            setUserDm={setUserDm}
+                                            setFirstLoad={setFirstLoad}
+                                            message={dm.status}
+                                            render={props.render}
+                                            setRender={props.setRender}
+                                            updateUser={updateUser}
+                                            setUpdateUser={setUpdateUser}
+                                            updateClass={updateClass}
+                                            setUpdateClass={setUpdateClass}
+                                            activeCard={
+                                                updateClass === dm?.id
+                                                    ? 'clickedDm'
+                                                    : ''
+                                            }
+                                        />
+                                    </Link>
                                 );
                             })
                         ) : (
