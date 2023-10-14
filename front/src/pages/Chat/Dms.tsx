@@ -317,7 +317,7 @@ const Dms = (props: any) => {
         <Flex flexDirection={'column'}>
             <NavbarSearch />
             <Flex>
-                <Sidebar render={props.render} setRender={props.setRender} />
+                <Sidebar />
                 <Box w="100%" bg="#E9ECEF" h={'90%'}>
                     <Flex justify="space-between">
                         <LeftSide

@@ -36,8 +36,10 @@ import { socket, SocketContext } from './socket';
 import React from 'react';
 import GamePage from './pages/game/GamePage';
 import BrowseChannels from './pages/Chat/Channels/BrowseChannels';
+import { Notification } from './Types/Notification';
 
 // const theme = createTheme();
+let notifArray: Notification[] = [];
 
 function App() {
     const [firstLogin, setFirstLogin] = React.useState(false);
@@ -79,7 +81,7 @@ function App() {
                         path="home"
                         element={
                             <ProtectRoutes>
-                                <Home />
+                                <Home notifArray={notifArray} />
                             </ProtectRoutes>
                         }
                     ></Route>
