@@ -330,6 +330,7 @@ export class ChannelService {
         senderId: userSender.id,
         receiverId: userReceiver.id,
         channelId: channel.id,
+        status: 'pending',
       },
     });
     if (!invitation) {
