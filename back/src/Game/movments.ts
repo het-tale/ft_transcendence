@@ -16,8 +16,8 @@ export function resetBall(ball: Ball, player: Player, otherPlayer: Player) {
     playerScore: otherPlayer.score,
     otherScore: player.score,
   });
-  ball.x = 720 / 2;
-  ball.y = 480 / 2;
+  ball.x = 1920 / 2;
+  ball.y = 1080 / 2;
   const random = Math.random();
   switch (true) {
     case random < 0.25:
