@@ -25,8 +25,8 @@ import { UseZodGuard } from 'nestjs-zod';
 export class UserController {
   constructor(private userService: UserService) {}
   @Get('me')
-  me(@Req() request: { user: User }) {
-    return this.userService.getUserById(request.user.id);
+  async me(@Req() request: { user: User }) {
+    return await this.userService.getUserById(request.user.id);
   }
   @Get(':id')
   async getUserById(@Param('id') idString: string) {
@@ -70,6 +70,16 @@ export class UserController {
     @Req() request: { user: User },
     @Body() dto: TChangePassword,
   ) {
-    return this.userService.changePassword(dto, request.user);
+    return await this.userService.changePassword(dto, request.user);
+  }
+
+  @Get('pending-friend-requests')
+  async getPendingFriendRequests(@Req() request: { user: User }) {
+    return await this.userService.getPendingFriendRequests(request.user);
+  }
+
+  @Get('pending-invitaions')
+  async getPendingInvitations(@Req() request: { user: User }) {
+    return await this.userService.getPendingInvitations(request.user);
   }
 }
