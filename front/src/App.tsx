@@ -149,7 +149,7 @@ function App() {
                     {/**----------------Chat Pages ----------------------*/}
                     <Route path="chat">
                         <Route
-                            path="rooms-dms"
+                            path="rooms-dms/:id"
                             element={
                                 <ProtectRoutes>
                                     <Chat

@@ -103,7 +103,7 @@ const Sidebar = (props: sidebarProps) => {
                 <BsHouseFill className="fa" />
                 Home
             </Link>
-            <Link to="/chat/rooms-dms">
+            <Link to={`/chat/rooms-dms/${user?.id}`}>
                 <BsChatRightFill className="fa" />
                 Chat
             </Link>
