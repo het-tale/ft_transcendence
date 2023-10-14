@@ -22,7 +22,7 @@ function Register() {
         e.preventDefault();
         const configuration = {
             method: "post",
-            url: `${process.env.BACKEND_URL}/auth/signup`,
+            url: `http://localhost:3001/auth/signup`,
             data: {
                 username,
               email,
