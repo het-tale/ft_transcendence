@@ -11,8 +11,9 @@ import {
 } from 'react-icons/bs';
 import { UserType } from '../Types/User';
 import User from './User';
-import { Image } from '@chakra-ui/react';
+import { Image, useToast } from '@chakra-ui/react';
 import NotifDm from '../pages/Chat/NotifDm';
+import { SocketContext } from '../socket';
 const Sidebar = (props: any) => {
     const [user, setUser] = React.useState<UserType>();
     useEffect(() => {
@@ -23,12 +24,42 @@ const Sidebar = (props: any) => {
 
         fetchUserData();
     }, []);
+    const socket = React.useContext(SocketContext);
+    const toast = useToast();
+    const token = localStorage.getItem('token');
+    useEffect(() => {
+        socket.auth = { token: token };
+        socket.connect();
+    }, []);
+
+    socket.on('roomInvitation', (data: any) => {
+        console.log('roomInvitation', data);
+        toast({
+            title: 'success',
+            description: data.from,
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+            position: 'bottom-right'
+        });
+    });
+    socket.on('roomInvitationError', (data: any) => {
+        console.log('roomInvitationError', data);
+        toast({
+            title: 'Error',
+            description: data,
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+            position: 'bottom-right'
+        });
+    });
     return (
         <aside>
-            <a href="">
+            <Link to="/home">
                 <BsHouseFill className="fa" />
                 Home
-            </a>
+            </Link>
             <Link to="/chat/rooms-dms">
                 <BsChatRightFill className="fa" />
                 Chat
