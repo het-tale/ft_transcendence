@@ -7,7 +7,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameData, Paddle, Player, Room } from './types';
+import { CONTAINERHIEGHT, CONTAINERWIDTH, GameData, Paddle, Player, Room } from './types';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
@@ -34,8 +34,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   //   onModuleInit() {}
-  private containerWidth = 1920;
-  private containerHeight = 1080;
 
   async handleConnection(client: Socket) {
     try {
@@ -82,8 +80,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       }
       StartGameEvent(
         client,
-        this.containerHeight,
-        this.containerWidth,
+        CONTAINERHIEGHT,
+        CONTAINERWIDTH,
         this.rooms,
         this.activeSockets,
         this.prisma,
@@ -135,17 +133,17 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     // Create an invitation room
     const invitationRoom = new Room(`invite_${sender.id}_${receiver.id}`);
     const padd = new Paddle(
-      (this.containerWidth * 2) / 100,
-      this.containerHeight / 2,
+      (CONTAINERWIDTH * 2) / 100,
+      CONTAINERHIEGHT / 2,
       8,
-      80,
+      120,
       3,
     );
     const otherpadd = new Paddle(
-      this.containerWidth - (this.containerWidth * 2) / 100,
-      this.containerHeight / 2,
+      CONTAINERWIDTH - (CONTAINERWIDTH * 2) / 100,
+      CONTAINERHIEGHT / 2,
       8,
-      80,
+      120,
       3,
     );
 
@@ -186,8 +184,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       playerScore: 0,
       otherScore: 0,
       rounds: invitationRoom.rounds,
-      containerHeight: this.containerHeight,
-      containerWidth: this.containerWidth,
+      containerHeight: CONTAINERHIEGHT,
+      containerWidth: CONTAINERWIDTH,
       id: 1,
     };
     client.emit('JoinRoom', invitationRoom.roomName);
@@ -205,15 +203,15 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       if (invitationRoom) {
         // Assign the player to the invitation room
         const padd = new Paddle(
-          (this.containerWidth * 2) / 100,
-          this.containerHeight / 2,
+          (CONTAINERWIDTH * 2) / 100,
+          CONTAINERHIEGHT / 2,
           8,
           80,
           3,
         );
         const otherpadd = new Paddle(
-          this.containerWidth - (this.containerWidth * 2) / 100,
-          this.containerHeight / 2,
+          CONTAINERWIDTH - (CONTAINERWIDTH * 2) / 100,
+          CONTAINERHIEGHT / 2,
           8,
           80,
           3,
@@ -231,8 +229,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
           playerScore: 0,
           otherScore: 0,
           rounds: invitationRoom.rounds,
-          containerHeight: this.containerHeight,
-          containerWidth: this.containerWidth,
+          containerHeight: CONTAINERHIEGHT,
+          containerWidth: CONTAINERWIDTH,
           id: 2,
         };
         client.emit('JoinRoom', roomId);
@@ -260,8 +258,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         this.activeSockets,
         this.prisma,
         this.server,
-        this.containerHeight,
-        this.containerWidth,
+        CONTAINERHIEGHT,
+        CONTAINERWIDTH,
       );
     } catch (e) {
       console.log('error', e);
@@ -271,7 +269,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('UpdatePlayerPaddle')
   handleUpdatePaddle(client: Socket, eventData: any) {
     try {
-      UpdatePaddle(client, eventData, this.rooms, this.containerHeight);
+      UpdatePaddle(client, eventData, this.rooms, CONTAINERHIEGHT);
     } catch (e) {
       console.log('error', e);
     }

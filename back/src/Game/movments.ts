@@ -1,5 +1,5 @@
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Room, Ball, Paddle, Player } from './types';
+import { Room, Ball, Paddle, Player, CONTAINERWIDTH, CONTAINERHIEGHT } from './types';
 import { Socket } from 'socket.io';
 import { User } from '@prisma/client';
 import { stopGame } from './Game_services';
@@ -16,8 +16,8 @@ export function resetBall(ball: Ball, player: Player, otherPlayer: Player) {
     playerScore: otherPlayer.score,
     otherScore: player.score,
   });
-  ball.x = 1920 / 2;
-  ball.y = 1080 / 2;
+  ball.x =  CONTAINERWIDTH/ 2;
+  ball.y = CONTAINERHIEGHT / 2;
   const random = Math.random();
   switch (true) {
     case random < 0.25:
