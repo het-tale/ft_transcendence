@@ -65,4 +65,41 @@ export class UserService {
 
     return users;
   }
+  async getPendingFriendRequests(user: User) {
+    const friendRequests = await this.prisma.friendRequest.findMany({
+      where: {
+        receiverId: user.id,
+        status: 'pending',
+      },
+      select: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+    return friendRequests;
+  }
+
+  async getPendingInvitations(user: User) {
+    const invitations = await this.prisma.friendRequest.findMany({
+      where: {
+        receiverId: user.id,
+        status: 'pending',
+      },
+      select: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+    return invitations;
+  }
 }
