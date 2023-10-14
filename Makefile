@@ -16,4 +16,6 @@ status :
 	@docker ps
 prune :
 	@docker system prune -a -f
+link :
+	ln -s ./.env ./front/.env
 re: stop prune up
