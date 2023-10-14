@@ -38,6 +38,7 @@ import { SocketContext } from '../../../socket';
 import React, { useEffect } from 'react';
 import client from '../../../components/Client';
 import { AxiosError } from 'axios';
+import { Link } from 'react-router-dom';
 
 const MemberInfo = (props: ChannelInfoProps) => {
     const socket = React.useContext(SocketContext);
@@ -507,9 +508,11 @@ const MemberInfo = (props: ChannelInfoProps) => {
                                 </Box>
                             ) : null}
 
-                            <MenuItem bg={'none'} icon={<BsPersonCircle />}>
-                                View Profile
-                            </MenuItem>
+                            <Link to={`/user-profile/${props.participant?.id}`}>
+                                <MenuItem bg={'none'} icon={<BsPersonCircle />}>
+                                    View Profile
+                                </MenuItem>
+                            </Link>
                         </MenuList>
                     </Menu>
                 ) : null}
