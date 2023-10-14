@@ -31,30 +31,6 @@ const InviteUsersModal = (props: InviteUsersModalProps) => {
         props.onClose();
     };
 
-    socket.on('roomInvitation', (data: any) => {
-        console.log('roomInvitation', data);
-        toast({
-            title: 'success',
-            description: data.from,
-            status: 'success',
-            duration: 9000,
-            isClosable: true,
-            position: 'bottom-right'
-        });
-        props.setRender && props.setRender(!props.render);
-    });
-    socket.on('roomInvitationError', (data: any) => {
-        console.log('roomInvitationError', data);
-        toast({
-            title: 'Error',
-            description: data,
-            status: 'error',
-            duration: 9000,
-            isClosable: true,
-            position: 'bottom-right'
-        });
-        props.setRender && props.setRender(!props.render);
-    });
     return (
         <form
             style={{ padding: '5px' }}

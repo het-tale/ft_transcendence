@@ -248,6 +248,7 @@ export class ChatGateway
         (user) => user.username === data.target,
       );
       let isReceiverOnline = false;
+      if (receiver) isReceiverOnline = true;
       await this.channelService.saveInvitation({
         sender: sender.username,
         receiver: data.target,
