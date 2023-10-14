@@ -22,9 +22,9 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    max-width: 800px;
+    /* max-width: 1000px; */
     /* max-height: 500px; */
-    height: 500px;
+    height: 720px;
     width: 100%;
     position: relative;
     row-gap: 10px;
@@ -58,14 +58,14 @@
 }
 
 .player-paddle {
-    left: 2%;
+    /* left: 2%; */
     top: 50%;
     /* transform: translateY(10%); */
     background-color: rgb(235, 182, 145);
 }
 
 .other-paddle {
-    right: 2%;
+    /* right: 2%; */
     top: 50%;
     /* transform: translateY(10%); */
     background-color: beige;
@@ -149,13 +149,13 @@
         width: 1.2%;
     }
 
-    .player-paddle {
-        left: -1%;
+    /* .player-paddle {
+        left: 2%;
     }
 
     .other-paddle {
-        right: 1%;
-    }
+        right: 2%;
+    } */
 }
 
 .overlay {

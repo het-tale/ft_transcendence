@@ -8,6 +8,7 @@ import User from '../../components/User';
 import { UserType } from '../../Types/User';
 import { ListenOnSocket } from './Game.lisners';
 
+
 export type MySocket = ReturnType<typeof io>;
 
 function updateDivPosition(
@@ -69,7 +70,7 @@ const Game: React.FC = () => {
 
     const setupSocket = () => {
         setSocket(
-            io('http://localhost:3001/game', {
+            io(`${process.env.REACT_APP_BACKEND_URL}/game`, {
                 withCredentials: true,
                 forceNew: true,
                 timeout: 100000,
