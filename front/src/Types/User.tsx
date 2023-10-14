@@ -13,4 +13,5 @@ export type UserType = {
     twoFaSecret: string;
     is2FaVerified: boolean;
     status: string;
+    blocked: UserType[];
 };

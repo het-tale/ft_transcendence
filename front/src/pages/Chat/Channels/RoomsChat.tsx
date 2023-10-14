@@ -22,7 +22,8 @@ import {
     background,
     useDisclosure,
     Image,
-    Button
+    Button,
+    useToast
 } from '@chakra-ui/react';
 import MessageUser from '../MessageUser';
 import { Channel } from '../../../Types/Channel';
@@ -34,17 +35,35 @@ import User from '../../../components/User';
 import { MessageType } from '../../../Types/Message';
 import GetChannelMessages from './GetChannelMessages';
 import ChannelInfo from './ChannelInfo';
+import Room from './Channel';
+import { on } from 'events';
+import ModalUi from '../../../components/ModalUi';
+import InviteUsersModal from './InviteUsersModal';
+import ModalConfirm from '../ModalConfirm';
+import { SocketContext } from '../../../socket';
+import DeletChannelModal from './DeletChannelModal';
 
 export interface RoomsChatProps {
     handleRenderActions: () => void;
     channelDm?: Channel;
     render: boolean;
     setRender: React.Dispatch<React.SetStateAction<boolean>>;
+    update: boolean;
+    setUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const RoomsChat = (props: RoomsChatProps) => {
+    const socket = React.useContext(SocketContext);
+    const toast = useToast();
     const [user, setUser] = React.useState<UserType>();
+    const [room, setRoom] = React.useState<Channel>();
     const [messages, setMessages] = React.useState<MessageType[]>([]);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const {
+        isOpen: isOpen2,
+        onOpen: onOpen2,
+        onClose: onClose2
+    } = useDisclosure();
     const [showChannelInfo, setShowChannelInfo] =
         React.useState<boolean>(false);
     useEffect(() => {
@@ -62,105 +81,207 @@ const RoomsChat = (props: RoomsChatProps) => {
               })
             : null;
     }, [props.render, props.channelDm]);
+    useEffect(() => {
+        async function fetchRoomData() {
+            const roomData = await Room(props.channelDm?.name);
+            setRoom(roomData);
+        }
+        fetchRoomData();
+    }, [props.render, props.update, props.channelDm]);
+    const handleDeleteChannel = () => {
+        console.log('delete channel');
+        socket.emit('deleteChannel', {
+            room: props.channelDm?.name
+        });
+    };
+    socket.on('channelDeleted', (data: any) => {
+        console.log('channelDeleted', data);
+        toast({
+            title: 'Success',
+            description: data,
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+            position: 'bottom-right'
+        });
+        props.setRender && props.setRender(!props.render);
+    });
+    socket.on('channelDeleteError', (data: any) => {
+        console.log('channelDeleteError', data);
+        toast({
+            title: 'Error',
+            description: data,
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+            position: 'bottom-right'
+        });
+        props.setRender && props.setRender(!props.render);
+    });
     if (!props.channelDm) return <></>;
     return (
         <Flex flexDirection={'row'}>
-            <Flex flexDirection={'column'} width={'100%'}>
-                <Flex>
-                    <Box width={'98%'}>
-                        <button
-                            onClick={props.handleRenderActions}
-                            style={{ background: 'transparent', width: '100%' }}
+            {room?.participants.some(
+                (participant) => participant.id === user?.id
+            ) ? (
+                <>
+                    <Flex flexDirection={'column'} width={'100%'}>
+                        <Flex>
+                            <Box width={'98%'}>
+                                <button
+                                    onClick={props.handleRenderActions}
+                                    style={{
+                                        background: 'transparent',
+                                        width: '100%'
+                                    }}
+                                >
+                                    <ChannelDmInfo
+                                        profile={props.channelDm.avatar}
+                                        type={props.channelDm.type}
+                                        name={props.channelDm.name}
+                                        showChannelInfo={showChannelInfo}
+                                        setShowChannelInfo={setShowChannelInfo}
+                                        setRender={props.setRender}
+                                        render={props.render}
+                                    />
+                                </button>
+                            </Box>
+                            {room.admins.some(
+                                (admin) => admin.id === user?.id
+                            ) ? (
+                                <Menu>
+                                    <MenuButton
+                                        as={IconButton}
+                                        aria-label="Options"
+                                        icon={
+                                            <BsThreeDots
+                                                color="#a435f0"
+                                                size={60}
+                                                transform="rotate(90)"
+                                            />
+                                        }
+                                        variant="outline"
+                                        bg={'#F5F5F5'}
+                                        h={100}
+                                    />
+                                    <MenuList
+                                        marginRight={0}
+                                        bg={'#c56af0'}
+                                        color={'white'}
+                                        w={250}
+                                        p={6}
+                                        fontFamily={'krona one'}
+                                        borderRadius={20}
+                                        marginTop={-25}
+                                    >
+                                        <MenuItem
+                                            paddingBottom={2}
+                                            bg={'none'}
+                                            icon={<BsTrash />}
+                                            onClick={onOpen}
+                                        >
+                                            <ModalUi
+                                                isOpen={isOpen}
+                                                onOpen={onOpen}
+                                                onClose={onClose}
+                                                title={'Invite new Users'}
+                                                body={
+                                                    <InviteUsersModal
+                                                        onClose={onClose}
+                                                        channelDm={room}
+                                                        user={user}
+                                                        render={props.render}
+                                                        setRender={
+                                                            props.setRender
+                                                        }
+                                                    />
+                                                }
+                                            />
+                                            Invite Users
+                                        </MenuItem>
+
+                                        {room?.ownerId === user?.id ? (
+                                            <MenuItem
+                                                bg={'none'}
+                                                icon={<BsBoxArrowLeft />}
+                                                onClick={
+                                                    room.type === 'protected'
+                                                        ? onOpen2
+                                                        : handleDeleteChannel
+                                                }
+                                            >
+                                                Delete Channel
+                                                <ModalUi
+                                                    isOpen={isOpen2}
+                                                    onOpen={onOpen2}
+                                                    onClose={onClose2}
+                                                    title={
+                                                        'Please Provide a password'
+                                                    }
+                                                    body={
+                                                        <DeletChannelModal
+                                                            onClose={onClose2}
+                                                            channelDm={room}
+                                                            render={
+                                                                props.render
+                                                            }
+                                                            setRender={
+                                                                props.setRender
+                                                            }
+                                                            user={user}
+                                                        />
+                                                    }
+                                                />
+                                            </MenuItem>
+                                        ) : null}
+                                    </MenuList>
+                                </Menu>
+                            ) : null}
+                        </Flex>
+                        <div
+                            className="messagesContainer"
+                            style={{ overflowY: 'auto' }}
                         >
-                            {props.channelDm ? (
-                                <ChannelDmInfo
-                                    profile={props.channelDm.avatar}
-                                    type={props.channelDm.type}
-                                    name={props.channelDm.name}
-                                    showChannelInfo={showChannelInfo}
-                                    setShowChannelInfo={setShowChannelInfo}
-                                    setRender={props.setRender}
-                                    render={props.render}
-                                />
-                            ) : (
-                                <></>
-                            )}
-                        </button>
-                    </Box>
-                    <Menu>
-                        <MenuButton
-                            as={IconButton}
-                            aria-label="Options"
-                            icon={
-                                <BsThreeDots
-                                    color="#a435f0"
-                                    size={60}
-                                    transform="rotate(90)"
-                                />
-                            }
-                            variant="outline"
-                            bg={'#F5F5F5'}
-                            h={100}
-                        />
-                        <MenuList
-                            marginRight={0}
-                            bg={'#c56af0'}
-                            color={'white'}
-                            w={250}
-                            p={6}
-                            fontFamily={'krona one'}
-                            borderRadius={20}
-                            marginTop={-25}
-                        >
-                            <MenuItem
-                                paddingBottom={2}
-                                bg={'none'}
-                                icon={<BsTrash />}
-                            >
-                                Delete Chat
-                            </MenuItem>
-                            <MenuItem bg={'none'} icon={<BsBoxArrowLeft />}>
-                                Leave Chat
-                            </MenuItem>
-                        </MenuList>
-                    </Menu>
-                </Flex>
-                <div
-                    className="messagesContainer"
-                    style={{ overflowY: 'auto' }}
-                >
-                    {messages?.map((message) => {
-                        return (
-                            <MessageContent
-                                key={message?.id}
-                                message={message?.content}
-                                name={
-                                    message?.senderId === user?.id
-                                        ? 'sender'
-                                        : 'receiver'
-                                }
-                                room={true}
-                                userSendId={message?.senderId}
+                            {messages?.map((message) => {
+                                return (
+                                    <MessageContent
+                                        key={message?.id}
+                                        message={message?.content}
+                                        name={
+                                            message?.senderId === user?.id
+                                                ? 'sender'
+                                                : 'receiver'
+                                        }
+                                        room={true}
+                                        userSendId={message?.senderId}
+                                    />
+                                );
+                            })}
+                        </div>
+                        <Box flex={1}>
+                            <ChannelTypingBar
+                                ChannelDm={props.channelDm}
+                                render={props.render}
+                                setRender={props.setRender}
+                                user={user}
                             />
-                        );
-                    })}
-                </div>
-                <Box flex={1}>
-                    <ChannelTypingBar
-                        ChannelDm={props.channelDm}
-                        render={props.render}
-                        setRender={props.setRender}
-                        user={user}
-                    />
-                </Box>
-            </Flex>
-            {showChannelInfo ? (
+                        </Box>
+                    </Flex>
+                </>
+            ) : (
+                <></>
+            )}
+            {room?.participants.some(
+                (participant) => participant.id === user?.id
+            ) && showChannelInfo ? (
                 <div className="container">
                     <ChannelInfo
                         ChannelDm={props.channelDm}
                         user={user}
                         render={props.render}
                         setRender={props.setRender}
+                        room={room}
+                        setRoom={setRoom}
                     />
                 </div>
             ) : null}

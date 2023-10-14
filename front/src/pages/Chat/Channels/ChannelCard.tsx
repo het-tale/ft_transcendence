@@ -53,6 +53,7 @@ const ChannelCard = (props: BrowseChannelsCardProps) => {
     const handleJoinRoom = (e: any) => {
         e.preventDefault();
         JoinLogic();
+        props.setUpdateChannel && props.setUpdateChannel(!props.updateChannel);
         onClose();
     };
 

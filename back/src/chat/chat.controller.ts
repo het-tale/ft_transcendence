@@ -76,6 +76,14 @@ export class ChatController {
       request.user,
     );
   }
+
+  @Get('room/:channelName')
+  async getChannel(
+    @Param('channelName') channelName: string,
+    @Req() request: { user: User },
+  ) {
+    return await this.channelService.getChannel(channelName, request.user);
+  }
   @Get('friends')
   async getFriends(@Req() request: { user: User }) {
     return await this.friendsService.getFriends(request.user);
