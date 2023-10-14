@@ -17,6 +17,7 @@ const Profile = () => {
     const [currentTab, setCurrentTab] = React.useState('1');
     const [user, setUser] = React.useState<UserType>();
     const [currentUser, setCurrentUser] = React.useState<UserType>();
+    const [update, setUpdate] = React.useState(false);
     const location = useLocation();
     console.log('THISSS', location);
     const id = location.pathname.split('/')[2];
@@ -30,8 +31,8 @@ const Profile = () => {
         }
 
         fetchUserData();
-    }, []);
-    console.log('USER', user);
+    }, [update]);
+    console.log('USER PROFILE', user);
     console.log(' CUrrent USER', currentUser);
     const isMyProfile = Number(id) === currentUser?.id;
     console.log('IS MY PROFILE', isMyProfile);
@@ -41,7 +42,16 @@ const Profile = () => {
             tabTitle: isMyProfile ? 'Friends' : 'Mutual Friends',
             content: (
                 <>
-                    <Friends />
+                    {isMyProfile ? (
+                        <Friends
+                            friend={true}
+                            update={update}
+                            setUpdate={setUpdate}
+                            user={user}
+                        />
+                    ) : (
+                        <Friends friend={false} user={user} />
+                    )}
                 </>
             ),
             rightSide: <>Hello Friends</>
@@ -81,6 +91,8 @@ const Profile = () => {
                             user={user}
                             currentUser={currentUser}
                             isMyProfile={isMyProfile}
+                            update={update}
+                            setUpdate={setUpdate}
                         />
                         <div className="delimiter"></div>
                         <LeftSide

@@ -37,7 +37,15 @@ import { UserType } from '../../Types/User';
 import { SocketContext } from '../../socket';
 import React from 'react';
 
-const UserInfo = (props: any) => {
+interface UserInfoProps {
+    user?: UserType;
+    currentUser?: UserType;
+    isMyProfile: boolean;
+    update?: boolean;
+    setUpdate?: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const UserInfo = (props: UserInfoProps) => {
     let status = 'Online';
     const { isOpen, onOpen, onClose } = useDisclosure();
     const user = props.isMyProfile ? props.currentUser : props.user;
@@ -49,15 +57,23 @@ const UserInfo = (props: any) => {
     const handleAddFriend = () => {
         console.log('ADD FRIEND');
         socket.emit('sendFriendRequest', {
-            target: user?.id
+            target: props.user?.username
         });
-        setFriendshipStatus('Friend Request Sent');
+        props.setUpdate!(!props.update);
     };
     socket.on('friendRequest', (data: any) => {
         console.log('FRIEND REQUEST', data);
+        props.setUpdate!(!props.update);
+    });
+
+    socket.on('friendRequestSent', (data: any) => {
+        setFriendshipStatus('Friend Request Sent');
+        console.log('FRIEND REQUEST SENT', data);
+        props.setUpdate!(!props.update);
     });
     socket.on('friendRequestError', (data: any) => {
         console.log('FRIEND REQUEST ERROR', data);
+        props.setUpdate!(!props.update);
     });
     return (
         <div className="container" style={{ width: '600px' }}>
