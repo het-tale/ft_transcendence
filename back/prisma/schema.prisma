@@ -26,6 +26,7 @@ model User {
   matchnumber        Int     @default(0)
   matchwin           Int     @default(0)
   matchlose          Int     @default(0)
+  rank               Int     @default(0)
 
   conversations          Conversation[]  @relation("ConversationParticipants")
   sentMessages           Message[]       @relation("MessageSender")
