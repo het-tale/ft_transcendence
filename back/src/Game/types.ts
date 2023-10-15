@@ -1,4 +1,5 @@
 // import { Socket } from 'dgram';
+import { number } from 'nestjs-zod/z';
 import { Subscription } from 'rxjs';
 import { Socket } from 'socket.io';
 export class Paddle {
@@ -44,18 +45,21 @@ export interface GameData {
 
 export class Player {
   constructor(
+    number: number,
     id: number,
     socket: Socket,
     paddle: Paddle,
     room: string,
     score: number,
   ) {
+    this.number = number;
     this.id = id;
     this.socket = socket;
     this.paddle = paddle;
     this.room = room;
     this.score = score;
   }
+  number: number;
   id: number;
   socket: Socket;
   paddle: Paddle;
@@ -81,19 +85,19 @@ export class Room {
     const random = Math.random();
     switch (true) {
       case random < 0.2:
-        this.ball = new Ball(720 / 2, 480 / 2, 15, 3, 3);
+        this.ball = new Ball(CONTAINERWIDTH / 2, CONTAINERHIEGHT / 2, RADIUS, 3, 3);
         break;
       case random < 0.4:
-        this.ball = new Ball(720 / 2, 480 / 2, 15, 3, -3);
+        this.ball = new Ball(CONTAINERWIDTH / 2, CONTAINERHIEGHT / 2, RADIUS, 3, -3);
         break;
       case random < 0.6:
-        this.ball = new Ball(720 / 2, 480 / 2, 15, -3, 3);
+        this.ball = new Ball(CONTAINERWIDTH / 2, CONTAINERHIEGHT / 2, RADIUS, -3, 3);
         break;
       case random < 0.8:
-        this.ball = new Ball(720 / 2, 480 / 2, 15, -3, -3);
+        this.ball = new Ball(CONTAINERWIDTH / 2, CONTAINERHIEGHT / 2, RADIUS, -3, -3);
         break;
       default:
-        this.ball = new Ball(720 / 2, 480 / 2, 15, 3, 3);
+        this.ball = new Ball(CONTAINERWIDTH / 2, CONTAINERHIEGHT / 2, RADIUS, 3, 3);
         break;
     }
     this.rounds = 5;
@@ -109,5 +113,8 @@ export class Room {
 }
 
 export const INTERVAL = 16.66;
-export const INCREASE_SPEED = 0.4;
+export const INCREASE_SPEED = 1;
 export const SPEED_INTERVAL = 1000;
+export const CONTAINERHIEGHT = 480;
+export const CONTAINERWIDTH = 720;
+export const RADIUS = 10;

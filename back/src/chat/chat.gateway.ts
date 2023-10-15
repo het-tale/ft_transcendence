@@ -308,7 +308,7 @@ export class ChatGateway
       } else {
         client
           .to(data.room)
-          .emit('roomInvitationDeclined', { room: data.room });
+          .emit('roomInvitationDeclined', data.room);
       }
     } catch (err) {
       client.emit('roomInvitationError', err.message);

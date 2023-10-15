@@ -1,5 +1,5 @@
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Room, Ball, Paddle, Player } from './types';
+import { Room, Ball, Paddle, Player, CONTAINERWIDTH, CONTAINERHIEGHT } from './types';
 import { Socket } from 'socket.io';
 import { User } from '@prisma/client';
 import { stopGame } from './Game_services';
@@ -17,8 +17,8 @@ export function resetBall(ball: Ball, player: Player, otherPlayer: Player) {
     playerScore: otherPlayer.score,
     otherScore: player.score,
   });
-  ball.x = 720 / 2;
-  ball.y = 480 / 2;
+  ball.x =  CONTAINERWIDTH/ 2;
+  ball.y = CONTAINERHIEGHT / 2;
   const random = Math.random();
   switch (true) {
     case random < 0.25:
@@ -199,6 +199,7 @@ export async function dataupdatetostop(player: Player, otherPlayer: Player, room
   const looserId = player.score < otherPlayer.score ? player.id : otherPlayer.id;
   const user1 = activeSockets.get(player.socket);
   const user2 = activeSockets.get(otherPlayer.socket);
+  console.log('player id ', );
   await prisma.match.update({
     where: { id: room.id },
     data: {
@@ -270,30 +271,41 @@ export async function intersections(
   otherPaddle: Paddle,
 ) {
   if (
-    room.ball.x + room.ball.radius >= playerPaddle.x &&
+    room.ball.x + room.ball.radius > playerPaddle.x - playerPaddle.width / 2 &&
     room.ball.y >= playerPaddle.y &&
     room.ball.y <= playerPaddle.y + playerPaddle.height
   ) {
+    console.log('colision 1');
     const relativeIntersectY =
       (room.ball.y - (playerPaddle.y + playerPaddle.height / 2)) /
       (playerPaddle.height / 2);
     const bounceAngle = relativeIntersectY * MAX_ANGLE_CHANGE;
-    room.ball.dx = -room.ball.dx;
-    room.ball.dy = Math.sin(bounceAngle) * 3;
+
+    // Add a random factor to bounceAngle
+    const randomFactor = (Math.random() - 0.5) * 0.5;
+    const finalBounceAngle = bounceAngle + randomFactor;
+
+    room.ball.dx *= -1;
+    room.ball.dy = Math.sin(finalBounceAngle) * 3;
   } else if (
-    room.ball.x - room.ball.radius <= otherPaddle.x + otherPaddle.width &&
+    room.ball.x - room.ball.radius < otherPaddle.x + otherPaddle.width &&
     room.ball.y >= otherPaddle.y &&
     room.ball.y <= otherPaddle.y + otherPaddle.height
   ) {
+    console.log('colision 2');
     const relativeIntersectY =
       (room.ball.y - (otherPaddle.y + otherPaddle.height / 2)) /
       (otherPaddle.height / 2);
     const bounceAngle = relativeIntersectY * MAX_ANGLE_CHANGE;
-    room.ball.dx = -room.ball.dx;
-    room.ball.dy = Math.sin(bounceAngle) * 3;
+
+    // Add a random factor to bounceAngle
+    const randomFactor = (Math.random() - 0.5) * 0.5;
+    const finalBounceAngle = bounceAngle + randomFactor;
+
+    room.ball.dx *= -1;
+    room.ball.dy = Math.sin(finalBounceAngle) * 3;
   }
 }
-
 export async function colision(
   room: Room,
   rooms: Map<string, Room>,
@@ -307,12 +319,14 @@ export async function colision(
   const playerPaddle = player.paddle;
   const otherPaddle = otherPlayer.paddle;
   intersections(room, playerPaddle, otherPaddle);
-  if (room.ball.x + room.ball.radius > playerPaddle.x + playerPaddle.width) {
+  if (room.ball.x > CONTAINERWIDTH) {
+    console.log('end game 1');
     otherPlayer.score++;
     room.rounds--;
     if (room.rounds === 0) dataupdatetostop(player, otherPlayer, room, activeSockets, prisma);
     else resetBall(room.ball, player, otherPlayer);
-  } else if (room.ball.x < otherPaddle.x - otherPaddle.width) {
+  } else if (room.ball.x < 0) {
+    console.log('end game 2');
     player.score++;
     room.rounds--;
     if (room.rounds === 0) dataupdatetostop(player, otherPlayer, room, activeSockets, prisma);

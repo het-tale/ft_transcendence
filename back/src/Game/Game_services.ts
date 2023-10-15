@@ -2,7 +2,7 @@ import { INCREASE_SPEED, Room, SPEED_INTERVAL } from './types';
 import { colision } from './movments';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Socket } from 'socket.io';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 
 export async function stopGame(
   room: Room,
@@ -23,6 +23,7 @@ export async function stopGame(
     room.gameInterval.unsubscribe();
   }
   room.gameActive = false;
+  console.log('stopina lgame ghayerha ');
   // rooms.delete(room.roomName);
 }
 
