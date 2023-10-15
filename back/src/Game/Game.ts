@@ -18,7 +18,6 @@ import { User } from '@prisma/client';
 import { UpdatePaddle, findRoomByPlayerSocket } from './Game-Update';
 import { cancelgamesart, startGame } from './start-game';
 import { stopGame } from './Game_services';
-import { calculateRank } from './Game-Update';
 
 @WebSocketGateway({ namespace: 'game' })
 @Injectable()
@@ -131,7 +130,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         });
         room.gameActive = false;
         this.rooms.delete(room.roomName);
-        calculateRank(this.prisma);
       }
     }
   }
