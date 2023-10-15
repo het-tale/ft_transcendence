@@ -82,27 +82,23 @@ const Profile = () => {
     };
     return (
         <div>
-            <NavbarSearch />
-            <Flex>
-                <Sidebar />
-                <Box w="100%" bg="#E9ECEF">
-                    <Flex justify="space-between">
-                        <UserInfo
-                            user={user}
-                            currentUser={currentUser}
-                            isMyProfile={isMyProfile}
-                            update={update}
-                            setUpdate={setUpdate}
-                        />
-                        <div className="delimiter"></div>
-                        <LeftSide
-                            handleTabClick={handleTabClick}
-                            tabs={tabs}
-                            currentTab={currentTab}
-                        />
-                    </Flex>
-                </Box>
-            </Flex>
+            <Box w="100%" bg="#E9ECEF">
+                <Flex justify="space-between">
+                    <UserInfo
+                        user={user}
+                        currentUser={currentUser}
+                        isMyProfile={isMyProfile}
+                        update={update}
+                        setUpdate={setUpdate}
+                    />
+                    <div className="delimiter"></div>
+                    <LeftSide
+                        handleTabClick={handleTabClick}
+                        tabs={tabs}
+                        currentTab={currentTab}
+                    />
+                </Flex>
+            </Box>
         </div>
     );
 };
