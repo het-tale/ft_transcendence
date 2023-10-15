@@ -80,6 +80,18 @@ export const Layout = ({ children }: Props) => {
                 });
                 renderData.setRenderData(!renderData.renderData);
             });
+            socket.on('ReceiveInvitation', (data: any) => {
+                console.log('ReceiveInvitation', data);
+                toast({
+                    title: 'success',
+                    description: data.from,
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                renderData.setRenderData(!renderData.renderData);
+            });
         }, 500);
 
         return () => {
@@ -87,6 +99,7 @@ export const Layout = ({ children }: Props) => {
             socket.off('roomInvitationError');
             socket.off('roomJoined');
             socket.off('roomInvitationDeclined');
+            socket.off('ReceiveInvitation');
             clearTimeout(timer);
         };
     }, [socket]);

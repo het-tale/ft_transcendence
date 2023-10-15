@@ -151,6 +151,12 @@ const DmsChat = (props: any) => {
         console.log('View Profile');
         <Link to="/user-profile" />;
     };
+    const handleSendGameInvitation = () => {
+        console.log('Send game invitation');
+        socket.emit('InvitePlayer', {
+            targetUserId: props.userDm?.id
+        });
+    };
     if (!dms || dms.length === 0 || !props.userDm) return <></>;
     return (
         <Flex flexDirection={'column'} justifyContent={'space-between'}>
@@ -196,6 +202,7 @@ const DmsChat = (props: any) => {
                             paddingBottom={2}
                             bg={'none'}
                             icon={<BsController />}
+                            onClick={handleSendGameInvitation}
                         >
                             Play with me
                         </MenuItem>
