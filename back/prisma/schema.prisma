@@ -26,7 +26,11 @@ model User {
   matchnumber        Int     @default(0)
   matchwin           Int     @default(0)
   matchlose          Int     @default(0)
-  rank               Int     @default(0)
+  win_rate           Float   @default(0)
+  add_nmr            Int     @default(0)
+  sub_nmr            Int     @default(0)
+  lp                 Int     @default(100)
+  g_rank             Int     @default(0)
 
   conversations          Conversation[]  @relation("ConversationParticipants")
   sentMessages           Message[]       @relation("MessageSender")
@@ -43,6 +47,7 @@ model User {
   matchHistoryB          Match[]         @relation("MatchPlayerB")
   winningMatches         Match[]         @relation("MatchWinner")
   achievements           Achievement[]   @relation("Achiever")
+  offlineAchievements    Achievement[]   @relation("OfflineAchiever")
   channels               Channel[]       @relation("ChannelParticipants")
   ownedChannels          Channel[]       @relation("ChannelOwner")
   adminChannels          Channel[]       @relation("ChannelAdmins")
@@ -164,4 +169,6 @@ model Achievement {
   description String
 
   achievers User[] @relation("Achiever")
+  offlineAchievers User[] @relation("OfflineAchiever")
 }
+

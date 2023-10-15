@@ -3,12 +3,10 @@ import { colision } from './movments';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Socket } from 'socket.io';
 import { Prisma, User } from '@prisma/client';
-import { calculateRank } from './Game-Update';
 
 export async function stopGame(
   room: Room,
   activeSockets: Map<Socket, User>,
-  prisma: PrismaService,
 ) {
   console.log('stopGame');
   const player = room.players[0];
@@ -26,7 +24,6 @@ export async function stopGame(
   }
   room.gameActive = false;
   console.log('stopina lgame ghayerha ');
-  calculateRank(prisma);
   // rooms.delete(room.roomName);
 }
 

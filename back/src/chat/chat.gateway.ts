@@ -25,6 +25,7 @@ import {
   TUserTarget,
 } from 'src/dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { AchievementsService } from './achievements.service';
 
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway
@@ -34,6 +35,7 @@ export class ChatGateway
     private dmService: DMService,
     private channelService: ChannelService,
     private friendsService: FriendsService,
+    private achievementsService: AchievementsService,
   ) {}
   @WebSocketServer() io: Server;
   private connectedUsers: { clientId: string; username: string }[] = [];
@@ -62,23 +64,28 @@ export class ChatGateway
         await this.channelService.getOfflineChannelMessages(user.id);
       const offlineFriendRequests =
         await this.dmService.getOfflineFriendRequests(user.id);
+      const offlineAchievements = await this.achievementsService.getOfflineAchievements(user.username);
       if (offlineChannelMessages.length > 0) {
         client.emit('offlineChannelMessages', offlineChannelMessages);
-        this.channelService.deleteOfflineChannelMessages(
+        await this.channelService.deleteOfflineChannelMessages(
           offlineChannelMessages,
         );
       }
       if (offlineMessages.length > 0) {
         client.emit('offlineMessages', offlineMessages);
-        this.dmService.changeOfflineMessagesStatus(offlineMessages);
+        await this.dmService.changeOfflineMessagesStatus(offlineMessages);
       }
       if (offlineInvitations.length > 0) {
         client.emit('offlineInvitations', offlineInvitations);
-        this.channelService.changeOfflineInvitationsStatus(offlineInvitations);
+        await this.channelService.changeOfflineInvitationsStatus(offlineInvitations);
       }
       if (offlineFriendRequests.length > 0) {
         client.emit('offlineFriendRequests', offlineFriendRequests);
-        this.dmService.changeOfflineFriendRequestsStatus(offlineFriendRequests);
+        await this.dmService.changeOfflineFriendRequestsStatus(offlineFriendRequests);
+      }
+      if (offlineAchievements.length > 0) {
+        client.emit('offlineAchievements', offlineAchievements);
+        await this.achievementsService.removeOfflineAchievements(user.username);
       }
     } catch (err) {
       client.disconnect();
@@ -133,6 +140,9 @@ export class ChatGateway
         from: sender.username,
         message: data.message,
       });
+      const obj = await this.achievementsService.check100SentMessages(sender.username);
+      if (obj.isUnlocked)
+        this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
     } catch (err) {
       console.log(err.message, 'privateMessageError');
       client.emit('privateMessageError', err.message);
@@ -165,6 +175,9 @@ export class ChatGateway
       );
       client.join(data.room);
       this.io.to(data.room).emit('roomCreated', { room: data.room });
+      const obj = await this.achievementsService.check20Channels(owner.username);
+      if (obj.isUnlocked)
+        this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
     } catch (err) {
       if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2002')
@@ -189,6 +202,9 @@ export class ChatGateway
         data.password ? data.password : null,
       );
       client.join(data.room);
+      const obj = await this.achievementsService.check20Channels(user.username);
+      if (obj.isUnlocked)
+        this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
       this.io.to(data.room).emit('roomJoined', `${user.username} joined`);
     } catch (err) {
       client.emit('roomJoinError', err.message);
@@ -231,6 +247,9 @@ export class ChatGateway
           this.io.to(user.clientId).emit('roomMessage', data.message);
         }
       }
+      const obj = await this.achievementsService.check100SentMessages(sender.username);
+      if (obj.isUnlocked)
+        this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
     } catch (err) {
       client.emit('roomMessageError', err.message);
     }
@@ -504,10 +523,16 @@ export class ChatGateway
         isOnline,
       );
       if (data.isAccepted) {
+        const obj = await this.achievementsService.check20friends(clientUsername);
+        if (obj.isUnlocked)
+          this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
         this.io.to(client.id).emit('friendRequestAccepted', {
           from: data.from,
         });
         if (receiver) {
+          const obj2 = await this.achievementsService.check20friends(receiver.username);
+          if (obj2.isUnlocked)
+            this.io.to(receiver.clientId).emit('achievementUnlocked', obj2.achievement);
           this.io.to(receiver.clientId).emit('friendRequestAccepted', {
             from: clientUsername,
           });
@@ -550,8 +575,17 @@ export class ChatGateway
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       ).username;
+      const target = this.connectedUsers.find(
+        (user) => user.username === data.target,
+      );
       await this.friendsService.blockUser(clientUsername, data.target);
+      const obj = await this.achievementsService.checkFirstBlock(clientUsername);
+      if (obj.isUnlocked)
+        this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
       this.io.to(client.id).emit('userBlocked');
+      const obj2 = await this.achievementsService.check20blocks(data.target);
+      if (obj2.isUnlocked && target)
+        this.io.to(target.clientId).emit('achievementUnlocked', obj2.achievement);
     } catch (err) {
       client.emit('userBlockError', err.message);
     }
