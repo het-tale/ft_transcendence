@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     BsBoxArrowLeft,
@@ -13,7 +13,9 @@ import { UserType } from '../Types/User';
 import User from './User';
 import { Button, Image, useToast } from '@chakra-ui/react';
 import { SocketContext } from '../socket';
-import { Notification } from '../Types/Notification';
+import { Invitation, Notification } from '../Types/Notification';
+import { RenderContext, RenderContextType } from '../RenderContext';
+import { GetPendingInvitations } from './GetNotification';
 
 interface sidebarProps {
     notification?: boolean;
@@ -23,6 +25,7 @@ interface sidebarProps {
 
 const Sidebar = (props: sidebarProps) => {
     const [user, setUser] = React.useState<UserType>();
+    const renderData: RenderContextType = React.useContext(RenderContext);
     useEffect(() => {
         async function fetchUserData() {
             const userData = await User();
@@ -31,71 +34,6 @@ const Sidebar = (props: sidebarProps) => {
 
         fetchUserData();
     }, []);
-    const socket = React.useContext(SocketContext);
-    const toast = useToast();
-    const token = localStorage.getItem('token');
-
-    useEffect(() => {
-        socket.auth = { token: token };
-        socket.connect();
-        const timer = setTimeout(() => {
-            socket.on('roomInvitation', (data: any) => {
-                console.log('roomInvitation', data);
-                toast({
-                    title: 'success',
-                    description: data.from,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.notifArray?.push({ from: data.from, type: data.room });
-            });
-            socket.on('roomInvitationError', (data: any) => {
-                console.log('roomInvitationError', data);
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-            });
-
-            socket.on('roomJoined', (data: any) => {
-                console.log('roomJoined', data);
-                toast({
-                    title: 'succes',
-                    description: data,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-            });
-
-            socket.on('roomInvitationDeclined', (data: any) => {
-                console.log('roomDeclined', data);
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-            });
-        }, 500);
-
-        return () => {
-            socket.off('roomInvitation');
-            socket.off('roomInvitationError');
-            socket.off('roomJoined');
-            socket.off('roomInvitationDeclined');
-            clearTimeout(timer);
-        };
-    }, [socket]);
 
     return (
         <aside>

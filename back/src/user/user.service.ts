@@ -85,7 +85,9 @@ export class UserService {
   }
 
   async getPendingInvitations(user: User) {
-    const invitations = await this.prisma.friendRequest.findMany({
+    console.log(user.username);
+
+    const invitations = await this.prisma.invitation.findMany({
       where: {
         receiverId: user.id,
         status: 'pending',
@@ -98,6 +100,7 @@ export class UserService {
             avatar: true,
           },
         },
+        channel: true,
       },
     });
     return invitations;

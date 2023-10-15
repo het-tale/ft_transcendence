@@ -316,29 +316,23 @@ const Dms = (props: any) => {
         setFirstLoad(e.target.tabTitle);
     };
     return (
-        <Flex flexDirection={'column'}>
-            <NavbarSearch />
-            <Flex>
-                <Sidebar />
-                <Box w="100%" bg="#E9ECEF" h={'90%'}>
-                    <Flex justify="space-between">
-                        <LeftSide
-                            handleTabClick={handleTabClick}
-                            tabs={tabs}
-                            currentTab={currentTab}
-                        />
-                        <div className="delimiter"></div>
-                        <RightSide
-                            handleTabClick={handleTabClick}
-                            tabs={tabs}
-                            currentTab={currentTab}
-                            firstLoad={firstLoad}
-                            renderActions={renderActions}
-                        />
-                    </Flex>
-                </Box>
+        <Box w="100%" bg="#E9ECEF" h={'90%'}>
+            <Flex justify="space-between">
+                <LeftSide
+                    handleTabClick={handleTabClick}
+                    tabs={tabs}
+                    currentTab={currentTab}
+                />
+                <div className="delimiter"></div>
+                <RightSide
+                    handleTabClick={handleTabClick}
+                    tabs={tabs}
+                    currentTab={currentTab}
+                    firstLoad={firstLoad}
+                    renderActions={renderActions}
+                />
             </Flex>
-        </Flex>
+        </Box>
     );
 };
 
