@@ -11,14 +11,30 @@ export async function updateGamerobot(
   prisma: PrismaService,
   containerHeight: number,
 ) {
-  if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL) {
-    room.lastspeedincrease = Date.now();
-    room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
-    room.ball.dy += room.ball.dy > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
-  }
-  // room.ball.setXY(room.ball.x + room.ball.dx, room.ball.y + room.ball.dy);
-  room.ball.x += room.ball.dx;
-  room.ball.y += room.ball.dy;
+
+  const robotpaddle = room.players[1].paddle;
+  
+  const randomError = Math.random();
+  const errorFactor = 0.3;
+
+const paddleCenterY = robotpaddle.y + robotpaddle.height / 2;
+const ballY = room.ball.y;
+const yDifference = ballY - paddleCenterY;
+
+if (randomError < errorFactor) {
+  // Apply random error to robot's movement
+  room.players[1].paddle.y += Math.random() * 2 * robotpaddle.dy - robotpaddle.dy;
+} else {
+  // Maintain normal robot behavior
+  room.players[1].paddle.y += yDifference > 0 ? robotpaddle.dy : -robotpaddle.dy;
+}
+
+const maxY = containerHeight - room.players[1].paddle.height;
+if (room.players[1].paddle.y < 0) {
+  room.players[1].paddle.y = 0;
+} else if (room.players[1].paddle.y > maxY) {
+  room.players[1].paddle.y = maxY;
+}
   // Check for collisions with top and bottom walls
   if (
     room.ball.y - room.ball.radius <= 0 ||
@@ -27,20 +43,15 @@ export async function updateGamerobot(
     // Reverse the vertical velocity of the ball
     room.ball.dy *= -1;
   }
-  const robotpaddle = room.players[1].paddle;
-
-  const paddleCenterY = robotpaddle.y + robotpaddle.height / 2;
-  const ballY = room.ball.y;
-  const yDifference = ballY - paddleCenterY;
-  room.players[1].paddle.y +=
-    yDifference > 0 ? robotpaddle.dy : -robotpaddle.dy;
-  const maxY = containerHeight - room.players[1].paddle.height;
-  if (room.players[1].paddle.y < 0) {
-    room.players[1].paddle.y = 0;
-  } else if (room.players[1].paddle.y > maxY) {
-    room.players[1].paddle.y = maxY;
-  }
   colisionrobot(room, rooms, activeSockets, prisma);
+  if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL) {
+    room.lastspeedincrease = Date.now();
+    room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
+    room.ball.dy += room.ball.dy > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
+  }
+  // room.ball.setXY(room.ball.x + room.ball.dx, room.ball.y + room.ball.dy);
+  room.ball.x += room.ball.dx;
+  room.ball.y += room.ball.dy;
 }
 
 export async function UpdatePaddle(
@@ -96,4 +107,22 @@ export function findRoomByPlayerSocket(
   }
 
   return undefined;
+}
+
+export async function calculateRank(prisma: PrismaService)
+{
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+    },
+    orderBy: {
+      matchwin: 'desc',
+    },
+  });
+  for (let i = 0; i < users.length; i++) {
+    await prisma.user.update({
+      where: { id: users[i].id },
+      data: { rank: i + 1 },
+    });
+  }
 }
