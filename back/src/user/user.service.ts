@@ -102,4 +102,61 @@ export class UserService {
     });
     return invitations;
   }
+
+  async changeLp(prisma: PrismaService, user: User, isWinner: boolean)
+  {
+    let lp = isWinner ? user.lp + user.add_nmr : user.lp - user.sub_nmr;
+    if (lp < 0) lp = 0;
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lp },
+    });
+  }
+
+  async calculateNmr(prisma: PrismaService, user: User)
+  {
+    const rate = user.win_rate;
+    let add;
+    let sub;
+    if (rate <= 20)
+      add = 7, sub = 3;
+    else if (rate <= 30)
+      add = 10, sub = 10;
+    else if (rate <= 50)
+      add = 15, sub = 9;
+    else if (rate <= 70)
+      add = 20, sub = 7;
+    else
+      add = 25, sub = 5;
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { add_nmr: add, sub_nmr: sub},
+    });
+  }
+  async calculateWinRate(prisma: PrismaService, user: User)
+  {
+    if (user.matchnumber === 0) return 0;
+    const rate = (user.matchwin * 100) / user.matchnumber;
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { win_rate: rate},
+    });
+  }
+  async calculateRank(prisma: PrismaService)
+  {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+      },
+      orderBy: {
+        matchwin: 'desc',
+      },
+    });
+    for (let i = 0; i < users.length; i++) {
+      await prisma.user.update({
+        where: { id: users[i].id },
+        data: { rank: i + 1 },
+      });
+    }
+  }
 }
