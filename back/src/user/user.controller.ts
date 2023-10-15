@@ -80,7 +80,7 @@ export class UserController {
   @Get(':id')
   async getUserById(@Param('id') idString: string) {
     const id = Number(idString);
-  
+    if(!id) return;
     return await this.userService.getUserById(id);
   }
 

@@ -26,7 +26,7 @@ import {
 } from '@chakra-ui/react';
 import MessageUser from './MessageUser';
 import React, { useEffect } from 'react';
-import { SocketContext } from '../../socket';
+import { SocketContext, SocketGameContext } from '../../socket';
 import GetDms from './GetDms';
 import { UserType } from '../../Types/User';
 import { MessageType } from '../../Types/Message';
@@ -37,8 +37,9 @@ import ModalConfirm from './ModalConfirm';
 import client from '../../components/Client';
 import { on } from 'events';
 import Profile from '../Profile/Profile';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import UserDmInfo from './UserDmInfo';
+import { RenderContext } from '../../RenderContext';
 
 const DmsChat = (props: any) => {
     const toast = useToast();
@@ -66,7 +67,9 @@ const DmsChat = (props: any) => {
     }, [props.render]);
     const [dms, setDms] = React.useState<UserType[]>([]);
     const socket = React.useContext(SocketContext);
+    const socketGame = React.useContext(SocketGameContext);
     const [messages, setMessages] = React.useState<MessageType[]>([]);
+    const renderData = React.useContext(RenderContext);
     // const [render, setRender] = React.useState(false);
     useEffect(() => {
         const res = GetDms().then((data) => {
@@ -151,11 +154,12 @@ const DmsChat = (props: any) => {
         console.log('View Profile');
         <Link to="/user-profile" />;
     };
+    const navigate = useNavigate();
     const handleSendGameInvitation = () => {
         console.log('Send game invitation');
-        socket.emit('InvitePlayer', {
-            targetUserId: props.userDm?.id
-        });
+        socketGame.emit('InvitePlayer', props.userDm?.id);
+        props.setRender(!props.render);
+        navigate(`/game/${user?.id}/${true}`);
     };
     if (!dms || dms.length === 0 || !props.userDm) return <></>;
     return (

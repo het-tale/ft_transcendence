@@ -12,9 +12,13 @@ import '../css/sidebar.css';
 import { useEffect, useState } from 'react';
 import { Invitation } from '../Types/Invitation';
 import React from 'react';
-import { SocketContext } from '../socket';
+import { SocketContext, SocketGameContext } from '../socket';
 import { RenderContext, RenderContextType } from '../RenderContext';
 import { GetPendingInvitations } from '../components/GetNotification';
+import { set } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { UserType } from '../Types/User';
+import User from '../components/User';
 
 interface Props {
     children?: React.ReactNode;
@@ -23,12 +27,26 @@ interface Props {
 export const Layout = ({ children }: Props) => {
     const [invitations, setInvitations] = useState<Invitation[]>([]);
     const socket = React.useContext(SocketContext);
+    const socketGame = React.useContext(SocketGameContext);
     const renderData: RenderContextType = React.useContext(RenderContext);
     const toast = useToast();
     const token = localStorage.getItem('token');
+    const [roomId, setRoomId] = useState<string>('');
+    const [user, setUser] = React.useState<UserType>();
+    const navigate = useNavigate();
+    React.useEffect(() => {
+        async function fetchUserData() {
+            const currentUserData = await User();
+            setUser(currentUserData);
+        }
+
+        fetchUserData();
+    }, []);
     useEffect(() => {
         socket.auth = { token: token };
         socket.connect();
+        socketGame.auth = { token: token };
+        socketGame.connect();
         const timer = setTimeout(() => {
             socket.on('roomInvitation', (data: any) => {
                 console.log('roomInvitation', data);
@@ -80,12 +98,25 @@ export const Layout = ({ children }: Props) => {
                 });
                 renderData.setRenderData(!renderData.renderData);
             });
-            socket.on('ReceiveInvitation', (data: any) => {
+            socketGame.on('ReceiveInvitation', (data: any) => {
                 console.log('ReceiveInvitation', data);
                 toast({
                     title: 'success',
-                    description: data.from,
+                    description: data.senderName,
                     status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                renderData.setRenderData(!renderData.renderData);
+                setRoomId(data.roomId);
+            });
+            socketGame.on('InvitationDeclined', () => {
+                console.log('InvitationDeclined');
+                toast({
+                    title: 'InvitationDeclined',
+                    description: '',
+                    status: 'info',
                     duration: 9000,
                     isClosable: true,
                     position: 'bottom-right'
@@ -99,7 +130,8 @@ export const Layout = ({ children }: Props) => {
             socket.off('roomInvitationError');
             socket.off('roomJoined');
             socket.off('roomInvitationDeclined');
-            socket.off('ReceiveInvitation');
+            socketGame.off('ReceiveInvitation');
+            socketGame.off('InvitationDeclined');
             clearTimeout(timer);
         };
     }, [socket]);
@@ -112,6 +144,16 @@ export const Layout = ({ children }: Props) => {
             isAccepted: isAccepted
         });
         renderData.setRenderData(!renderData.renderData);
+    };
+
+    const handleAcceptRejectGame = (isAccepted: boolean) => {
+        if (isAccepted) {
+            socketGame.emit('AcceptInvitation', roomId);
+            navigate(`/game/${user?.id}/${true}`);
+        } else socketGame.emit('DeclineInvitation', roomId);
+        renderData.setRenderData(!renderData.renderData);
+        renderData.setNotification &&
+            renderData.setNotification(!renderData.notification);
     };
 
     useEffect(() => {
@@ -154,7 +196,9 @@ export const Layout = ({ children }: Props) => {
                                             fontSize={15}
                                             color={'#a435f0'}
                                         >
-                                            {`${invit.sender.username} invited you to join ${invit.channel?.name}`}
+                                            {invit.isGame
+                                                ? `${invit.sender.username} invited you to play a game`
+                                                : `${invit.sender.username} invited you to join ${invit.channel?.name}`}
                                         </Text>
                                         <Flex
                                             justifyContent={'flex-end'}
@@ -164,11 +208,17 @@ export const Layout = ({ children }: Props) => {
                                                 <Button
                                                     backgroundColor={'white'}
                                                     color={'#a435f0'}
-                                                    onClick={() =>
-                                                        handleAcceptReject(
-                                                            invit,
-                                                            false
-                                                        )
+                                                    onClick={
+                                                        invit.isGame
+                                                            ? () =>
+                                                                  handleAcceptRejectGame(
+                                                                      false
+                                                                  )
+                                                            : () =>
+                                                                  handleAcceptReject(
+                                                                      invit,
+                                                                      false
+                                                                  )
                                                     }
                                                 >
                                                     Decline
@@ -176,11 +226,17 @@ export const Layout = ({ children }: Props) => {
                                                 <Button
                                                     backgroundColor={'#a435f0'}
                                                     color={'white'}
-                                                    onClick={() =>
-                                                        handleAcceptReject(
-                                                            invit,
-                                                            true
-                                                        )
+                                                    onClick={
+                                                        invit.isGame
+                                                            ? () =>
+                                                                  handleAcceptRejectGame(
+                                                                      true
+                                                                  )
+                                                            : () =>
+                                                                  handleAcceptReject(
+                                                                      invit,
+                                                                      true
+                                                                  )
                                                     }
                                                 >
                                                     Accept
