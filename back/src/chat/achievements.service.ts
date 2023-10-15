@@ -148,47 +148,4 @@ export class AchievementsService {
         const isUnlocked = await this.checkIfAchiever(user, achievement, false);
         return  {achievement, isUnlocked};
     }
-    async checkFirstWin(username: string)
-    {
-        const user = await this.prisma.user.findUnique({
-            where: { username },
-        });
-        const achievement = await this.getAchievement("First Win");
-        if (user.matchwin !== 1)
-            return { achievement, isUnlocked: false };
-        const isUnlocked = await this.checkIfAchiever(user, achievement, true);
-        return { achievement, isUnlocked };
-    }
-    async checkFirstLoss(username: string)
-    {
-        const user = await this.prisma.user.findUnique({
-            where: { username },
-        });
-        const achievement = await this.getAchievement("First Loss");
-        if (user.matchlose !== 1)
-            return false;
-        const isUnlocked = await this.checkIfAchiever(user, achievement, true);
-        return { achievement, isUnlocked };
-    }
-    async checkRank(username: string)
-    {
-        const user = await this.prisma.user.findUnique({
-            where: { username },
-        });
-        let achievement: TAchievement;
-        if (user.lp < 300)
-            achievement = await this.getAchievement("Iron Curtain Crusher");
-        else if (user.lp < 600)
-            achievement = await this.getAchievement("Bronze Bounce Master");
-        else if (user.lp < 900)
-            achievement = await this.getAchievement("Silver Paddle Prodigy");
-        else if (user.lp < 1200)
-            achievement = await this.getAchievement("Golden Ball Wizard");
-        else if (user.lp < 1500)
-            achievement = await this.getAchievement("Diamond Duelist");
-        else
-            achievement = await this.getAchievement("Master of the Pongiverse");
-        const isUnlocked = await this.checkIfAchiever(user, achievement, true);
-        return { achievement, isUnlocked };
-    }
 }

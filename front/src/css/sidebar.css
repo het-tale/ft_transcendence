@@ -4,7 +4,7 @@ aside {
     color: var(--white);
     width: 200px;
     padding-left: 15px;
-    height: 90%;
+    height: 92vh;
     background-image: linear-gradient(30deg , var(--fakhti), var(--koki));
     border-top-right-radius: 80px;
     font-family: 'Krona One';

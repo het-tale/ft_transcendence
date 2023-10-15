@@ -175,6 +175,9 @@ export class ChatGateway
       );
       client.join(data.room);
       this.io.to(data.room).emit('roomCreated', { room: data.room });
+      const obj = await this.achievementsService.check20Channels(owner.username);
+      if (obj.isUnlocked)
+        this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
     } catch (err) {
       if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2002')
