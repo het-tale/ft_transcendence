@@ -38,8 +38,8 @@ export async function StartGameEvent(
     );
     if (existRoom.players.length === 1) {
       exist = true;
-      const playerId = activeSockets.get(client).id;
-      const player = new Player(playerId, client, padd, existRoom.roomName, 0);
+      const user = activeSockets.get(client);
+      const player = new Player(2, user.id, client, padd, existRoom.roomName, 0);
       existRoom.players.push(player);
       client.join(existRoom.roomName);
       const gamedata: GameData = {
@@ -68,8 +68,7 @@ export async function StartGameEvent(
 
     //find the user id by activ socket
     const user = activeSockets.get(client);
-    const PlayerId = user.id;
-    const player = new Player(PlayerId, client, otherpadd, room.roomName, 0);
+    const player = new Player(1, user.id, client, otherpadd, room.roomName, 0);
     room.players.push(player);
     client.join(room.roomName);
 
@@ -82,7 +81,7 @@ export async function StartGameEvent(
       rounds: room.rounds,
       containerHeight: containerHeight,
       containerWidth: containerWidth,
-      id: 1,
+      id: player.number,
     };
     client.emit('JoinRoom', room.roomName);
     client.emit('InitGame', gamedata);
@@ -110,14 +109,14 @@ export async function StartGameEventRobot(
   const room = new Room(Math.random().toString(36).substring(7));
   rooms.set(room.roomName, room);
   console.log('new room created with name ', room.roomName);
-  const playerNumber = 1;
-  const player = new Player(playerNumber, client, otherpadd, room.roomName, 0);
+  const user = activeSockets.get(client);
+  const player = new Player(1, user.id, client, otherpadd, room.roomName, 0);
   const robotUser = await prisma.user.findUnique({
     where: {
       username: 'ROBOT',
     },
   });
-  const robot = new Player(robotUser.id, client, padd, room.roomName, 0);
+  const robot = new Player(2, robotUser.id, client, padd, room.roomName, 0);
   room.players.push(player);
   room.players.push(robot);
   client.join(room.roomName);
@@ -130,7 +129,7 @@ export async function StartGameEventRobot(
     rounds: room.rounds,
     containerHeight: containerHeight,
     containerWidth: containerWidth,
-    id: playerNumber,
+    id: player.number,
   };
   client.emit('JoinRoom', room.roomName);
   client.emit('InitGame', gamedata);

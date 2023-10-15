@@ -1,4 +1,5 @@
 // import { Socket } from 'dgram';
+import { number } from 'nestjs-zod/z';
 import { Subscription } from 'rxjs';
 import { Socket } from 'socket.io';
 export class Paddle {
@@ -44,18 +45,21 @@ export interface GameData {
 
 export class Player {
   constructor(
+    number: number,
     id: number,
     socket: Socket,
     paddle: Paddle,
     room: string,
     score: number,
   ) {
+    this.number = number;
     this.id = id;
     this.socket = socket;
     this.paddle = paddle;
     this.room = room;
     this.score = score;
   }
+  number: number;
   id: number;
   socket: Socket;
   paddle: Paddle;

@@ -43,7 +43,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       if (user) {
         if (user.status === 'InGame') {
           console.log('user connection ', user);
-          //   client.disconnect();
+            client.disconnect();
           return;
         }
         console.log('user is found');
@@ -147,19 +147,11 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       3,
     );
 
-    const playerNumber = 1;
-    const player = new Player(
-      playerNumber,
-      client,
-      padd,
-      invitationRoom.roomName,
-      0,
-    );
+    const user = this.activeSockets.get(client);
+    const player = new Player( 1, user.id , client, padd, invitationRoom.roomName, 0);
 
     invitationRoom.players.push(player);
-    invitationRoom.rounds = 1;
-
-    // Add the invitation room to the list
+    client.join(invitationRoom.roomName);
     this.invitrooms.set(invitationRoom.roomName, invitationRoom);
 
     // Update player statuses
@@ -186,7 +178,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       rounds: invitationRoom.rounds,
       containerHeight: CONTAINERHIEGHT,
       containerWidth: CONTAINERWIDTH,
-      id: 1,
+      id: player.number,
     };
     client.emit('JoinRoom', invitationRoom.roomName);
     client.emit('InitGame', gamedata);
@@ -216,8 +208,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
           80,
           3,
         );
-        const playerNumber = 2;
-        const player = new Player(playerNumber, client, otherpadd, roomId, 0);
+        const user = this.activeSockets.get(client);
+        const player = new Player(2, user.id, client, otherpadd, roomId, 0);
         invitationRoom.players.push(player);
         client.join(roomId);
 
@@ -231,7 +223,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
           rounds: invitationRoom.rounds,
           containerHeight: CONTAINERHIEGHT,
           containerWidth: CONTAINERWIDTH,
-          id: 2,
+          id: player.number,
         };
         client.emit('JoinRoom', roomId);
         client.emit('InitGame', gamedata);
@@ -246,7 +238,24 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   // Add a method to handle declining invitations if needed
   @SubscribeMessage('DeclineInvitation')
   async handleDeclineInvitation(client: Socket, roomId: string) {
-    // Handle declining invitations (i don't know what to do here) :)
+    const room = this.invitrooms.get(roomId);
+    const roomPlayer = room.players.find((player) => player.socket !== client);
+    const playerdecline = room.players.find((player) => player.socket === client);
+    const roomPlayerSocket = roomPlayer.socket;
+    const roomPlayerUser = this.activeSockets.get(roomPlayerSocket);
+    const playerdeclineUser = this.activeSockets.get(client);
+    this.prisma.user.update({
+      where: {
+        id: roomPlayerUser.id,
+      },
+      data: {
+        status: 'online',
+      },
+    });
+    roomPlayerUser.status = 'online';
+    roomPlayerSocket.emit('InvitationDeclined');
+    roomPlayerSocket.leave(roomId);
+    this.invitrooms.delete(roomId);
   }
 
   @SubscribeMessage('StartGameRobot')
