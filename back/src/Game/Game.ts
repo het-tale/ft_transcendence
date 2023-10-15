@@ -7,7 +7,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameData, Paddle, Player, Room } from './types';
+import { CONTAINERHIEGHT, CONTAINERWIDTH, GameData, Paddle, Player, Room } from './types';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
@@ -34,8 +34,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   //   onModuleInit() {}
-  private containerWidth = 1000;
-  private containerHeight = 720;
 
   async handleConnection(client: Socket) {
     try {
@@ -45,7 +43,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       if (user) {
         if (user.status === 'InGame') {
           console.log('user connection ', user);
-          //   client.disconnect();
+            client.disconnect();
           return;
         }
         console.log('user is found');
@@ -82,8 +80,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       }
       StartGameEvent(
         client,
-        this.containerHeight,
-        this.containerWidth,
+        CONTAINERHIEGHT,
+        CONTAINERWIDTH,
         this.rooms,
         this.activeSockets,
         this.prisma,
@@ -135,33 +133,25 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     // Create an invitation room
     const invitationRoom = new Room(`invite_${sender.id}_${receiver.id}`);
     const padd = new Paddle(
-      (this.containerWidth * 2) / 100,
-      this.containerHeight / 2,
+      (CONTAINERWIDTH * 2) / 100,
+      CONTAINERHIEGHT / 2,
       8,
-      80,
+      120,
       3,
     );
     const otherpadd = new Paddle(
-      this.containerWidth - (this.containerWidth * 2) / 100,
-      this.containerHeight / 2,
+      CONTAINERWIDTH - (CONTAINERWIDTH * 2) / 100,
+      CONTAINERHIEGHT / 2,
       8,
-      80,
+      120,
       3,
     );
 
-    const playerNumber = 1;
-    const player = new Player(
-      playerNumber,
-      client,
-      padd,
-      invitationRoom.roomName,
-      0,
-    );
+    const user = this.activeSockets.get(client);
+    const player = new Player( 1, user.id , client, padd, invitationRoom.roomName, 0);
 
     invitationRoom.players.push(player);
-    invitationRoom.rounds = 1;
-
-    // Add the invitation room to the list
+    client.join(invitationRoom.roomName);
     this.invitrooms.set(invitationRoom.roomName, invitationRoom);
 
     // Update player statuses
@@ -186,9 +176,9 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       playerScore: 0,
       otherScore: 0,
       rounds: invitationRoom.rounds,
-      containerHeight: this.containerHeight,
-      containerWidth: this.containerWidth,
-      id: 1,
+      containerHeight: CONTAINERHIEGHT,
+      containerWidth: CONTAINERWIDTH,
+      id: player.number,
     };
     client.emit('JoinRoom', invitationRoom.roomName);
     client.emit('InitGame', gamedata);
@@ -205,21 +195,21 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       if (invitationRoom) {
         // Assign the player to the invitation room
         const padd = new Paddle(
-          (this.containerWidth * 2) / 100,
-          this.containerHeight / 2,
+          (CONTAINERWIDTH * 2) / 100,
+          CONTAINERHIEGHT / 2,
           8,
           80,
           3,
         );
         const otherpadd = new Paddle(
-          this.containerWidth - (this.containerWidth * 2) / 100,
-          this.containerHeight / 2,
+          CONTAINERWIDTH - (CONTAINERWIDTH * 2) / 100,
+          CONTAINERHIEGHT / 2,
           8,
           80,
           3,
         );
-        const playerNumber = 2;
-        const player = new Player(playerNumber, client, otherpadd, roomId, 0);
+        const user = this.activeSockets.get(client);
+        const player = new Player(2, user.id, client, otherpadd, roomId, 0);
         invitationRoom.players.push(player);
         client.join(roomId);
 
@@ -231,9 +221,9 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
           playerScore: 0,
           otherScore: 0,
           rounds: invitationRoom.rounds,
-          containerHeight: this.containerHeight,
-          containerWidth: this.containerWidth,
-          id: 2,
+          containerHeight: CONTAINERHIEGHT,
+          containerWidth: CONTAINERWIDTH,
+          id: player.number,
         };
         client.emit('JoinRoom', roomId);
         client.emit('InitGame', gamedata);
@@ -248,7 +238,24 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   // Add a method to handle declining invitations if needed
   @SubscribeMessage('DeclineInvitation')
   async handleDeclineInvitation(client: Socket, roomId: string) {
-    // Handle declining invitations (i don't know what to do here) :)
+    const room = this.invitrooms.get(roomId);
+    const roomPlayer = room.players.find((player) => player.socket !== client);
+    const playerdecline = room.players.find((player) => player.socket === client);
+    const roomPlayerSocket = roomPlayer.socket;
+    const roomPlayerUser = this.activeSockets.get(roomPlayerSocket);
+    const playerdeclineUser = this.activeSockets.get(client);
+    this.prisma.user.update({
+      where: {
+        id: roomPlayerUser.id,
+      },
+      data: {
+        status: 'online',
+      },
+    });
+    roomPlayerUser.status = 'online';
+    roomPlayerSocket.emit('InvitationDeclined');
+    roomPlayerSocket.leave(roomId);
+    this.invitrooms.delete(roomId);
   }
 
   @SubscribeMessage('StartGameRobot')
@@ -260,8 +267,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         this.activeSockets,
         this.prisma,
         this.server,
-        this.containerHeight,
-        this.containerWidth,
+        CONTAINERHIEGHT,
+        CONTAINERWIDTH,
       );
     } catch (e) {
       console.log('error', e);
@@ -271,7 +278,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('UpdatePlayerPaddle')
   handleUpdatePaddle(client: Socket, eventData: any) {
     try {
-      UpdatePaddle(client, eventData, this.rooms, this.containerHeight);
+      UpdatePaddle(client, eventData, this.rooms, CONTAINERHIEGHT);
     } catch (e) {
       console.log('error', e);
     }
