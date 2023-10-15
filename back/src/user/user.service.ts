@@ -101,6 +101,7 @@ export class UserService {
           },
         },
         channel: true,
+        isGame: true,
       },
     });
     return invitations;

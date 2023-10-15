@@ -66,7 +66,7 @@ const Sidebar = (props: sidebarProps) => {
                 />
                 Notifications
             </Button>
-            <Link to={'/game'}>
+            <Link to={`/game/${user?.id}/${false}`}>
                 <BsController className="fa" />
                 Play
             </Link>

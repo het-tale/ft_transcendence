@@ -13,4 +13,5 @@ export type Invitation = {
     receiverId: number;
     channel: Channel;
     channelId: number;
+    isGame: boolean;
 };
