@@ -4,7 +4,7 @@ aside {
     color: var(--white);
     width: 200px;
     padding-left: 15px;
-    height: 90%;
+    height: 92vh;
     background-image: linear-gradient(30deg , var(--fakhti), var(--koki));
     border-top-right-radius: 80px;
     font-family: 'Krona One';
@@ -75,4 +75,16 @@ aside {
   
   aside #more {
       margin-top: 37.5rem;
+  }
+
+  .notifContainer {
+    background-color: var(--white);
+    box-shadow: 1px 1px 20px var(--koki);
+    height: 90vh;
+    width: 500px;
+    border-radius: 15px;
+    margin-top: 8px;
+    margin-left: 10px;
+    padding: 14px;
+    z-index: 4;
   }
