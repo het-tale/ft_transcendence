@@ -28,13 +28,7 @@ export class UserController {
   async me(@Req() request: { user: User }) {
     return await this.userService.getUserById(request.user.id);
   }
-  @Get(':id')
-  async getUserById(@Param('id') idString: string) {
-    const id = Number(idString);
-
-    return await this.userService.getUserById(id);
-  }
-
+  
   @Get('search-users/:beginWith')
   async searchUsers(
     @Req() request: { user: User },
@@ -82,4 +76,12 @@ export class UserController {
   async getPendingInvitations(@Req() request: { user: User }) {
     return await this.userService.getPendingInvitations(request.user);
   }
+
+  @Get(':id')
+  async getUserById(@Param('id') idString: string) {
+    const id = Number(idString);
+    if(!id) return;
+    return await this.userService.getUserById(id);
+  }
+
 }

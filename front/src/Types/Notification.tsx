@@ -1,6 +1,11 @@
 import { Channel } from './Channel';
 import { UserType } from './User';
 
+export type Notification = {
+    type: string;
+    from: string;
+};
+
 export type Invitation = {
     id: number;
     createdAt: Date;
@@ -13,5 +18,4 @@ export type Invitation = {
     receiverId: number;
     channel: Channel;
     channelId: number;
-    isGame: boolean;
 };

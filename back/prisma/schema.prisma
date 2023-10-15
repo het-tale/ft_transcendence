@@ -88,13 +88,14 @@ model Invitation {
 
   isReceiverOnline Boolean @default(false)
   status           String  @default("pending")
+  isGame    Boolean  @default(false)
 
   sender     User    @relation("InvitationSender", fields: [senderId], references: [id])
   senderId   Int
   receiver   User    @relation("InvitationReceiver", fields: [receiverId], references: [id])
   receiverId Int
-  channel    Channel @relation("ChannelInvitations", fields: [channelId], references: [id])
-  channelId  Int
+  channel    Channel? @relation("ChannelInvitations", fields: [channelId], references: [id])
+  channelId  Int?
 }
 
 model Message {

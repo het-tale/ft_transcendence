@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     BsBoxArrowLeft,
@@ -11,11 +11,21 @@ import {
 } from 'react-icons/bs';
 import { UserType } from '../Types/User';
 import User from './User';
-import { Image, useToast } from '@chakra-ui/react';
-import NotifDm from '../pages/Chat/NotifDm';
+import { Button, Image, useToast } from '@chakra-ui/react';
 import { SocketContext } from '../socket';
-const Sidebar = (props: any) => {
+import { Invitation, Notification } from '../Types/Notification';
+import { RenderContext, RenderContextType } from '../RenderContext';
+import { GetPendingInvitations } from './GetNotification';
+
+interface sidebarProps {
+    notification?: boolean;
+    setNotification?: React.Dispatch<React.SetStateAction<boolean>>;
+    notifArray?: Notification[];
+}
+
+const Sidebar = (props: sidebarProps) => {
     const [user, setUser] = React.useState<UserType>();
+    const renderData: RenderContextType = React.useContext(RenderContext);
     useEffect(() => {
         async function fetchUserData() {
             const userData = await User();
@@ -24,51 +34,39 @@ const Sidebar = (props: any) => {
 
         fetchUserData();
     }, []);
-    const socket = React.useContext(SocketContext);
-    const toast = useToast();
-    const token = localStorage.getItem('token');
-    useEffect(() => {
-        socket.auth = { token: token };
-        socket.connect();
-    }, []);
 
-    socket.on('roomInvitation', (data: any) => {
-        console.log('roomInvitation', data);
-        toast({
-            title: 'success',
-            description: data.from,
-            status: 'success',
-            duration: 9000,
-            isClosable: true,
-            position: 'bottom-right'
-        });
-    });
-    socket.on('roomInvitationError', (data: any) => {
-        console.log('roomInvitationError', data);
-        toast({
-            title: 'Error',
-            description: data,
-            status: 'error',
-            duration: 9000,
-            isClosable: true,
-            position: 'bottom-right'
-        });
-    });
     return (
         <aside>
             <Link to="/home">
                 <BsHouseFill className="fa" />
                 Home
             </Link>
-            <Link to="/chat/rooms-dms">
+            <Link to={`/chat/rooms-dms/${user?.id}`}>
                 <BsChatRightFill className="fa" />
                 Chat
             </Link>
-            <a href="">
-                <BsBellFill className="fa" />
+            <Button
+                style={{
+                    backgroundColor: 'transparent',
+                    color: 'white',
+                    fontWeight: 'unset',
+                    fontFamily: 'unset',
+                    fontSize: '13px',
+                    marginLeft: '2px'
+                }}
+                onClick={() =>
+                    props.setNotification &&
+                    props.setNotification(!props.notification)
+                }
+            >
+                <BsBellFill
+                    className="fa"
+                    size={20}
+                    style={{ marginRight: '15px' }}
+                />
                 Notifications
-            </a>
-            <Link to={'/game'}>
+            </Button>
+            <Link to={`/game/${user?.id}/${false}`}>
                 <BsController className="fa" />
                 Play
             </Link>
@@ -90,7 +88,6 @@ const Sidebar = (props: any) => {
                 />
                 Log Out
             </Link>
-            {/* <NotifDm render={props.render} setRender={props.setRender} /> */}
         </aside>
     );
 };

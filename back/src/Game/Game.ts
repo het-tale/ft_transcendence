@@ -7,7 +7,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameData, Paddle, Player, Room } from './types';
+import { CONTAINERHIEGHT, CONTAINERWIDTH, GameData, Paddle, Player, Room } from './types';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
@@ -16,7 +16,9 @@ import { verifyToken } from './Player-Init';
 import { StartGameEvent, StartGameEventRobot } from './game-start-event';
 import { User } from '@prisma/client';
 import { UpdatePaddle, findRoomByPlayerSocket } from './Game-Update';
-import { cancelgamesart } from './start-game';
+import { cancelgamesart, startGame } from './start-game';
+import { stopGame } from './Game_services';
+import { calculateRank } from './Game-Update';
 
 @WebSocketGateway({ namespace: 'game' })
 @Injectable()
@@ -34,18 +36,16 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   //   onModuleInit() {}
-  private containerWidth = 1000;
-  private containerHeight = 720;
 
   async handleConnection(client: Socket) {
     try {
-      const token = client.handshake.query.token;
+      const token = client.handshake.auth.token;
       //   console.log('token', token);
       const user = await verifyToken(token, this.prisma, this.conf, this.jwt);
       if (user) {
         if (user.status === 'InGame') {
-          console.log('user connection ', user);
-          //   client.disconnect();
+          console.log('user connection allready in game ', user);
+            client.disconnect();
           return;
         }
         console.log('user is found');
@@ -82,8 +82,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       }
       StartGameEvent(
         client,
-        this.containerHeight,
-        this.containerWidth,
+        CONTAINERHIEGHT,
+        CONTAINERWIDTH,
         this.rooms,
         this.activeSockets,
         this.prisma,
@@ -107,25 +107,44 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
           status: 'online',
         },
       });
-      // this.activeSockets.delete(client);
+      
     }
-    if (room) {
+    if (room && room.gameActive) {
+
+      console.log('room found to make force leave ');
+      client.leave(room.roomName);
       room.players = room.players.filter((player) => player.socket !== client);
-      //
+
       if (room.players.length < 2) {
-        cancelgamesart(room, this.rooms);
+        const otherPlayerid = room.players
+          .filter((player) => player.socket !== client)
+          .map((player) => player.id)[0];
+        this.prisma.match.update({
+          where: {
+            id: room.id,
+          },
+          data: {
+            winnerId: otherPlayerid,
+            result: 'aborted',
+            end: new Date(),
+          },
+        });
         room.gameActive = false;
         this.rooms.delete(room.roomName);
+        calculateRank(this.prisma);
       }
     }
   }
 
   @SubscribeMessage('InvitePlayer')
   async handleInvitePlayer(client: Socket, targetUserId: number) {
+    console.log('invite player backend', targetUserId);
     const sender = this.activeSockets.get(client);
     const receiver = Array.from(this.activeSockets.values()).find(
       (user) => user.id === targetUserId,
     );
+    console.log('invite player sender', sender);
+    console.log('invite player receiver', receiver);
 
     if (!receiver) {
       console.log('receiver not found');
@@ -135,38 +154,34 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     // Create an invitation room
     const invitationRoom = new Room(`invite_${sender.id}_${receiver.id}`);
     const padd = new Paddle(
-      (this.containerWidth * 2) / 100,
-      this.containerHeight / 2,
+      (CONTAINERWIDTH * 2) / 100,
+      CONTAINERHIEGHT / 2,
       8,
-      80,
+      120,
       3,
     );
     const otherpadd = new Paddle(
-      this.containerWidth - (this.containerWidth * 2) / 100,
-      this.containerHeight / 2,
+      CONTAINERWIDTH - (CONTAINERWIDTH * 2) / 100,
+      CONTAINERHIEGHT / 2,
       8,
-      80,
+      120,
       3,
     );
 
-    const playerNumber = 1;
-    const player = new Player(
-      playerNumber,
-      client,
-      padd,
-      invitationRoom.roomName,
-      0,
-    );
+    const user = this.activeSockets.get(client);
+    const player = new Player( 1, user.id , client, padd, invitationRoom.roomName, 0);
 
     invitationRoom.players.push(player);
-    invitationRoom.rounds = 1;
-
-    // Add the invitation room to the list
+    client.join(invitationRoom.roomName);
     this.invitrooms.set(invitationRoom.roomName, invitationRoom);
 
-    // Update player statuses
-    sender.status = 'Invited'; // i should change change this to another variable in  database
-    receiver.status = 'Invited'; // the same here
+    await this.prisma.invitation.create({
+      data: {
+        senderId: sender.id,
+        receiverId: receiver.id,
+        isGame: true,
+      }
+    })
 
     // Send the invitation to the target user
     const invitationData = {
@@ -186,9 +201,9 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       playerScore: 0,
       otherScore: 0,
       rounds: invitationRoom.rounds,
-      containerHeight: this.containerHeight,
-      containerWidth: this.containerWidth,
-      id: 1,
+      containerHeight: CONTAINERHIEGHT,
+      containerWidth: CONTAINERWIDTH,
+      id: player.number,
     };
     client.emit('JoinRoom', invitationRoom.roomName);
     client.emit('InitGame', gamedata);
@@ -197,29 +212,56 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('AcceptInvitation')
   async handleAcceptInvitation(client: Socket, roomId: string) {
     const player = this.activeSockets.get(client);
-
+    console.log('invitation Game backend hereee0');
     // Check if the player is invited to this room
-    if (player.status === 'Invited') {
+    // if (player.status === 'Invited') {
+      console.log('invitation Game backend hereee-1');
       const invitationRoom = this.invitrooms.get(roomId);
-
+      const otherPlayer = invitationRoom.players.find(
+        (player) => player.socket !== client,
+        );
+      const user = this.activeSockets.get(client);
+      const otheruser = this.activeSockets.get(otherPlayer.socket);
+      const pendingInvitation = await this.prisma.invitation.findFirst({
+        where: {
+          receiverId: user.id,
+          senderId: otheruser.id,
+          isGame: true,
+          status: 'pending'
+        }
+      });
+      if (!pendingInvitation) {
+        otherPlayer.socket.leave(roomId);
+        this.invitrooms.delete(roomId);
+        console.log('invitation Game backend hereee1');
+        return;
+      }
+      await this.prisma.invitation.update({
+        where: {
+          id: pendingInvitation.id
+        },
+        data: {
+          status: 'accepted'
+        }
+      })
       if (invitationRoom) {
+        console.log('invitation Game backend hereee');
         // Assign the player to the invitation room
         const padd = new Paddle(
-          (this.containerWidth * 2) / 100,
-          this.containerHeight / 2,
+          (CONTAINERWIDTH * 2) / 100,
+          CONTAINERHIEGHT / 2,
           8,
           80,
           3,
         );
         const otherpadd = new Paddle(
-          this.containerWidth - (this.containerWidth * 2) / 100,
-          this.containerHeight / 2,
+          CONTAINERWIDTH - (CONTAINERWIDTH * 2) / 100,
+          CONTAINERHIEGHT / 2,
           8,
           80,
           3,
         );
-        const playerNumber = 2;
-        const player = new Player(playerNumber, client, otherpadd, roomId, 0);
+        const player = new Player(2, user.id, client, otherpadd, roomId, 0);
         invitationRoom.players.push(player);
         client.join(roomId);
 
@@ -231,24 +273,60 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
           playerScore: 0,
           otherScore: 0,
           rounds: invitationRoom.rounds,
-          containerHeight: this.containerHeight,
-          containerWidth: this.containerWidth,
-          id: 2,
+          containerHeight: CONTAINERHIEGHT,
+          containerWidth: CONTAINERWIDTH,
+          id: player.number,
         };
         client.emit('JoinRoom', roomId);
         client.emit('InitGame', gamedata);
         this.server.to(roomId).emit('StartGame', roomId);
-
-        // Remove the invitation room from the list
-        // this.invitrooms.delete(roomId); // room ned to be deleeted afert the game end
-      }
+        startGame(invitationRoom, this.invitrooms, this.activeSockets, this.prisma, CONTAINERHIEGHT);
+      // }
     }
   }
 
   // Add a method to handle declining invitations if needed
   @SubscribeMessage('DeclineInvitation')
   async handleDeclineInvitation(client: Socket, roomId: string) {
-    // Handle declining invitations (i don't know what to do here) :)
+    const room = this.invitrooms.get(roomId);
+    const roomPlayer = room.players.find((player) => player.socket !== client);
+    const playerdecline = room.players.find((player) => player.socket === client);
+    const roomPlayerSocket = roomPlayer.socket;
+    const roomPlayerUser = this.activeSockets.get(roomPlayerSocket);
+    const playerdeclineUser = this.activeSockets.get(client);
+    const pendingInvitation = await this.prisma.invitation.findFirst({
+      where: {
+        receiverId: playerdeclineUser.id,
+        senderId: roomPlayerUser.id,
+        isGame: true,
+        status: 'pending'
+      }
+    });
+    if (!pendingInvitation) {
+      roomPlayerSocket.leave(roomId);
+      this.invitrooms.delete(roomId);
+      return;
+    }
+    await this.prisma.invitation.update({
+      where: {
+        id: pendingInvitation.id
+      },
+      data: {
+        status: 'rejected'
+      }
+    })
+    this.prisma.user.update({
+      where: {
+        id: roomPlayerUser.id,
+      },
+      data: {
+        status: 'online',
+      },
+    });
+    roomPlayerUser.status = 'online';
+    roomPlayerSocket.emit('InvitationDeclined');
+    roomPlayerSocket.leave(roomId);
+    this.invitrooms.delete(roomId);
   }
 
   @SubscribeMessage('StartGameRobot')
@@ -260,8 +338,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         this.activeSockets,
         this.prisma,
         this.server,
-        this.containerHeight,
-        this.containerWidth,
+        CONTAINERHIEGHT,
+        CONTAINERWIDTH,
       );
     } catch (e) {
       console.log('error', e);
@@ -271,7 +349,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('UpdatePlayerPaddle')
   handleUpdatePaddle(client: Socket, eventData: any) {
     try {
-      UpdatePaddle(client, eventData, this.rooms, this.containerHeight);
+      UpdatePaddle(client, eventData, this.rooms, CONTAINERHIEGHT);
     } catch (e) {
       console.log('error', e);
     }
