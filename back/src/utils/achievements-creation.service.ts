@@ -3,11 +3,11 @@ import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
-export class AchievementsService {
+export class AchievementService {
     constructor(
     private readonly prisma: PrismaService,
     private config: ConfigService) {}
-    async creteAchievements()
+    async createAchievements()
     {
         await this.prisma.achievement.create({
             data: {
@@ -53,6 +53,20 @@ export class AchievementsService {
         });
         await this.prisma.achievement.create({
             data: {
+                name: "First Win",
+                description: "Congratulations on winning your first match! You've shown your skills and proved to be an invaluable asset in the game of pong.!",
+                icon: this.config.get<string>("ICON_WINNER") ?? "",
+            }
+        });
+        await this.prisma.achievement.create({
+            data: {
+                name: "First Loss",
+                description: "Congratulations on losing your first match! You've shown your skills and proved to be an invaluable asset in the game of pong.!",
+                icon: this.config.get<string>("ICON_LOSER") ?? "",
+            }
+        });
+        await this.prisma.achievement.create({
+            data: {
                 name: "The Unstoppable Block-nado",
                 description: "You've become a force to be reckoned with! 20 users couldn't handle your chat prowess and resorted to blocking you. With the power of the 'Unstoppable Block-nado,' you leave a trail of blocked users in your wake!",
                 icon: this.config.get<string>("ICON_TOXIC") ?? "",
@@ -75,29 +89,8 @@ export class AchievementsService {
         await this.prisma.achievement.create({
             data: {
                 name: "Chat Chatterbox",
-                description: "You've become a true master of channel hopping, joining 20 different channels. Keep exploring and connecting with the pong community!",
+                description: "You've unleashed your inner chatterbox, sending 100 messages in the chat. Keep the conversations flowing and the pong banter alive!",
                 icon: this.config.get<string>("ICON_CHAT") ?? "",
-            }
-        });
-        await this.prisma.achievement.create({
-            data: {
-                name: "First Win",
-                description: "Congratulations on winning your first match! You've shown your skills and proved to be an invaluable asset in the game of pong.!",
-                icon: this.config.get<string>("ICON_WINNER") ?? "",
-            }
-        });
-        await this.prisma.achievement.create({
-            data: {
-                name: "First Loss",
-                description: "Congratulations on losing your first match! You've shown your skills and proved to be an invaluable asset in the game of pong.!",
-                icon: this.config.get<string>("ICON_LOSER") ?? "",
-            }
-        });
-        await this.prisma.achievement.create({
-            data: {
-                name: "First Game",
-                description: "Congratulations on playing your first game of pong! You've taken your first step into a larger world.",
-                icon: this.config.get<string>("ICON_WINNER") ?? "",
             }
         });
         await this.prisma.achievement.create({

@@ -4,11 +4,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { patchNestJsSwagger } from 'nestjs-zod';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { RobotUserService } from './utils/robot-user.service';
+import { AchievementService } from './utils/achievements-creation.service';
 
 async function bootstrap() {
   patchNestJsSwagger();
   const app = await NestFactory.create(AppModule);
   await app.get(RobotUserService).createRobotUser();
+  await app.get(AchievementService).createAchievements();
   
   app.enableCors({
     origin: [process.env.FRONTEND_URL, process.env.BACKEND_URL],

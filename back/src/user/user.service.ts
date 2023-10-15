@@ -103,6 +103,11 @@ export class UserService {
     return invitations;
   }
 
+
+
+
+
+// game related functions
   async changeLp(prisma: PrismaService, user: User, isWinner: boolean)
   {
     let lp = isWinner ? user.lp + user.add_nmr : user.lp - user.sub_nmr;
@@ -116,8 +121,8 @@ export class UserService {
   async calculateNmr(prisma: PrismaService, user: User)
   {
     const rate = user.win_rate;
-    let add;
-    let sub;
+    let add: number;
+    let sub: number;
     if (rate <= 20)
       add = 7, sub = 3;
     else if (rate <= 30)
@@ -149,7 +154,7 @@ export class UserService {
         id: true,
       },
       orderBy: {
-        matchwin: 'desc',
+        lp: 'desc',
       },
     });
     for (let i = 0; i < users.length; i++) {
