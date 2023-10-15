@@ -48,6 +48,7 @@ model User {
   matchHistoryB          Match[]         @relation("MatchPlayerB")
   winningMatches         Match[]         @relation("MatchWinner")
   achievements           Achievement[]   @relation("Achiever")
+  offlineAchievements    Achievement[]   @relation("OfflineAchiever")
   channels               Channel[]       @relation("ChannelParticipants")
   ownedChannels          Channel[]       @relation("ChannelOwner")
   adminChannels          Channel[]       @relation("ChannelAdmins")
@@ -168,4 +169,6 @@ model Achievement {
   description String
 
   achievers User[] @relation("Achiever")
+  offlineAchievers User[] @relation("OfflineAchiever")
 }
+
