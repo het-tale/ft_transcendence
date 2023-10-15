@@ -29,9 +29,8 @@ model User {
   win_rate           Float   @default(0)
   add_nmr            Int     @default(0)
   sub_nmr            Int     @default(0)
-  sub_points         Int     @default(0)
   lp                 Int     @default(100)
-  rank               Int     @default(0)
+  g_rank             Int     @default(0)
 
   conversations          Conversation[]  @relation("ConversationParticipants")
   sentMessages           Message[]       @relation("MessageSender")
