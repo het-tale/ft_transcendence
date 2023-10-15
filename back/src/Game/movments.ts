@@ -142,7 +142,7 @@ export async function changeLp(prisma: PrismaService, user: User, isWinner: bool
     for (let i = 0; i < users.length; i++) {
       await prisma.user.update({
         where: { id: users[i].id },
-        data: { rank: i + 1 },
+        data: { g_rank: i + 1 },
       });
     }
   }
