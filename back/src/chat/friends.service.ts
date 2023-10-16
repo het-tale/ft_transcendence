@@ -77,8 +77,8 @@ export class FriendsService {
     }
     const friendRequest = await this.prisma.friendRequest.findFirst({
       where: {
-        senderId: client.id,
-        receiverId: receiver.id,
+        senderId: receiver.id,
+        receiverId: client.id,
         status: 'pending',
       },
     });
@@ -104,6 +104,18 @@ export class FriendsService {
           friends: {
             connect: {
               id: receiver.id,
+            },
+          },
+        },
+      });
+      await this.prisma.user.update({
+        where: {
+          id: receiver.id,
+        },
+        data: {
+          friends: {
+            connect: {
+              id: client.id,
             },
           },
         },
@@ -139,6 +151,18 @@ export class FriendsService {
         friends: {
           disconnect: {
             id: friend.id,
+          },
+        },
+      },
+    });
+    await this.prisma.user.update({
+      where: {
+        id: friend.id,
+      },
+      data: {
+        friends: {
+          disconnect: {
+            id: client.id,
           },
         },
       },
