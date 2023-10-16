@@ -16,6 +16,46 @@ function Login(props: any) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
     const toast = useToast();
+
+    const handleLogin = async (event: any) => {
+        event.preventDefault();
+        setErrorMessage('');
+        const sentData = {
+            identifier: email,
+            password: password
+        };
+        try {
+            const response = await client.post(`auth/signin`, sentData);
+            localStorage.setItem('token', response.data);
+            const condition = await checkAuthentication();
+            if (condition === true) navigate('/home');
+            else {
+                toast({
+                    title: 'Email not Confirmed.',
+                    description: 'Your email address has not been verified.',
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                navigate('/confirm-email');
+            }
+        } catch (error: any) {
+            console.log('Login Error', error);
+            const errorMessage = error.response.data.message;
+            setErrorMessage(errorMessage);
+            console.log('The error message', errorMessage);
+            toast({
+                title: 'Login Failed.',
+                description: errorMessage,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+        }
+    };
+
     const checkAuthentication = async () => {
         try {
             const response = await client.get('/user/me', {
@@ -35,50 +75,7 @@ function Login(props: any) {
             return false;
         }
     };
-    const handleSubmite = (event: any) => {
-        event.preventDefault();
-        setErrorMessage('');
-        const configuration = {
-            method: 'post',
-            url: 'http://localhost:3001/auth/signin',
-            data: {
-                identifier: email,
-                password
-            }
-        };
-        axios(configuration)
-            .then(async (result) => {
-                setIsLoggedIn(true);
-                localStorage.setItem('token', result.data);
-                const condition = await checkAuthentication();
-                if (condition === true) navigate('/home');
-                else {
-                    toast({
-                        title: 'Email not Confirmed.',
-                        description:
-                            'Your email address has not been verified.',
-                        status: 'error',
-                        duration: 9000,
-                        isClosable: true,
-                        position: 'bottom-right'
-                    });
-                    navigate('/confirm-email');
-                }
-            })
-            .catch((error) => {
-                const errorMessage = error.response.data.message;
-                setErrorMessage(errorMessage);
-                console.log(errorMessage);
-                toast({
-                    title: 'Login Failed.',
-                    description: errorMessage,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-            });
-    };
+
     return (
         <div className="signupContainer">
             <div className="left">
@@ -278,7 +275,7 @@ function Login(props: any) {
                         </g>
                     </svg>
                 </div>
-                <form onSubmit={(e) => handleSubmite(e)}>
+                <form onSubmit={(e) => handleLogin(e)}>
                     <div className="form-group">
                         <label htmlFor="email">Email</label>
                         <input
@@ -311,7 +308,7 @@ function Login(props: any) {
                         <input
                             type="submit"
                             value="Login"
-                            onClick={(e) => handleSubmite(e)}
+                            onClick={(e) => handleLogin(e)}
                         />
                         {/* <a href="#" className="dejavu">forgot password?</a> */}
                         <Link to={'/forgot-password'} className="dejavu">
