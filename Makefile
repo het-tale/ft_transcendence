@@ -1,21 +1,26 @@
-all : up
+all: up
 
-up : 
+up:
 	@docker-compose -f ./docker-compose.yml up --build
 
-down : 
+down:
 	@docker-compose -f ./docker-compose.yml down
 
-stop : 
+stop:
 	@docker-compose -f ./docker-compose.yml stop
 
-start : 
+start:
 	@docker-compose -f ./docker-compose.yml start
 
-status : 
+status:
 	@docker ps
-prune :
+
+prune:
 	@docker system prune -a -f
-link :
-	ln -s ./.env ./front/.env
+
+link:
+	@if [ ! -L ./front/.env ]; then \
+		ln -s ./.env ./front/.env; \
+	fi
+
 re: stop prune link up

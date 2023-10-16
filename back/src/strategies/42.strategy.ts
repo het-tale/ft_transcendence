@@ -13,10 +13,11 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
     private prisma: PrismaService,
     private readonly configService: ConfigService,
   ) {
+    console.log('strategy 42 called', process.env.BACKEND_URL);
     super({
       clientID: configService.get('UID_42'),
       clientSecret: configService.get('SECRET_42'),
-      callbackURL: `http://localhost:3001/auth/42/callback`,
+      callbackURL: `${process.env.BACKEND_URL}/auth/42/callback`,
       profileFields: {
         login: 'login',
         email: 'email',

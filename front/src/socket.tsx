@@ -3,7 +3,8 @@ import { io } from 'socket.io-client';
 
 let token = localStorage.getItem('token');
 console.log('Socket token', token);
-const URL = 'http://localhost:3001/chat';
+console.log('Socket URL', process.env.REACT_APP_BACKEND_URL);
+const URL = `${process.env.REACT_APP_BACKEND_URL}/chat`;
 
 export const socket = io(URL, {
     withCredentials: true,

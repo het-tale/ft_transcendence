@@ -57,7 +57,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         client.disconnect();
       }
     } catch (e) {
-      console.log('get an error while connection');
       console.log('error', e);
     }
   }
@@ -66,6 +65,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   async handleStartGame(client: Socket) {
     try {
       const user = this.activeSockets.get(client);
+      if (!user)
+        throw new Error("undefined user ");
       if (user.status === 'InGame') {
         console.log('user is already in game handle start game');
         return;

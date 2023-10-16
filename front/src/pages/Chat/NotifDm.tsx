@@ -9,7 +9,7 @@ import { io } from 'socket.io-client';
 const NotifDm = (props: any) => {
     const toast = useToast();
     // const socket = React.useContext(SocketContext);
-    const socket = io('http://localhost:3001/chat', {
+    const socket = io(`${process.env.REACT_APP_BACKEND_URL}/chat`, {
         withCredentials: true,
         forceNew: true,
         timeout: 100000,

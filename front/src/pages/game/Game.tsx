@@ -16,10 +16,12 @@ function draw(ctx:  CanvasRenderingContext2D, canvas: HTMLCanvasElement, padd: R
     if (padd.current && otherpad.current && ball.current)
     {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(235, 182, 145, 1)';
         ctx.fillRect(padd.current.x, padd.current.y, padd.current.width, padd.current.height);
+        ctx.fillStyle = 'beige';
         ctx.fillRect(otherpad.current.x, otherpad.current.y, otherpad.current.width, otherpad.current.height);
         ctx.beginPath();
-        ctx.fillStyle = 'blue';
+        ctx.fillStyle = 'rgb(170, 251, 57)';
         ctx.arc(ball.current.x, ball.current.y, ball.current.radius, 0, 2 * Math.PI, false);
         ctx.fill();
         ctx.closePath();
