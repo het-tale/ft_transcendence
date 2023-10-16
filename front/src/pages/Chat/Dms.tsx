@@ -175,25 +175,27 @@ const Dms = (props: any) => {
                         props.dms.length > 0 ? (
                             props.dms?.map((dm: UserType) => {
                                 return (
-                                    <MessageUser
-                                        profile={dm.avatar}
-                                        name={dm.username}
-                                        dm={dm}
-                                        setUserDm={setUserDm}
-                                        setFirstLoad={setFirstLoad}
-                                        message={dm.status}
-                                        render={props.render}
-                                        setRender={props.setRender}
-                                        updateUser={updateUser}
-                                        setUpdateUser={setUpdateUser}
-                                        updateClass={updateClass}
-                                        setUpdateClass={setUpdateClass}
-                                        activeCard={
-                                            updateClass === dm?.id
-                                                ? 'clickedDm'
-                                                : ''
-                                        }
-                                    />
+                                    <Link to={`/chat/rooms-dms/${dm.id}`}>
+                                        <MessageUser
+                                            profile={dm.avatar}
+                                            name={dm.username}
+                                            dm={dm}
+                                            setUserDm={setUserDm}
+                                            setFirstLoad={setFirstLoad}
+                                            message={dm.status}
+                                            render={props.render}
+                                            setRender={props.setRender}
+                                            updateUser={updateUser}
+                                            setUpdateUser={setUpdateUser}
+                                            updateClass={updateClass}
+                                            setUpdateClass={setUpdateClass}
+                                            activeCard={
+                                                updateClass === dm?.id
+                                                    ? 'clickedDm'
+                                                    : ''
+                                            }
+                                        />
+                                    </Link>
                                 );
                             })
                         ) : (
@@ -314,29 +316,23 @@ const Dms = (props: any) => {
         setFirstLoad(e.target.tabTitle);
     };
     return (
-        <Flex flexDirection={'column'}>
-            <NavbarSearch />
-            <Flex>
-                <Sidebar render={props.render} setRender={props.setRender} />
-                <Box w="100%" bg="#E9ECEF" h={'90%'}>
-                    <Flex justify="space-between">
-                        <LeftSide
-                            handleTabClick={handleTabClick}
-                            tabs={tabs}
-                            currentTab={currentTab}
-                        />
-                        <div className="delimiter"></div>
-                        <RightSide
-                            handleTabClick={handleTabClick}
-                            tabs={tabs}
-                            currentTab={currentTab}
-                            firstLoad={firstLoad}
-                            renderActions={renderActions}
-                        />
-                    </Flex>
-                </Box>
+        <Box w="100%" bg="#E9ECEF" h={'90%'}>
+            <Flex justify="space-between">
+                <LeftSide
+                    handleTabClick={handleTabClick}
+                    tabs={tabs}
+                    currentTab={currentTab}
+                />
+                <div className="delimiter"></div>
+                <RightSide
+                    handleTabClick={handleTabClick}
+                    tabs={tabs}
+                    currentTab={currentTab}
+                    firstLoad={firstLoad}
+                    renderActions={renderActions}
+                />
             </Flex>
-        </Flex>
+        </Box>
     );
 };
 

@@ -7,14 +7,20 @@ import '../../css/game/game.css';
 import User from '../../components/User';
 import { UserType } from '../../Types/User';
 import { ListenOnSocket } from './Game.lisners';
-
+import { SocketGameContext } from '../../socket';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { RenderContext } from '../../RenderContext';
 
 export type MySocket = ReturnType<typeof io>;
 
-function draw(ctx:  CanvasRenderingContext2D, canvas: HTMLCanvasElement, padd: React.RefObject<Paddle>, otherpad: React.RefObject<Paddle>, ball: React.RefObject<Ball>)
-{
-    if (padd.current && otherpad.current && ball.current)
-    {
+function draw(
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement,
+    padd: React.RefObject<Paddle>,
+    otherpad: React.RefObject<Paddle>,
+    ball: React.RefObject<Ball>
+) {
+    if (padd.current && otherpad.current && ball.current) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'rgba(235, 182, 145, 1)';
         ctx.fillRect(padd.current.x, padd.current.y, padd.current.width, padd.current.height);
@@ -26,7 +32,7 @@ function draw(ctx:  CanvasRenderingContext2D, canvas: HTMLCanvasElement, padd: R
         ctx.fill();
         ctx.closePath();
     }
-    requestAnimationFrame(() => draw(ctx, canvas, padd, otherpad, ball))
+    requestAnimationFrame(() => draw(ctx, canvas, padd, otherpad, ball));
 }
 
 function updateDivPosition(
@@ -75,10 +81,15 @@ const Game: React.FC = () => {
         otherPaddle: useRef<HTMLDivElement>(null),
         ball: useRef<HTMLDivElement>(null)
     };
-    const [gameStarted, setGameStarted] = useState(false);
+    const { startGame } = useParams();
+    const [gameStarted, setGameStarted] = useState(
+        startGame === 'true' ? true : false
+    );
     const [gameOver, setGameOver] = useState(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const ctx = canvasRef.current?.getContext('2d');
+    const socketGame = React.useContext(SocketGameContext);
+    const renderData = React.useContext(RenderContext);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -89,21 +100,12 @@ const Game: React.FC = () => {
     }, []);
 
     const setupSocket = () => {
-        setSocket(
-            io(`${process.env.REACT_APP_BACKEND_URL}/game`, {
-                withCredentials: true,
-                forceNew: true,
-                timeout: 100000,
-                transports: ['websocket'],
-                query: { token: token }
-            })
-        );
+        setSocket(socketGame);
     };
 
     const handleMouseMove = (event: MouseEvent) => {
         if (socket && padd && canvasRef.current) {
-            const gameContainerRect =
-                canvasRef.current.getBoundingClientRect();
+            const gameContainerRect = canvasRef.current.getBoundingClientRect();
             // Get the mouse position relative to dimentions withe border protected
             const mouseYRelative = Math.min(
                 Math.max(
@@ -125,12 +127,10 @@ const Game: React.FC = () => {
     }, 16.66);
 
     const setupEventListeners = () => {
-        if (canvasRef.current) {
-            canvasRef.current.addEventListener(
+            canvasRef.current?.addEventListener(
                 'mousemove',
                 throttleHandleMouseMove
             );
-        }
     };
 
     useEffectOnce(() => {
@@ -150,12 +150,10 @@ const Game: React.FC = () => {
                 socket.disconnect();
                 console.log('socket disconnected');
             }
-            if (divRefs.gameContainer.current) {
-                divRefs.gameContainer.current.removeEventListener(
+            canvasRef.current?.removeEventListener(
                     'mousemove',
                     throttleHandleMouseMove
                 );
-            }
         };
     });
 
@@ -167,15 +165,13 @@ const Game: React.FC = () => {
         paddRef.current = padd;
         otherpaddRef.current = otherpad;
         ballRef.current = ball;
-
     }, [padd, ball, otherpad]);
     useEffect(() => {
         if (!intialise.current && ctx && canvasRef.current) {
-            intialise.current = true
+            intialise.current = true;
             draw(ctx, canvasRef.current, paddRef, otherpaddRef, ballRef);
         }
-
-    },[init]);
+    }, [init]);
 
     useEffect(() => {
         if (init) setupEventListeners();
@@ -206,25 +202,27 @@ const Game: React.FC = () => {
         socket?.disconnect();
     };
 
+    const navigate = useNavigate();
     const handleStartGame = () => {
         socket?.emit('StartGame');
         setGameStarted(true);
+        // navigate(`/game`);
     };
     const handleStartGamerobot = () => {
         socket?.emit('StartGameRobot');
         setGameStarted(true);
     };
 
-    useEffect(() => {
-        if (padd && Dimensions.width > 0 && Dimensions.height > 0)
-            updateDivPosition(
-                divRefs.playerPaddle.current,
-                padd,
-                Dimensions.width,
-                Dimensions.height
-            );
-            console.log('padd', padd);
-    }, [padd]);
+    // useEffect(() => {
+    //     if (padd && Dimensions.width > 0 && Dimensions.height > 0)
+    //         updateDivPosition(
+    //             divRefs.playerPaddle.current,
+    //             padd,
+    //             Dimensions.width,
+    //             Dimensions.height
+    //         );
+    //     console.log('padd', padd);
+    // }, [padd]);
 
     // useEffect(() => {
     //     if (padd && otherpad && canvasRef.current && ctx && ball && Dimensions.width > 0 && Dimensions.height > 0){
@@ -237,18 +235,18 @@ const Game: React.FC = () => {
     //             // );
 
     //         }
-            
+
     // }, [ball]);
 
-    useEffect(() => {
-        if (otherpad && Dimensions.width > 0 && Dimensions.height > 0)
-            updateDivPosition(
-                divRefs.otherPaddle.current,
-                otherpad,
-                Dimensions.width,
-                Dimensions.height
-            );
-    }, [otherpad]);
+    // useEffect(() => {
+    //     if (otherpad && Dimensions.width > 0 && Dimensions.height > 0)
+    //         updateDivPosition(
+    //             divRefs.otherPaddle.current,
+    //             otherpad,
+    //             Dimensions.width,
+    //             Dimensions.height
+    //         );
+    // }, [otherpad]);
 
     return (
         <div className="containerGame">
@@ -288,7 +286,7 @@ const Game: React.FC = () => {
                                 {otherUsername
                                     ? otherUsername
                                     : ' waiting ... '}
-                            <div className="player-score">{otherScore}</div>
+                                <div className="player-score">{otherScore}</div>
                             </div>
                         </div>
                         <div className="vs-image">
@@ -297,7 +295,9 @@ const Game: React.FC = () => {
                         <div className="player-profile">
                             <div className="player-username">
                                 {user?.username}
-                            <div className="player-score">{playerScore}</div>
+                                <div className="player-score">
+                                    {playerScore}
+                                </div>
                             </div>
                             <img src={user?.avatar} alt="Player Profile" />
                         </div>
@@ -308,7 +308,9 @@ const Game: React.FC = () => {
                             <img src={user?.avatar} alt="Player Profile" />
                             <div className="player-username">
                                 {user?.username}
-                            <div className="player-score">{playerScore}</div>
+                                <div className="player-score">
+                                    {playerScore}
+                                </div>
                             </div>
                         </div>
                         <div className="vs-image">
@@ -319,16 +321,16 @@ const Game: React.FC = () => {
                                 {otherUsername
                                     ? otherUsername
                                     : ' waiting ... '}
-                            <div className="player-score">{otherScore}</div>
+                                <div className="player-score">{otherScore}</div>
                             </div>
-                                    <img
-                                        src={
-                                            otherAvatar
-                                                ? otherAvatar
-                                                : '/assets/circles-menu-1.gif'
-                                        }
-                                        alt="Other Profile"
-                                    />
+                            <img
+                                src={
+                                    otherAvatar
+                                        ? otherAvatar
+                                        : '/assets/circles-menu-1.gif'
+                                }
+                                alt="Other Profile"
+                            />
                         </div>
                     </>
                 )}
@@ -342,6 +344,7 @@ const Game: React.FC = () => {
                     >
                         Start Game
                     </button>
+
                     <button
                         className="start-button"
                         onClick={handleStartGamerobot}
@@ -351,7 +354,7 @@ const Game: React.FC = () => {
                 </>
             ) : (
                 <div className="game-container" ref={divRefs.gameContainer}>
-                    <canvas ref={canvasRef} width={720} height={480}/>
+                    <canvas ref={canvasRef} width={720} height={480} />
                 </div>
             )}
         </div>

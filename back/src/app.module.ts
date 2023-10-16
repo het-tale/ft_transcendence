@@ -10,6 +10,7 @@ import { ChatModule } from './chat/chat.module';
 import { GameModule } from './Game/Game.Module';
 import { UserModule } from './user/user.module';
 import { RobotUserService } from './utils/robot-user.service';
+import { AchievementService } from './utils/achievements-creation.service';
 
 @Module({
   imports: [
@@ -26,6 +27,6 @@ import { RobotUserService } from './utils/robot-user.service';
     GameModule,
     UserModule,
   ],
-  providers: [RobotUserService],
+  providers: [RobotUserService, AchievementService],
 })
 export class AppModule {}
