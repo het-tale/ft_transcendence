@@ -129,12 +129,13 @@ model Match {
 
   start  DateTime
   end    DateTime?
-  result String
 
   playerA   User? @relation("MatchPlayerA", fields: [playerAId], references: [id])
   playerAId Int?
+  resultA Int?
   playerB   User? @relation("MatchPlayerB", fields: [playerBId], references: [id])
   playerBId Int?
+  resultB Int?
   winner    User? @relation("MatchWinner", fields: [winnerId], references: [id])
   winnerId  Int?
 }

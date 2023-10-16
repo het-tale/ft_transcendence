@@ -56,7 +56,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         client.disconnect();
       }
     } catch (e) {
-      console.log('get an error while connection');
       console.log('error', e);
     }
   }
@@ -65,6 +64,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   async handleStartGame(client: Socket) {
     try {
       const user = this.activeSockets.get(client);
+      if (!user)
+        throw new Error("undefined user ");
       if (user.status === 'InGame') {
         console.log('user is already in game handle start game');
         return;
@@ -106,28 +107,30 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
           status: 'online',
         },
       });
-      
+      this.activeSockets.get(client).status = 'online';
     }
     if (room && room.gameActive) {
-
       console.log('room found to make force leave ');
-      client.leave(room.roomName);
-      room.players = room.players.filter((player) => player.socket !== client);
-
+      //give the disconnected player 0 in scode and the other player 5
+      const player = room.players.find((player) => player.socket === client);
+      const resultA = player === room.players[0]? 0 : 5;
+      const resultB = player === room.players[0]? 5 : 0;
       if (room.players.length < 2) {
         const otherPlayerid = room.players
-          .filter((player) => player.socket !== client)
-          .map((player) => player.id)[0];
+        .filter((player) => player.socket !== client)
+        .map((player) => player.id)[0];
         this.prisma.match.update({
           where: {
             id: room.id,
           },
           data: {
             winnerId: otherPlayerid,
-            result: 'aborted',
+            resultA: resultA, // TODO: fix this to give disconnected palayer score 0 and other player score 5
+            resultB: resultB,
             end: new Date(),
           },
         });
+        client.leave(room.roomName);
         room.gameActive = false;
         this.rooms.delete(room.roomName);
       }
