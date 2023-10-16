@@ -203,12 +203,8 @@ export async function dataupdatetostop(player: Player, otherPlayer: Player, room
   await prisma.match.update({
     where: { id: room.id },
     data: {
-      result:
-        'playerA ' +
-        player.score.toString() +
-        ' ' +
-        otherPlayer.score.toString() +
-        ' playerB',
+      resultA: player.score,
+      resultB: otherPlayer.score,
       winnerId: winnerId,
       end: new Date(),
     },

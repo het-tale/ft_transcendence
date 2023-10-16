@@ -64,8 +64,11 @@ export class AuthController {
   @Get('42/callback')
   async signin42Callback(@Req() request: { user: User }, @Res() res: Response) {
     const token = await this.authService.signin42(request.user);
+    console.log(process.env.FRONTEND_URL);
     console.log(token);
-    return await res.redirect(`${process.env.FRONTEND_URL}/signin42?token=${token}`);
+    const url = `${process.env.FRONTEND_URL}/signin42?token=${token}`;
+    console.log(url);
+    return res.redirect(url);
   }
 
   @ApiBody({ type: ForgetPassworddto })

@@ -84,7 +84,6 @@ export async function createMatch(
       .create({
         data: {
           start: new Date(),
-          result: 'ongoing',
           playerAId: playerid,
           playerBId: playerid2,
         },
@@ -128,7 +127,6 @@ export async function createMatchrobot(
       .create({
         data: {
           start: new Date(),
-          result: 'ongoing',
           playerAId: playerid,
           playerBId: 1,
         },
