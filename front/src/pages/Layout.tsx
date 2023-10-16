@@ -187,6 +187,31 @@ export const Layout = ({ children }: Props) => {
                 });
                 renderData.setRenderData(!renderData.renderData);
             });
+
+            socket.on('friendRemoved', () => {
+                console.log('friendRemoved');
+                toast({
+                    title: 'success',
+                    description: 'Friend removed',
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                renderData.setRenderData(!renderData.renderData);
+            });
+            socket.on('friendRemoveError', (data: any) => {
+                console.log('friendRemoveError', data);
+                toast({
+                    title: 'error',
+                    description: data,
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+                renderData.setRenderData(!renderData.renderData);
+            });
         }, 500);
 
         return () => {
@@ -201,6 +226,8 @@ export const Layout = ({ children }: Props) => {
             socket.off('friendRequestError');
             socket.off('friendRequestAccepted');
             socket.off('friendRequestDeclined');
+            socket.off('friendRemoved');
+            socket.off('friendRemoveError');
             clearTimeout(timer);
         };
     }, [socket]);
