@@ -37,7 +37,7 @@ const Profile = () => {
         }
 
         fetchUserData();
-    }, [update]);
+    }, [update, renderData.renderData]);
     useEffect(() => {
         GetFriendsList().then((data) => {
             setFriends(data);
