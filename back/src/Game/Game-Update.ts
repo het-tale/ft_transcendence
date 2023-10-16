@@ -109,20 +109,3 @@ export function findRoomByPlayerSocket(
   return undefined;
 }
 
-export async function calculateRank(prisma: PrismaService)
-{
-  const users = await prisma.user.findMany({
-    select: {
-      id: true,
-    },
-    orderBy: {
-      matchwin: 'desc',
-    },
-  });
-  for (let i = 0; i < users.length; i++) {
-    await prisma.user.update({
-      where: { id: users[i].id },
-      data: { rank: i + 1 },
-    });
-  }
-}
