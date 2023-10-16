@@ -27,24 +27,26 @@ interface FriendsProps {
     user?: UserType;
     update?: boolean;
     setUpdate?: React.Dispatch<React.SetStateAction<boolean>>;
+    friends?: UserType[];
+    setFriends?: React.Dispatch<React.SetStateAction<UserType[]>>;
 }
 
 const Friends = (props: FriendsProps) => {
-    const [friends, setFriends] = React.useState<UserType[]>([]);
+    // const [friends, setFriends] = React.useState<UserType[]>([]);
     console.log('FRIENDS', props.user);
-    useEffect(() => {
-        console.log('Friends');
-        props.friend
-            ? GetFriendsList().then((data) => {
-                  setFriends(data);
-              })
-            : GetMutualFriendsList(props.user?.username).then((data) => {
-                  setFriends(data);
-              });
-    }, [props.update]);
+    // useEffect(() => {
+    //     console.log('Friends');
+    //     props.friend
+    //         ? GetFriendsList().then((data) => {
+    //               setFriends(data);
+    //           })
+    //         : GetMutualFriendsList(props.user?.username).then((data) => {
+    //               setFriends(data);
+    //           });
+    // }, [props.update]);
     return (
         <div>
-            {friends?.map((friend) => {
+            {props.friends?.map((friend) => {
                 return (
                     <Card
                         direction={{ base: 'column', sm: 'row' }}

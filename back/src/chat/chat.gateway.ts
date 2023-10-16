@@ -508,20 +508,27 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      const clientUsername = this.connectedUsers.find(
+      console.log("heeeey m heeere friend0");
+      const user1 = this.connectedUsers.find(
         (user) => user.clientId === client.id,
-      ).username;
+      );
+      console.log("heeeey m heeere friend-1", user1);
+      const clientUsername = user1.username;
+      console.log("ClientUsername", clientUsername);
       const receiver = this.connectedUsers.find(
         (user) => user.username === data.from,
-      );
+        );
+        console.log("heeeey m heeere friend-2", receiver.username);
       let isOnline = false;
       if (receiver) isOnline = true;
+      console.log("heeeey m heeere friend2");
       await this.friendsService.handleFriendRequest(
         clientUsername,
         data.from,
         data.isAccepted,
         isOnline,
       );
+      console.log("heeeey m heeere friend1");
       if (data.isAccepted) {
         const obj = await this.achievementsService.check20friends(clientUsername);
         if (obj.isUnlocked)

@@ -43,6 +43,8 @@ interface UserInfoProps {
     isMyProfile: boolean;
     update?: boolean;
     setUpdate?: React.Dispatch<React.SetStateAction<boolean>>;
+    friends: UserType[];
+    mutualFriends: UserType[];
 }
 
 const UserInfo = (props: UserInfoProps) => {
@@ -61,20 +63,6 @@ const UserInfo = (props: UserInfoProps) => {
         });
         props.setUpdate!(!props.update);
     };
-    socket.on('friendRequest', (data: any) => {
-        console.log('FRIEND REQUEST', data);
-        props.setUpdate!(!props.update);
-    });
-
-    socket.on('friendRequestSent', (data: any) => {
-        setFriendshipStatus('Friend Request Sent');
-        console.log('FRIEND REQUEST SENT', data);
-        props.setUpdate!(!props.update);
-    });
-    socket.on('friendRequestError', (data: any) => {
-        console.log('FRIEND REQUEST ERROR', data);
-        props.setUpdate!(!props.update);
-    });
     return (
         <div className="container" style={{ width: '600px' }}>
             <Center>
@@ -151,9 +139,23 @@ const UserInfo = (props: UserInfoProps) => {
                 bg={'#a435f0'}
                 color={'white'}
                 marginBottom={'-42rem'}
-                onClick={props.isMyProfile ? onOpen : handleAddFriend}
+                onClick={
+                    props.isMyProfile
+                        ? onOpen
+                        : props.friends.some(
+                              (friend) => friend.id === props.user?.id
+                          )
+                        ? () => {}
+                        : handleAddFriend
+                }
             >
-                {props.isMyProfile ? 'Edit Profile' : friendshipStatus}
+                {props.isMyProfile
+                    ? 'Edit Profile'
+                    : props.friends.some(
+                          (friend) => friend.id === props.user?.id
+                      )
+                    ? 'Friends'
+                    : 'Add Friend'}
             </Button>
             <ModalUi
                 isOpen={isOpen}
