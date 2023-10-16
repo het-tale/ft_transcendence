@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import NavbarSearch from '../../components/NavbarSearch';
 import { Box, Flex } from '@chakra-ui/react';
 import Sidebar from '../../components/Sidebar';
@@ -14,6 +14,7 @@ import { useLocation } from 'react-router-dom';
 import User from '../../components/User';
 import { GetFriendsList } from './GetFriendsList';
 import { GetMutualFriendsList } from './GetMutualFriendsList';
+import { RenderContext } from '../../RenderContext';
 
 const Profile = () => {
     const [currentTab, setCurrentTab] = React.useState('1');
@@ -22,6 +23,7 @@ const Profile = () => {
     const [update, setUpdate] = React.useState(false);
     const [friends, setFriends] = React.useState<UserType[]>([]);
     const [mutualFriends, setMutualFriends] = React.useState<UserType[]>([]);
+    const renderData = useContext(RenderContext);
     const location = useLocation();
     console.log('THISSS', location);
     const id = location.pathname.split('/')[2];
@@ -43,7 +45,7 @@ const Profile = () => {
         GetMutualFriendsList(user?.username).then((data) => {
             setMutualFriends(data);
         });
-    }, [update]);
+    }, [renderData.renderData]);
     console.log('USER PROFILE', user);
     console.log(' CUrrent USER', currentUser);
     const isMyProfile = Number(id) === currentUser?.id;
@@ -61,12 +63,14 @@ const Profile = () => {
                             setUpdate={setUpdate}
                             user={user}
                             friends={friends}
+                            renderData={renderData}
                         />
                     ) : (
                         <Friends
                             friend={false}
                             user={user}
                             friends={mutualFriends}
+                            renderData={renderData}
                         />
                     )}
                 </>
@@ -99,7 +103,7 @@ const Profile = () => {
     };
     return (
         <div>
-            <Box w="100%" bg="#E9ECEF">
+            <Box w="89.5vw" bg="#E9ECEF">
                 <Flex justify="space-between">
                     <UserInfo
                         user={user}

@@ -14,13 +14,15 @@ import {
     Stack,
     Text
 } from '@chakra-ui/react';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { BsChatLeftFill, BsThreeDotsVertical, BsTrash } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { UserType } from '../../Types/User';
 import React from 'react';
 import { GetFriendsList } from './GetFriendsList';
 import { GetMutualFriendsList } from './GetMutualFriendsList';
+import { SocketContext } from '../../socket';
+import { RenderContext, RenderContextType } from '../../RenderContext';
 
 interface FriendsProps {
     friend: boolean;
@@ -29,6 +31,7 @@ interface FriendsProps {
     setUpdate?: React.Dispatch<React.SetStateAction<boolean>>;
     friends?: UserType[];
     setFriends?: React.Dispatch<React.SetStateAction<UserType[]>>;
+    renderData?: RenderContextType;
 }
 
 const Friends = (props: FriendsProps) => {
@@ -44,6 +47,15 @@ const Friends = (props: FriendsProps) => {
     //               setFriends(data);
     //           });
     // }, [props.update]);
+    const socket = React.useContext(SocketContext);
+    const handleRemoveFriend = (username: string) => {
+        console.log('REMOVE FRIEND');
+        socket.emit('removeFriend', {
+            target: username
+        });
+        props.setUpdate!(!props.update);
+        props.renderData?.setRenderData!(!props.renderData?.renderData);
+    };
     return (
         <div>
             {props.friends?.map((friend) => {
@@ -130,6 +142,11 @@ const Friends = (props: FriendsProps) => {
                                                 paddingBottom={2}
                                                 bg={'none'}
                                                 icon={<BsTrash />}
+                                                onClick={() =>
+                                                    handleRemoveFriend(
+                                                        friend.username
+                                                    )
+                                                }
                                             >
                                                 Remove Friend
                                             </MenuItem>
