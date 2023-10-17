@@ -76,6 +76,13 @@ export class ChatController {
       request.user,
     );
   }
+  @Get('search-channels/:startsWith')
+  async searchChannels(
+    @Param('startsWith') startsWith: string,
+    @Req() request: { user: User },
+  ) {
+    return await this.channelService.searchChannels(startsWith, request.user);
+  }
 
   @Get('room/:channelName')
   async getChannel(

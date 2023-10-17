@@ -295,6 +295,9 @@ export class DMService {
       where: {
         username: clientUsername,
       },
+      include: {
+        friends: true,
+      },
     });
     const receiver = await this.prisma.user.findUnique({
       where: {
@@ -303,6 +306,13 @@ export class DMService {
     });
     if (!client || !receiver) {
       throw new Error('User not found.');
+    }
+    //check if already friends
+    const alreadyFriends = client.friends.find(
+      (friend) => friend.id === receiver.id,
+    );
+    if (alreadyFriends) {
+      throw new Error('You are already friends.');
     }
     const existingFriendRequest = await this.prisma.friendRequest.findFirst({
       where: {
