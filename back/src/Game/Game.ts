@@ -10,12 +10,10 @@ import { Server, Socket } from 'socket.io';
 import { GameData, OTHERPADDLE, PADDLE, Player, Room } from './types';
 
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { verifyToken } from './Game-Init';
+import { GameInit } from './Game-Init';
 import { GameStartEvent} from './game-start-event';
 import { User } from '@prisma/client';
-import { UpdatePaddle, dataupdatetostop, findRoomByPlayerSocket } from './Game-Update';
+import { GameUpdate } from './Game-Update';
 
 @WebSocketGateway({ namespace: 'game' })
 @Injectable()
@@ -27,9 +25,9 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   private rooms: Map<string, Room> = new Map();
   constructor(
     private prisma: PrismaService,
-    private conf: ConfigService,
-    private jwt: JwtService,
     private serviceStart: GameStartEvent,
+    private serviceInit: GameInit,
+    private serviceUpdate: GameUpdate,
   ) {
     this.AddRobotToSOckets();
   }
@@ -49,7 +47,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       const token = client.handshake.auth.token;
       //   console.log('token', token);
-      const user = await verifyToken(token, this.prisma, this.conf, this.jwt);
+      const user = await this.serviceInit.verifyToken(token);
       if (user) {
         if (user.status === 'InGame') {
           console.log('\x1b[33m user connection allready in game ', user, '\x1b[0m');
@@ -130,7 +128,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleDisconnect(client: Socket) {
-    const room = findRoomByPlayerSocket(client, this.rooms);
+    const room = this.serviceInit.findRoomByPlayerSocket(client, this.rooms);
     const user = this.activeSockets.get(client);
     if (user) {
       console.log('disconnecting client ', user.login);
@@ -146,14 +144,10 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     if (room) {
       console.log('room found to make force leave ');
       if (room.players.length === 2) {
-        const player = room.players.find((player) => player.socket === client);
-        const otherPlayer = room.players.find(
-          (player) => player.socket !== client,
-          console.log('other player', player.socket),
-        );
-        player.score = 0;
-        otherPlayer.score = 5;
-        dataupdatetostop(room, this.activeSockets, this.prisma);
+        const playerindex = room.players.indexOf(room.players.find((player) => player.socket === client));
+        room.players[playerindex].score = 0;
+        room.players[playerindex === 0 ? 1 : 0].score = 5;
+        this.serviceUpdate.dataupdatetostop(room, this.activeSockets);
       }
       else {
         this.prisma.match.delete({
@@ -327,7 +321,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('UpdatePlayerPaddle')
   handleUpdatePaddle(client: Socket, eventData: any) {
     try {
-      UpdatePaddle(client, eventData, this.rooms);
+      this.serviceUpdate.UpdatePaddle(client, eventData, this.rooms);
     } catch (e) {
       console.log('error', e);
     }
