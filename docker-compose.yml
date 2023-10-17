@@ -3,17 +3,21 @@ version: '3.8'
 services:
   my_database:
     image: postgres:13
+    init: true
     container_name: my_postgres_db
     working_dir: /app/back
     env_file:
       - .env
     ports:
       - "5432:5432"
+    networks:
+      - my_network
 
   backend:
     build:
       context: .
       dockerfile: ./back/Dockerfile
+    init: true
     container_name: my_backend_container
     working_dir: /app/back
     volumes:
@@ -24,26 +28,30 @@ services:
       - my_database
     env_file:
       - .env
+    networks:
+      - my_network
 
   frontend:
     build:
       context: .
       dockerfile: ./front/Dockerfile
+    init: true
     container_name: my_frontend_container
     working_dir: /app/front
     volumes:
       - ./front:/app/front
     ports:
       - "3000:3000"
-    depends_on:
-      - backend
     env_file:
       - .env
+    networks:
+      - my_network
 
   prisma_studio:
     build:
       context: .
-      dockerfile: ./database/Dockerfile  
+      dockerfile: ./database/Dockerfile
+    init: true 
     container_name: prisma_container
     env_file:
       - .env
@@ -51,3 +59,9 @@ services:
       - "5555:5555"  
     depends_on:
       - my_database
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
