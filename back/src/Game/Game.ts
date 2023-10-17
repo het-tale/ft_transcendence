@@ -23,14 +23,16 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   private activeSockets: Map<Socket, User> = new Map();
 
   private rooms: Map<string, Room> = new Map();
+  private robot: boolean;
   constructor(
     private prisma: PrismaService,
     private serviceStart: GameStartEvent,
     private serviceInit: GameInit,
     private serviceUpdate: GameUpdate,
   ) {
-    this.AddRobotToSOckets();
+    this.robot = false;
   }
+
 
   async AddRobotToSOckets() {
     const robotUser = await this.prisma.user.findFirst({
@@ -38,15 +40,14 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         id: 1,
       },
     });
-    console.log('robotUser', robotUser);
     this.activeSockets.set(null, robotUser);
+    this.robot = true;
   }
-
 
   async handleConnection(client: Socket) {
     try {
+      !this.robot? this.AddRobotToSOckets(): null;
       const token = client.handshake.auth.token;
-      //   console.log('token', token);
       const user = await this.serviceInit.verifyToken(token);
       if (user) {
         if (user.status === 'InGame') {

@@ -5,6 +5,8 @@ import { patchNestJsSwagger } from 'nestjs-zod';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { RobotUserService } from './utils/robot-user.service';
 import { AchievementService } from './utils/achievements-creation.service';
+import { Game } from './Game/Game';
+import { GameModule } from './Game/Game.Module';
 
 async function bootstrap() {
   patchNestJsSwagger();
@@ -22,11 +24,11 @@ async function bootstrap() {
   });
   app.useWebSocketAdapter(new IoAdapter(app));
   const config = new DocumentBuilder()
-    .setTitle('ft_transcendence API')
-    .setDescription('Showing all the routes of the API')
-    .setVersion('1.0')
-    .addTag('ft_transcendence')
-    .build();
+  .setTitle('ft_transcendence API')
+  .setDescription('Showing all the routes of the API')
+  .setVersion('1.0')
+  .addTag('ft_transcendence')
+  .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
