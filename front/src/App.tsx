@@ -42,6 +42,7 @@ import { Layout } from './pages/Layout';
 import { UserType } from './Types/User';
 import User from './components/User';
 import { Verify2Fa } from './pages/Profile/Verify2Fa';
+import { SlideEx } from './components/Test';
 
 // const theme = createTheme();
 let notifArray: Notification[] = [];
@@ -229,7 +230,7 @@ function App() {
                                     }
                                 />
                             </Route>
-                            <Route path="testt" element={<Testt />} />
+                            <Route path="testt" element={<SlideEx />} />
                         </Routes>
                     </RenderContext.Provider>
                 </SocketGameContext.Provider>
