@@ -1,62 +1,51 @@
 import { Server, Socket } from 'socket.io';
-import { GameData, Paddle, Player, Room } from './types';
+import { GameData, INTERVAL, OTHERPADDLE, PADDLE, Player, Room } from './types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
-import { startGame, startGamerobot } from './start-game';
+import {  Injectable } from '@nestjs/common';
+import { interval } from 'rxjs';
+import { GameInit } from './Game-Init';
+import { GameUpdate } from './Game-Update';
 
-export async function StartGameEvent(
+
+
+@Injectable()
+export class GameStartEvent {
+  constructor(
+    private prisma: PrismaService,
+    private serviceInit: GameInit,
+    private serviceUpdate: GameUpdate,
+  ) {}
+ async  StartGameEvent(
   client: Socket,
-  containerHeight: number,
-  containerWidth: number,
   rooms: Map<string, Room>,
   activeSockets: Map<Socket, User>,
-  prisma: PrismaService,
   server: Server,
 ) {
   let exist = false;
-  const padd = new Paddle(
-    (containerWidth * 2) / 100,
-    containerHeight / 2,
-    8,
-    containerHeight * 0.15,
-    3,
-  );
-  const otherpadd = new Paddle(
-    containerWidth - (containerWidth * 2) / 100,
-    containerHeight / 2,
-    8,
-    containerHeight * 0.15,
-    3,
-  );
-
   for (const existRoom of rooms.values()) {
-    console.log(
-      'at room ',
-      existRoom.roomName,
-      ' players ',
-      existRoom.players.length,
-    );
-    if (existRoom.players.length === 1) {
+    console.log('at room ', existRoom.roomName, ' players ', existRoom.players.length, );
+    if (existRoom.players.length === 1 && !existRoom.isinvit) {
       exist = true;
+      console.log('room found ', existRoom.roomName);
+      console.log('player 1 ', existRoom.players[0].id);
       const user = activeSockets.get(client);
-      const player = new Player(2, user.id, client, padd, existRoom.roomName, 0);
+      const player = new Player(2, user.id, client, PADDLE, existRoom.roomName, 0);
       existRoom.players.push(player);
       client.join(existRoom.roomName);
       const gamedata: GameData = {
         playerpad: player.paddle,
-        otherpad: otherpadd,
+        otherpad: OTHERPADDLE,
         ball: existRoom.ball,
         playerScore: 0,
         otherScore: 0,
         rounds: existRoom.rounds,
-        containerHeight: containerHeight,
-        containerWidth: containerWidth,
         id: 2,
       };
       client.emit('JoinRoom', existRoom.roomName);
       client.emit('InitGame', gamedata);
       server.to(existRoom.roomName).emit('StartGame', existRoom.roomName);
-      startGame(existRoom, rooms, activeSockets, prisma, containerHeight);
+      this.startGame(false, existRoom, client, rooms, activeSockets);
       break;
     }
   }
@@ -66,21 +55,18 @@ export async function StartGameEvent(
     rooms.set(room.roomName, room);
     console.log('new room created with name ', room.roomName);
 
-    //find the user id by activ socket
     const user = activeSockets.get(client);
-    const player = new Player(1, user.id, client, otherpadd, room.roomName, 0);
+    const player = new Player(1, user.id, client, OTHERPADDLE, room.roomName, 0);
     room.players.push(player);
     client.join(room.roomName);
 
     const gamedata: GameData = {
       playerpad: player.paddle,
-      otherpad: padd,
+      otherpad: PADDLE,
       ball: room.ball,
       playerScore: 0,
       otherScore: 0,
       rounds: room.rounds,
-      containerHeight: containerHeight,
-      containerWidth: containerWidth,
       id: player.number,
     };
     client.emit('JoinRoom', room.roomName);
@@ -88,58 +74,77 @@ export async function StartGameEvent(
   }
 }
 
-export async function StartGameEventRobot(
+async StartGameEventRobot(
   client: Socket,
   rooms: Map<string, Room>,
   activeSockets: Map<Socket, User>,
-  prisma: PrismaService,
   server: Server,
-  containerHeight: number,
-  containerWidth: number,
-) {
-  // the same as StartGameEvent but with a robot as second player
-  const padd = new Paddle(containerWidth * 0.02, containerHeight / 2, 8, containerHeight * 0.15, 3);
-  const otherpadd = new Paddle(
-    containerWidth - containerWidth * 0.02,
-    containerHeight / 2,
-    8,
-    containerHeight * 0.15,
-    3,
-  );
-  const room = new Room(Math.random().toString(36).substring(7));
-  rooms.set(room.roomName, room);
-  console.log('new room created with name ', room.roomName);
-  const user = activeSockets.get(client);
-  const player = new Player(1, user.id, client, otherpadd, room.roomName, 0);
-  const robotUser = await prisma.user.findUnique({
-    where: {
-      username: 'ROBOT',
+  ) {
+    const room = new Room(Math.random().toString(36).substring(7));
+    rooms.set(room.roomName, room);
+    console.log('new room created with name ', room.roomName);
+    const user = activeSockets.get(client);
+    const player = new Player(1, user.id, client, OTHERPADDLE, room.roomName, 0);
+    const robotUser = await this.prisma.user.findUnique({
+      where: {
+        username: 'ROBOT',
     },
   });
-  const robot = new Player(2, robotUser.id, client, padd, room.roomName, 0);
+  const robot = new Player(2, robotUser.id, null, PADDLE, room.roomName, 0);
   room.players.push(player);
   room.players.push(robot);
   client.join(room.roomName);
   const gamedata: GameData = {
     playerpad: player.paddle,
-    otherpad: padd,
+    otherpad: OTHERPADDLE,
     ball: room.ball,
     playerScore: 0,
     otherScore: 0,
     rounds: room.rounds,
-    containerHeight: containerHeight,
-    containerWidth: containerWidth,
     id: player.number,
   };
   client.emit('JoinRoom', room.roomName);
   client.emit('InitGame', gamedata);
   server.to(room.roomName).emit('StartGame', room.roomName);
-  startGamerobot(
-    robotUser,
+  this.startGame(
+    true,
     room,
+    client,
     rooms,
     activeSockets,
-    prisma,
-    containerHeight,
-  );
+    );
+  }
+
+ async startGame(
+  robot: boolean,
+    room: Room,
+    client: Socket,
+    rooms: Map<string, Room>,
+    activeSockets: Map<Socket, User>,
+  ) {
+    console.log('startGame');
+    this.serviceUpdate.OtherAvatar(client, room , activeSockets);
+    if (!room.gameActive) {
+      room.gameActive = true;
+      room.gameInterval = interval(INTERVAL).subscribe(() => {
+        if (!room.gameActive) {
+          cancelgamesart(room, rooms);
+          return;
+        }
+        robot? this.serviceUpdate.updateGamerobot(room, activeSockets): this.serviceUpdate.updateGame(room, activeSockets);
+      });
+      this.serviceInit.createMatch(room );
+    }
+  }
+  
+}
+
+export function cancelgamesart(room: Room, rooms: Map<string, Room>) {
+  console.log('cancelgamesart');
+  //dell room from map
+  rooms.delete(room.roomName);
+  room.gameActive = false;
+  if (room.gameInterval) {
+    room.gameInterval.unsubscribe();
+  }
 }

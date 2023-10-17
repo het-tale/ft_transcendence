@@ -217,7 +217,7 @@ function App() {
                                 }
                             >
                                 <Route
-                                    path=":id/:startGame"
+                                    path=":startGame"
                                     element={
                                         <ProtectRoutes>
                                             <Layout children={<GamePage />} />

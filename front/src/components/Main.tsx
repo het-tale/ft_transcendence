@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from "react-router-dom";
 
 const Main = () => {
+    const url = `${process.env.REACT_APP_BACKEND_URL}/auth/42signin`;
+    console.log(url);
     return (
         <div className="main">
         <p className="enjoy">Enjoy The moment with <span className="enjoy-text">Friends</span> Chat Play and Connect...</p>
@@ -30,7 +32,7 @@ c-34 -13 -75 -19 -130 -19 -68 0 -89 5 -145 31 -79 38 -140 97 -177 172 -23
 </svg>
         <div className="intra-wrapper">
             {/* <Link to="/signin42" className="intra">Sign in with intra 42</Link> */}
-            <button className='intra' onClick={() => {window.location.assign("http://localhost:3001/auth/42signin");}}>Sign in with intra 42</button>
+            <button className='intra' onClick={() => {window.location.assign(url);}}>Sign in with intra 42</button>
         </div>
     </div>);
 }
