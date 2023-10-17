@@ -1,7 +1,26 @@
 import React from 'react';
 import Search from './Search';
+import {
+    Box,
+    Card,
+    CardBody,
+    CardHeader,
+    Flex,
+    Heading,
+    Stack,
+    StackDivider,
+    Text,
+    Image
+} from '@chakra-ui/react';
+import { UserType } from '../Types/User';
 
-const NavbarSearch = function (props: any) {
+interface NavbarSearchProps {
+    setUsers?: React.Dispatch<React.SetStateAction<UserType[]>>;
+}
+
+const NavbarSearch = function (props: NavbarSearchProps) {
+    const [name, setName] = React.useState('');
+
     return (
         <div className="navbar">
             <div className="logo">
@@ -44,7 +63,12 @@ const NavbarSearch = function (props: any) {
                 </svg>
                 <span className="ng">ng</span>
             </div>
-            <Search />
+            <Search
+                isSearchGlobal={true}
+                filter={name}
+                setName={setName}
+                setUsers={props.setUsers}
+            />
         </div>
     );
 };
