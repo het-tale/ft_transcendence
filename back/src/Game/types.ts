@@ -38,8 +38,6 @@ export interface GameData {
   playerScore: number;
   otherScore: number;
   rounds: number;
-  containerHeight: number;
-  containerWidth: number;
   id: number;
 }
 
@@ -101,6 +99,7 @@ export class Room {
         break;
     }
     this.rounds = 5;
+    this.isinvit = false;
   }
   id: number;
   roomName: string;
@@ -110,7 +109,9 @@ export class Room {
   lastspeedincrease: number;
   ball: Ball;
   rounds: number;
+  isinvit: boolean;
 }
+
 
 export const INTERVAL = 16.66;
 export const INCREASE_SPEED = 1;
@@ -118,3 +119,22 @@ export const SPEED_INTERVAL = 1000;
 export const CONTAINERHIEGHT = 480;
 export const CONTAINERWIDTH = 720;
 export const RADIUS = 10;
+export const MAX_ANGLE_CHANGE = Math.PI / 4;
+
+export const PADDLE = new Paddle(
+  CONTAINERWIDTH - (CONTAINERWIDTH * 2) / 100,
+  CONTAINERHIEGHT / 2,
+  8,
+  CONTAINERHIEGHT * 0.15,
+  3,
+
+);
+
+export const OTHERPADDLE = new Paddle(
+  (CONTAINERWIDTH * 2) / 100,
+  CONTAINERHIEGHT / 2,
+  8,
+  CONTAINERHIEGHT * 0.15,
+  3,
+);
+
