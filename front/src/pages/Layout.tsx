@@ -11,7 +11,13 @@ import {
     StackDivider,
     Text,
     Image,
-    useToast
+    useToast,
+    useDisclosure,
+    Drawer,
+    DrawerOverlay,
+    DrawerContent,
+    DrawerHeader,
+    DrawerBody
 } from '@chakra-ui/react';
 import NavbarSearch from '../components/NavbarSearch';
 import Sidebar from '../components/Sidebar';
@@ -48,6 +54,7 @@ export const Layout = ({ children }: Props) => {
     const [user, setUser] = React.useState<UserType>();
     const [users, setUsers] = React.useState<UserType[]>([]);
     const navigate = useNavigate();
+    const { isOpen, onOpen, onClose } = useDisclosure();
     React.useEffect(() => {
         async function fetchUserData() {
             const currentUserData = await User();
@@ -287,148 +294,171 @@ export const Layout = ({ children }: Props) => {
                 <Sidebar
                     notification={renderData.notification}
                     setNotification={renderData.setNotification}
+                    onOpen={onOpen}
+                    isOpen={isOpen}
+                    onClose={onClose}
                 />
-                {renderData.notification ? (
-                    <div className="notifContainer">
-                        <h3 style={{ textAlign: 'center' }}>Notifications</h3>
-                        {invitations?.map((invit) => {
-                            return (
-                                <Card
-                                    direction={{ base: 'column', sm: 'row' }}
-                                    overflow="hidden"
-                                    variant="outline"
-                                    bg={'#EEEEFF'}
-                                    boxShadow={'2xl'}
-                                    p={2}
-                                    h={'100px'}
-                                    w={'100%'}
-                                    style={{ boxShadow: 'none' }}
-                                    marginBottom={2}
-                                >
-                                    <Flex
-                                        w={'full'}
-                                        justifyContent={'space-between'}
+                <Drawer placement={'left'} onClose={onClose} isOpen={isOpen}>
+                    <DrawerOverlay />
+                    <DrawerContent>
+                        <DrawerHeader borderBottomWidth="1px">
+                            Notifications
+                        </DrawerHeader>
+                        <DrawerBody>
+                            {invitations?.map((invit) => {
+                                return (
+                                    <Card
+                                        direction={{
+                                            base: 'column',
+                                            sm: 'row'
+                                        }}
+                                        overflow="hidden"
+                                        variant="outline"
+                                        bg={'#EEEEFF'}
+                                        boxShadow={'2xl'}
+                                        p={2}
+                                        h={'100px'}
+                                        w={'100%'}
+                                        style={{ boxShadow: 'none' }}
+                                        marginBottom={2}
                                     >
-                                        <Text
-                                            fontWeight={'bold'}
-                                            textAlign={'center'}
-                                            fontSize={15}
-                                            color={'#a435f0'}
-                                        >
-                                            {invit.isGame
-                                                ? `${invit.sender.username} invited you to play a game`
-                                                : `${invit.sender.username} invited you to join ${invit.channel?.name}`}
-                                        </Text>
                                         <Flex
-                                            justifyContent={'flex-end'}
-                                            flexDirection={'column'}
+                                            w={'full'}
+                                            justifyContent={'space-between'}
                                         >
-                                            <ButtonGroup>
-                                                <Button
-                                                    backgroundColor={'white'}
-                                                    color={'#a435f0'}
-                                                    onClick={
-                                                        invit.isGame
-                                                            ? () =>
-                                                                  handleAcceptRejectGame(
-                                                                      false
-                                                                  )
-                                                            : () =>
-                                                                  handleAcceptReject(
-                                                                      invit,
-                                                                      false
-                                                                  )
-                                                    }
-                                                >
-                                                    Decline
-                                                </Button>
-                                                <Button
-                                                    backgroundColor={'#a435f0'}
-                                                    color={'white'}
-                                                    onClick={
-                                                        invit.isGame
-                                                            ? () =>
-                                                                  handleAcceptRejectGame(
-                                                                      true
-                                                                  )
-                                                            : () =>
-                                                                  handleAcceptReject(
-                                                                      invit,
-                                                                      true
-                                                                  )
-                                                    }
-                                                >
-                                                    Accept
-                                                </Button>
-                                            </ButtonGroup>
+                                            <Text
+                                                fontWeight={'bold'}
+                                                textAlign={'center'}
+                                                fontSize={15}
+                                                color={'#a435f0'}
+                                            >
+                                                {invit.isGame
+                                                    ? `${invit.sender.username} invited you to play a game`
+                                                    : `${invit.sender.username} invited you to join ${invit.channel?.name}`}
+                                            </Text>
+                                            <Flex
+                                                justifyContent={'flex-end'}
+                                                flexDirection={'column'}
+                                            >
+                                                <ButtonGroup>
+                                                    <Button
+                                                        backgroundColor={
+                                                            'white'
+                                                        }
+                                                        color={'#a435f0'}
+                                                        onClick={
+                                                            invit.isGame
+                                                                ? () =>
+                                                                      handleAcceptRejectGame(
+                                                                          false
+                                                                      )
+                                                                : () =>
+                                                                      handleAcceptReject(
+                                                                          invit,
+                                                                          false
+                                                                      )
+                                                        }
+                                                    >
+                                                        Decline
+                                                    </Button>
+                                                    <Button
+                                                        backgroundColor={
+                                                            '#a435f0'
+                                                        }
+                                                        color={'white'}
+                                                        onClick={
+                                                            invit.isGame
+                                                                ? () =>
+                                                                      handleAcceptRejectGame(
+                                                                          true
+                                                                      )
+                                                                : () =>
+                                                                      handleAcceptReject(
+                                                                          invit,
+                                                                          true
+                                                                      )
+                                                        }
+                                                    >
+                                                        Accept
+                                                    </Button>
+                                                </ButtonGroup>
+                                            </Flex>
                                         </Flex>
-                                    </Flex>
-                                </Card>
-                            );
-                        })}
-                        {friendRequests?.map((friend) => {
-                            return (
-                                <Card
-                                    direction={{ base: 'column', sm: 'row' }}
-                                    overflow="hidden"
-                                    variant="outline"
-                                    bg={'#EEEEFF'}
-                                    boxShadow={'2xl'}
-                                    p={2}
-                                    h={'100px'}
-                                    w={'100%'}
-                                    style={{ boxShadow: 'none' }}
-                                    marginBottom={2}
-                                >
-                                    <Flex
-                                        w={'full'}
-                                        justifyContent={'space-between'}
+                                    </Card>
+                                );
+                            })}
+                            {friendRequests?.map((friend) => {
+                                return (
+                                    <Card
+                                        direction={{
+                                            base: 'column',
+                                            sm: 'row'
+                                        }}
+                                        overflow="hidden"
+                                        variant="outline"
+                                        bg={'#EEEEFF'}
+                                        boxShadow={'2xl'}
+                                        p={2}
+                                        h={'100px'}
+                                        w={'100%'}
+                                        style={{ boxShadow: 'none' }}
+                                        marginBottom={2}
                                     >
-                                        <Text
-                                            fontWeight={'bold'}
-                                            textAlign={'center'}
-                                            fontSize={15}
-                                            color={'#a435f0'}
-                                        >
-                                            {`${friend.sender.username} sent you a friend request`}
-                                        </Text>
                                         <Flex
-                                            justifyContent={'flex-end'}
-                                            flexDirection={'column'}
+                                            w={'full'}
+                                            justifyContent={'space-between'}
                                         >
-                                            <ButtonGroup>
-                                                <Button
-                                                    backgroundColor={'white'}
-                                                    color={'#a435f0'}
-                                                    onClick={() =>
-                                                        handleAcceptRejectFriend(
-                                                            friend,
-                                                            false
-                                                        )
-                                                    }
-                                                >
-                                                    Decline
-                                                </Button>
-                                                <Button
-                                                    backgroundColor={'#a435f0'}
-                                                    color={'white'}
-                                                    onClick={() =>
-                                                        handleAcceptRejectFriend(
-                                                            friend,
-                                                            true
-                                                        )
-                                                    }
-                                                >
-                                                    Accept
-                                                </Button>
-                                            </ButtonGroup>
+                                            <Text
+                                                fontWeight={'bold'}
+                                                textAlign={'center'}
+                                                fontSize={15}
+                                                color={'#a435f0'}
+                                            >
+                                                {`${friend.sender.username} sent you a friend request`}
+                                            </Text>
+                                            <Flex
+                                                justifyContent={'flex-end'}
+                                                flexDirection={'column'}
+                                            >
+                                                <ButtonGroup>
+                                                    <Button
+                                                        backgroundColor={
+                                                            'white'
+                                                        }
+                                                        color={'#a435f0'}
+                                                        onClick={() =>
+                                                            handleAcceptRejectFriend(
+                                                                friend,
+                                                                false
+                                                            )
+                                                        }
+                                                    >
+                                                        Decline
+                                                    </Button>
+                                                    <Button
+                                                        backgroundColor={
+                                                            '#a435f0'
+                                                        }
+                                                        color={'white'}
+                                                        onClick={() =>
+                                                            handleAcceptRejectFriend(
+                                                                friend,
+                                                                true
+                                                            )
+                                                        }
+                                                    >
+                                                        Accept
+                                                    </Button>
+                                                </ButtonGroup>
+                                            </Flex>
                                         </Flex>
-                                    </Flex>
-                                </Card>
-                            );
-                        })}
-                    </div>
-                ) : null}
+                                    </Card>
+                                );
+                            })}
+                        </DrawerBody>
+                    </DrawerContent>
+                </Drawer>
+
                 {children}
                 <SearchUsers users={users} setUsers={setUsers} />
             </Flex>

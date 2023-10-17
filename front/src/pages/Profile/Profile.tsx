@@ -1,9 +1,6 @@
 import React, { useContext, useEffect } from 'react';
-import NavbarSearch from '../../components/NavbarSearch';
 import { Box, Flex } from '@chakra-ui/react';
-import Sidebar from '../../components/Sidebar';
 import LeftSide from '../Chat/LeftSide';
-import RightSide from '../Chat/RightSide';
 import UserInfo from './UserInfo';
 import Friends from './Friends';
 import Statistics from './Statistics';
