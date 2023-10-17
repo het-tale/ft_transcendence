@@ -19,7 +19,8 @@ import {
     List,
     ListItem,
     ListIcon,
-    useDisclosure
+    useDisclosure,
+    useToast
 } from '@chakra-ui/react';
 import {
     BsThreeDotsVertical,
@@ -35,12 +36,15 @@ import ModalUi from '../../components/ModalUi';
 import EditProfileBody from './EditProfileBody';
 import { UserType } from '../../Types/User';
 import { SocketContext } from '../../socket';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { EditIcon } from '@chakra-ui/icons';
 import { Opacity } from '@mui/icons-material';
 import EditUserNameBody from './EditUserNameBody';
 import EditPasswordBody from './EditPasswordBody';
 import EditAvatarBody from './EditAvatarBody';
+import Manage2fa from './Manage2fa';
+import { RenderContext } from '../../RenderContext';
+import client from '../../components/Client';
 
 interface UserInfoProps {
     user?: UserType;
@@ -78,8 +82,33 @@ const UserInfo = (props: UserInfoProps) => {
             target: props.user?.username
         });
         props.setUpdate!(!props.update);
+        renderData.setRenderData(!renderData.renderData);
     };
     const [isHovered, setIsHovered] = useState(false);
+    const renderData = useContext(RenderContext);
+    const toast = useToast();
+    const disable2fa = async () => {
+        try {
+            console.log('disable 2fa');
+            const response = await client.get(`auth/2fa/disable`, {
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('token')
+                }
+            });
+            renderData.setRenderData(!renderData.renderData);
+        } catch (error: any) {
+            console.log('error', error);
+            toast({
+                title: 'Error',
+                description: error.response.data.message,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            renderData.setRenderData(!renderData.renderData);
+        }
+    };
     return (
         <div className="container" style={{ width: '600px' }}>
             <Center
@@ -202,7 +231,7 @@ const UserInfo = (props: UserInfoProps) => {
                             fontFamily={'Krona One'}
                             marginTop={2}
                         >
-                            Enable/Disable 2FA
+                            {user?.is2FaEnabled ? 'Disable 2FA' : 'Enable 2FA'}
                         </Text>
                         <IconButton
                             variant="ghost"
@@ -211,14 +240,14 @@ const UserInfo = (props: UserInfoProps) => {
                             aria-label=""
                             icon={<BsPencilFill />}
                             color={'#a435f0'}
-                            onClick={onOpen3}
+                            onClick={user?.is2FaEnabled ? disable2fa : onOpen3}
                         />
                         <ModalUi
                             isOpen={isOpen3}
                             onOpen={onOpen3}
                             onClose={onClose3}
                             title={'Change Two Factor Authentication'}
-                            body={''}
+                            body={<Manage2fa onClose={onClose3} user={user} />}
                         />
                     </Flex>
                 </>
