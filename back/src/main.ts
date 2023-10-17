@@ -5,8 +5,6 @@ import { patchNestJsSwagger } from 'nestjs-zod';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { RobotUserService } from './utils/robot-user.service';
 import { AchievementService } from './utils/achievements-creation.service';
-import { Game } from './Game/Game';
-import { GameModule } from './Game/Game.Module';
 
 async function bootstrap() {
   patchNestJsSwagger();
