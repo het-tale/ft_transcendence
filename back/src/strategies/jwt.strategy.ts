@@ -25,7 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     }
 
     user = exclude(user, 'hash');
-    // user = exclude(user, 'twoFaSecret');
+    user = exclude(user, 'twoFaSecret');
 
     return user;
   }
