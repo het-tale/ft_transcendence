@@ -3,9 +3,9 @@ import { GameData, INTERVAL, OTHERPADDLE, PADDLE, Player, Room } from './types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import {  Injectable } from '@nestjs/common';
-import { OtherAvatar, updateGame, updateGamerobot } from './Game-Update';
 import { interval } from 'rxjs';
-import { createMatch } from './Game-Init';
+import { GameInit } from './Game-Init';
+import { GameUpdate } from './Game-Update';
 
 
 
@@ -13,6 +13,8 @@ import { createMatch } from './Game-Init';
 export class GameStartEvent {
   constructor(
     private prisma: PrismaService,
+    private serviceInit: GameInit,
+    private serviceUpdate: GameUpdate,
   ) {}
  async  StartGameEvent(
   client: Socket,
@@ -121,7 +123,7 @@ async StartGameEventRobot(
     activeSockets: Map<Socket, User>,
   ) {
     console.log('startGame');
-    OtherAvatar(client, room , activeSockets);
+    this.serviceUpdate.OtherAvatar(client, room , activeSockets);
     if (!room.gameActive) {
       room.gameActive = true;
       room.gameInterval = interval(INTERVAL).subscribe(() => {
@@ -129,9 +131,9 @@ async StartGameEventRobot(
           cancelgamesart(room, rooms);
           return;
         }
-        robot? updateGamerobot(room, activeSockets, this.prisma): updateGame(room, activeSockets, this.prisma);
+        robot? this.serviceUpdate.updateGamerobot(room, activeSockets): this.serviceUpdate.updateGame(room, activeSockets);
       });
-      createMatch(room, this.prisma);
+      this.serviceInit.createMatch(room );
     }
   }
   
