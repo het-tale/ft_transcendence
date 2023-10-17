@@ -189,9 +189,13 @@ function App() {
                                     path="browse-channels"
                                     element={
                                         <ProtectRoutes>
-                                            <BrowseChannels
-                                                update={update}
-                                                setUpdate={setUpdate}
+                                            <Layout
+                                                children={
+                                                    <BrowseChannels
+                                                        update={update}
+                                                        setUpdate={setUpdate}
+                                                    />
+                                                }
                                             />
                                         </ProtectRoutes>
                                     }

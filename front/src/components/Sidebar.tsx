@@ -21,6 +21,9 @@ interface sidebarProps {
     notification?: boolean;
     setNotification?: React.Dispatch<React.SetStateAction<boolean>>;
     notifArray?: Notification[];
+    isOpen?: boolean;
+    onOpen?: () => void;
+    onClose?: () => void;
 }
 
 const Sidebar = (props: sidebarProps) => {
@@ -54,10 +57,7 @@ const Sidebar = (props: sidebarProps) => {
                     fontSize: '13px',
                     marginLeft: '2px'
                 }}
-                onClick={() =>
-                    props.setNotification &&
-                    props.setNotification(!props.notification)
-                }
+                onClick={props.onOpen}
             >
                 <BsBellFill
                     className="fa"

@@ -20,8 +20,6 @@ interface SearchUsersProps {
 }
 
 export const SearchUsers = (props: SearchUsersProps) => {
-    console.log('THIS IS THE USERS', props.users);
-    console.log('THIS IS THE LENGTH USERS', props.users.length);
     return (
         <>
             {props.users.length > 0
@@ -61,6 +59,7 @@ export const SearchUsers = (props: SearchUsersProps) => {
                                                       fontWeight={'bold'}
                                                       marginTop={'1.8rem'}
                                                       marginLeft={'1rem'}
+                                                      color={'#a435f0'}
                                                   >
                                                       {user.username}
                                                   </Text>
