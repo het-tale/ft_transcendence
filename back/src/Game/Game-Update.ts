@@ -4,8 +4,20 @@ import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { stopGame } from './Game_Stop';
 import { TAchievement } from 'src/dto';
+import { Injectable } from '@nestjs/common';
+import { GameInit } from './Game-Init';
 
-export async function intersections(
+
+@Injectable()
+
+export class GameUpdate {
+  constructor(
+    private prisma: PrismaService,
+    private serviceInit: GameInit,
+  ) {}
+
+
+ async intersections(
   room: Room,
   playerPaddle: Paddle,
   otherPaddle: Paddle,
@@ -47,10 +59,9 @@ export async function intersections(
   }
 }
 
-export async function colisionrobot(
+async colisionrobot(
   room: Room,
   activeSockets: Map<Socket, User>,
-  prisma: PrismaService,
 ) {
   const player = room.players[0];
   const otherPlayer = room.players[1];
@@ -58,18 +69,18 @@ export async function colisionrobot(
   const otherPlayerSocket = otherPlayer.socket;
   const playerPaddle = player.paddle;
   const otherPaddle = otherPlayer.paddle;
-  intersections(room, playerPaddle, otherPaddle);
+  this.intersections(room, playerPaddle, otherPaddle);
   if (room.ball.x + room.ball.radius >= CONTAINERWIDTH) {
     player.score++;
     room.rounds--;
-    if (room.rounds === 0) dataupdatetostop( room, activeSockets, prisma);
-    else resetBall(room.ball, player, otherPlayer);
+    if (room.rounds === 0) this.dataupdatetostop( room, activeSockets);
+    else this.resetBall(room.ball, player, otherPlayer);
   }
   if (room.ball.x - room.ball.radius <= 0) {
     otherPlayer.score++;
     room.rounds--;
-    if (room.rounds === 0) dataupdatetostop( room, activeSockets, prisma);
-    else resetBall(room.ball, player, otherPlayer);
+    if (room.rounds === 0) this.dataupdatetostop( room, activeSockets);
+    else this.resetBall(room.ball, player, otherPlayer);
   }
   playerSocket.emit('UPDATE', {
     ball: room.ball,
@@ -83,10 +94,9 @@ export async function colisionrobot(
   });
 }
 
-export async function updateGamerobot(
+ async updateGamerobot(
   room: Room,
   activeSockets: Map<Socket, User>,
-  prisma: PrismaService,
 ) {
 
   const robotpaddle = room.players[1].paddle;
@@ -120,7 +130,7 @@ if (room.players[1].paddle.y < 0) {
     // Reverse the vertical velocity of the ball
     room.ball.dy *= -1;
   }
-  colisionrobot(room, activeSockets, prisma);
+  this.colisionrobot(room, activeSockets);
   if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL) {
     room.lastspeedincrease = Date.now();
     room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
@@ -131,12 +141,12 @@ if (room.players[1].paddle.y < 0) {
   room.ball.y += room.ball.dy;
 }
 
-export async function UpdatePaddle(
+ async UpdatePaddle(
   client: Socket,
   eventData: any,
   rooms: Map<string, Room>,
 ) {
-  const room = findRoomByPlayerSocket(client, rooms);
+  const room = this.serviceInit.findRoomByPlayerSocket(client, rooms);
 
   if (room) {
     const player = room.players.find((p) => p.socket === client);
@@ -148,7 +158,7 @@ export async function UpdatePaddle(
   }
 }
 
-export async function OtherAvatar(
+async  OtherAvatar(
   client: Socket,
   room: Room,
   activeSockets: Map<Socket, User>,
@@ -165,26 +175,9 @@ export async function OtherAvatar(
     player.socket?.emit('OTHER AVATAR', otherUser.avatar, otherUser.username);
 }
 
-export function findRoomByPlayerSocket(
-  socket: Socket,
-  rooms: Map<string, Room>,
-) {
-  for (const room of rooms.values()) {
-    const playerInRoom = room.players.find(
-      (player) => player.socket === socket,
-    );
-    if (playerInRoom) {
-      return room;
-    }
-  }
-
-  return undefined;
-}
-
-export async function updateGame(
+async updateGame(
   room: Room,
   activeSockets: Map<Socket, User>,
-  prisma: PrismaService,
 ) {
   // Calculate the new ball position based on its current position and velocity
   if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL) {
@@ -203,10 +196,10 @@ export async function updateGame(
     // Reverse the vertical velocity of the ball
     room.ball.dy *= -1;
   }
-  colisionrobot(room, activeSockets, prisma);
+  this.colisionrobot(room, activeSockets);
 }
 
-export async function getclient(
+async getclient(
   client: Socket,
   activeSockets: Map<Socket, User>,
 ) {
@@ -218,7 +211,7 @@ export async function getclient(
   return user;
 }
 
-export function resetBall(ball: Ball, player: Player, otherPlayer: Player) {
+resetBall(ball: Ball, player: Player, otherPlayer: Player) {
 
   player.socket?.emit('UPDATE SCORE', {
     playerScore: player.score,
@@ -250,9 +243,9 @@ export function resetBall(ball: Ball, player: Player, otherPlayer: Player) {
       break;
   }
 }
-export async function getAchievement(name: string, prisma: PrismaService)
+ async getAchievement(name: string)
     {
-        const achiev =  await prisma.achievement.findFirst({
+        const achiev =  await this.prisma.achievement.findFirst({
             where: {
                 name,
             },
@@ -264,11 +257,11 @@ export async function getAchievement(name: string, prisma: PrismaService)
         return achiev;
     }
 
-export async function checkIfAchiever(user: User, achievement: TAchievement, checkOnline: boolean = true, prisma: PrismaService)
+ async checkIfAchiever(user: User, achievement: TAchievement, checkOnline: boolean = true)
     {
         const ifAchiever = achievement.achievers.find((ach) => ach.id === user.id);
         if (ifAchiever) return false;
-        await prisma.achievement.update({
+        await this.prisma.achievement.update({
             where: {
                 id: achievement.id,
             },
@@ -284,7 +277,7 @@ export async function checkIfAchiever(user: User, achievement: TAchievement, che
         {
             if (user.status === 'offline')
             {
-                await prisma.achievement.update({
+                await this.prisma.achievement.update({
                     where: {
                         id: achievement.id,
                     },
@@ -301,17 +294,17 @@ export async function checkIfAchiever(user: User, achievement: TAchievement, che
         }
         return true;
     }
-export async function changeLp(prisma: PrismaService, user: User, isWinner: boolean)
+async changeLp( user: User, isWinner: boolean)
   {
     let lp = isWinner ? user.lp + user.add_nmr : user.lp - user.sub_nmr;
     if (lp < 0) lp = 0;
-    await prisma.user.update({
+    await this.prisma.user.update({
       where: { id: user.id },
       data: { lp },
     });
   }
 
-  export async function calculateNmr(prisma: PrismaService, user: User)
+async calculateNmr( user: User)
   {
     const rate = user.win_rate;
     let add: number;
@@ -326,23 +319,25 @@ export async function changeLp(prisma: PrismaService, user: User, isWinner: bool
       add = 20, sub = 7;
     else
       add = 25, sub = 5;
-    await prisma.user.update({
+    await this.prisma.user.update({
       where: { id: user.id },
       data: { add_nmr: add, sub_nmr: sub},
     });
   }
-  export async function calculateWinRate(prisma: PrismaService, user: User)
+
+  async calculateWinRate(user: User)
   {
     if (user.matchnumber === 0) return 0;
     const rate = (user.matchwin * 100) / user.matchnumber;
-    await prisma.user.update({
+    await this.prisma.user.update({
       where: { id: user.id },
       data: { win_rate: rate},
     });
   }
-  export async function calculateRank(prisma: PrismaService)
+
+async  calculateRank(prisma: PrismaService)
   {
-    const users = await prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       select: {
         id: true,
       },
@@ -351,7 +346,7 @@ export async function changeLp(prisma: PrismaService, user: User, isWinner: bool
       },
     });
     for (let i = 0; i < users.length; i++) {
-      await prisma.user.update({
+      await this.prisma.user.update({
         where: { id: users[i].id },
         data: { g_rank: i + 1 },
       });
@@ -359,51 +354,51 @@ export async function changeLp(prisma: PrismaService, user: User, isWinner: bool
   }
 
 
-export async function checkFirstWin(username: string, prisma: PrismaService)
+ async checkFirstWin(username: string)
 {
-    const user = await prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
         where: { username },
     });
-    const achievement = await getAchievement("First Win", prisma);
+    const achievement = await this.getAchievement("First Win");
     if (user.matchwin !== 1)
         return { achievement, isUnlocked: false };
-    const isUnlocked = await checkIfAchiever(user, achievement, true, prisma);
+    const isUnlocked = await this.checkIfAchiever(user, achievement, true);
     return { achievement, isUnlocked };
 }
-export async function checkFirstLoss(username: string, prisma: PrismaService)
+ async checkFirstLoss(username: string)
 {
-    const user = await prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
         where: { username },
     });
-    const achievement = await getAchievement("First Loss", prisma);
+    const achievement = await this.getAchievement("First Loss");
     if (user.matchlose !== 1)
         return { achievement, isUnlocked: false };
-    const isUnlocked = await checkIfAchiever(user, achievement, true, prisma);
+    const isUnlocked = await this.checkIfAchiever(user, achievement, true);
     return { achievement, isUnlocked };
 }
 
-export async function checkRank(username: string, prisma: PrismaService)
+ async checkRank(username: string)
 {
-    const user = await prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
         where: { username },
     });
     let achievement: TAchievement;
     if (user.lp < 300)
-        achievement = await getAchievement("Iron Curtain Crusher", prisma);
+        achievement = await this.getAchievement("Iron Curtain Crusher");
     else if (user.lp < 600)
-        achievement = await getAchievement("Bronze Bounce Master", prisma);
+        achievement = await this.getAchievement("Bronze Bounce Master");
     else if (user.lp < 900)
-        achievement = await getAchievement("Silver Paddle Prodigy", prisma);
+        achievement = await this.getAchievement("Silver Paddle Prodigy");
     else if (user.lp < 1200)
-        achievement = await getAchievement("Golden Ball Wizard", prisma);
+        achievement = await this.getAchievement("Golden Ball Wizard");
     else if (user.lp < 1500)
-        achievement = await getAchievement("Diamond Duelist", prisma);
+        achievement = await this.getAchievement("Diamond Duelist");
     else
-        achievement = await getAchievement("Master of the Pongiverse", prisma);
-    const isUnlocked = await checkIfAchiever(user, achievement, true, prisma);
+        achievement = await this.getAchievement("Master of the Pongiverse");
+    const isUnlocked = await this.checkIfAchiever(user, achievement, true);
     return { achievement, isUnlocked };
 }
-export async function dataupdatetostop(room: Room, activeSockets: Map<Socket, User>, prisma: PrismaService)
+ async dataupdatetostop(room: Room, activeSockets: Map<Socket, User>)
 {
   const player = room.players[0];
   const otherPlayer = room.players[1];
@@ -413,7 +408,7 @@ export async function dataupdatetostop(room: Room, activeSockets: Map<Socket, Us
   const user1 = activeSockets.get(player.socket);
   const user2 = activeSockets.get(otherPlayer.socket);
 
-  await prisma.match.update({
+  await this.prisma.match.update({
     where: { id: room.id },
     data: {
       resultA: player.score,
@@ -422,7 +417,7 @@ export async function dataupdatetostop(room: Room, activeSockets: Map<Socket, Us
       end: new Date(),
     },
   });
-  await prisma.user.update({
+  await this.prisma.user.update({
     where: { id: winnerId },
     data: {
       matchwin: {
@@ -430,7 +425,7 @@ export async function dataupdatetostop(room: Room, activeSockets: Map<Socket, Us
       },
     },
   });
-  await prisma.user.update({
+  await this.prisma.user.update({
     where: { id: looserId },
     data: {
       matchlose: {
@@ -446,30 +441,32 @@ export async function dataupdatetostop(room: Room, activeSockets: Map<Socket, Us
     otherPlayer.socket?.emit('GAME OVER', { winner: true });
   }
   room.gameActive = false;
-  await calculateWinRate(prisma, user1);
-  await calculateWinRate(prisma, user2);
-  await calculateNmr(prisma, user1);
-  await calculateNmr(prisma, user2);
-  user1.id === winnerId ? await changeLp(prisma, user1, true) : await changeLp(prisma, user1, false);
-  user2.id === winnerId ? await changeLp(prisma, user2, true) : await changeLp(prisma, user2, false);
-  const obj = await checkRank(user1.username, prisma);
+  await this.calculateWinRate(user1);
+  await this.calculateWinRate(user2);
+  await this.calculateNmr(user1);
+  await this.calculateNmr(user2);
+  user1.id === winnerId ? await this.changeLp(user1, true) : await this.changeLp(user1, false);
+  user2.id === winnerId ? await this.changeLp(user2, true) : await this.changeLp(user2, false);
+  const obj = await this.checkRank(user1.username);
   if (obj.isUnlocked)
     player.socket?.emit('achievementUnlocked', obj.achievement);
-  const obj2 = await checkRank(user2.username, prisma);
+  const obj2 = await this.checkRank(user2.username);
   if (obj2.isUnlocked)
     otherPlayer.socket?.emit('achievementUnlocked', obj2.achievement);
-  const obj3 = await checkFirstWin(user1.username, prisma);
+  const obj3 = await this.checkFirstWin(user1.username);
   if (obj3.isUnlocked)
     player.socket?.emit('achievementUnlocked', obj3.achievement);
-  const obj4 = await checkFirstWin(user2.username, prisma);
+  const obj4 = await this.checkFirstWin(user2.username);
   if (obj4.isUnlocked)
     otherPlayer.socket?.emit('achievementUnlocked', obj4.achievement);
-  const obj5 = await checkFirstLoss(user1.username, prisma);
+  const obj5 = await this.checkFirstLoss(user1.username);
   if (obj5.isUnlocked)
     player.socket?.emit('achievementUnlocked', obj5.achievement);
-  const obj6 = await checkFirstLoss(user2.username, prisma);
+  const obj6 = await this.checkFirstLoss(user2.username);
   if (obj6.isUnlocked)
     otherPlayer.socket?.emit('achievementUnlocked', obj6.achievement);
 
 stopGame(room, activeSockets);
+}
+
 }
