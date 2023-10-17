@@ -12,4 +12,8 @@ RUN npm install -g npm@latest
 
 RUN npm install
 
+# RUN npm run prisma:generate
+
+# RUN npm run prisma:push
+
 CMD ["npx", "prisma", "studio"]
