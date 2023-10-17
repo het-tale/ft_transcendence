@@ -79,7 +79,7 @@ const Profile = () => {
             tabTitle: 'Stats',
             content: (
                 <>
-                    <Statistics />
+                    <Statistics user={user} />
                 </>
             ),
             rightSide: <>Hello Stats</>
