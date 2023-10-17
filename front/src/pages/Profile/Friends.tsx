@@ -1,4 +1,5 @@
 import {
+    Avatar,
     Box,
     Card,
     CardBody,
@@ -12,7 +13,8 @@ import {
     MenuList,
     Spacer,
     Stack,
-    Text
+    Text,
+    AvatarBadge
 } from '@chakra-ui/react';
 import { useContext, useEffect } from 'react';
 import { BsChatLeftFill, BsThreeDotsVertical, BsTrash } from 'react-icons/bs';
@@ -35,18 +37,6 @@ interface FriendsProps {
 }
 
 const Friends = (props: FriendsProps) => {
-    // const [friends, setFriends] = React.useState<UserType[]>([]);
-    console.log('FRIENDS', props.user);
-    // useEffect(() => {
-    //     console.log('Friends');
-    //     props.friend
-    //         ? GetFriendsList().then((data) => {
-    //               setFriends(data);
-    //           })
-    //         : GetMutualFriendsList(props.user?.username).then((data) => {
-    //               setFriends(data);
-    //           });
-    // }, [props.update]);
     const socket = React.useContext(SocketContext);
     const handleRemoveFriend = (username: string) => {
         console.log('REMOVE FRIEND');
@@ -73,15 +63,16 @@ const Friends = (props: FriendsProps) => {
                     >
                         <Flex>
                             <Flex>
-                                <Image
-                                    objectFit="cover"
-                                    width={'50px'}
-                                    height={'50px'}
-                                    marginTop={'18px'}
-                                    src={friend.avatar}
-                                    alt={'name'}
-                                    borderRadius={'30px'}
-                                />
+                                <Avatar src={friend.avatar} marginTop={'18px'}>
+                                    <AvatarBadge
+                                        boxSize="1.25em"
+                                        bg={
+                                            friend.status === 'offline'
+                                                ? '#F5F5F5'
+                                                : 'green.500'
+                                        }
+                                    />
+                                </Avatar>
                                 <Stack>
                                     <CardBody>
                                         <Heading
@@ -105,7 +96,7 @@ const Friends = (props: FriendsProps) => {
                                 </Stack>
                             </Flex>
                             <Spacer w={'60em'} />
-                            <Box marginTop={1}>
+                            <Box>
                                 <Link to={`/chat/rooms-dms/${friend?.id}`}>
                                     <IconButton
                                         aria-label=""
