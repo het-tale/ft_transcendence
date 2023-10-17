@@ -17,7 +17,7 @@ export class SecurityService {
     private confirmationService: ConfirmationService,
     private cloudinary: CloudinaryService,
   ) {}
-  async generate2Fa(user: User, res: Response) {
+  async generate2Fa(user: User) {
     if (user.is2FaEnabled)
       throw new HttpException('2fa already enabled', HttpStatus.FORBIDDEN);
     const secret = await this.tw.generateSecret();
@@ -27,7 +27,8 @@ export class SecurityService {
         twoFaSecret: secret,
       },
     });
-    const qr = await this.tw.generateQRCode(secret, user.email, res);
+    console.log("secret in generate", secret);
+    const qr = await this.tw.generateQRCode(secret, user.email);
 
     return qr;
   }
@@ -52,8 +53,8 @@ export class SecurityService {
   async verify2Fa(token: string, user: User) {
     if (!user.is2FaEnabled)
       throw new HttpException('2fa not enabled', HttpStatus.FORBIDDEN);
-    console.log(user.twoFaSecret);
-    console.log(token);
+    console.log("secret", user.twoFaSecret);
+    console.log("token", token);
     const isValid = await this.tw.verifyToken(token, user.twoFaSecret);
     if (!isValid) throw new HttpException('invalid code', HttpStatus.FORBIDDEN);
     await this.prisma.user.update({
@@ -112,5 +113,18 @@ export class SecurityService {
         avatar: result,
       },
     });
+  }
+  async getUser(user: User) {
+    const usery =  await this.prisma.user.findUnique({
+      where: { email: user.email },
+      include : {
+        blocked: true,
+      }
+    });
+    if (!usery) {
+      throw new HttpException('User not found', 404);
+    }
+
+    return usery;
   }
 }

@@ -30,10 +30,6 @@ import { AuthService } from '../auth/auth.service';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
-  @Get('me')
-  async me(@Req() request: { user: User }) {
-    return await this.userService.getUserById(request.user.id);
-  }
   
   @Get('search-users/:beginWith')
   async searchUsers(
