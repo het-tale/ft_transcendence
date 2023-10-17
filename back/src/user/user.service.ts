@@ -106,4 +106,38 @@ export class UserService {
     });
     return invitations;
   }
+  async getAchievements(user: User) {
+    const achievements = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      select: {
+        achievements: true,
+      },
+    });
+    const ranks = achievements.achievements.filter(
+      (achievement) => achievement.rank,
+    );
+    if (ranks.length === 0) {
+      return achievements.achievements;
+    }
+    const highestRank = ranks.reduce((prev, curr) =>
+      prev.rank < curr.rank ? prev : curr,
+    );
+    const filteredAchievements = achievements.achievements.filter(
+      (achievement) => !achievement.rank,
+    );
+    filteredAchievements.push(highestRank);
+    return filteredAchievements;
+  }
+  async getMatchHistory(user: User)
+  {
+    const myUser = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      select: {
+        matchHistoryA: true,
+        matchHistoryB: true,
+      },
+    });
+    return [...myUser.matchHistoryA, ...myUser.matchHistoryB];
+  }
+
 }
