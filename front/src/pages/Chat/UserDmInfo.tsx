@@ -1,20 +1,16 @@
 import {
     Card,
-    CardHeader,
     CardBody,
-    CardFooter,
     Image,
     Stack,
     Heading,
     Text,
-    Button,
     Flex
 } from '@chakra-ui/react';
 import { UserType } from '../../Types/User';
 import React from 'react';
 import UserId from './GetUserById';
 import { SocketContext } from '../../socket';
-import { render } from '@testing-library/react';
 
 interface MessageUserProps {
     children?: React.ReactNode;

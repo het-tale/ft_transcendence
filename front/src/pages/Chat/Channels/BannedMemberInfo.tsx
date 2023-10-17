@@ -1,43 +1,24 @@
 import {
-    Avatar,
     Box,
-    Button,
-    Card,
-    CardBody,
-    CardFooter,
-    CardHeader,
     Flex,
-    Heading,
     IconButton,
     Text,
     Image,
-    Center,
     Menu,
     MenuButton,
     MenuList,
     MenuItem,
-    useDisclosure,
-    useToast
+    useDisclosure
 } from '@chakra-ui/react';
 import {
     BsThreeDotsVertical,
-    BsPencilFill,
-    BsVolumeMuteFill,
     BsPersonDashFill,
-    BsPersonXFill,
-    BsGearFill,
-    BsBoxArrowRight,
     BsPersonCircle
 } from 'react-icons/bs';
 import '../../../css/chat/channelSetting.css';
-import MessageUser from '../MessageUser';
-import { ChannelInfoProps } from './ChannelInfo';
 import ModalConfirm from '../ModalConfirm';
-import { on } from 'events';
 import { SocketContext } from '../../../socket';
-import React, { useEffect } from 'react';
-import client from '../../../components/Client';
-import { AxiosError } from 'axios';
+import React from 'react';
 import { UserType } from '../../../Types/User';
 import { Channel } from '../../../Types/Channel';
 

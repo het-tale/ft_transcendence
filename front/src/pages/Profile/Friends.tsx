@@ -21,10 +21,8 @@ import { BsChatLeftFill, BsThreeDotsVertical, BsTrash } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { UserType } from '../../Types/User';
 import React from 'react';
-import { GetFriendsList } from './GetFriendsList';
-import { GetMutualFriendsList } from './GetMutualFriendsList';
 import { SocketContext } from '../../socket';
-import { RenderContext, RenderContextType } from '../../RenderContext';
+import { RenderContextType } from '../../RenderContext';
 
 interface FriendsProps {
     friend: boolean;

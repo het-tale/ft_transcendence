@@ -1,6 +1,5 @@
 import React from 'react';
 import { useState } from 'react';
-import ReactDOM from 'react-dom/client';
 import client from './Client';
 import { UserType } from '../Types/User';
 import GetDms from '../pages/Chat/GetDms';

@@ -11,20 +11,14 @@ import TypingBar from './TypingBar';
 import {
     Box,
     Flex,
-    Grid,
-    GridItem,
     IconButton,
     Menu,
     MenuButton,
     MenuItem,
     MenuList,
-    SimpleGrid,
-    Spacer,
-    background,
     useDisclosure,
     useToast
 } from '@chakra-ui/react';
-import MessageUser from './MessageUser';
 import React, { useEffect } from 'react';
 import { SocketContext, SocketGameContext } from '../../socket';
 import GetDms from './GetDms';
@@ -32,12 +26,9 @@ import { UserType } from '../../Types/User';
 import { MessageType } from '../../Types/Message';
 import GetMessages from './GetMessages';
 import User from '../../components/User';
-import ModalUi from '../../components/ModalUi';
 import ModalConfirm from './ModalConfirm';
 import client from '../../components/Client';
-import { on } from 'events';
-import Profile from '../Profile/Profile';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import UserDmInfo from './UserDmInfo';
 import { RenderContext } from '../../RenderContext';
 
@@ -69,8 +60,6 @@ const DmsChat = (props: any) => {
     const socket = React.useContext(SocketContext);
     const socketGame = React.useContext(SocketGameContext);
     const [messages, setMessages] = React.useState<MessageType[]>([]);
-    const renderData = React.useContext(RenderContext);
-    // const [render, setRender] = React.useState(false);
     useEffect(() => {
         const res = GetDms().then((data) => {
             setDms(data);

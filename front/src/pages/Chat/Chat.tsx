@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react';
 import Dms from './Dms';
 import { SocketContext } from '../../socket';
-import { Flex, useToast } from '@chakra-ui/react';
+import { useToast } from '@chakra-ui/react';
 import GetDms from './GetDms';
 import { UserType } from '../../Types/User';
 import GetRoomDms from './GetRoomDms';
 import { Channel } from '../../Types/Channel';
 import { BrowseChannelsProps } from './Channels/BrowseChannels';
-import NavbarSearch from '../../components/NavbarSearch';
-import Sidebar from '../../components/Sidebar';
 
 export default function Chat(props: BrowseChannelsProps) {
     const socket = React.useContext(SocketContext);

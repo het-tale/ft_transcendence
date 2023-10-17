@@ -2,18 +2,12 @@ import {
     Card,
     Flex,
     Image,
-    Box,
     Stack,
     CardBody,
     Heading,
-    Text,
-    Spacer,
-    IconButton,
     Grid,
     GridItem
 } from '@chakra-ui/react';
-import { BsChatLeftFill } from 'react-icons/bs';
-import { Link } from 'react-router-dom';
 import { Match } from '../../Types/Match';
 import React, { useContext, useEffect } from 'react';
 import { RenderContext } from '../../RenderContext';
