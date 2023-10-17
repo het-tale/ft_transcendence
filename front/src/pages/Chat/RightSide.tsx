@@ -1,32 +1,6 @@
-import {
-    Tabs,
-    TabList,
-    TabPanels,
-    Tab,
-    TabPanel,
-    Flex,
-    Spacer,
-    Box,
-    Center,
-    Menu,
-    MenuButton,
-    MenuList,
-    MenuItem,
-    IconButton
-} from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 import '../../css/chat/left.css';
-import MessageUser from './MessageUser';
-import {
-    BsThreeDots,
-    BsPersonCircle,
-    BsPersonFillSlash,
-    BsTrash,
-    BsController
-} from 'react-icons/bs';
-import MessageContent from './MessageContent';
-import TypingBar from './TypingBar';
 import { Image } from '@chakra-ui/react';
-import ChannelInfo from './Channels/ChannelInfo';
 const RightSide = (props: any) => {
     return (
         <Flex w="100%" h="100%" bg="#E9ECEF" justify="space-between">
@@ -59,11 +33,6 @@ const RightSide = (props: any) => {
                     )
                 )}
             </div>
-            {/* {props.currentTab === '2' && props.renderActions && (
-                <div className="container">
-                    <ChannelInfo />
-                </div>
-            )} */}
         </Flex>
     );
 };

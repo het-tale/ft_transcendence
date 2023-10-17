@@ -1,8 +1,6 @@
-import { Button, ButtonGroup, useToast } from '@chakra-ui/react';
-import { useContext, useEffect, useState } from 'react';
+import { useToast } from '@chakra-ui/react';
+import { useContext } from 'react';
 import client from '../../components/Client';
-import QRCode from 'react-qr-code';
-import { UserType } from '../../Types/User';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { RenderContext } from '../../RenderContext';
 import { Link, useNavigate } from 'react-router-dom';

@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import client from '../../../components/Client';
 const GetChannelMessages = async (name: string) => {
     console.log('channel name', name);

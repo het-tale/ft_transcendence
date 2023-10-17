@@ -1,13 +1,10 @@
-import React, { useEffect } from 'react';
-import { Form, ModalBody, ModalFooter } from 'react-bootstrap';
+import React from 'react';
+import { ModalBody, ModalFooter } from 'react-bootstrap';
 import '../css/chat/modal.css';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { SentData } from '../pages/Chat/Dms';
 import { Button, ButtonGroup, Flex } from '@chakra-ui/react';
 import { SocketContext } from '../socket';
-import { UserType } from '../Types/User';
-import User from './User';
-import { io } from 'socket.io-client';
 
 const ModalSendMessage = (props: any) => {
     const socket = React.useContext(SocketContext);

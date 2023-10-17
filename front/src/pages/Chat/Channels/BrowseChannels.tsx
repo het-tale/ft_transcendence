@@ -1,11 +1,8 @@
-import { Flex, Grid, GridItem } from '@chakra-ui/react';
-import NavbarSearch from '../../../components/NavbarSearch';
-import Sidebar from '../../../components/Sidebar';
+import { Grid, GridItem } from '@chakra-ui/react';
 import ChannelCard from './ChannelCard';
 import { Channel } from '../../../Types/Channel';
 import React, { useEffect } from 'react';
 import { GetBrowsedChannels } from './GetBrowsedChannels';
-import { render } from '@testing-library/react';
 
 export interface BrowseChannelsProps {
     update?: boolean;

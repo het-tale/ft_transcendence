@@ -1,21 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    BsBoxArrowLeft,
     BsBellFill,
     BsHouseFill,
     BsController,
     BsChatRightFill,
-    BsChatFill,
     BsPersonFill
 } from 'react-icons/bs';
 import { UserType } from '../Types/User';
 import User from './User';
 import { Button, Image, useToast } from '@chakra-ui/react';
-import { SocketContext } from '../socket';
-import { Invitation, Notification } from '../Types/Notification';
+import { Notification } from '../Types/Notification';
 import { RenderContext, RenderContextType } from '../RenderContext';
-import { GetPendingInvitations } from './GetNotification';
 
 interface sidebarProps {
     notification?: boolean;

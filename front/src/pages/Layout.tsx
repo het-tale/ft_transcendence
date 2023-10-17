@@ -1,16 +1,9 @@
 import {
     Button,
     ButtonGroup,
-    Box,
     Card,
-    CardBody,
-    CardHeader,
     Flex,
-    Heading,
-    Stack,
-    StackDivider,
     Text,
-    Image,
     useToast,
     useDisclosure,
     Drawer,
@@ -31,11 +24,9 @@ import {
     GetPendingFriendRequests,
     GetPendingInvitations
 } from '../components/GetNotification';
-import { set } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { UserType } from '../Types/User';
 import User from '../components/User';
-import Search from '../components/Search';
 import { SearchUsers } from '../components/SearchUsers';
 
 interface Props {

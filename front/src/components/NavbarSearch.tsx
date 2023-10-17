@@ -1,17 +1,5 @@
 import React from 'react';
 import Search from './Search';
-import {
-    Box,
-    Card,
-    CardBody,
-    CardHeader,
-    Flex,
-    Heading,
-    Stack,
-    StackDivider,
-    Text,
-    Image
-} from '@chakra-ui/react';
 import { UserType } from '../Types/User';
 
 interface NavbarSearchProps {
