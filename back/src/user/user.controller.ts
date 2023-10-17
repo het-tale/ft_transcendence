@@ -19,8 +19,6 @@ import { TwoFaVerificationGuard } from 'src/guards/two-fa-verification.guard';
 import { User } from '@prisma/client';
 import { ChangePasswordDto, TChangePassword, Tname, NameDto } from 'src/dto';
 import { UseZodGuard } from 'nestjs-zod';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { AuthService } from '../auth/auth.service';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -40,7 +38,6 @@ export class UserController {
 
     return users;
   }
-
 
 
   @UseZodGuard('body', NameDto)
@@ -66,6 +63,16 @@ export class UserController {
   @Get('pending-invitaions')
   async getPendingInvitations(@Req() request: { user: User }) {
     return await this.userService.getPendingInvitations(request.user);
+  }
+
+  @Get('match-history')
+  async getMatchHistory(@Req() request: { user: User }) {
+    return await this.userService.getMatchHistory(request.user);
+  }
+
+  @Get('achievements')
+  async getAchievements(@Req() request: { user: User }) {
+    return await this.userService.getAchievements(request.user);
   }
 
   @Get(':id')

@@ -22,28 +22,13 @@ function draw(
 ) {
     if (padd.current && otherpad.current && ball.current) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillRect(
-            padd.current.x,
-            padd.current.y,
-            padd.current.width,
-            padd.current.height
-        );
-        ctx.fillRect(
-            otherpad.current.x,
-            otherpad.current.y,
-            otherpad.current.width,
-            otherpad.current.height
-        );
+        ctx.fillStyle = 'rgba(235, 182, 145, 1)';
+        ctx.fillRect(padd.current.x, padd.current.y, padd.current.width, padd.current.height);
+        ctx.fillStyle = 'beige';
+        ctx.fillRect(otherpad.current.x, otherpad.current.y, otherpad.current.width, otherpad.current.height);
         ctx.beginPath();
-        ctx.fillStyle = 'blue';
-        ctx.arc(
-            ball.current.x,
-            ball.current.y,
-            ball.current.radius,
-            0,
-            2 * Math.PI,
-            false
-        );
+        ctx.fillStyle = 'rgb(170, 251, 57)';
+        ctx.arc(ball.current.x, ball.current.y, ball.current.radius, 0, 2 * Math.PI, false);
         ctx.fill();
         ctx.closePath();
     }
@@ -76,7 +61,6 @@ function useEffectOnce(effect: React.EffectCallback) {
 }
 
 const Game: React.FC = () => {
-    const token: string = localStorage.getItem('token') as string;
     const [user, setUser] = useState<UserType | null>(null);
     const [otherAvatar, setOtherAvatar] = useState<string | null>(null);
     const [otherUsername, setOtherUsername] = useState<string | null>(null);
@@ -88,7 +72,6 @@ const Game: React.FC = () => {
     const [ball, setBall] = useState<Ball | null>(null);
     const [otherpad, setOtherpad] = useState<Paddle | null>(null);
     const [socket, setSocket] = useState<MySocket | null>(null);
-    const [Dimensions, setDimention] = useState({ width: 0, height: 0 });
     const [init, setInit] = useState(false);
     const divRefs = {
         gameContainer: useRef<HTMLDivElement>(null),
@@ -104,7 +87,6 @@ const Game: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const ctx = canvasRef.current?.getContext('2d');
     const socketGame = React.useContext(SocketGameContext);
-    const renderData = React.useContext(RenderContext);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -142,12 +124,10 @@ const Game: React.FC = () => {
     }, 16.66);
 
     const setupEventListeners = () => {
-        if (canvasRef.current) {
-            canvasRef.current.addEventListener(
-                'mousemove',
-                throttleHandleMouseMove
-            );
-        }
+        canvasRef.current?.addEventListener(
+            'mousemove',
+            throttleHandleMouseMove
+        );
     };
 
     useEffectOnce(() => {
@@ -167,12 +147,10 @@ const Game: React.FC = () => {
                 socket.disconnect();
                 console.log('socket disconnected');
             }
-            if (divRefs.gameContainer.current) {
-                divRefs.gameContainer.current.removeEventListener(
+            canvasRef.current?.removeEventListener(
                     'mousemove',
                     throttleHandleMouseMove
                 );
-            }
         };
     });
 
@@ -208,9 +186,9 @@ const Game: React.FC = () => {
                 setOtherAvatar,
                 setGameOver,
                 setId,
-                setDimention,
                 setInit,
-                setOtherUsername
+                setOtherUsername,
+                setGameStarted
             );
             listning = true;
         }
@@ -225,47 +203,12 @@ const Game: React.FC = () => {
     const handleStartGame = () => {
         socket?.emit('StartGame');
         setGameStarted(true);
-        navigate(`/game/${user?.id}`);
+        // navigate(`/game`);
     };
     const handleStartGamerobot = () => {
         socket?.emit('StartGameRobot');
         setGameStarted(true);
     };
-
-    useEffect(() => {
-        if (padd && Dimensions.width > 0 && Dimensions.height > 0)
-            updateDivPosition(
-                divRefs.playerPaddle.current,
-                padd,
-                Dimensions.width,
-                Dimensions.height
-            );
-        console.log('padd', padd);
-    }, [padd]);
-
-    // useEffect(() => {
-    //     if (padd && otherpad && canvasRef.current && ctx && ball && Dimensions.width > 0 && Dimensions.height > 0){
-
-    //         // updateDivPosition(
-    //             //     divRefs.ball.current,
-    //             //     ball,
-    //             //     Dimensions.width,
-    //             //     Dimensions.height
-    //             // );
-
-    //         }
-
-    // }, [ball]);
-
-    useEffect(() => {
-        if (otherpad && Dimensions.width > 0 && Dimensions.height > 0)
-            updateDivPosition(
-                divRefs.otherPaddle.current,
-                otherpad,
-                Dimensions.width,
-                Dimensions.height
-            );
-    }, [otherpad]);
 
     return (
         <div className="containerGame">
@@ -290,7 +233,7 @@ const Game: React.FC = () => {
                 </div>
             ) : null}
             <div className="container-profile">
-                {id === 1 ? (
+                {id !== 1 ? (
                     <>
                         <div className="player-profile">
                             <img

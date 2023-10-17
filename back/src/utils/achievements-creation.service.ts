@@ -14,6 +14,7 @@ export class AchievementService {
                 name: "Iron Curtain Crusher",
                 description: "100lp !.You've smashed through the iron curtain and proved that you're not to be taken lightly. Keep climbing!",
                 icon: this.config.get<string>("ICON_IRON") ?? "",
+                rank: 6,
             }
         });
         await this.prisma.achievement.create({
@@ -21,6 +22,7 @@ export class AchievementService {
                 name: "Bronze Bounce Master",
                 description: "300lp !.You've mastered the art of the bounce! Your opponents better watch out, because you're on the rise!",
                 icon: this.config.get<string>("ICON_BRONZE") ?? "",
+                rank: 5,
             }
         });
         await this.prisma.achievement.create({
@@ -28,6 +30,7 @@ export class AchievementService {
                 name: "Silver Paddle Prodigy",
                 description: "600lp !.You've shown incredible skill and finesse with your paddle. You're on your way to pong greatness!",
                 icon: this.config.get<string>("ICON_SILVER") ?? "",
+                rank: 4,
             }
         });
         await this.prisma.achievement.create({
@@ -35,6 +38,7 @@ export class AchievementService {
                 name: "Golden Ball Wizard",
                 description: "900lp !.You've reached the pinnacle of pong excellence! Your golden touch has set you apart from the competition.",
                 icon: this.config.get<string>("ICON_GOLD") ?? "",
+                rank: 3,
             }
         });
         await this.prisma.achievement.create({
@@ -42,6 +46,7 @@ export class AchievementService {
                 name: "Diamond Duelist",
                 description: "1200lp !.You've become a true diamond in the rough, surpassing all expectations. Keep shining bright on the pong court!",
                 icon: this.config.get<string>("ICON_DIAMOND") ?? "",
+                rank: 2,
             }
         });
         await this.prisma.achievement.create({
@@ -49,6 +54,7 @@ export class AchievementService {
                 name: "Master of the Pongiverse",
                 description: "1500lp !.You've ascended to the highest echelon of pong mastery. You're a force to be reckoned with, and the pong world trembles in your presence!",
                 icon: this.config.get<string>("ICON_MASTER") ?? "",
+                rank: 1,
             }
         });
         await this.prisma.achievement.create({
@@ -76,28 +82,28 @@ export class AchievementService {
             data: {
                 name: "Social Pong Star",
                 description: "Congratulations! You've made 20 amazing friends who love playing pong with you. Keep spreading the pong love!",
-                icon: this.config.get<string>("ICON_FRIENDLY") ?? "",
+                icon: this.config.get<string>("ICON_EXTROVERT") ?? "",
             }
         });
         await this.prisma.achievement.create({
             data: {
                 name: "Channel Hopper Extraordinaire",
                 description: "You've become a true master of channel hopping, joining 20 different channels. Keep exploring and connecting with the pong community!",
-                icon: this.config.get<string>("ICON_WINNER") ?? "",
+                icon: this.config.get<string>("ICON_CHANNEL") ?? "",
             }
         });
         await this.prisma.achievement.create({
             data: {
                 name: "Chat Chatterbox",
                 description: "You've unleashed your inner chatterbox, sending 100 messages in the chat. Keep the conversations flowing and the pong banter alive!",
-                icon: this.config.get<string>("ICON_CHAT") ?? "",
+                icon: this.config.get<string>("ICON_CHATTER") ?? "",
             }
         });
         await this.prisma.achievement.create({
             data: {
                 name: "Boundries Set",
                 description : "Congratulations on setting your first block! By establishing boundaries, you're ensuring a positive and respectful chat experience for all.",
-                icon: this.config.get<string>("ICON_BLOCK") ?? "",
+                icon: this.config.get<string>("ICON_BOUNDRIES") ?? "",
             }
         });
     }
