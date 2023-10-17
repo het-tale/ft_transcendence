@@ -1,5 +1,6 @@
 import { Ball, GameData, Paddle } from "./Game.types";
 import { MySocket } from "./Game";
+import { set } from "react-hook-form";
 
 type numberstate = React.Dispatch<React.SetStateAction<number>>;
 type ballstate = React.Dispatch<React.SetStateAction<Ball | null>>;
@@ -16,9 +17,9 @@ export function ListenOnSocket(
   setOtherAvatar: stringstate,
   setGameOver: React.Dispatch<React.SetStateAction<boolean>>,
   setId: React.Dispatch<React.SetStateAction<number | null>>,
-  setDimention: React.Dispatch<React.SetStateAction<{ width: number; height: number }>>,
   setInit: React.Dispatch<React.SetStateAction<boolean>>,
-  setOtherUsername: React.Dispatch<React.SetStateAction<string | null>>
+  setOtherUsername: React.Dispatch<React.SetStateAction<string | null>>,
+  setGameStarted: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   socket.on("connect", () => {
     console.log("connected to server");
@@ -47,8 +48,11 @@ export function ListenOnSocket(
   });
 
   socket.on("StartGame", (message: string) => {
-    console.log("StartGame on room", message); // print the start game message
-	// socket?.emit("OTHER AVATAR", user?.avatar);
+    console.log("StartGame on room", message); 
+  });
+
+  socket.on("GAME STARTED", (message: boolean) => {
+    setGameStarted(message);
   });
 
   socket.on(
@@ -85,11 +89,6 @@ export function ListenOnSocket(
 	if (game.id) setId(game.id);
 	if (game.playerScore) setPlayerScore(game.playerScore);
 	if (game.otherScore) setOtherScore(game.otherScore);
-	if (game.containerWidth && game.containerHeight)
-	  setDimention({
-		width: game.containerWidth,
-		height: game.containerHeight,
-	  });
 	});
 }
 

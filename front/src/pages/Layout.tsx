@@ -15,7 +15,6 @@ import React from 'react';
 import { SocketContext, SocketGameContext } from '../socket';
 import { RenderContext, RenderContextType } from '../RenderContext';
 import { GetPendingInvitations } from '../components/GetNotification';
-import { set } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { UserType } from '../Types/User';
 import User from '../components/User';
@@ -149,7 +148,7 @@ export const Layout = ({ children }: Props) => {
     const handleAcceptRejectGame = (isAccepted: boolean) => {
         if (isAccepted) {
             socketGame.emit('AcceptInvitation', roomId);
-            navigate(`/game/${user?.id}/${true}`);
+            navigate(`/game`);
         } else socketGame.emit('DeclineInvitation', roomId);
         renderData.setRenderData(!renderData.renderData);
         renderData.setNotification &&
