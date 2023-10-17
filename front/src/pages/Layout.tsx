@@ -1,9 +1,16 @@
 import {
     Button,
     ButtonGroup,
+    Box,
     Card,
+    CardBody,
+    CardHeader,
     Flex,
+    Heading,
+    Stack,
+    StackDivider,
     Text,
+    Image,
     useToast
 } from '@chakra-ui/react';
 import NavbarSearch from '../components/NavbarSearch';
@@ -22,6 +29,8 @@ import { set } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { UserType } from '../Types/User';
 import User from '../components/User';
+import Search from '../components/Search';
+import { SearchUsers } from '../components/SearchUsers';
 
 interface Props {
     children?: React.ReactNode;
@@ -37,6 +46,7 @@ export const Layout = ({ children }: Props) => {
     const token = localStorage.getItem('token');
     const [roomId, setRoomId] = useState<string>('');
     const [user, setUser] = React.useState<UserType>();
+    const [users, setUsers] = React.useState<UserType[]>([]);
     const navigate = useNavigate();
     React.useEffect(() => {
         async function fetchUserData() {
@@ -272,7 +282,7 @@ export const Layout = ({ children }: Props) => {
     }, [renderData.renderData]);
     return (
         <Flex flexDirection={'column'}>
-            <NavbarSearch />
+            <NavbarSearch setUsers={setUsers} />
             <Flex flexDirection={'row'}>
                 <Sidebar
                     notification={renderData.notification}
@@ -420,6 +430,7 @@ export const Layout = ({ children }: Props) => {
                     </div>
                 ) : null}
                 {children}
+                <SearchUsers users={users} setUsers={setUsers} />
             </Flex>
         </Flex>
     );
