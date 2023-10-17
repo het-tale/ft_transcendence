@@ -39,18 +39,6 @@ export class UserController {
     return users;
   }
 
-  // @Post('change-avatar')
-  // @UseInterceptors(FileInterceptor('file'))
-  // async changeAvatar(
-  //   @Req() request: { user: User },
-  //   @UploadedFile() file: Express.Multer.File,
-  // ) {
-  //   if (!file || file.originalname !== 'file') {
-  //     throw new HttpException('No file provided', HttpStatus.BAD_REQUEST);
-  //   }
-
-  //   return this.authService.uploadAvatar(file, request.user);
-  // }
 
   @UseZodGuard('body', NameDto)
   @Post('change-username')
@@ -75,6 +63,16 @@ export class UserController {
   @Get('pending-invitaions')
   async getPendingInvitations(@Req() request: { user: User }) {
     return await this.userService.getPendingInvitations(request.user);
+  }
+
+  @Get('match-history')
+  async getMatchHistory(@Req() request: { user: User }) {
+    return await this.userService.getMatchHistory(request.user);
+  }
+
+  @Get('achievements')
+  async getAchievements(@Req() request: { user: User }) {
+    return await this.userService.getAchievements(request.user);
   }
 
   @Get(':id')

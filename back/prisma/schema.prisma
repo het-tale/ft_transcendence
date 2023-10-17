@@ -168,6 +168,7 @@ model Achievement {
   name        String
   icon        String
   description String
+  rank        Int?
 
   achievers User[] @relation("Achiever")
   offlineAchievers User[] @relation("OfflineAchiever")
