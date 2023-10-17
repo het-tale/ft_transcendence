@@ -133,8 +133,20 @@ export class UserService {
     const myUser = await this.prisma.user.findUnique({
       where: { id: user.id },
       select: {
-        matchHistoryA: true,
-        matchHistoryB: true,
+        matchHistoryA: {
+          include : {
+            playerA: true,
+            playerB: true,
+            winner: true,
+          },
+        },
+        matchHistoryB: {
+          include : {
+            playerA: true,
+            playerB: true,
+            winner: true,
+          },
+        },
       },
     });
     return [...myUser.matchHistoryA, ...myUser.matchHistoryB];
