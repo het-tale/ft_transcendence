@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import NavbarSearch from '../../components/NavbarSearch';
 import { Box, Flex } from '@chakra-ui/react';
 import Sidebar from '../../components/Sidebar';
@@ -12,12 +12,18 @@ import { UserType } from '../../Types/User';
 import UserId from '../Chat/GetUserById';
 import { useLocation } from 'react-router-dom';
 import User from '../../components/User';
+import { GetFriendsList } from './GetFriendsList';
+import { GetMutualFriendsList } from './GetMutualFriendsList';
+import { RenderContext } from '../../RenderContext';
 
 const Profile = () => {
     const [currentTab, setCurrentTab] = React.useState('1');
     const [user, setUser] = React.useState<UserType>();
     const [currentUser, setCurrentUser] = React.useState<UserType>();
     const [update, setUpdate] = React.useState(false);
+    const [friends, setFriends] = React.useState<UserType[]>([]);
+    const [mutualFriends, setMutualFriends] = React.useState<UserType[]>([]);
+    const renderData = useContext(RenderContext);
     const location = useLocation();
     console.log('THISSS', location);
     const id = location.pathname.split('/')[2];
@@ -31,7 +37,15 @@ const Profile = () => {
         }
 
         fetchUserData();
-    }, [update]);
+    }, [update, renderData.renderData]);
+    useEffect(() => {
+        GetFriendsList().then((data) => {
+            setFriends(data);
+        });
+        GetMutualFriendsList(user?.username).then((data) => {
+            setMutualFriends(data);
+        });
+    }, [renderData.renderData]);
     console.log('USER PROFILE', user);
     console.log(' CUrrent USER', currentUser);
     const isMyProfile = Number(id) === currentUser?.id;
@@ -48,9 +62,16 @@ const Profile = () => {
                             update={update}
                             setUpdate={setUpdate}
                             user={user}
+                            friends={friends}
+                            renderData={renderData}
                         />
                     ) : (
-                        <Friends friend={false} user={user} />
+                        <Friends
+                            friend={false}
+                            user={user}
+                            friends={mutualFriends}
+                            renderData={renderData}
+                        />
                     )}
                 </>
             ),
@@ -82,7 +103,7 @@ const Profile = () => {
     };
     return (
         <div>
-            <Box w="100%" bg="#E9ECEF">
+            <Box w="89.5vw" bg="#E9ECEF">
                 <Flex justify="space-between">
                     <UserInfo
                         user={user}
@@ -90,6 +111,8 @@ const Profile = () => {
                         isMyProfile={isMyProfile}
                         update={update}
                         setUpdate={setUpdate}
+                        friends={friends}
+                        mutualFriends={mutualFriends}
                     />
                     <div className="delimiter"></div>
                     <LeftSide
