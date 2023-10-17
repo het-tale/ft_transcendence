@@ -143,7 +143,6 @@ const Dms = (props: any) => {
                             dms={props.dms}
                             setDms={props.setDms}
                             setFirstLoad={setFirstLoad}
-                            tempDm={props.dms}
                         />
                         <button className="newChannel" onClick={onOpen}>
                             <BsPlusLg

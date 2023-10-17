@@ -20,59 +20,28 @@ const BrowseChannels = (props: BrowseChannelsProps) => {
         });
     }, [props.update]);
     return (
-        <Flex flexDirection={'column'}>
-            <NavbarSearch />
-            <Flex>
-                <Sidebar />
-                {/* <Grid
-                    templateColumns="repeat(5, 1fr)"
-                    gap={6}
-                    width={'100%'}
-                    p={'4rem'}
-                >
-                    <GridItem w="100%">
-                        <ChannelCard ChannelInfo={browseChannels[0]} />
-                    </GridItem>
-                    <GridItem w="100%" h="100px">
-                        <ChannelCard ChannelInfo={browseChannels[0]} />
-                    </GridItem>
-                    <GridItem w="100%" h="100px">
-                        <ChannelCard ChannelInfo={browseChannels[0]} />
-                    </GridItem>
-                    <GridItem w="100%" h="100px">
-                        <ChannelCard ChannelInfo={browseChannels[0]} />
-                    </GridItem>
-                    <GridItem w="100%" h="100px">
-                        <ChannelCard ChannelInfo={browseChannels[0]} />
-                    </GridItem>
-                    <GridItem w="100%" h="100px">
-                        <ChannelCard ChannelInfo={browseChannels[0]} />
-                    </GridItem>
-                </Grid> */}
-                <Grid
-                    templateColumns="repeat(5, 1fr)"
-                    gap={6}
-                    width={'100%'}
-                    p={'4rem'}
-                >
-                    {browseChannels ? (
-                        browseChannels.map((channel: Channel) => {
-                            return (
-                                <GridItem w="100%">
-                                    <ChannelCard
-                                        ChannelInfo={channel}
-                                        updateChannel={props.update}
-                                        setUpdateChannel={props.setUpdate}
-                                    />
-                                </GridItem>
-                            );
-                        })
-                    ) : (
-                        <></>
-                    )}
-                </Grid>
-            </Flex>
-        </Flex>
+        <Grid
+            templateColumns="repeat(5, 1fr)"
+            gap={6}
+            width={'100%'}
+            p={'4rem'}
+        >
+            {browseChannels ? (
+                browseChannels.map((channel: Channel) => {
+                    return (
+                        <GridItem w="100%">
+                            <ChannelCard
+                                ChannelInfo={channel}
+                                updateChannel={props.update}
+                                setUpdateChannel={props.setUpdate}
+                            />
+                        </GridItem>
+                    );
+                })
+            ) : (
+                <></>
+            )}
+        </Grid>
     );
 };
 

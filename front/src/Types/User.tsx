@@ -14,4 +14,10 @@ export type UserType = {
     is2FaVerified: boolean;
     status: string;
     blocked: UserType[];
+    matchnumber: number;
+    matchwin: number;
+    matchlose: number;
+    win_rate: number;
+    lp: number;
+    g_rank: number;
 };
