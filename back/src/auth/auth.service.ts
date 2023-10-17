@@ -118,6 +118,12 @@ export class AuthService {
       throw new HttpException('wrong password', HttpStatus.FORBIDDEN);
     }
     const token = await this.getJwtToken(user.id, user.email);
+    await this.prisma.user.update({
+      where: { email: user.email },
+      data: {
+        is2FaVerified: false,
+      },
+    });
     console.log(token);
 
     return token;

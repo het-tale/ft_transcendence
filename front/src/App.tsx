@@ -41,6 +41,7 @@ import { RenderContext } from './RenderContext';
 import { Layout } from './pages/Layout';
 import { UserType } from './Types/User';
 import User from './components/User';
+import { Verify2Fa } from './pages/Profile/Verify2Fa';
 
 // const theme = createTheme();
 let notifArray: Notification[] = [];
@@ -103,6 +104,7 @@ function App() {
                                     </ProtectRoutes>
                                 }
                             ></Route>
+                            <Route path="verify-2fa" element={<Verify2Fa />} />
                             <Route
                                 path="complete-profile"
                                 element={
@@ -163,11 +165,7 @@ function App() {
                                 }
                             />
                             <Route path="signin42" element={<Signin42 />} />
-                            <Route path="2fa" element={<TFactorAuth />} />
-                            <Route
-                                path="generate-qr"
-                                element={<GenerateQr />}
-                            />
+
                             <Route path="logout" element={<Logout />} />
 
                             {/**----------------Chat Pages ----------------------*/}

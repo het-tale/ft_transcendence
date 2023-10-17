@@ -15,3 +15,15 @@ export type Invitation = {
     channelId: number;
     isGame: boolean;
 };
+
+export type FriendRequest = {
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
+    isReceiverOnline: boolean;
+    status: string;
+    sender: UserType;
+    senderId: number;
+    receiver: UserType;
+    receiverId: number;
+};

@@ -8,10 +8,21 @@ const RequireNoAuth = (props: any) => {
     const [isLoggedOut, setIsLoggedOut] = useState(false);
     useEffect(() => {
         const checkAuthentication = async () => {
-            const response = await User();
-            if (response !== null) {
-                navigate('/home');
-            } else {
+            try {
+                const response = await User();
+                if (
+                    (response !== null && !response.is2FaEnabled) ||
+                    (response.is2FaEnabled && response.is2FaVerified)
+                ) {
+                    navigate('/home');
+                } else {
+                    localStorage.clear();
+                    if (localStorage.getItem('token') == null) {
+                        setIsLoggedOut(true);
+                    }
+                }
+            } catch (error) {
+                console.log('error No auth', error);
                 localStorage.clear();
                 if (localStorage.getItem('token') == null) {
                     setIsLoggedOut(true);

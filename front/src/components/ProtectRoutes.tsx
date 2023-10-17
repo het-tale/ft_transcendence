@@ -11,15 +11,27 @@ const ProtectRoutes = (props: any) => {
     useEffect(() => {
         const checkAuthentication = async () => {
             try {
-                const response = await client.get('/user/me', {
+                const response = await client.get('/auth/me', {
                     headers: {
                         Authorization: 'Bearer ' + token
                     }
                 });
                 if (response.status === 200) {
-                    setIsLoggedIn(true);
-                    socket.auth = { token: token };
-                    socket.connect();
+                    console.log('response User', response.data);
+                    if (response.data.is2FaEnabled) {
+                        if (response.data.is2FaVerified) {
+                            setIsLoggedIn(true);
+                            socket.auth = { token: token };
+                            socket.connect();
+                        } else {
+                            console.log('2fa not verified');
+                            navigate('/verify-2fa');
+                        }
+                    } else {
+                        setIsLoggedIn(true);
+                        socket.auth = { token: token };
+                        socket.connect();
+                    }
                 } else {
                     navigate('/');
                 }

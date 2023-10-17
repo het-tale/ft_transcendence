@@ -36,10 +36,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class SecurityController {
   constructor(private securityService: SecurityService) {}
   @Get('2fa/generate')
-  @Header('Content-Type', 'image/png')
-  async generate2Fa(@Req() request: { user: User }, @Res() res: Response) {
-    const code = await this.securityService.generate2Fa(request.user, res);
-
+  // @Header('Content-Type', 'image/png')
+  async generate2Fa(@Req() request: { user: User }) {
+    const code = await this.securityService.generate2Fa(request.user);
     return code;
   }
 
@@ -54,6 +53,7 @@ export class SecurityController {
   @UseZodGuard('body', TwofaCodeDto)
   @Post('2fa/verify')
   async verify2Fa(@Req() request: { user: User }, @Body() dto: TtwofaCodeData) {
+    console.log('The user in verify', request.user)
     await this.securityService.verify2Fa(dto.code, request.user);
   }
 
@@ -88,5 +88,10 @@ export class SecurityController {
     }
 
     return await this.securityService.uploadAvatar(file, request.user);
+  }
+
+  @Get('me')
+  async me(@Req() request: { user: User }) {
+    return await this.securityService.getUser(request.user);
   }
 }

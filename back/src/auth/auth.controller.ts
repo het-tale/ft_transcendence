@@ -88,4 +88,5 @@ export class AuthController {
   ) {
     return await this.authService.confirmChangePassword(token, dto);
   }
+
 }

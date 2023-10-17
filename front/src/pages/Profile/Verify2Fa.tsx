@@ -1,81 +1,48 @@
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import '../css/login.css';
-import React, { useState } from 'react';
-import { error } from 'console';
-import ErrorToast from '../components/ErrorToast';
-import client from '../components/Client';
-import { useToast } from '@chakra-ui/react';
-// let setIsLoggedIn: boolean = false;
-function Login(props: any) {
-    const [errorMessage, setErrorMessage] = React.useState('');
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+import { Button, ButtonGroup, useToast } from '@chakra-ui/react';
+import { useContext, useEffect, useState } from 'react';
+import client from '../../components/Client';
+import QRCode from 'react-qr-code';
+import { UserType } from '../../Types/User';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { RenderContext } from '../../RenderContext';
+import { Link, useNavigate } from 'react-router-dom';
+
+interface Verify2FaData {
+    code: string;
+}
+
+export const Verify2Fa = () => {
     const navigate = useNavigate();
     const toast = useToast();
-
-    const handleLogin = async (event: any) => {
-        event.preventDefault();
-        setErrorMessage('');
+    const { register, handleSubmit } = useForm<Verify2FaData>();
+    const renderData = useContext(RenderContext);
+    const handleVerify2Fa: SubmitHandler<Verify2FaData> = async (data) => {
+        console.log('The verification code', data);
         const sentData = {
-            identifier: email,
-            password: password
+            code: data.code
         };
         try {
-            const response = await client.post(`auth/signin`, sentData);
-            localStorage.setItem('token', response.data);
-            const condition = await checkAuthentication();
-            if (condition === true) navigate('/home');
-            else {
-                toast({
-                    title: 'Email not Confirmed.',
-                    description: 'Your email address has not been verified.',
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                navigate('/confirm-email');
-            }
+            console.log('verify 2fa');
+            const response = await client.post(`auth/2fa/verify`, sentData, {
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('token')
+                }
+            });
+            renderData.setRenderData(!renderData.renderData);
+            navigate('/home');
         } catch (error: any) {
-            console.log('Login Error', error);
-            const errorMessage = error.response.data.message;
-            setErrorMessage(errorMessage);
-            console.log('The error message', errorMessage);
+            console.log('error', error);
             toast({
-                title: 'Login Failed.',
-                description: errorMessage,
+                title: 'Error',
+                description: error.response.data.message,
                 status: 'error',
                 duration: 9000,
                 isClosable: true,
                 position: 'bottom-right'
             });
+            renderData.setRenderData(!renderData.renderData);
         }
     };
-
-    const checkAuthentication = async () => {
-        try {
-            const response = await client.get('/auth/me', {
-                headers: {
-                    Authorization: 'Bearer ' + localStorage.getItem('token')
-                }
-            });
-            if (
-                response.status === 200 &&
-                response.data.isEmailConfirmed === true
-            ) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (error) {
-            return false;
-        }
-    };
-
     return (
         <div className="signupContainer">
             <div className="left">
@@ -275,53 +242,27 @@ function Login(props: any) {
                         </g>
                     </svg>
                 </div>
-                <form onSubmit={(e) => handleLogin(e)}>
+                <form
+                    style={{ marginTop: '13rem' }}
+                    onSubmit={handleSubmit(handleVerify2Fa)}
+                >
                     <div className="form-group">
-                        <label htmlFor="email">Email</label>
+                        <label htmlFor="code">Verification Code</label>
                         <input
                             className="form-control"
                             type="text"
-                            placeholder="Enter your email"
-                            id="email"
-                            name="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Enter your verification code"
+                            id="code"
                             required
+                            {...register('code')}
                         />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            className="form-control"
-                            type="password"
-                            name="password"
-                            id="password"
-                            placeholder="Enter password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                        {/* <span className='error-message'>{errrorMessage}</span> */}
                     </div>
 
                     <div className="submit">
-                        <input
-                            type="submit"
-                            value="Login"
-                            onClick={(e) => handleLogin(e)}
-                        />
-                        {/* <a href="#" className="dejavu">forgot password?</a> */}
-                        <Link to={'/forgot-password'} className="dejavu">
-                            forgot password?
-                        </Link>
+                        <input type="submit" value="Verify" />
                     </div>
                 </form>
-                {/* <span>
-                {errorMessage !== '' ? <ErrorToast message={errorMessage}/> : null }  
-            </span> */}
             </div>
         </div>
     );
-}
-
-export default Login;
+};

@@ -53,6 +53,7 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
         data: {
           login,
           isEmailConfirmed: true,
+          is2FaVerified: false,
         },
       });
     }
