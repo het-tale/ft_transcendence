@@ -49,7 +49,7 @@ async createMatch(
         },
       })
       .then((match) => {
-        console.log(`Created match with ID: ${match.id}`);
+        // console.log(`Created match with ID: ${match.id}`);
         room.id = match.id;
       })
       .catch((error) => {
