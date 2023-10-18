@@ -507,7 +507,6 @@ export const Layout = ({ children }: Props) => {
                 setIsModalOpen={setIsModalOpen}
                 achievements={achievements}
             />
-            ;
         </Flex>
     );
 };
