@@ -15,14 +15,14 @@ const [isProtected, setIsProtected] = useState(false);
           setIsLoggedIn(true);
           if (props.name === "password")
           {
-            console.log("Password", response.isPasswordRequired);
+            // console.log("Password", response.isPasswordRequired);
             setIsProtected(response.isPasswordRequired);
           }
         else if (props.name === "confirmation")
         {
 
             setIsProtected(!response.isEmailConfirmed);
-            console.log("Email", response.isEmailConfirmed);
+            // console.log("Email", response.isEmailConfirmed);
         }
         } else {
           navigate('/');

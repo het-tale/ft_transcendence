@@ -20,8 +20,8 @@ const Email = async () => {
           Authorization: 'Bearer ' + localStorage.getItem('token'),
         },
       });
-    console.log("STATUS", response.status);
-    console.log("MESSAGE", response.data.message);                     
+    // console.log("STATUS", response.status);
+    // console.log("MESSAGE", response.data.message);                     
     if (response.status === 200) {
         toast({
             title: 'Email Sent.',

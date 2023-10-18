@@ -28,7 +28,7 @@ const EditUserNameBody = (props: EditUserNameBodyProps) => {
     const handleEditUserName: SubmitHandler<EditUserNameData> = async (
         data
     ) => {
-        console.log('Edit Profile data', data);
+        // console.log('Edit Profile data', data);
         const sentData = {
             name: data.username
         };

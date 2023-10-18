@@ -19,7 +19,7 @@ interface SearchProps {
 
 const Search = (props: SearchProps) => {
     const [opa, setOpa] = useState(0);
-    console.log('THIS IS the name u wrote', props.filter);
+    // console.log('THIS IS the name u wrote', props.filter);
     const HandleSearch = async () => {
         try {
             setOpa(1);
@@ -31,7 +31,7 @@ const Search = (props: SearchProps) => {
                     }
                 }
             );
-            console.log('THIS IS THE RESULTTTT', res);
+            // console.log('THIS IS THE RESULTTTT', res);
             if (res.data.length > 0) {
                 props.setDms && props.setDms(res.data);
             } else {
@@ -41,7 +41,7 @@ const Search = (props: SearchProps) => {
             GetDms().then((data) => {
                 props.setDms && props.setDms(data);
             });
-            console.log('THIS IS THE ERROR', error);
+            // console.log('THIS IS THE ERROR', error);
         }
     };
     const reset = () => {
@@ -52,7 +52,7 @@ const Search = (props: SearchProps) => {
         setOpa(0);
     };
     const HandleGlobalSearch = async () => {
-        console.log('THIS IS THE GLOBAL SEARCH');
+        // console.log('THIS IS THE GLOBAL SEARCH');
         try {
             setOpa(1);
             const res = await client.get(`user/search-users/${props.filter}`, {
@@ -60,14 +60,14 @@ const Search = (props: SearchProps) => {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
             });
-            console.log('THIS IS THE RESULTTTT', res);
+            // console.log('THIS IS THE RESULTTTT', res);
             if (res.data.length > 0) {
                 props.setUsers && props.setUsers(res.data);
             } else {
                 props.setUsers && props.setUsers([]);
             }
         } catch (error: any) {
-            console.log('THIS IS THE ERROR', error);
+            // console.log('THIS IS THE ERROR', error);
         }
     };
     return (

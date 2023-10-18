@@ -21,34 +21,34 @@ export default function Chat(props: BrowseChannelsProps) {
     useEffect(() => {
         GetDms().then((data) => {
             setDms(data);
-            console.log('UPDATE DM');
+            // console.log('UPDATE DM');
         });
         GetRoomDms().then((data) => {
             setRoomDms(data);
         });
     }, [render, props.update]);
     socket.on('privateMessage', (data: any) => {
-        console.log('MESSAGE DATA', data);
+        // console.log('MESSAGE DATA', data);
         setRender(!render);
     });
     socket.on('userOffline', (data: any) => {
-        console.log('USER OFFLINE', data);
-        console.log('RENDER Before', render);
+        // console.log('USER OFFLINE', data);
+        // console.log('RENDER Before', render);
         setRender(!render);
-        console.log('RENDER after', render);
+        // console.log('RENDER after', render);
     });
     socket.on('userOnline', (data: any) => {
-        console.log('USER ONLINE', data);
+        // console.log('USER ONLINE', data);
         setRender(!render);
     });
     socket.on('roomCreateError', (data: any) => {
-        console.log('ROOM ERROR DATAAA', data);
+        // console.log('ROOM ERROR DATAAA', data);
         setRender(!render);
     });
     useEffect(() => {
         const timer = setTimeout(() => {
             socket.on('privateMessageError', (data: any) => {
-                console.log('MESSAGE ERROR DATAAA', data);
+                // console.log('MESSAGE ERROR DATAAA', data);
 
                 toast({
                     title: 'Error',
@@ -60,7 +60,7 @@ export default function Chat(props: BrowseChannelsProps) {
                 });
             });
             socket.on('roomMessageError', (data: any) => {
-                console.log('ROOM MESSAGE ERROR DATAAA', data);
+                // console.log('ROOM MESSAGE ERROR DATAAA', data);
 
                 toast({
                     title: 'Error',
@@ -78,7 +78,7 @@ export default function Chat(props: BrowseChannelsProps) {
         };
     }, []);
     socket.on('roomMessage', (data: any) => {
-        console.log('ROOM MESSAGE DATA', data);
+        // console.log('ROOM MESSAGE DATA', data);
         setRender(!render);
     });
     return (

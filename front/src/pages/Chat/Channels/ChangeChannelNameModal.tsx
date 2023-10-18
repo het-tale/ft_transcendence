@@ -23,7 +23,7 @@ const ChangeChannelNameModal = (props: ChangeChannelNameModalProps) => {
     const toast = useToast();
     const { register, handleSubmit } = useForm<changeName>();
     const handleChangeName: SubmitHandler<changeName> = async (data) => {
-        console.log('Change Channel Name Data', data);
+        // console.log('Change Channel Name Data', data);
         const sentData = {
             name: data.name
         };
@@ -40,7 +40,7 @@ const ChangeChannelNameModal = (props: ChangeChannelNameModalProps) => {
             props.setRender && props.setRender(!props.render);
             props.onClose();
         } catch (error: any) {
-            console.log('error', error);
+            // console.log('error', error);
             toast({
                 title: 'Error',
                 description: error.response.data.message,

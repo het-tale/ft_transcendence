@@ -2,14 +2,13 @@ import React, { useEffect, useRef, useState } from 'react'; // Clear the canvas
 import { io } from 'socket.io-client';
 import { throttle } from 'lodash';
 import { Paddle, Ball } from './Game.types';
-import { Image } from '@chakra-ui/react';
 import '../../css/game/game.css';
 import User from '../../components/User';
 import { UserType } from '../../Types/User';
 import { ListenOnSocket } from './Game.lisners';
 import { SocketGameContext } from '../../socket';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { RenderContext } from '../../RenderContext';
+import { useParams } from 'react-router-dom';
+import InviteUsersModal from '../Chat/Channels/InviteUsersModal';
 
 export type MySocket = ReturnType<typeof io>;
 
@@ -20,6 +19,7 @@ function draw(
     otherpad: React.RefObject<Paddle>,
     ball: React.RefObject<Ball>
 ) {
+    console.log('draw', ball.current);
     if (padd.current && otherpad.current && ball.current) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'rgba(235, 182, 145, 1)';
@@ -33,21 +33,6 @@ function draw(
         ctx.closePath();
     }
     requestAnimationFrame(() => draw(ctx, canvas, padd, otherpad, ball));
-}
-
-function updateDivPosition(
-    divElement: HTMLDivElement | null,
-    position: Paddle | Ball,
-    containerWidth: number,
-    containerHeight: number
-) {
-    if (divElement) {
-        const leftPercentage = (position.x / containerWidth) * 100;
-        const topPercentage = (position.y / containerHeight) * 100;
-
-        divElement.style.left = `${leftPercentage}%`;
-        divElement.style.top = `${topPercentage}%`;
-    }
 }
 
 function useEffectOnce(effect: React.EffectCallback) {
@@ -75,18 +60,17 @@ const Game: React.FC = () => {
     const [init, setInit] = useState(false);
     const divRefs = {
         gameContainer: useRef<HTMLDivElement>(null),
-        playerPaddle: useRef<HTMLDivElement>(null),
-        otherPaddle: useRef<HTMLDivElement>(null),
-        ball: useRef<HTMLDivElement>(null)
     };
-    const { startGame } = useParams();
-    const [gameStarted, setGameStarted] = useState(
-        startGame === 'true' ? true : false
-    );
+    const [gameStarted, setGameStarted] = useState(false);
     const [gameOver, setGameOver] = useState(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const ctx = canvasRef.current?.getContext('2d');
     const socketGame = React.useContext(SocketGameContext);
+    const { token } = useParams();
+    console.log('token', token);
+    const [gameinvite , setGameinvite] = useState(
+        token? true : false
+    );
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -102,17 +86,17 @@ const Game: React.FC = () => {
 
     const handleMouseMove = (event: MouseEvent) => {
         if (socket && padd && canvasRef.current) {
-            const gameContainerRect = canvasRef.current.getBoundingClientRect();
+            const canvasrect = canvasRef.current.getBoundingClientRect();
             // Get the mouse position relative to dimentions withe border protected
             const mouseYRelative = Math.min(
                 Math.max(
-                    event.clientY - gameContainerRect.top - padd.height,
+                    event.clientY - canvasrect.top - padd.height,
                     0
                 ),
-                gameContainerRect.height
+                canvasrect.height
             );
             const relativeMouseY =
-                (mouseYRelative / gameContainerRect.height) * 100;
+                (mouseYRelative / canvasrect.height) * 100;
             socket.emit('UpdatePlayerPaddle', {
                 relativeMouseY: relativeMouseY
             });
@@ -145,7 +129,7 @@ const Game: React.FC = () => {
                 socket.off('error');
                 socket.off('connected');
                 socket.disconnect();
-                console.log('socket disconnected');
+                // console.log('socket disconnected');
             }
             canvasRef.current?.removeEventListener(
                     'mousemove',
@@ -172,10 +156,12 @@ const Game: React.FC = () => {
 
     useEffect(() => {
         if (init) setupEventListeners();
+        console.log('init', init);
     }, [init]);
 
     useEffect(() => {
         if (socket && !listning) {
+            console.log('listning on socket');
             ListenOnSocket(
                 socket,
                 setPadd,
@@ -188,7 +174,8 @@ const Game: React.FC = () => {
                 setId,
                 setInit,
                 setOtherUsername,
-                setGameStarted
+                setGameStarted,
+                setGameinvite
             );
             listning = true;
         }
@@ -199,11 +186,9 @@ const Game: React.FC = () => {
         socket?.disconnect();
     };
 
-    const navigate = useNavigate();
     const handleStartGame = () => {
         socket?.emit('StartGame');
         setGameStarted(true);
-        // navigate(`/game`);
     };
     const handleStartGamerobot = () => {
         socket?.emit('StartGameRobot');
@@ -212,26 +197,6 @@ const Game: React.FC = () => {
 
     return (
         <div className="containerGame">
-            {gameOver ? (
-                <div className="overlay">
-                    <div className="game-over-container">
-                        <div className="game-over">
-                            <p className="paraInfo">Game Over</p>
-                            <p className="paraInfo">
-                                {playerScore > otherScore
-                                    ? 'you won'
-                                    : 'you lost'}
-                            </p>
-                        </div>
-                        <button
-                            className="home-button"
-                            onClick={handleHomeNavigation}
-                        >
-                            Go to Home
-                        </button>
-                    </div>
-                </div>
-            ) : null}
             <div className="container-profile">
                 {id !== 1 ? (
                     <>
@@ -297,28 +262,56 @@ const Game: React.FC = () => {
                     </>
                 )}
             </div>
-            {!gameStarted ? (
+            {gameStarted ? (
+                 <div className="game-container" ref={divRefs.gameContainer}>
+                    <canvas ref={canvasRef} width={720} height={480} />
+                </div>
+            ) : (
                 <>
-                    <button
+                    {gameinvite ? (
+                        <div className="game-container">
+                        <p>Waiting for other player to join</p>
+                    </div>   
+                    ) : (
+                        <>
+                        <button
                         className="start-button"
                         id="firstButton"
                         onClick={handleStartGame}
-                    >
-                        Start Game
-                    </button>
+                        >
+                     Start Game
+                 </button>
 
-                    <button
-                        className="start-button"
-                        onClick={handleStartGamerobot}
-                    >
-                        Start Game with robot
-                    </button>
-                </>
-            ) : (
-                <div className="game-container" ref={divRefs.gameContainer}>
-                    <canvas ref={canvasRef} width={720} height={480} />
+                 <button
+                     className="start-button"
+                     onClick={handleStartGamerobot}
+                 >
+                     Start Game with robot
+                 </button>
+                 </>
+                )}
+             </>
+    )}
+            {gameOver ? (
+                <div className="overlay">
+                    <div className="game-over-container">
+                        <div className="game-over">
+                            <p className="paraInfo">Game Over</p>
+                            <p className="paraInfo">
+                                {playerScore > otherScore
+                                    ? 'you won'
+                                    : 'you lost'}
+                            </p>
+                        </div>
+                        <button
+                            className="home-button"
+                            onClick={handleHomeNavigation}
+                        >
+                            Go to Home
+                        </button>
+                    </div>
                 </div>
-            )}
+            ) : null}
         </div>
     );
 };

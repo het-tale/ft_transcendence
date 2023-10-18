@@ -22,7 +22,7 @@ const RequireNoAuth = (props: any) => {
                     }
                 }
             } catch (error) {
-                console.log('error No auth', error);
+                // console.log('error No auth', error);
                 localStorage.clear();
                 if (localStorage.getItem('token') == null) {
                     setIsLoggedOut(true);
