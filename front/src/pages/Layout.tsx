@@ -28,6 +28,9 @@ import { useNavigate } from 'react-router-dom';
 import { UserType } from '../Types/User';
 import User from '../components/User';
 import { SearchUsers } from '../components/SearchUsers';
+import { AchievementUnlocked } from './AchievementUnlocked';
+import { Achievement } from '../Types/Achievement';
+import { set } from 'react-hook-form';
 
 interface Props {
     children?: React.ReactNode;
@@ -47,6 +50,8 @@ export const Layout = ({ children }: Props) => {
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [showHide, setShowHide] = React.useState(false);
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
+    const [achievement, setAchievement] = React.useState<Achievement>();
     React.useEffect(() => {
         async function fetchUserData() {
             const currentUserData = await User();
@@ -221,6 +226,18 @@ export const Layout = ({ children }: Props) => {
                 });
                 renderData.setRenderData(!renderData.renderData);
             });
+            socket.on('achievementUnlocked', (data: Achievement) => {
+                console.log('achievementUnlocked', data);
+                setAchievement(data);
+                setIsModalOpen(true);
+                renderData.setRenderData(!renderData.renderData);
+            });
+            socketGame.on('achievementUnlocked', (data: Achievement) => {
+                console.log('achievementUnlocked', data);
+                setAchievement(data);
+                setIsModalOpen(true);
+                renderData.setRenderData(!renderData.renderData);
+            });
         }, 500);
 
         return () => {
@@ -237,6 +254,8 @@ export const Layout = ({ children }: Props) => {
             socket.off('friendRequestDeclined');
             socket.off('friendRemoved');
             socket.off('friendRemoveError');
+            socket.off('achievementUnlocked');
+            socketGame.off('achievementUnlocked');
             clearTimeout(timer);
         };
     }, [socket]);
@@ -465,6 +484,12 @@ export const Layout = ({ children }: Props) => {
                     setShowHide={setShowHide}
                 />
             ) : null}
+            <AchievementUnlocked
+                achievement={achievement}
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+            />
+            ;
         </Flex>
     );
 };
