@@ -1,3 +1,5 @@
+import { FriendRequest } from './Invitation';
+
 export type UserType = {
     id: number;
     createdAt: Date;
@@ -20,4 +22,5 @@ export type UserType = {
     win_rate: number;
     lp: number;
     g_rank: number;
+    sentFriendRequests: FriendRequest[];
 };

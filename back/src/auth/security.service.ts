@@ -120,6 +120,7 @@ export class SecurityService {
       where: { email: user.email },
       include : {
         blocked: true,
+        sentFriendRequests: true,
       }
     });
     if (!usery) {

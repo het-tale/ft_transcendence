@@ -239,25 +239,33 @@ const UserInfo = (props: UserInfoProps) => {
                 </Text>
             </Flex>
             {props.isMyProfile ? null : (
-                <Button
-                    w={'100%'}
-                    bg={'#a435f0'}
-                    color={'white'}
-                    marginBottom={'-42rem'}
-                    onClick={
-                        props.friends.some(
+                <>
+                    <Button
+                        w={'100%'}
+                        bg={'#a435f0'}
+                        color={'white'}
+                        marginBottom={'-42rem'}
+                        onClick={
+                            props.friends.some(
+                                (friend) => friend.id === props.user?.id
+                            )
+                                ? () => {}
+                                : handleAddFriend
+                        }
+                    >
+                        {props.friends.some(
                             (friend) => friend.id === props.user?.id
                         )
-                            ? () => {}
-                            : handleAddFriend
-                    }
-                >
-                    {props.friends.some(
-                        (friend) => friend.id === props.user?.id
-                    )
-                        ? 'Friends'
-                        : 'Add Friend'}
-                </Button>
+                            ? 'Friends'
+                            : props.currentUser?.sentFriendRequests?.some(
+                                  (request) =>
+                                      request.receiverId === props.user?.id &&
+                                      request.status === 'pending'
+                              )
+                            ? 'Friend Request Sent'
+                            : 'Add Friend'}
+                    </Button>
+                </>
             )}
         </div>
     );
