@@ -81,6 +81,7 @@ const Dms = (props: any) => {
                             dms={props.dms}
                             setDms={props.setDms}
                             setFirstLoad={setFirstLoad}
+                            isDm={true}
                         />
                         <button className="newChannel" onClick={onOpen}>
                             <BsPlusLg
@@ -162,7 +163,15 @@ const Dms = (props: any) => {
             content: (
                 <>
                     <Flex justify={'space-between'}>
-                        <Search name="tabDesign" />
+                        <Search
+                            name="tabDesign"
+                            isDm={false}
+                            setName={setName}
+                            filter={name}
+                            dms={props.roomDms}
+                            setDms={props.setRoomDms}
+                            setFirstLoad={setFirstLoad}
+                        />
 
                         <button className="newChannel" onClick={onOpen}>
                             <BsPlusLg
