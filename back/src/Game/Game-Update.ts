@@ -337,9 +337,7 @@ async calculateNmr( userId: number)
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
-    console.log(user.username, ": matchwin,    match number", user.matchwin,"    ", user.matchnumber)
     const rate = (user.matchwin * 100) / user.matchnumber;
-    console.log("rate", rate)
     await this.prisma.user.update({
       where: { id: user.id },
       data: { win_rate: rate},
