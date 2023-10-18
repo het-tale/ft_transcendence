@@ -1,13 +1,11 @@
 import { createZodDto } from 'nestjs-zod';
-import { z } from 'nestjs-zod/z';
+import { custom, z } from 'nestjs-zod/z';
 
-const customEmailValidator = z.string().refine(
+export const customEmailValidator = z.string().refine(
   (value) => {
-    // Use a regular expression or any custom logic to validate the email format
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const isStandardEmail = emailRegex.test(value);
 
-    // You can also add custom logic to check for specific domains, like "@student.1337.ma"
     const isCustomEmail = value.endsWith('@student.1337.ma');
 
     return isStandardEmail || isCustomEmail;
@@ -17,21 +15,35 @@ const customEmailValidator = z.string().refine(
   },
 );
 
+export const customPasswordValidator = z.string().refine(
+  (value) => {
+    const passwordRegex = /^(?=(.*[a-z]){3,})(?=(.*[A-Z]){2,})(?=(.*[0-9]){2,})(?=(.*[!@#$%^&*()\-__+.]){1,}).{8,}$/;
+    return passwordRegex.test(value);
+  },
+  {
+    message:
+      'Password must contain at least 8 characters, 3 lowercase, 2 uppercase, 2 digits and 1 special character',
+  },
+);
+
+export const customUsernameValidator = z.string().refine(
+  (value) => {
+    const usernameRegex = /^[a-zA-Z0-9._-]{3,}$/;
+    return usernameRegex.test(value);
+  },
+  {
+    message: 'Username must contain at least 3 characters and no special characters',
+  },
+);
+
 export const AuthsignUpSchema = z.object({
-  username: z
-    .string()
-    .trim()
-    .min(1, { message: 'Required' })
-    .describe('Username'),
+  username: customUsernameValidator.describe('Username'),
   email: customEmailValidator.describe('Email'),
-  password: z
-    .password()
-    .min(8, { message: 'Required' })
-    .describe('This is a password'),
+  password: customPasswordValidator.describe('Password'),
 });
 
 export const AuthSignInSchema = z.object({
-  password: z.password().min(8, { message: 'Required' }).describe('Password'),
+  password: z.password().min(1, { message: 'Required' }).describe('Password'),
   identifier: z
     .string()
     .trim()
@@ -41,28 +53,18 @@ export const AuthSignInSchema = z.object({
 
 export const SetPasswordSchema = z
   .object({
-    password: z.password().min(8, { message: 'Required' }).describe('Password'),
-    confirmPassword: z
-      .password()
-      .min(8, { message: 'Required' })
-      .describe('Matching password'),
+    password: customPasswordValidator.describe('Password'),
+    confirmPassword: customPasswordValidator.describe('Matching password'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ['confirm'],
+    path: ['confirmPassword'],
   });
 export const Add42CredentialsSchema = z
   .object({
-    password: z.password().min(8, { message: 'Required' }).describe('Password'),
-    confirmPassword: z
-      .password()
-      .min(8, { message: 'Required' })
-      .describe('Matching password'),
-    username: z
-      .string()
-      .trim()
-      .min(1, { message: 'Required' })
-      .describe('Username'),
+    password: customPasswordValidator.describe('Password'),
+    confirmPassword: customPasswordValidator.describe('Matching password'),
+    username: customUsernameValidator.describe('Username'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",

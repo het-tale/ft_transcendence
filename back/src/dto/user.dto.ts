@@ -1,28 +1,20 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'nestjs-zod/z';
+import { customPasswordValidator, customUsernameValidator } from './auth.dto';
 
 export const nameSchema = z.object({
-  name: z.string().trim().min(1, { message: 'Required' }).describe('name'),
+  name: customUsernameValidator.describe('name'),
 });
 
 export const roomSchema = z.object({
-  name: z.string().trim().min(1, { message: 'Required' }).describe('name'),
-  password: z
-    .string()
-    .trim()
-    .min(1, { message: 'Required' })
-    .describe('name')
-    .optional(),
+  name: customUsernameValidator.describe('channel name'),
+  password: customPasswordValidator.optional().describe('password'),
   type: z.enum(['public', 'private', 'protected']),
 });
 
 export const adminSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, { message: 'Required' })
-    .describe('channel name'),
-  admin: z.string().trim().min(8, { message: 'Required' }).describe('admin'),
+  name: customUsernameValidator.describe('name'),
+  admin: customUsernameValidator.describe('admin username'),
 });
 export const changePasswordSchema = z
   .object({
@@ -31,16 +23,8 @@ export const changePasswordSchema = z
       .trim()
       .min(1, { message: 'Required' })
       .describe('Old Password'),
-    newPassword: z
-      .string()
-      .trim()
-      .min(8, { message: 'Required' })
-      .describe('New Password'),
-    newPasswordConfirm: z
-      .string()
-      .trim()
-      .min(8, { message: 'Required' })
-      .describe('New Password Confirm'),
+    newPassword: customPasswordValidator.describe('New Password'),
+    newPasswordConfirm: customPasswordValidator.describe('Confirm Password'),
   })
   .refine((data) => data.newPassword === data.newPasswordConfirm, {
     message: "Passwords don't match",
