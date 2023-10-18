@@ -14,6 +14,8 @@ interface SearchProps {
     name?: string;
     users?: UserType[];
     setUsers?: React.Dispatch<React.SetStateAction<UserType[]>>;
+    showHide?: boolean;
+    setShowHide?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Search = (props: SearchProps) => {
@@ -53,6 +55,7 @@ const Search = (props: SearchProps) => {
     const HandleGlobalSearch = async () => {
         console.log('THIS IS THE GLOBAL SEARCH');
         try {
+            props.setShowHide && props.setShowHide(true);
             setOpa(1);
             const res = await client.get(`user/search-users/${props.filter}`, {
                 headers: {
@@ -85,7 +88,15 @@ const Search = (props: SearchProps) => {
             <button
                 className="reset"
                 type="reset"
-                onClick={!props.isSearchGlobal ? reset : () => {}}
+                onClick={
+                    !props.isSearchGlobal
+                        ? reset
+                        : () => {
+                              props.setName && props.setName('');
+                              props.setUsers && props.setUsers([]);
+                              setOpa(0);
+                          }
+                }
                 style={{ opacity: `${opa}` }}
             >
                 <i className="fas fa-times"></i>

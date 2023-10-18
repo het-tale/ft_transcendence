@@ -46,6 +46,7 @@ export const Layout = ({ children }: Props) => {
     const [users, setUsers] = React.useState<UserType[]>([]);
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [showHide, setShowHide] = React.useState(false);
     React.useEffect(() => {
         async function fetchUserData() {
             const currentUserData = await User();
@@ -280,7 +281,11 @@ export const Layout = ({ children }: Props) => {
     }, [renderData.renderData]);
     return (
         <Flex flexDirection={'column'}>
-            <NavbarSearch setUsers={setUsers} />
+            <NavbarSearch
+                setUsers={setUsers}
+                showHide={showHide}
+                setShowHide={setShowHide}
+            />
             <Flex flexDirection={'row'}>
                 <Sidebar
                     notification={renderData.notification}
@@ -451,8 +456,15 @@ export const Layout = ({ children }: Props) => {
                 </Drawer>
 
                 {children}
-                <SearchUsers users={users} setUsers={setUsers} />
             </Flex>
+            {showHide ? (
+                <SearchUsers
+                    users={users}
+                    setUsers={setUsers}
+                    showHide={showHide}
+                    setShowHide={setShowHide}
+                />
+            ) : null}
         </Flex>
     );
 };

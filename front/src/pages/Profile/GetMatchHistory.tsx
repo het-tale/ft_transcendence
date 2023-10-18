@@ -1,8 +1,9 @@
 import client from '../../components/Client';
 
-export const GetMatchHistory = async () => {
+export const GetMatchHistory = async (username: string | undefined) => {
     try {
-        const res = await client.get(`user/match-history`, {
+        console.log('USERNAME', username);
+        const res = await client.get(`user/match-history/${username}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
