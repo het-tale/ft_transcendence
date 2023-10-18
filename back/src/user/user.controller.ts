@@ -65,14 +65,14 @@ export class UserController {
     return await this.userService.getPendingInvitations(request.user);
   }
 
-  @Get('match-history')
-  async getMatchHistory(@Req() request: { user: User }) {
-    return await this.userService.getMatchHistory(request.user);
+  @Get('match-history/:username')
+  async getMatchHistory(@Param('username') username: string) {
+    return await this.userService.getMatchHistory( username);
   }
 
-  @Get('achievements')
-  async getAchievements(@Req() request: { user: User }) {
-    return await this.userService.getAchievements(request.user);
+  @Get('achievements/:username')
+  async getAchievements(@Param('username') username: string) {
+    return await this.userService.getAchievements(username);
   }
 
   @Get(':id')

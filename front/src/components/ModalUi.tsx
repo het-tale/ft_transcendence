@@ -3,25 +3,11 @@ import {
     ModalOverlay,
     ModalContent,
     ModalHeader,
-    ModalFooter,
-    ModalBody,
-    ModalCloseButton,
-    useDisclosure,
-    Button,
-    FormControl,
-    FormLabel,
-    Input,
-    Flex,
-    Avatar,
-    Icon
+    ModalCloseButton
 } from '@chakra-ui/react';
 import React from 'react';
-import { Form } from 'react-bootstrap';
 import '../css/chat/modal.css';
-import { BsPerson, BsPersonFill } from 'react-icons/bs';
-import ModalBodyUi from './ModalBodyUi';
 import { SubmitHandler, UseFormHandleSubmit } from 'react-hook-form';
-import { Interface } from 'readline';
 import { SentData } from '../pages/Chat/Dms';
 
 interface ModalUiProps {

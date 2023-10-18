@@ -1,17 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import '../css/login.css';
-import {
-    Button,
-    FormControl,
-    FormLabel,
-    Input,
-    useToast
-} from '@chakra-ui/react';
-import User from '../components/User';
-import { error } from 'console';
+import { useToast } from '@chakra-ui/react';
 import client from '../components/Client';
 import { useState } from 'react';
-import axios from 'axios';
 
 const SetPassword = (props: any) => {
     const [password, setPassword] = useState('');

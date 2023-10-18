@@ -1,8 +1,8 @@
 import client from '../../components/Client';
 
-export const GetAchievements = async () => {
+export const GetAchievements = async (username: string | undefined) => {
     try {
-        const res = await client.get(`user/achievements`, {
+        const res = await client.get(`user/achievements/${username}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }

@@ -22,9 +22,7 @@ const Profile = () => {
     const [mutualFriends, setMutualFriends] = React.useState<UserType[]>([]);
     const renderData = useContext(RenderContext);
     const location = useLocation();
-    console.log('THISSS', location);
     const id = location.pathname.split('/')[2];
-    console.log('ID', id);
     React.useEffect(() => {
         async function fetchUserData() {
             const userData = await UserId(Number(id));
@@ -43,10 +41,7 @@ const Profile = () => {
             setMutualFriends(data);
         });
     }, [renderData.renderData]);
-    console.log('USER PROFILE', user);
-    console.log(' CUrrent USER', currentUser);
     const isMyProfile = Number(id) === currentUser?.id;
-    console.log('IS MY PROFILE', isMyProfile);
     const tabs = [
         {
             id: 1,
@@ -79,7 +74,7 @@ const Profile = () => {
             tabTitle: 'Stats',
             content: (
                 <>
-                    <Statistics user={user} />
+                    <Statistics id={Number(id)} user={user} />
                 </>
             ),
             rightSide: <>Hello Stats</>
@@ -89,7 +84,7 @@ const Profile = () => {
             tabTitle: 'Match History',
             content: (
                 <>
-                    <MatchHistory />
+                    <MatchHistory id={Number(id)} username={user?.username} />
                 </>
             ),
             rightSide: <>Hello Match History</>
@@ -97,6 +92,7 @@ const Profile = () => {
     ];
     const handleTabClick = (e: any) => {
         setCurrentTab(e.target.id);
+        renderData.setRenderData(!renderData.renderData);
     };
     return (
         <div>
