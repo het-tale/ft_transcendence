@@ -12,6 +12,7 @@ export class UserService {
       where: { id },
       include:{
         blocked: true,
+        sentFriendRequests: true,
       }
 
     });

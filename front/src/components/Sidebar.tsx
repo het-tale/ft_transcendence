@@ -36,11 +36,21 @@ const Sidebar = (props: sidebarProps) => {
 
     return (
         <aside>
-            <Link to="/home">
+            <Link
+                to="/home"
+                onClick={() => {
+                    renderData.setRenderData(!renderData.renderData);
+                }}
+            >
                 <BsHouseFill className="fa" />
                 Home
             </Link>
-            <Link to={`/chat/rooms-dms/${user?.id}`}>
+            <Link
+                to={`/chat/rooms-dms/${user?.id}`}
+                onClick={() => {
+                    renderData.setRenderData(!renderData.renderData);
+                }}
+            >
                 <BsChatRightFill className="fa" />
                 Chat
             </Link>
@@ -62,7 +72,12 @@ const Sidebar = (props: sidebarProps) => {
                 />
                 Notifications
             </Button>
-            <Link to={`/game/`}>
+            <Link
+                to={`/game/`}
+                onClick={() => {
+                    renderData.setRenderData(!renderData.renderData);
+                }}
+            >
                 <BsController className="fa" />
                 Play
             </Link>
