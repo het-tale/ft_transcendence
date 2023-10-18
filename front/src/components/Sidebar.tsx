@@ -66,7 +66,12 @@ const Sidebar = (props: sidebarProps) => {
                 <BsController className="fa" />
                 Play
             </Link>
-            <Link to={`/user-profile/${user?.id}`}>
+            <Link
+                to={`/user-profile/${user?.id}`}
+                onClick={() => {
+                    renderData.setRenderData(!renderData.renderData);
+                }}
+            >
                 <BsPersonFill className="fa" />
                 Profile
             </Link>
