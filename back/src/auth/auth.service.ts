@@ -124,13 +124,11 @@ export class AuthService {
         is2FaVerified: false,
       },
     });
-    console.log(token);
 
     return token;
   }
   async signin42(user: User) {
     const token = await this.getJwtToken(user.id, user.email);
-    console.log(token);
 
     return token;
   }

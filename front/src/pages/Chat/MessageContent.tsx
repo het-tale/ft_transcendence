@@ -20,8 +20,8 @@ const MessageContent = ({
     let parent = name === 'sender' ? 'parentSender' : 'parentReceiver';
     let recvRoom = name === 'receiver' && room ? 'recvRoom' : '';
     const [sender, setSender] = React.useState<UserType>();
-    console.log('message', message);
-    console.log('userSendId', userSendId);
+    // console.log('message', message);
+    // console.log('userSendId', userSendId);
     React.useEffect(() => {
         async function fetchUserData() {
             const userData = await UserId(Number(userSendId));

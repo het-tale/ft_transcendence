@@ -22,7 +22,7 @@ const NotifDm = (props: any) => {
         const timer = setTimeout(() => {
             socket.on('privateMessage', (data: any) => {
                 props.setRender(!props.render);
-                console.log('MESSAGE DATA', data);
+                // console.log('MESSAGE DATA', data);
                 toast({
                     title: "You've got a new message",
                     description: data.message,

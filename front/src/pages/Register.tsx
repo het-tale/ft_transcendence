@@ -47,7 +47,7 @@ function Register() {
         .catch((error) => {
             const errorMessage = error.response.data.message;
             setErrorMessage(errorMessage);
-            console.log(errorMessage);
+            // console.log(errorMessage);
             toast({
                 title: 'Registration Failed.',
                 description: errorMessage,

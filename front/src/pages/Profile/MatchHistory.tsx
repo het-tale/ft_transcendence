@@ -2,18 +2,12 @@ import {
     Card,
     Flex,
     Image,
-    Box,
     Stack,
     CardBody,
     Heading,
-    Text,
-    Spacer,
-    IconButton,
-    Grid,
-    GridItem
+    GridItem,
+    Grid
 } from '@chakra-ui/react';
-import { BsChatLeftFill } from 'react-icons/bs';
-import { Link } from 'react-router-dom';
 import { Match } from '../../Types/Match';
 import React, { useContext, useEffect } from 'react';
 import { RenderContext } from '../../RenderContext';
@@ -27,13 +21,13 @@ const MatchHistory = () => {
             setMatchHistory(data);
         });
     }, [renderData.renderData]);
-    console.log('MATCH HISTORY', matchHistory);
-    console.log('First MATCH HISTORY', matchHistory[0]?.PlayerA);
+    // console.log('MATCH HISTORY', matchHistory);
+    // console.log('First MATCH HISTORY', matchHistory[0]?.PlayerA);
     return (
         <div>
             {matchHistory.length > 0
                 ? matchHistory.map((match) => {
-                      console.log('MATCH', match.PlayerA);
+                    //   console.log('MATCH', match.PlayerA);
                       return (
                           <Card
                               direction={{ base: 'column', sm: 'row' }}

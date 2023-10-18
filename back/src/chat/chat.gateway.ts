@@ -41,7 +41,7 @@ export class ChatGateway
   private connectedUsers: { clientId: string; username: string }[] = [];
 
   afterInit() {
-    console.log('Initialized');
+    // console.log('Initialized');
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
@@ -55,7 +55,7 @@ export class ChatGateway
         username: user.username,
       });
       await this.dmService.changeUserStatus(user.username, 'online');
-      console.log(this.connectedUsers);
+      // console.log(this.connectedUsers);
       await this.channelService.rejoinRooms(user.id, client);
       const offlineMessages = await this.dmService.getOfflineMessages(user.id);
       const offlineInvitations =
@@ -98,7 +98,7 @@ export class ChatGateway
     const user = this.connectedUsers.find(
       (user) => user.clientId === client.id,
     );
-    console.log(`Cliend id:${client.id} disconnected`);
+    // console.log(`Cliend id:${client.id} disconnected`);
     if (!user) return;
     await this.dmService.changeUserStatus(user.username, 'offline');
     this.connectedUsers = this.connectedUsers.filter(
@@ -112,7 +112,7 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      console.log(data);
+      // console.log(data);
       if (data.message === '') return;
       const sender = this.connectedUsers.find(
         (user) => user.clientId === client.id,
@@ -144,7 +144,7 @@ export class ChatGateway
       if (obj.isUnlocked)
         this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
     } catch (err) {
-      console.log(err.message, 'privateMessageError');
+      // console.log(err.message, 'privateMessageError');
       client.emit('privateMessageError', err.message);
     }
   }
@@ -508,27 +508,27 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      console.log("heeeey m heeere friend0");
+      // console.log("heeeey m heeere friend0");
       const user1 = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       );
-      console.log("heeeey m heeere friend-1", user1);
+      // console.log("heeeey m heeere friend-1", user1);
       const clientUsername = user1.username;
-      console.log("ClientUsername", clientUsername);
+      // console.log("ClientUsername", clientUsername);
       const receiver = this.connectedUsers.find(
         (user) => user.username === data.from,
         );
-        console.log("heeeey m heeere friend-2", receiver.username);
+        // console.log("heeeey m heeere friend-2", receiver.username);
       let isOnline = false;
       if (receiver) isOnline = true;
-      console.log("heeeey m heeere friend2");
+      // console.log("heeeey m heeere friend2");
       await this.friendsService.handleFriendRequest(
         clientUsername,
         data.from,
         data.isAccepted,
         isOnline,
       );
-      console.log("heeeey m heeere friend1");
+      // console.log("heeeey m heeere friend1");
       if (data.isAccepted) {
         const obj = await this.achievementsService.check20friends(clientUsername);
         if (obj.isUnlocked)

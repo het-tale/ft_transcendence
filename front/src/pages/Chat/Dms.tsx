@@ -81,7 +81,7 @@ const Dms = (props: any) => {
     const handleRadioChange = (event: any) => {
         setSelectedOption(event.target.value);
         setShowField(event.target.value === 'protected');
-        console.log('RADIOOOOOOO CHAAAANGE', event.target.value);
+        // console.log('RADIOOOOOOO CHAAAANGE', event.target.value);
     };
 
     const handleSubmit1 = () => {
@@ -92,14 +92,14 @@ const Dms = (props: any) => {
             type: data.get('group1'),
             password: data.get('password')
         };
-        console.log('FORMDATA', formData);
+        // console.log('FORMDATA', formData);
     };
 
     const { register, handleSubmit } = useForm<SentData>();
     const handleSendMessage: SubmitHandler<SentData> = (data) => {
-        console.log('FORMDATA', data);
+        // console.log('FORMDATA', data);
     };
-    console.log('DMSSSSSSSSSSSSSS', props.dms);
+    // console.log('DMSSSSSSSSSSSSSS', props.dms);
     const deleteConversation = async () => {
         try {
             const res = await client.delete(
@@ -110,12 +110,12 @@ const Dms = (props: any) => {
                     }
                 }
             );
-            console.log('RES', res);
+            // console.log('RES', res);
             if (res.status === 200) {
                 props.setRender(!props.render);
             }
         } catch (error: any) {
-            console.log('Error', error);
+            // console.log('Error', error);
             props.toast({
                 title: 'Error.',
                 description: error.response.data.message,
@@ -203,7 +203,7 @@ const Dms = (props: any) => {
                     ) : (
                         <></>
                     )}
-                    {console.log('USERDM', userDm)}
+                    {/* {console.log('USERDM', userDm)} */}
                 </>
             ),
             rightSide: (
@@ -267,7 +267,7 @@ const Dms = (props: any) => {
                     {props.roomDms ? (
                         props.roomDms.length > 0 ? (
                             props.roomDms?.map((room: Channel) => {
-                                console.log('Room looop', room);
+                                // console.log('Room looop', room);
                                 return (
                                     <ChannelDisplay
                                         profile={room.avatar}

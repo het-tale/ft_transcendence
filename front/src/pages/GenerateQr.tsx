@@ -12,12 +12,12 @@ const GenerateQr = () => {
             },
             responseType: 'blob'
         });
-        console.log("data", response);
+        // console.log("data", response);
         // console.log("qr", qr);
     //    setQr(response.data);
     // const url = createObjectURL(response);
     qr = response.data.Blob;
-        console.log("qr1", qr);
+        // console.log("qr1", qr);
     }
     useEffect(() => {
         const timer = setTimeout(() => {

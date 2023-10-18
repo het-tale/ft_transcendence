@@ -214,7 +214,7 @@ function App() {
                                 />
                             </Route>
                             <Route
-                                path="game/"
+                                path="game/:token"
                                 element={
                                     <ProtectRoutes>
                                         <Layout children={<GamePage />} />

@@ -7,7 +7,7 @@ const Email = async () => {
     const token = location.search.split('=')[1];
     console.log(token);
     const response = await client.get("/auth/confirm-email?token=" + token);
-    console.log("STATUS", response.status);
+    // console.log("STATUS", response.status);
     // if (response.status === 200) {
     //     console.log("Email confirmed");
     // } else {

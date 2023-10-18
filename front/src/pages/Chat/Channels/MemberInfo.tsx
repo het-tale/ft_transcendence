@@ -74,7 +74,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
             name: props.room?.name,
             admin: props.participant?.username
         };
-        console.log('remove admin logic');
+        // console.log('remove admin logic');
         try {
             const response = await client.post('chat/remove-admin', data, {
                 headers: {
@@ -97,7 +97,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
         }
     };
     const handleMuteUser = () => {
-        console.log('mute user logic', props.room?.muted[0]);
+        // console.log('mute user logic', props.room?.muted[0]);
         socket.emit('muteUser', {
             room: props.ChannelDm?.name,
             target: props.participant?.username
@@ -116,7 +116,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
         setMute(false);
     };
     const handleKickUser = () => {
-        console.log('kick user logic');
+        // console.log('kick user logic');
         socket.emit('kickUser', {
             room: props.room?.name,
             target: props.participant?.username
@@ -125,7 +125,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
         onClose3();
     };
     const handleBanUser = () => {
-        console.log('ban user logic', props.room?.name);
+        // console.log('ban user logic', props.room?.name);
         socket.emit('banneUser', {
             room: props.room?.name,
             target: props.participant?.username
@@ -134,7 +134,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
         onClose4();
     };
     const handleUnbanUser = () => {
-        console.log('unban user logic');
+        // console.log('unban user logic');
         socket.emit('unbanUser', {
             room: props.room?.name,
             target: props.participant?.username
@@ -145,7 +145,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
     useEffect(() => {
         const timer = setTimeout(() => {
             socket.on('adminAddError', (data: any) => {
-                console.log('adminAddError', data);
+                // console.log('adminAddError', data);
                 toast({
                     title: 'Error',
                     description: data,
@@ -157,7 +157,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                 props.setRender && props.setRender(!props.render);
             });
             socket.on('adminAdded', (data: any) => {
-                console.log('adminAdded', data);
+                // console.log('adminAdded', data);
                 toast({
                     title: 'Success',
                     description: data,
@@ -169,7 +169,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                 props.setRender && props.setRender(!props.render);
             });
             socket.on('userMuted', (data: any) => {
-                console.log('userMuted', data);
+                // console.log('userMuted', data);
                 toast({
                     title: 'success',
                     description: data,
@@ -181,8 +181,8 @@ const MemberInfo = (props: ChannelInfoProps) => {
                 props.setRender && props.setRender(!props.render);
             });
             socket.on('userMuteError', (data: any) => {
-                console.log('userMuteError', data);
-                console.log('mute usererror logic', props.room?.name);
+                // console.log('userMuteError', data);
+                // console.log('mute usererror logic', props.room?.name);
                 toast({
                     title: 'Error',
                     description: data,
@@ -194,7 +194,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                 props.setRender && props.setRender(!props.render);
             });
             socket.on('userKicked', (data: any) => {
-                console.log('userKicked', data);
+                // console.log('userKicked', data);
                 toast({
                     title: 'success',
                     description: data,
@@ -206,7 +206,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                 props.setRender && props.setRender(!props.render);
             });
             socket.on('userKickError', (data: any) => {
-                console.log('userKickError', data);
+                // console.log('userKickError', data);
                 toast({
                     title: 'Error',
                     description: data,
@@ -219,7 +219,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
             });
 
             socket.on('userUnmuted', (data: any) => {
-                console.log('userUnMuted', data);
+                // console.log('userUnMuted', data);
                 toast({
                     title: 'success',
                     description: data,
@@ -231,7 +231,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                 props.setRender && props.setRender(!props.render);
             });
             socket.on('userUnmuteError', (data: any) => {
-                console.log('userUnmuteError', data);
+                // console.log('userUnmuteError', data);
                 toast({
                     title: 'Error',
                     description: data,
@@ -243,7 +243,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                 props.setRender && props.setRender(!props.render);
             });
             socket.on('userBanned', (data: any) => {
-                console.log('userBanned', data);
+                // console.log('userBanned', data);
                 toast({
                     title: 'success',
                     description: data,
@@ -255,7 +255,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                 props.setRender && props.setRender(!props.render);
             });
             socket.on('userBanError', (data: any) => {
-                console.log('userBanError', data);
+                // console.log('userBanError', data);
                 toast({
                     title: 'Error',
                     description: data,
@@ -268,7 +268,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
             });
 
             socket.on('userUnbanned', (data: any) => {
-                console.log('userUnbanned', data);
+                // console.log('userUnbanned', data);
                 toast({
                     title: 'success',
                     description: data,
@@ -280,7 +280,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                 props.setRender && props.setRender(!props.render);
             });
             socket.on('userUnbanError', (data: any) => {
-                console.log('userUnbanError', data);
+                // console.log('userUnbanError', data);
                 toast({
                     title: 'Error',
                     description: data,
@@ -292,7 +292,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                 props.setRender && props.setRender(!props.render);
             });
             socket.on('roomLeft', (data: any) => {
-                console.log('roomLeft', data);
+                // console.log('roomLeft', data);
                 toast({
                     title: 'success',
                     description: data,
@@ -304,7 +304,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
                 props.setRender && props.setRender(!props.render);
             });
             socket.on('roomLeaveError', (data: any) => {
-                console.log('roomLeaveError', data);
+                // console.log('roomLeaveError', data);
                 toast({
                     title: 'Error',
                     description: data,
@@ -321,7 +321,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
             clearTimeout(timer);
         };
     }, []);
-    console.log('ROOMMMMMMM', props.room);
+    // console.log('ROOMMMMMMM', props.room);
     return (
         <Flex bg={'#F5F5F5'} p={'10px'} marginBottom={8} marginTop={-6}>
             <Box w={'90%'}>

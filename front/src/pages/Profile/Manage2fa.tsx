@@ -20,12 +20,12 @@ const Manage2fa = (props: Manage2faProps) => {
     const { register, handleSubmit } = useForm<Manage2faData>();
     const renderData = useContext(RenderContext);
     const handleGenerateQrCode: SubmitHandler<Manage2faData> = async (data) => {
-        console.log('The code', data);
+        // console.log('The code', data);
         const sentData = {
             code: data.code
         };
         try {
-            console.log('enable 2fa');
+            // console.log('enable 2fa');
             const response = await client.post(`auth/2fa/enable`, sentData, {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
@@ -50,7 +50,7 @@ const Manage2fa = (props: Manage2faProps) => {
     useEffect(() => {
         const generate2fa = async () => {
             try {
-                console.log('generate 2fa');
+                // console.log('generate 2fa');
                 const response = await client.get(
                     `auth/2fa/generate`,
 
@@ -62,7 +62,7 @@ const Manage2fa = (props: Manage2faProps) => {
                     }
                 );
                 if (response.status === 200) {
-                    console.log('response generate', response.data);
+                    // console.log('response generate', response.data);
                     setQrCodeImageUrl(response.data);
                 }
             } catch (error: any) {
@@ -79,7 +79,7 @@ const Manage2fa = (props: Manage2faProps) => {
         };
         generate2fa();
     }, []);
-    console.log('qr code', qrCodeImageUrl);
+    // console.log('qr code', qrCodeImageUrl);
     return (
         <>
             <div>

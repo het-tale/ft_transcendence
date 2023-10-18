@@ -26,10 +26,10 @@ const ResetPassword = () => {
                 password: data.password,
                 confirmPassword: data.confirmPassword,
             }
-            console.log(data1);
-            console.log("Token", token);
+            // console.log(data1);
+            // console.log("Token", token);
             const response = await client.post("/auth/change-password?token=" + token, data1);
-            console.log(response);
+            // console.log(response);
             if (response.status === 201) {
                 toast({
                     title: 'Password updated.',
@@ -44,7 +44,7 @@ const ResetPassword = () => {
         }
         catch (error : any) {
             const errorMessage = error.response.data.message;
-            console.log(errorMessage);
+            // console.log(errorMessage);
             toast({
                 title: 'Error.',
                 description: errorMessage,

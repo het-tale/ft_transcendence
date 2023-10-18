@@ -29,8 +29,8 @@ const Statistics = (props: StatisticsProps) => {
             setAchievements(data);
         });
     }, [renderData.renderData]);
-    console.log('Achievements', achievements);
-    console.log('User', props.user);
+    // console.log('Achievements', achievements);
+    // console.log('User', props.user);
     return (
         <Flex flexDirection={'column'}>
             <Flex flexDirection={'column'} marginTop={'1rem'}>
