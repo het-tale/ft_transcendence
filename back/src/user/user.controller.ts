@@ -2,14 +2,11 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Req,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { EmailConfirmationGuard } from 'src/guards/email-confirmation.guard';
@@ -76,9 +73,7 @@ export class UserController {
   }
 
   @Get(':id')
-  async getUserById(@Param('id') idString: string) {
-    const id = Number(idString);
-    if(!id) return;
+  async getUserById(@Param('id', ParseIntPipe) id: number) {
     return await this.userService.getUserById(id);
   }
 
