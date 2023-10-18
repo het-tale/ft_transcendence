@@ -11,14 +11,16 @@ import {
     Text
 } from '@chakra-ui/react';
 import { Achievement } from '../Types/Achievement';
+import React from 'react';
 
 interface AchievementUnlockedProps {
     isModalOpen: boolean;
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    achievement?: Achievement;
+    achievements?: Achievement[];
 }
 
 export const AchievementUnlocked = (props: AchievementUnlockedProps) => {
+    const [id, setId] = React.useState<number>(0);
     return (
         <>
             <Modal
@@ -41,7 +43,7 @@ export const AchievementUnlocked = (props: AchievementUnlockedProps) => {
                     >
                         <Flex flexDirection={'row'}>
                             <Avatar
-                                src={props.achievement?.icon}
+                                src={props.achievements![id]?.icon}
                                 marginTop={'10px'}
                             />
                             <Flex flexDirection={'column'} marginLeft={'15px'}>
@@ -50,10 +52,10 @@ export const AchievementUnlocked = (props: AchievementUnlockedProps) => {
                                     color={'#a435f0'}
                                     fontFamily={'sans-serif'}
                                 >
-                                    {props.achievement?.name}
+                                    {props.achievements![id]?.name}
                                 </Text>
                                 <Text fontSize={'lg'}>
-                                    {props.achievement?.description}
+                                    {props.achievements![id]?.description}
                                 </Text>
                             </Flex>
                         </Flex>
@@ -68,7 +70,11 @@ export const AchievementUnlocked = (props: AchievementUnlockedProps) => {
                             backgroundColor={'white'}
                             color={'#a435f0'}
                             mr={3}
-                            onClick={() => props.setIsModalOpen(false)}
+                            onClick={
+                                id < props.achievements!.length - 1
+                                    ? () => setId(id + 1)
+                                    : () => props.setIsModalOpen(false)
+                            }
                             w={'100%'}
                             _hover={{
                                 backgroundColor: '#a435f0',
