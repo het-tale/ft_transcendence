@@ -2,6 +2,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@prisma/client';
+import * as argon from 'argon2';
 
 @Injectable()
 export class RobotUserService {
@@ -21,6 +22,11 @@ export class RobotUserService {
       return;
     }
     const avatar = this.config.get('ROBOT_AVATAR');
+    const password = this.config.get('ROBOT_PASSWORD');
+    console.log(password);
+    let hashedPassword = null;
+    if (password)
+      hashedPassword = await argon.hash(password);
     robotUser = await this.prisma.user.create({
       data: {
         username: 'ROBOT',
@@ -28,6 +34,7 @@ export class RobotUserService {
         isEmailConfirmed: true,
         avatar,
         status: 'online',
+        hash: hashedPassword,
       },
     });
     if (!robotUser) {

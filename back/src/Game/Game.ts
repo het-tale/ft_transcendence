@@ -51,14 +51,14 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       const user = await this.serviceInit.verifyToken(token);
       if (user) {
         if (user.status === 'InGame') {
-          console.log('\x1b[33m user connection allready in game ', user, '\x1b[0m');
+          // console.log('\x1b[33m user connection allready in game ', user, '\x1b[0m');
             client.disconnect();
           return;
         }
-        console.log('\x1b[33m user is found \x1b[0m');
+        // console.log('\x1b[33m user is found \x1b[0m');
         this.activeSockets.set(client, user);
       } else {
-        console.log('connection refused');
+        // console.log('connection refused');
         client.disconnect();
       }
     } catch (e) {
@@ -73,7 +73,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       if (!user)
         throw new Error("undefined user ");
       if (user.status === 'InGame') {
-        console.log('user is already in game handle start game');
+        // console.log('user is already in game handle start game');
         return;
       } else {
         await this.prisma.user.update({
@@ -104,7 +104,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       if (!user)
         throw new Error("undefined user ");
       if (user.status === 'InGame') {
-        console.log('user is already in game handle start game');
+        // console.log('user is already in game handle start game');
         return;
       } else {
         await this.prisma.user.update({
@@ -132,7 +132,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     const room = this.serviceInit.findRoomByPlayerSocket(client, this.rooms);
     const user = this.activeSockets.get(client);
     if (user) {
-      console.log('disconnecting client ', user.login);
+      // console.log('disconnecting client ', user.login);
       await this.prisma.user.update({
         where: {
           id: user.id,
@@ -143,7 +143,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       });
     }
     if (room) {
-      console.log('room found to make force leave ');
+      // console.log('room found to make force leave ');
       if (room.players.length === 2) {
         const playerindex = room.players.indexOf(room.players.find((player) => player.socket === client));
         room.players[playerindex].score = 0;
@@ -169,11 +169,11 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     const receiver = Array.from(this.activeSockets.values()).find(
       (user) => user.id === targetUserId,
     );
-    console.log('invite player sender', sender);
-    console.log('invite player receiver', receiver);
+    // console.log('invite player sender', sender);
+    // console.log('invite player receiver', receiver);
 
     if (!receiver) {
-      console.log('receiver not found');
+      // console.log('receiver not found');
       return;
     }
 
@@ -249,7 +249,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         }
       })
       if (invitationRoom) {
-        console.log('invitation Game backend hereee');
+        // console.log('invitation Game backend hereee');
         const player = new Player(2, user.id, client, PADDLE, roomId, 0);
         invitationRoom.players.push(player);
         client.join(roomId);

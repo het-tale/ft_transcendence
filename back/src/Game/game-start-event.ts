@@ -24,11 +24,11 @@ export class GameStartEvent {
 ) {
   let exist = false;
   for (const existRoom of rooms.values()) {
-    console.log('at room ', existRoom.roomName, ' players ', existRoom.players.length, );
+    // console.log('at room ', existRoom.roomName, ' players ', existRoom.players.length, );
     if (existRoom.players.length === 1 && !existRoom.isinvit) {
       exist = true;
-      console.log('room found ', existRoom.roomName);
-      console.log('player 1 ', existRoom.players[0].id);
+      // console.log('room found ', existRoom.roomName);
+      // console.log('player 1 ', existRoom.players[0].id);
       const user = activeSockets.get(client);
       const player = new Player(2, user.id, client, PADDLE, existRoom.roomName, 0);
       existRoom.players.push(player);
@@ -53,7 +53,7 @@ export class GameStartEvent {
   if (!exist) {
     const room = new Room(Math.random().toString(36).substring(7));
     rooms.set(room.roomName, room);
-    console.log('new room created with name ', room.roomName);
+    // console.log('new room created with name ', room.roomName);
 
     const user = activeSockets.get(client);
     const player = new Player(1, user.id, client, OTHERPADDLE, room.roomName, 0);
@@ -122,7 +122,7 @@ async StartGameEventRobot(
     rooms: Map<string, Room>,
     activeSockets: Map<Socket, User>,
   ) {
-    console.log('startGame');
+    // console.log('startGame');
     this.serviceUpdate.OtherAvatar(client, room , activeSockets);
     if (!room.gameActive) {
       room.gameActive = true;
@@ -140,7 +140,7 @@ async StartGameEventRobot(
 }
 
 export function cancelgamesart(room: Room, rooms: Map<string, Room>) {
-  console.log('cancelgamesart');
+  // console.log('cancelgamesart');
   //dell room from map
   rooms.delete(room.roomName);
   room.gameActive = false;
