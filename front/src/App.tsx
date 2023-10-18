@@ -25,7 +25,6 @@ import BrowseChannels from './pages/Chat/Channels/BrowseChannels';
 import { RenderContext } from './RenderContext';
 import { Layout } from './pages/Layout';
 import { Verify2Fa } from './pages/Profile/Verify2Fa';
-import { SlideEx } from './components/Test';
 
 function App() {
     const [firstLogin, setFirstLogin] = React.useState(false);
@@ -209,7 +208,6 @@ function App() {
                                     }
                                 />
                             </Route>
-                            <Route path="testt" element={<SlideEx />} />
                         </Routes>
                     </RenderContext.Provider>
                 </SocketGameContext.Provider>
