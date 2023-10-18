@@ -1,7 +1,5 @@
-import { error } from 'console';
 import User from '../components/User';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 
 import React from 'react';
 
@@ -11,7 +9,7 @@ const Signin42 = () => {
     console.log(location);
     const token = location.search.split('=')[1];
     localStorage.setItem('token', token);
-    console.log("THE TOKEN ", token);
+    console.log('THE TOKEN ', token);
     User()
         .then((res) => {
             console.log('User', res);

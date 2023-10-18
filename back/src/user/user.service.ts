@@ -106,9 +106,9 @@ export class UserService {
     });
     return invitations;
   }
-  async getAchievements(user: User) {
+  async getAchievements(username: string) {
     const achievements = await this.prisma.user.findUnique({
-      where: { id: user.id },
+      where: { username },
       select: {
         achievements: true,
       },
@@ -128,10 +128,10 @@ export class UserService {
     filteredAchievements.push(highestRank);
     return filteredAchievements;
   }
-  async getMatchHistory(user: User)
+  async getMatchHistory(username: string)
   {
     const myUser = await this.prisma.user.findUnique({
-      where: { id: user.id },
+      where: { username },
       select: {
         matchHistoryA: {
           include : {

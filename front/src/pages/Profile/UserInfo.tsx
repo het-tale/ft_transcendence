@@ -1,44 +1,19 @@
 import {
-    Avatar,
-    Box,
     Button,
-    Card,
-    CardBody,
-    CardFooter,
-    CardHeader,
     Flex,
-    Heading,
     IconButton,
     Text,
     Image,
     Center,
-    Menu,
-    MenuButton,
-    MenuList,
-    MenuItem,
-    List,
-    ListItem,
-    ListIcon,
     useDisclosure,
     useToast
 } from '@chakra-ui/react';
-import {
-    BsThreeDotsVertical,
-    BsPencilFill,
-    BsVolumeMuteFill,
-    BsPersonDashFill,
-    BsPersonXFill,
-    BsGearFill,
-    BsBoxArrowRight,
-    BsCircleFill
-} from 'react-icons/bs';
+import { BsPencilFill } from 'react-icons/bs';
 import ModalUi from '../../components/ModalUi';
-import EditProfileBody from './EditProfileBody';
 import { UserType } from '../../Types/User';
 import { SocketContext } from '../../socket';
 import React, { useContext, useState } from 'react';
 import { EditIcon } from '@chakra-ui/icons';
-import { Opacity } from '@mui/icons-material';
 import EditUserNameBody from './EditUserNameBody';
 import EditPasswordBody from './EditPasswordBody';
 import EditAvatarBody from './EditAvatarBody';

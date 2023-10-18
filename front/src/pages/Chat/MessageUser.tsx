@@ -1,17 +1,6 @@
-import {
-    Card,
-    CardHeader,
-    CardBody,
-    CardFooter,
-    Image,
-    Stack,
-    Heading,
-    Text,
-    Button
-} from '@chakra-ui/react';
+import { Card, CardBody, Image, Stack, Heading, Text } from '@chakra-ui/react';
 import { UserType } from '../../Types/User';
-import { useEffect, useState } from 'react';
-import { set } from 'react-hook-form';
+import { useEffect } from 'react';
 
 interface MessageUserProps {
     profile: string;
@@ -41,13 +30,10 @@ const MessageUser = ({
     name,
     message,
     children,
-    design,
     setUserDm,
     dm,
     setFirstLoad,
     isUserDm,
-    render,
-    setRender,
     updateUser,
     setUpdateUser,
     updateClass,

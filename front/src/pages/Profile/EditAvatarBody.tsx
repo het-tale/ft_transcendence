@@ -2,14 +2,7 @@ import { useContext, useState } from 'react';
 import { UserType } from '../../Types/User';
 import client from '../../components/Client';
 import '../../css/chat/modal.css';
-import {
-    Button,
-    ButtonGroup,
-    FormControl,
-    FormLabel,
-    Switch,
-    useToast
-} from '@chakra-ui/react';
+import { Button, ButtonGroup, useToast } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { RenderContext } from '../../RenderContext';
 
