@@ -112,15 +112,15 @@ const Dms = (props: any) => {
                     {props.dms ? (
                         props.dms.length > 0 ? (
                             props.dms?.map((dm: UserType) => {
-                                return (
-                                    <Link to={`/chat/rooms-dms/${dm.id}`}>
+                                return dm ? (
+                                    <Link to={`/chat/rooms-dms/${dm?.id}`}>
                                         <MessageUser
-                                            profile={dm.avatar}
-                                            name={dm.username}
+                                            profile={dm?.avatar}
+                                            name={dm?.username}
                                             dm={dm}
                                             setUserDm={setUserDm}
                                             setFirstLoad={setFirstLoad}
-                                            message={dm.status}
+                                            message={dm?.status}
                                             render={props.render}
                                             setRender={props.setRender}
                                             updateUser={updateUser}
@@ -134,6 +134,8 @@ const Dms = (props: any) => {
                                             }
                                         />
                                     </Link>
+                                ) : (
+                                    <></>
                                 );
                             })
                         ) : (
