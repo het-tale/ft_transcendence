@@ -23,33 +23,25 @@ export function ListenOnSocket(
   setGameinvite: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   socket.on("connect", () => {
-    // console.log("connected to server");
   });
 
   socket.on('connected', (message: string) => {
-    // console.log(message);
-    // socket.emit("StartGame", "StartGame");
   });
   socket.on("disconnect", () => {
-    // console.log("disconnected");
   });
 
   socket.on("error", (error) => {
-    // console.log("error", error);
   });
 
   socket.on("OTHER AVATAR", (avatar: string, username: string) => {
-	// console.log("OTHER AVATAR", avatar);
 	setOtherAvatar(avatar);
 	setOtherUsername(username);
 	  });
 	
   socket.on("JoinRoom", (message: string) => {
-    // console.log("JoinRoom", message);
   });
 
-  socket.on("StartGame", (message: string) => {
-    // console.log("StartGame on room", message); 
+  socket.on("StartGame", (message: string) => { 
   });
 
   socket.on("GAME STARTED", (message: boolean) => {
@@ -58,17 +50,20 @@ export function ListenOnSocket(
     // setGameinvite(false);
   });
 
+  socket.on("GAME INVITE", (message: boolean) => {
+    console.log("GAME INVITE", message);
+    setGameinvite(true);
+  });
+
   socket.on(
     "UPDATE",
     (update: { ball: Ball; paddle: Paddle; otherPaddle: Paddle }) => {
-      console.log("UPDATE", update);
       setPadd(update.paddle);
       setBall(update.ball);
       setOtherpad(update.otherPaddle);
     }
   );
   socket.on("GAME OVER", (payload: any) => {
-    // console.log("GAME OVER", payload.winner);
 	setGameOver(true);
   });
   socket.on(

@@ -159,7 +159,7 @@ const DmsChat = (props: any) => {
         // console.log('Send game invitation');
         socketGame.emit('InvitePlayer', props.userDm?.id);
         props.setRender(!props.render);
-        navigate(`/game/${true}`);
+        navigate(`/game/`);
     };
     if (!dms || dms.length === 0 || !props.userDm) return <></>;
     return (

@@ -262,7 +262,7 @@ export const Layout = ({ children }: Props) => {
     const handleAcceptRejectGame = (isAccepted: boolean) => {
         if (isAccepted) {
             socketGame.emit('AcceptInvitation', roomId);
-            navigate(`/game/${true}`);
+            navigate(`/game/`);
         } else socketGame.emit('DeclineInvitation', roomId);
         renderData.setRenderData(!renderData.renderData);
         renderData.setNotification &&
