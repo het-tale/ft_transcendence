@@ -7,8 +7,6 @@ import User from '../../components/User';
 import { UserType } from '../../Types/User';
 import { ListenOnSocket } from './Game.lisners';
 import { SocketGameContext } from '../../socket';
-import { useParams } from 'react-router-dom';
-import { set } from 'react-hook-form';
 
 export type MySocket = ReturnType<typeof io>;
 
@@ -19,6 +17,8 @@ function draw(
     otherpad: React.RefObject<Paddle>,
     ball: React.RefObject<Ball>
 ) {
+    if (!ctx)
+        ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     if (ctx && padd.current && otherpad.current && ball.current) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'rgba(235, 182, 145, 1)';
@@ -60,9 +60,11 @@ const Game: React.FC = () => {
     const gameContainer = useRef<HTMLDivElement>(null);
     const [gameStarted, setGameStarted] = useState(false);
     const [gameOver, setGameOver] = useState(false);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null) as React.RefObject<HTMLCanvasElement>;
+    const ctx = canvasRef.current?.getContext('2d') as CanvasRenderingContext2D;
     const socketGame = React.useContext(SocketGameContext);
     const [gameinvite , setGameinvite] = useState(false);
+    const [loaded, setDataLoaded] = useState(false);
     const intialise = useRef(false);
     let paddRef = useRef<Paddle | null>(null);
     let otherpaddRef = useRef<Paddle | null>(null);
@@ -138,17 +140,13 @@ const Game: React.FC = () => {
         ballRef.current = ball;
     }, [ball]);
     useEffect(() => {
-        console.log('is gamestarted ' +  gameStarted + ' || is init ' +  init + ' || is initilise ' + intialise.current + ' || canvas ?? ' + canvasRef.current);
-        if (init && !intialise.current && canvasRef.current) {
-            const ctx = canvasRef.current?.getContext('2d');
+        console.log('ctx check ');
+        if (init && !intialise.current && canvasRef.current && ctx) {
+            // const ctx = canvasRef.current?.getContext('2d');
             intialise.current = true;
-            console.log('gameStarted going to draw ', paddRef.current, otherpaddRef.current, ballRef.current);
-            if (ctx)
-            {
-                draw(ctx, canvasRef.current, paddRef, otherpaddRef, ballRef);
-            }
+            draw(ctx, canvasRef.current, paddRef, otherpaddRef, ballRef);
         }
-    }, [init, canvasRef.current, gameStarted]);
+    }, [ctx]);
     useEffect(() => {
         if (init && canvasRef.current) setupEventListeners();
         console.log('init', init);
@@ -174,6 +172,12 @@ const Game: React.FC = () => {
                 setGameinvite
             );
             listning = true;
+            const loadDataFromBackend = async () => {
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+                setDataLoaded(true);
+            };
+
+            loadDataFromBackend();
         }
     }, [socket]);
 
@@ -193,6 +197,12 @@ const Game: React.FC = () => {
 
     return (
         <div className="containerGame">
+            {!loaded ? (
+                <div className="overlay">
+                    <p className="paraInfo">Loading ...</p>
+                    </div>
+            ) : (
+                <>
             <div className="container-profile">
                 {id !== 1 ? (
                     <>
@@ -288,11 +298,13 @@ const Game: React.FC = () => {
                 )}
              </>
     )}
+    </>
+            )}
             {gameOver ? (
                 <div className="overlay">
                     <div className="game-over-container">
                         <div className="game-over">
-                            <p className="paraInfo">Game Over</p>
+                            <p className="paraInfo">Game Over.</p>
                             <p className="paraInfo">
                                 {playerScore > otherScore
                                     ? 'you won'
@@ -309,6 +321,7 @@ const Game: React.FC = () => {
                 </div>
             ) : null}
         </div>
+
     );
 };
 

@@ -206,14 +206,11 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       rounds: invitationRoom.rounds,
       id: player.number,
     };
-
     setTimeout(() => {
     if (client.emit('GAME INVITE', true)) console.log('game invite sent');
-    }, 2000);
-    setTimeout(() => {
       client.emit('InitGame', gamedata);
       client.emit('JoinRoom', invitationRoom.roomName);
-    }, 2000);
+    }, 1000);
       // client.emit('GAME STARTED', true);
 
   }
@@ -263,19 +260,16 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         };
         setTimeout(() => {
         client.emit('GAME INVITE', true);
-        }, 2000);
-        setTimeout(() => {
           client.emit('InitGame', gamedata);
           client.emit('JoinRoom', roomId);
-        }, 2000);
+        }, 1000);
           // client.emit('GAME STARTED', true);
           // this.server.to(roomId).emit('StartGame', roomId);
           setTimeout(() => {
           invitationRoom.players.forEach((player) => {
             player.socket.emit('GAME STARTED', true);
             this.serviceStart.startGame(false, invitationRoom, client, this.rooms, this.activeSockets);
-          });
-        }, 2000);
+          }); }, 1000);
     }
   }
 
