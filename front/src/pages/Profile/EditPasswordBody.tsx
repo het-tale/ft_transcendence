@@ -23,7 +23,7 @@ const EditPasswordBody = (props: EditPasswordBodyProps) => {
     const handleEditPassword: SubmitHandler<EditPasswordData> = async (
         data
     ) => {
-        console.log('Edit Profile data', data);
+        // console.log('Edit Profile data', data);
         const sentData = {
             oldPassword: data.oldPassword,
             newPassword: data.newPassword,

@@ -8,7 +8,7 @@ export const GetMatchHistory = async (username: string | undefined) => {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         });
-        console.log('RES', res);
+        // console.log('RES', res);
         if (res.status === 200) {
             console.log('Match History data', res);
             return res.data;

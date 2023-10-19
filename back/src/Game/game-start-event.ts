@@ -24,11 +24,8 @@ export class GameStartEvent {
 ) {
   let exist = false;
   for (const existRoom of rooms.values()) {
-    // console.log('at room ', existRoom.roomName, ' players ', existRoom.players.length, );
     if (existRoom.players.length === 1 && !existRoom.isinvit) {
       exist = true;
-      // console.log('room found ', existRoom.roomName);
-      // console.log('player 1 ', existRoom.players[0].id);
       const user = activeSockets.get(client);
       const player = new Player(2, user.id, client, PADDLE, existRoom.roomName, 0);
       existRoom.players.push(player);
@@ -82,7 +79,7 @@ async StartGameEventRobot(
   ) {
     const room = new Room(Math.random().toString(36).substring(7));
     rooms.set(room.roomName, room);
-    console.log('new room created with name ', room.roomName);
+    // console.log('new room created with name ', room.roomName);
     const user = activeSockets.get(client);
     const player = new Player(1, user.id, client, OTHERPADDLE, room.roomName, 0);
     const robotUser = await this.prisma.user.findUnique({
