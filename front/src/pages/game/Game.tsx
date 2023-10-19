@@ -8,7 +8,7 @@ import { UserType } from '../../Types/User';
 import { ListenOnSocket } from './Game.lisners';
 import { SocketGameContext } from '../../socket';
 import { useParams } from 'react-router-dom';
-import InviteUsersModal from '../Chat/Channels/InviteUsersModal';
+import { set } from 'react-hook-form';
 
 export type MySocket = ReturnType<typeof io>;
 
@@ -19,8 +19,7 @@ function draw(
     otherpad: React.RefObject<Paddle>,
     ball: React.RefObject<Ball>
 ) {
-    console.log('draw', ball.current);
-    if (padd.current && otherpad.current && ball.current) {
+    if (ctx && padd.current && otherpad.current && ball.current) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'rgba(235, 182, 145, 1)';
         ctx.fillRect(padd.current.x, padd.current.y, padd.current.width, padd.current.height);
@@ -58,19 +57,16 @@ const Game: React.FC = () => {
     const [otherpad, setOtherpad] = useState<Paddle | null>(null);
     const [socket, setSocket] = useState<MySocket | null>(null);
     const [init, setInit] = useState(false);
-    const divRefs = {
-        gameContainer: useRef<HTMLDivElement>(null),
-    };
+    const gameContainer = useRef<HTMLDivElement>(null);
     const [gameStarted, setGameStarted] = useState(false);
     const [gameOver, setGameOver] = useState(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const ctx = canvasRef.current?.getContext('2d');
     const socketGame = React.useContext(SocketGameContext);
-    const { token } = useParams();
-    console.log('token', token);
-    const [gameinvite , setGameinvite] = useState(
-        token? true : false
-    );
+    const [gameinvite , setGameinvite] = useState(false);
+    const intialise = useRef(false);
+    let paddRef = useRef<Paddle | null>(null);
+    let otherpaddRef = useRef<Paddle | null>(null);
+    let ballRef = useRef<Ball | null>(null);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -87,7 +83,6 @@ const Game: React.FC = () => {
     const handleMouseMove = (event: MouseEvent) => {
         if (socket && padd && canvasRef.current) {
             const canvasrect = canvasRef.current.getBoundingClientRect();
-            // Get the mouse position relative to dimentions withe border protected
             const mouseYRelative = Math.min(
                 Math.max(
                     event.clientY - canvasrect.top - padd.height,
@@ -129,7 +124,6 @@ const Game: React.FC = () => {
                 socket.off('error');
                 socket.off('connected');
                 socket.disconnect();
-                // console.log('socket disconnected');
             }
             canvasRef.current?.removeEventListener(
                     'mousemove',
@@ -138,30 +132,32 @@ const Game: React.FC = () => {
         };
     });
 
-    const intialise = useRef(false);
-    let paddRef = useRef<Paddle | null>(null);
-    let otherpaddRef = useRef<Paddle | null>(null);
-    let ballRef = useRef<Ball | null>(null);
     useEffect(() => {
         paddRef.current = padd;
         otherpaddRef.current = otherpad;
         ballRef.current = ball;
-    }, [padd, ball, otherpad]);
+    }, [ball]);
     useEffect(() => {
-        if (!intialise.current && ctx && canvasRef.current) {
+        console.log('is gamestarted ' +  gameStarted + ' || is init ' +  init + ' || is initilise ' + intialise.current + ' || canvas ?? ' + canvasRef.current);
+        if (init && !intialise.current && canvasRef.current) {
+            const ctx = canvasRef.current?.getContext('2d');
             intialise.current = true;
-            draw(ctx, canvasRef.current, paddRef, otherpaddRef, ballRef);
+            console.log('gameStarted going to draw ', paddRef.current, otherpaddRef.current, ballRef.current);
+            if (ctx)
+            {
+                draw(ctx, canvasRef.current, paddRef, otherpaddRef, ballRef);
+            }
         }
-    }, [init]);
-
+    }, [init, canvasRef.current, gameStarted]);
     useEffect(() => {
-        if (init) setupEventListeners();
+        if (init && canvasRef.current) setupEventListeners();
         console.log('init', init);
-    }, [init]);
+    }, [init, canvasRef.current]);
 
     useEffect(() => {
         if (socket && !listning) {
             console.log('listning on socket');
+            console.log('gameinvite', gameinvite);
             ListenOnSocket(
                 socket,
                 setPadd,
@@ -263,15 +259,15 @@ const Game: React.FC = () => {
                 )}
             </div>
             {gameStarted ? (
-                 <div className="game-container" ref={divRefs.gameContainer}>
+                 <div className="game-container" ref={gameContainer}>
                     <canvas ref={canvasRef} width={720} height={480} />
                 </div>
             ) : (
                 <>
-                    {gameinvite ? (
+                    {gameinvite? (
                         <div className="game-container">
                         <p>Waiting for other player to join</p>
-                    </div>   
+                    </div>
                     ) : (
                         <>
                         <button
