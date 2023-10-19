@@ -1,7 +1,7 @@
 import LeftSide from './LeftSide';
 import { Box, Flex, useDisclosure } from '@chakra-ui/react';
 import RightSide from './RightSide';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Search from '../../components/Search';
 import MessageUser from './MessageUser';
 import ModalUi from '../../components/ModalUi';
@@ -12,7 +12,6 @@ import ModalBodyUi from '../../components/ModalBodyUi';
 import { UserType } from '../../Types/User';
 import ModalSendMessage from '../../components/ModalSendMessage';
 import { SubmitHandler, set, useForm } from 'react-hook-form';
-import client from '../../components/Client';
 import { Channel } from '../../Types/Channel';
 import ChannelDisplay from './Channels/ChannelDisplay';
 import { Link } from 'react-router-dom';
@@ -48,7 +47,7 @@ const Dms = (props: any) => {
     const handleRadioChange = (event: any) => {
         setSelectedOption(event.target.value);
         setShowField(event.target.value === 'protected');
-        console.log('RADIOOOOOOO CHAAAANGE', event.target.value);
+        // console.log('RADIOOOOOOO CHAAAANGE', event.target.value);
     };
 
     const handleSubmit1 = () => {
@@ -59,12 +58,12 @@ const Dms = (props: any) => {
             type: data.get('group1'),
             password: data.get('password')
         };
-        console.log('FORMDATA', formData);
+        // console.log('FORMDATA', formData);
     };
 
     const { register, handleSubmit } = useForm<SentData>();
     const handleSendMessage: SubmitHandler<SentData> = (data) => {
-        console.log('FORMDATA', data);
+        // console.log('FORMDATA', data);
     };
 
     const tabs = [
@@ -144,7 +143,7 @@ const Dms = (props: any) => {
                     ) : (
                         <></>
                     )}
-                    {console.log('USERDM', userDm)}
+                    {/* {console.log('USERDM', userDm)} */}
                 </>
             ),
             rightSide: (
@@ -215,7 +214,7 @@ const Dms = (props: any) => {
                     {props.roomDms ? (
                         props.roomDms.length > 0 ? (
                             props.roomDms?.map((room: Channel) => {
-                                console.log('Room looop', room);
+                                // console.log('Room looop', room);
                                 return (
                                     <ChannelDisplay
                                         profile={room.avatar}

@@ -535,7 +535,7 @@ export class ChannelService {
       throw new Error('user is not in the channel');
     }
     const isOwner = channel.ownerId === user.id;
-    console.log(channel.participants.length);
+    // console.log(channel.participants.length);
     if (
       isOwner &&
       (data.newOwner === undefined || data.newOwner === null) &&
@@ -734,7 +734,7 @@ export class ChannelService {
     clientUsername: string,
     bannedUsername: string,
   ) {
-    console.log('First channel name', channelName);
+    // console.log('First channel name', channelName);
     const { target, channel } = await this.checkInput(
       channelName,
       clientUsername,
@@ -1141,7 +1141,7 @@ export class ChannelService {
     }
     if (channel.ownerId !== user.id)
       throw new HttpException('user is not the owner', 400);
-    console.log(dto);
+    // console.log(dto);
     if (
       dto.type === 'protected' &&
       (dto.password === undefined || dto.password === null)
@@ -1150,7 +1150,7 @@ export class ChannelService {
     let hash = null;
     if (dto.type === 'protected') {
       if (channel.type === 'protected') {
-        console.log(channel.hash);
+        // console.log(channel.hash);
         if (channel.hash !== null) {
           const isSame = await argon.verify(channel.hash, dto.password);
           if (isSame) throw new HttpException('same password', 400);
