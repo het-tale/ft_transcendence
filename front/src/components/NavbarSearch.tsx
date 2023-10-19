@@ -1,21 +1,11 @@
 import React from 'react';
 import Search from './Search';
-import {
-    Box,
-    Card,
-    CardBody,
-    CardHeader,
-    Flex,
-    Heading,
-    Stack,
-    StackDivider,
-    Text,
-    Image
-} from '@chakra-ui/react';
 import { UserType } from '../Types/User';
 
 interface NavbarSearchProps {
     setUsers?: React.Dispatch<React.SetStateAction<UserType[]>>;
+    showHide: boolean;
+    setShowHide: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const NavbarSearch = function (props: NavbarSearchProps) {
@@ -68,6 +58,8 @@ const NavbarSearch = function (props: NavbarSearchProps) {
                 filter={name}
                 setName={setName}
                 setUsers={props.setUsers}
+                showHide={props.showHide}
+                setShowHide={props.setShowHide}
             />
         </div>
     );

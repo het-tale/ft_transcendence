@@ -22,14 +22,9 @@ import { socket, SocketContext, socketGame, SocketGameContext } from './socket';
 import React, { useRef } from 'react';
 import GamePage from './pages/game/GamePage';
 import BrowseChannels from './pages/Chat/Channels/BrowseChannels';
-import { Notification } from './Types/Notification';
 import { RenderContext } from './RenderContext';
 import { Layout } from './pages/Layout';
 import { Verify2Fa } from './pages/Profile/Verify2Fa';
-import { SlideEx } from './components/Test';
-
-// const theme = createTheme();
-let notifArray: Notification[] = [];
 
 function App() {
     const [firstLogin, setFirstLogin] = React.useState(false);
@@ -39,7 +34,6 @@ function App() {
     const buttonClicked = useRef<HTMLButtonElement | null>(null);
 
     return (
-        // <ThemeProvider theme={theme}>
         <BrowserRouter>
             <SocketContext.Provider value={socket}>
                 <SocketGameContext.Provider value={socketGame}>
@@ -206,13 +200,11 @@ function App() {
                                 }
                             >
                             </Route>
-                            <Route path="testt" element={<SlideEx />} />
                         </Routes>
                     </RenderContext.Provider>
                 </SocketGameContext.Provider>
             </SocketContext.Provider>
         </BrowserRouter>
-        // </ThemeProvider>sports: ['websocket'],
     );
 }
 

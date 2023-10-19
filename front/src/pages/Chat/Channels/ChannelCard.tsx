@@ -14,7 +14,6 @@ import {
 } from '@chakra-ui/react';
 import { Channel } from '../../../Types/Channel';
 import ModalUi from '../../../components/ModalUi';
-import { SubmitHandler, useForm } from 'react-hook-form';
 import React, { useEffect } from 'react';
 import { SocketContext } from '../../../socket';
 import { UserType } from '../../../Types/User';

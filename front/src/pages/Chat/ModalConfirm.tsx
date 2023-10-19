@@ -6,22 +6,9 @@ import {
     ModalFooter,
     ModalBody,
     ModalCloseButton,
-    useDisclosure,
-    Button,
-    FormControl,
-    FormLabel,
-    Input,
-    Flex,
-    Avatar,
-    Icon
+    Button
 } from '@chakra-ui/react';
 import React from 'react';
-import { Form } from 'react-bootstrap';
-// import '../css/chat/modal.css';
-import { BsPerson, BsPersonFill } from 'react-icons/bs';
-import { SubmitHandler, UseFormHandleSubmit } from 'react-hook-form';
-import { Interface } from 'readline';
-import { socket } from '../../socket';
 
 interface ModalConfirmProps {
     isOpen: boolean;
@@ -40,14 +27,9 @@ interface ModalConfirmProps {
 
 function ModalConfirm({
     isOpen,
-    onOpen,
     onClose,
     title,
-    children,
     body,
-    target,
-    blocked,
-    setBlocked,
     handleBlockedUser
 }: ModalConfirmProps) {
     return (

@@ -1,17 +1,9 @@
 import {
-    Avatar,
     Box,
-    Button,
-    Card,
-    CardBody,
-    CardFooter,
-    CardHeader,
     Flex,
-    Heading,
     IconButton,
     Text,
     Image,
-    Center,
     Menu,
     MenuButton,
     MenuList,
@@ -21,29 +13,22 @@ import {
 } from '@chakra-ui/react';
 import {
     BsThreeDotsVertical,
-    BsPencilFill,
     BsVolumeMuteFill,
     BsPersonDashFill,
     BsPersonXFill,
     BsGearFill,
-    BsBoxArrowRight,
     BsPersonCircle
 } from 'react-icons/bs';
 import '../../../css/chat/channelSetting.css';
-import MessageUser from '../MessageUser';
 import { ChannelInfoProps } from './ChannelInfo';
 import ModalConfirm from '../ModalConfirm';
-import { on } from 'events';
 import { SocketContext } from '../../../socket';
 import React, { useEffect } from 'react';
 import client from '../../../components/Client';
-import { AxiosError } from 'axios';
 import { Link } from 'react-router-dom';
 
 const MemberInfo = (props: ChannelInfoProps) => {
     const socket = React.useContext(SocketContext);
-    const [mute, setMute] = React.useState<boolean>(false);
-    const [ban, setBan] = React.useState<boolean>(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const {
         isOpen: isOpen2,
@@ -104,7 +89,6 @@ const MemberInfo = (props: ChannelInfoProps) => {
         });
         props.setRender && props.setRender(!props.render);
         onClose2();
-        setMute(true);
     };
     const handleUnMuteUser = () => {
         socket.emit('unmuteUser', {
@@ -113,7 +97,6 @@ const MemberInfo = (props: ChannelInfoProps) => {
         });
         props.setRender && props.setRender(!props.render);
         onClose2();
-        setMute(false);
     };
     const handleKickUser = () => {
         // console.log('kick user logic');

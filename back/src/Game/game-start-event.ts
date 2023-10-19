@@ -137,7 +137,7 @@ async StartGameEventRobot(
 }
 
 export function cancelgamesart(room: Room, rooms: Map<string, Room>) {
-  console.log('cancelgamesart');
+  // console.log('cancelgamesart');
   //dell room from map
   rooms.delete(room.roomName);
   room.gameActive = false;

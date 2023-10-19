@@ -54,6 +54,7 @@ export class ChatGateway
         clientId: client.id,
         username: user.username,
       });
+      if (!user) throw new Error('Authentication failed');
       await this.dmService.changeUserStatus(user.username, 'online');
       // console.log(this.connectedUsers);
       await this.channelService.rejoinRooms(user.id, client);

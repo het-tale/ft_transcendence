@@ -104,6 +104,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         throw new Error("undefined user ");
       if (user.status === 'InGame') {
         // console.log('user is already in game handle start game');
+        // console.log('user is already in game handle start game');
         return;
       } else {
         await this.prisma.user.update({
@@ -132,6 +133,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     const user = this.activeSockets.get(client);
     if (user) {
       // console.log('disconnecting client ', user.login);
+      // console.log('disconnecting client ', user.login);
       await this.prisma.user.update({
         where: {
           id: user.id,
@@ -142,6 +144,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       });
     }
     if (room) {
+      // console.log('room found to make force leave ');
       // console.log('room found to make force leave ');
       if (room.players.length === 2) {
         const playerindex = room.players.indexOf(room.players.find((player) => player.socket === client));

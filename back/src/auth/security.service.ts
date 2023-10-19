@@ -50,11 +50,12 @@ export class SecurityService {
       },
     });
   }
-  async verify2Fa(token: string, user: User) {
+  async verify2Fa(token: string, jwtUser: User) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: jwtUser.email },
+    });
     if (!user.is2FaEnabled)
       throw new HttpException('2fa not enabled', HttpStatus.FORBIDDEN);
-    // console.log("secret", user.twoFaSecret);
-    // console.log("token", token);
     const isValid = await this.tw.verifyToken(token, user.twoFaSecret);
     if (!isValid) throw new HttpException('invalid code', HttpStatus.FORBIDDEN);
     await this.prisma.user.update({
@@ -119,6 +120,7 @@ export class SecurityService {
       where: { email: user.email },
       include : {
         blocked: true,
+        sentFriendRequests: true,
       }
     });
     if (!usery) {

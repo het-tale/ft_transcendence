@@ -1,19 +1,13 @@
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../css/login.css';
 import React, { useState } from 'react';
-import { error } from 'console';
-import ErrorToast from '../components/ErrorToast';
 import client from '../components/Client';
 import { useToast } from '@chakra-ui/react';
-// let setIsLoggedIn: boolean = false;
 function Login(props: any) {
     const [errorMessage, setErrorMessage] = React.useState('');
-    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
     const toast = useToast();
 

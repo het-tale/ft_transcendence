@@ -1,31 +1,16 @@
-import {
-    BsBoxArrowLeft,
-    BsPersonCircle,
-    BsPersonFillSlash,
-    BsThreeDots,
-    BsTrash
-} from 'react-icons/bs';
+import { BsBoxArrowLeft, BsThreeDots, BsTrash } from 'react-icons/bs';
 import MessageContent from '../MessageContent';
-import TypingBar from '../TypingBar';
 import {
     Box,
     Flex,
-    Grid,
-    GridItem,
     IconButton,
     Menu,
     MenuButton,
     MenuItem,
     MenuList,
-    SimpleGrid,
-    Spacer,
-    background,
     useDisclosure,
-    Image,
-    Button,
     useToast
 } from '@chakra-ui/react';
-import MessageUser from '../MessageUser';
 import { Channel } from '../../../Types/Channel';
 import ChannelDmInfo from './ChannelDmInfo';
 import ChannelTypingBar from './ChannelTypingBar';
@@ -36,10 +21,8 @@ import { MessageType } from '../../../Types/Message';
 import GetChannelMessages from './GetChannelMessages';
 import ChannelInfo from './ChannelInfo';
 import Room from './Channel';
-import { on } from 'events';
 import ModalUi from '../../../components/ModalUi';
 import InviteUsersModal from './InviteUsersModal';
-import ModalConfirm from '../ModalConfirm';
 import { SocketContext } from '../../../socket';
 import DeletChannelModal from './DeletChannelModal';
 

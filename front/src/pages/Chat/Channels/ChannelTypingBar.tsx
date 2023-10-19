@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../../../css/chat/Right.css';
-import { set } from 'react-hook-form';
 import { useToast } from '@chakra-ui/react';
-import { render } from '@testing-library/react';
-import { io } from 'socket.io-client';
 import { SocketContext } from '../../../socket';
 import { Channel } from '../../../Types/Channel';
 import { UserType } from '../../../Types/User';
