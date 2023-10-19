@@ -12,31 +12,15 @@ import {
     Text,
     Image,
     Center,
-    Menu,
-    MenuButton,
-    MenuList,
-    MenuItem,
     useDisclosure
 } from '@chakra-ui/react';
-import {
-    BsThreeDotsVertical,
-    BsPencilFill,
-    BsVolumeMuteFill,
-    BsPersonDashFill,
-    BsPersonXFill,
-    BsGearFill,
-    BsBoxArrowRight
-} from 'react-icons/bs';
+import { BsPencilFill, BsBoxArrowRight } from 'react-icons/bs';
 import '../../../css/chat/channelSetting.css';
-import MessageUser from '../MessageUser';
 import { Channel } from '../../../Types/Channel';
 import MemberInfo from './MemberInfo';
 import { UserType } from '../../../Types/User';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { SocketContext } from '../../../socket';
-import ModalConfirm from '../ModalConfirm';
-import Room from './Channel';
-import { on } from 'events';
 import ModalUi from '../../../components/ModalUi';
 import BodySetOwnerModal from './BodySetOwnerModal';
 import ChangeChannelNameModal from './ChangeChannelNameModal';

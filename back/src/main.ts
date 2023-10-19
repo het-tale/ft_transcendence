@@ -5,10 +5,12 @@ import { patchNestJsSwagger } from 'nestjs-zod';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { RobotUserService } from './utils/robot-user.service';
 import { AchievementService } from './utils/achievements-creation.service';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   patchNestJsSwagger();
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe());
   await app.get(RobotUserService).createRobotUser();
   await app.get(AchievementService).createAchievements();
   
@@ -20,6 +22,7 @@ async function bootstrap() {
     preflightContinue: false,
     allowedHeaders: 'Authorization, Content-Type',
   });
+  
   app.useWebSocketAdapter(new IoAdapter(app));
   const config = new DocumentBuilder()
   .setTitle('ft_transcendence API')

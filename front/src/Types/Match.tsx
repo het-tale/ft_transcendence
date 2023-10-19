@@ -1,4 +1,3 @@
-import { Channel } from './Channel';
 import { UserType } from './User';
 
 export type Match = {
@@ -7,11 +6,11 @@ export type Match = {
     updatedAt: Date;
     start: Date;
     end: Date;
-    PlayerA: UserType;
-    PlayerAId: number;
+    playerA: UserType;
+    playerAId: number;
     resultA: number;
-    PlayerB: UserType;
-    PlayerBId: number;
+    playerB: UserType;
+    playerBId: number;
     resultB: number;
     winner: UserType;
     winnerId: number;

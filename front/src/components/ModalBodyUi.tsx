@@ -1,11 +1,9 @@
 import React from 'react';
 import '../css/chat/modal.css';
-import { Button, ButtonGroup, Input } from '@chakra-ui/react';
+import { Button, ButtonGroup } from '@chakra-ui/react';
 import {
     FormControl,
     FormLabel,
-    FormErrorMessage,
-    FormHelperText,
     Radio,
     RadioGroup,
     HStack

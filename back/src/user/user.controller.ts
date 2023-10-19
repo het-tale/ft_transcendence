@@ -2,14 +2,11 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Req,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { EmailConfirmationGuard } from 'src/guards/email-confirmation.guard';
@@ -65,20 +62,18 @@ export class UserController {
     return await this.userService.getPendingInvitations(request.user);
   }
 
-  @Get('match-history')
-  async getMatchHistory(@Req() request: { user: User }) {
-    return await this.userService.getMatchHistory(request.user);
+  @Get('match-history/:username')
+  async getMatchHistory(@Param('username') username: string) {
+    return await this.userService.getMatchHistory( username);
   }
 
-  @Get('achievements')
-  async getAchievements(@Req() request: { user: User }) {
-    return await this.userService.getAchievements(request.user);
+  @Get('achievements/:username')
+  async getAchievements(@Param('username') username: string) {
+    return await this.userService.getAchievements(username);
   }
 
   @Get(':id')
-  async getUserById(@Param('id') idString: string) {
-    const id = Number(idString);
-    if(!id) return;
+  async getUserById(@Param('id', ParseIntPipe) id: number) {
     return await this.userService.getUserById(id);
   }
 

@@ -1,16 +1,6 @@
-import {
-    Card,
-    CardBody,
-    Flex,
-    Heading,
-    Image,
-    Stack,
-    Text
-} from '@chakra-ui/react';
-import { Margin } from '@mui/icons-material';
+import { Card, CardBody, Flex, Image, Stack, Text } from '@chakra-ui/react';
 import { BsIncognito, BsShieldLock } from 'react-icons/bs';
 import { Channel } from '../../../Types/Channel';
-import { useEffect } from 'react';
 
 export interface ChannelDisplayProps {
     profile?: string;

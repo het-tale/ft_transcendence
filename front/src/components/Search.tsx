@@ -1,9 +1,9 @@
 import React from 'react';
 import { useState } from 'react';
-import ReactDOM from 'react-dom/client';
 import client from './Client';
 import { UserType } from '../Types/User';
 import GetDms from '../pages/Chat/GetDms';
+import GetRoomDms from '../pages/Chat/GetRoomDms';
 
 interface SearchProps {
     isSearchGlobal?: boolean;
@@ -15,12 +15,14 @@ interface SearchProps {
     name?: string;
     users?: UserType[];
     setUsers?: React.Dispatch<React.SetStateAction<UserType[]>>;
+    showHide?: boolean;
+    setShowHide?: React.Dispatch<React.SetStateAction<boolean>>;
+    isDm?: boolean;
 }
 
 const Search = (props: SearchProps) => {
     const [opa, setOpa] = useState(0);
-    // console.log('THIS IS the name u wrote', props.filter);
-    const HandleSearch = async () => {
+    const handleDmSearch = async () => {
         try {
             setOpa(1);
             const res = await client.get(
@@ -46,14 +48,47 @@ const Search = (props: SearchProps) => {
     };
     const reset = () => {
         props.setName && props.setName('');
-        GetDms().then((data) => {
-            props.setDms && props.setDms(data);
-        });
+        props.isDm
+            ? GetDms().then((data) => {
+                  props.setDms && props.setDms(data);
+              })
+            : GetRoomDms().then((data) => {
+                  props.setDms && props.setDms(data);
+              });
         setOpa(0);
+    };
+    const handleRoomSearch = async () => {
+        try {
+            setOpa(1);
+            const res = await client.get(
+                `chat/search-channels/${props.filter}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                }
+            );
+            console.log('THIS IS THE RESULTTTT', res);
+            if (res.data.length > 0) {
+                props.setDms && props.setDms(res.data);
+            } else {
+                props.setDms && props.setDms([]);
+            }
+        } catch (error: any) {
+            props.isDm
+                ? GetDms().then((data) => {
+                      props.setDms && props.setDms(data);
+                  })
+                : GetRoomDms().then((data) => {
+                      props.setDms && props.setDms(data);
+                  });
+            console.log('THIS IS THE ERROR', error);
+        }
     };
     const HandleGlobalSearch = async () => {
         // console.log('THIS IS THE GLOBAL SEARCH');
         try {
+            props.setShowHide && props.setShowHide(true);
             setOpa(1);
             const res = await client.get(`user/search-users/${props.filter}`, {
                 headers: {
@@ -73,7 +108,13 @@ const Search = (props: SearchProps) => {
     return (
         <form
             className={`form ${props.name}`}
-            onKeyUp={props.isSearchGlobal ? HandleGlobalSearch : HandleSearch}
+            onKeyUp={
+                props.isSearchGlobal
+                    ? HandleGlobalSearch
+                    : props.isDm
+                    ? handleDmSearch
+                    : handleRoomSearch
+            }
         >
             <input
                 className="input"
@@ -86,7 +127,15 @@ const Search = (props: SearchProps) => {
             <button
                 className="reset"
                 type="reset"
-                onClick={!props.isSearchGlobal ? reset : () => {}}
+                onClick={
+                    !props.isSearchGlobal
+                        ? reset
+                        : () => {
+                              props.setName && props.setName('');
+                              props.setUsers && props.setUsers([]);
+                              setOpa(0);
+                          }
+                }
                 style={{ opacity: `${opa}` }}
             >
                 <i className="fas fa-times"></i>

@@ -14,6 +14,28 @@ export class ChannelService {
     private config: ConfigService,
     private cloud: CloudinaryService,
   ) {}
+  async searchChannels(beginWith: string, user: User) {
+    const channels = await this.prisma.channel.findMany({
+      where: {
+        name: {
+          startsWith: beginWith,
+        },
+        participants: {
+          some: {
+            id: user.id,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+        type: true,
+      },
+    });
+
+    return channels;
+  }
   async getChannelMessages(channelName: string, user: User) {
     const actualUser = await this.prisma.user.findUnique({
       where: {

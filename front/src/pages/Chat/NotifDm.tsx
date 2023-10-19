@@ -8,7 +8,6 @@ import { io } from 'socket.io-client';
 
 const NotifDm = (props: any) => {
     const toast = useToast();
-    // const socket = React.useContext(SocketContext);
     const socket = io(`${process.env.REACT_APP_BACKEND_URL}/chat`, {
         withCredentials: true,
         forceNew: true,
@@ -22,7 +21,6 @@ const NotifDm = (props: any) => {
         const timer = setTimeout(() => {
             socket.on('privateMessage', (data: any) => {
                 props.setRender(!props.render);
-                // console.log('MESSAGE DATA', data);
                 toast({
                     title: "You've got a new message",
                     description: data.message,

@@ -1,21 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    BsBoxArrowLeft,
     BsBellFill,
     BsHouseFill,
     BsController,
     BsChatRightFill,
-    BsChatFill,
     BsPersonFill
 } from 'react-icons/bs';
 import { UserType } from '../Types/User';
 import User from './User';
 import { Button, Image, useToast } from '@chakra-ui/react';
-import { SocketContext } from '../socket';
-import { Invitation, Notification } from '../Types/Notification';
+import { Notification } from '../Types/Notification';
 import { RenderContext, RenderContextType } from '../RenderContext';
-import { GetPendingInvitations } from './GetNotification';
 
 interface sidebarProps {
     notification?: boolean;
@@ -40,11 +36,21 @@ const Sidebar = (props: sidebarProps) => {
 
     return (
         <aside>
-            <Link to="/home">
+            <Link
+                to="/home"
+                onClick={() => {
+                    renderData.setRenderData(!renderData.renderData);
+                }}
+            >
                 <BsHouseFill className="fa" />
                 Home
             </Link>
-            <Link to={`/chat/rooms-dms/${user?.id}`}>
+            <Link
+                to={`/chat/rooms-dms/${user?.id}`}
+                onClick={() => {
+                    renderData.setRenderData(!renderData.renderData);
+                }}
+            >
                 <BsChatRightFill className="fa" />
                 Chat
             </Link>
@@ -66,11 +72,21 @@ const Sidebar = (props: sidebarProps) => {
                 />
                 Notifications
             </Button>
-            <Link to={`/game/`}>
+            <Link
+                to={`/game/`}
+                onClick={() => {
+                    renderData.setRenderData(!renderData.renderData);
+                }}
+            >
                 <BsController className="fa" />
                 Play
             </Link>
-            <Link to={`/user-profile/${user?.id}`}>
+            <Link
+                to={`/user-profile/${user?.id}`}
+                onClick={() => {
+                    renderData.setRenderData(!renderData.renderData);
+                }}
+            >
                 <BsPersonFill className="fa" />
                 Profile
             </Link>

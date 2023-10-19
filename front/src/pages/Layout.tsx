@@ -1,16 +1,9 @@
 import {
     Button,
     ButtonGroup,
-    Box,
     Card,
-    CardBody,
-    CardHeader,
     Flex,
-    Heading,
-    Stack,
-    StackDivider,
     Text,
-    Image,
     useToast,
     useDisclosure,
     Drawer,
@@ -31,12 +24,14 @@ import {
     GetPendingFriendRequests,
     GetPendingInvitations
 } from '../components/GetNotification';
-import { set } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { UserType } from '../Types/User';
 import User from '../components/User';
-import Search from '../components/Search';
 import { SearchUsers } from '../components/SearchUsers';
+import { AchievementUnlocked } from './AchievementUnlocked';
+import { Achievement } from '../Types/Achievement';
+import { set } from 'react-hook-form';
+import { MessageType } from '../Types/Message';
 
 interface Props {
     children?: React.ReactNode;
@@ -55,6 +50,9 @@ export const Layout = ({ children }: Props) => {
     const [users, setUsers] = React.useState<UserType[]>([]);
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [showHide, setShowHide] = React.useState(false);
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
+    const [achievements, setAchievements] = React.useState<Achievement[]>([]);
     React.useEffect(() => {
         async function fetchUserData() {
             const currentUserData = await User();
@@ -68,168 +66,196 @@ export const Layout = ({ children }: Props) => {
         socket.connect();
         socketGame.auth = { token: token };
         socketGame.connect();
-        const timer = setTimeout(() => {
-            socket.on('roomInvitation', (data: any) => {
-                // console.log('roomInvitation', data);
-                toast({
-                    title: 'success',
-                    description: data.from,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                renderData.setRenderData(!renderData.renderData);
+        socket.on('roomInvitation', (data: any) => {
+            console.log('roomInvitation', data);
+            toast({
+                title: 'success',
+                description: data.from,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
             });
-            socket.on('roomInvitationError', (data: any) => {
-                // console.log('roomInvitationError', data);
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                renderData.setRenderData(!renderData.renderData);
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('roomInvitationError', (data: any) => {
+            console.log('roomInvitationError', data);
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
             });
+            renderData.setRenderData(!renderData.renderData);
+        });
 
-            socket.on('roomJoined', (data: any) => {
-                // console.log('roomJoined', data);
-                toast({
-                    title: 'succes',
-                    description: data,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                renderData.setRenderData(!renderData.renderData);
+        socket.on('roomJoined', (data: any) => {
+            console.log('roomJoined', data);
+            toast({
+                title: 'succes',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
             });
+            renderData.setRenderData(!renderData.renderData);
+        });
 
-            socket.on('roomInvitationDeclined', (data: any) => {
-                // console.log('roomDeclined', data);
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                renderData.setRenderData(!renderData.renderData);
+        socket.on('roomInvitationDeclined', (data: any) => {
+            console.log('roomDeclined', data);
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
             });
-            socketGame.on('ReceiveInvitation', (data: any) => {
-                // console.log('ReceiveInvitation', data);
-                toast({
-                    title: 'success',
-                    description: data.senderName,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                renderData.setRenderData(!renderData.renderData);
-                setRoomId(data.roomId);
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socketGame.on('ReceiveInvitation', (data: any) => {
+            console.log('ReceiveInvitation', data);
+            toast({
+                title: 'success',
+                description: data.senderName,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
             });
-            socketGame.on('InvitationDeclined', () => {
-                // console.log('InvitationDeclined');
-                toast({
-                    title: 'InvitationDeclined',
-                    description: '',
-                    status: 'info',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                renderData.setRenderData(!renderData.renderData);
+            renderData.setRenderData(!renderData.renderData);
+            setRoomId(data.roomId);
+        });
+        socketGame.on('InvitationDeclined', () => {
+            console.log('InvitationDeclined');
+            toast({
+                title: 'InvitationDeclined',
+                description: '',
+                status: 'info',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
             });
-            socket.on('frienRequest', (data: any) => {
-                // console.log('frienRequest', data);
-                toast({
-                    title: 'success',
-                    description: data.from,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                renderData.setRenderData(!renderData.renderData);
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('frienRequest', (data: any) => {
+            console.log('frienRequest', data);
+            toast({
+                title: 'success',
+                description: data.from,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
             });
-            socket.on('friendRequestSent', () => {
-                // console.log('friendRequestSent');
-                toast({
-                    title: 'success',
-                    description: 'Friend request sent',
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                renderData.setRenderData(!renderData.renderData);
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('friendRequestSent', () => {
+            console.log('friendRequestSent');
+            toast({
+                title: 'success',
+                description: 'Friend request sent',
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
             });
-            socket.on('friendRequestError', (data: any) => {
-                // console.log('friendRequestError', data);
-                toast({
-                    title: 'error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                renderData.setRenderData(!renderData.renderData);
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('friendRequestError', (data: any) => {
+            console.log('friendRequestError', data);
+            toast({
+                title: 'error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
             });
-            socket.on('friendRequestAccepted', (data: any) => {
-                // console.log('friendRequestAccepted', data);
-                toast({
-                    title: 'success',
-                    description: data.from,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                renderData.setRenderData(!renderData.renderData);
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('friendRequestAccepted', (data: any) => {
+            console.log('friendRequestAccepted', data);
+            toast({
+                title: 'success',
+                description: data.from,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
             });
-            socket.on('friendRequestDeclined', (data: any) => {
-                console.log('friendRequestDeclined', data);
-                toast({
-                    title: 'error',
-                    description: data.from,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                renderData.setRenderData(!renderData.renderData);
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('friendRequestDeclined', (data: any) => {
+            console.log('friendRequestDeclined', data);
+            toast({
+                title: 'error',
+                description: data.from,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
             });
+            renderData.setRenderData(!renderData.renderData);
+        });
 
-            socket.on('friendRemoved', () => {
-                // console.log('friendRemoved');
-                toast({
-                    title: 'success',
-                    description: 'Friend removed',
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                renderData.setRenderData(!renderData.renderData);
+        socket.on('friendRemoved', () => {
+            console.log('friendRemoved');
+            toast({
+                title: 'success',
+                description: 'Friend removed',
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
             });
-            socket.on('friendRemoveError', (data: any) => {
-                // console.log('friendRemoveError', data);
-                toast({
-                    title: 'error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                renderData.setRenderData(!renderData.renderData);
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('friendRemoveError', (data: any) => {
+            console.log('friendRemoveError', data);
+            toast({
+                title: 'error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
             });
-        }, 500);
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('achievementUnlocked', (data: Achievement) => {
+            console.log('achievementUnlocked', data);
+            setAchievements([...achievements, data]);
+            setIsModalOpen(true);
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socketGame.on('achievementUnlocked', (data: Achievement) => {
+            console.log('achievementUnlocked', data);
+            setAchievements([...achievements, data]);
+            setIsModalOpen(true);
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('offlineAchievements', (data: Achievement[]) => {
+            console.log('offlineAchievements', data);
+            setAchievements(data);
+            setIsModalOpen(true);
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('offlineMessages', (data: MessageType[]) => {
+            console.log('offlineMessages', data);
+            toast({
+                title: 'success',
+                description: 'You have new messages',
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            renderData.setRenderData(!renderData.renderData);
+        });
 
         return () => {
             socket.off('roomInvitation');
@@ -245,7 +271,10 @@ export const Layout = ({ children }: Props) => {
             socket.off('friendRequestDeclined');
             socket.off('friendRemoved');
             socket.off('friendRemoveError');
-            clearTimeout(timer);
+            socket.off('achievementUnlocked');
+            socketGame.off('achievementUnlocked');
+            socket.off('offlineMessages');
+            socket.off('offlineAchievements');
         };
     }, [socket]);
 
@@ -289,7 +318,11 @@ export const Layout = ({ children }: Props) => {
     }, [renderData.renderData]);
     return (
         <Flex flexDirection={'column'}>
-            <NavbarSearch setUsers={setUsers} />
+            <NavbarSearch
+                setUsers={setUsers}
+                showHide={showHide}
+                setShowHide={setShowHide}
+            />
             <Flex flexDirection={'row'}>
                 <Sidebar
                     notification={renderData.notification}
@@ -460,8 +493,20 @@ export const Layout = ({ children }: Props) => {
                 </Drawer>
 
                 {children}
-                <SearchUsers users={users} setUsers={setUsers} />
             </Flex>
+            {showHide ? (
+                <SearchUsers
+                    users={users}
+                    setUsers={setUsers}
+                    showHide={showHide}
+                    setShowHide={setShowHide}
+                />
+            ) : null}
+            <AchievementUnlocked
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                achievements={achievements}
+            />
         </Flex>
     );
 };
