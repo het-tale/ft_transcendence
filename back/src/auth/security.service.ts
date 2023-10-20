@@ -115,18 +115,4 @@ export class SecurityService {
       },
     });
   }
-  async getUser(user: User) {
-    const usery = await this.prisma.user.findUnique({
-      where: { email: user.email },
-      include: {
-        blocked: true,
-        sentFriendRequests: true,
-      },
-    });
-    if (!usery) {
-      throw new HttpException('User not found', 404);
-    }
-
-    return usery;
-  }
 }

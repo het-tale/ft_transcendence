@@ -88,4 +88,9 @@ export class AuthController {
   ) {
     return await this.authService.confirmChangePassword(token, dto);
   }
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('me')
+  async me(@Req() request: { user: User }) {
+    return await this.authService.getUser(request.user);
+  }
 }
