@@ -125,7 +125,7 @@ export class ChatController {
     @Param('channelName') channelName: string,
     @Req() request: { user: User },
   ) {
-    if (!file || !file.originalname) {
+    if (!file?.originalname) {
       throw new HttpException(
         'Please provide a file named "file" in the request.',
         HttpStatus.BAD_REQUEST,
