@@ -168,6 +168,8 @@ export class UserService {
         matchwin: true,
         matchlose: true,
         achievements: true,
+        win_rate: true,
+        status: true,
       },
       orderBy: {
         g_rank: 'asc',

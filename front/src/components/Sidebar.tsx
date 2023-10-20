@@ -4,12 +4,11 @@ import {
     BsBellFill,
     BsHouseFill,
     BsController,
-    BsChatRightFill,
-    BsPersonFill
+    BsChatRightFill
 } from 'react-icons/bs';
 import { UserType } from '../Types/User';
 import User from './User';
-import { Button, Image, useToast } from '@chakra-ui/react';
+import { Button } from '@chakra-ui/react';
 import { Notification } from '../Types/Notification';
 import { RenderContext, RenderContextType } from '../RenderContext';
 
@@ -54,24 +53,10 @@ const Sidebar = (props: sidebarProps) => {
                 <BsChatRightFill className="fa" />
                 Chat
             </Link>
-            <Button
-                style={{
-                    backgroundColor: 'transparent',
-                    color: 'white',
-                    fontWeight: 'unset',
-                    fontFamily: 'unset',
-                    fontSize: '13px',
-                    marginLeft: '2px'
-                }}
-                onClick={props.onOpen}
-            >
-                <BsBellFill
-                    className="fa"
-                    size={20}
-                    style={{ marginRight: '15px' }}
-                />
+            <Link to="" onClick={props.onOpen}>
+                <BsBellFill className="fa" />
                 Notifications
-            </Button>
+            </Link>
             <Link
                 to={`/game/`}
                 onClick={() => {
@@ -80,29 +65,6 @@ const Sidebar = (props: sidebarProps) => {
             >
                 <BsController className="fa" />
                 Play
-            </Link>
-            <Link
-                to={`/user-profile/${user?.id}`}
-                onClick={() => {
-                    renderData.setRenderData(!renderData.renderData);
-                }}
-            >
-                <BsPersonFill className="fa" />
-                Profile
-            </Link>
-            <Link to="/logout" id="more" style={{ marginTop: '35rem' }}>
-                {/* <i className="fa fa-gear fa-lg" aria-hidden="true"></i> */}
-                {/* <BsBoxArrowLeft className='fa'/> */}
-                <Image
-                    src={user?.avatar}
-                    objectFit="cover"
-                    width={'30px'}
-                    height={'30px'}
-                    marginTop={'-20px'}
-                    marginRight={2}
-                    borderRadius={'30px'}
-                />
-                Log Out
             </Link>
         </aside>
     );
