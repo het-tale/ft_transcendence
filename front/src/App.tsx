@@ -26,6 +26,8 @@ import { RenderContext } from './RenderContext';
 import { Layout } from './pages/Layout';
 import { Verify2Fa } from './pages/Profile/Verify2Fa';
 import Example from './pages/Example';
+import User from './components/User';
+import { UserType } from './Types/User';
 
 function App() {
     const [firstLogin, setFirstLogin] = React.useState(false);
@@ -33,7 +35,15 @@ function App() {
     const [renderData, setRenderData] = React.useState(false);
     const [notification, setNotification] = React.useState(false);
     const buttonClicked = useRef<HTMLButtonElement | null>(null);
+    const [user, setUser] = React.useState<UserType>();
+    React.useEffect(() => {
+        async function fetchUserData() {
+            const userData = await User();
+            setUser(userData);
+        }
 
+        fetchUserData();
+    }, []);
     return (
         <BrowserRouter>
             <SocketContext.Provider value={socket}>
@@ -44,7 +54,8 @@ function App() {
                             setRenderData: setRenderData,
                             notification: notification,
                             setNotification: setNotification,
-                            buttonClicked: buttonClicked
+                            buttonClicked: buttonClicked,
+                            user: user
                         }}
                     >
                         <Routes>
@@ -199,9 +210,8 @@ function App() {
                                         <Layout children={<GamePage />} />
                                     </ProtectRoutes>
                                 }
-                            >
-                            </Route>
-                            <Route path='testt' element={<Example/>}/>
+                            ></Route>
+                            <Route path="testt" element={<Example />} />
                         </Routes>
                     </RenderContext.Provider>
                 </SocketGameContext.Provider>
