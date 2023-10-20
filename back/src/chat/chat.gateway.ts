@@ -23,6 +23,7 @@ import {
   TRoomMessage,
   TRoomTarget,
   TUserTarget,
+  Tname,
 } from 'src/dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { AchievementsService } from './achievements.service';
@@ -54,8 +55,6 @@ export class ChatGateway
         clientId: client.id,
         username: user.username,
       });
-      if (!user) throw new Error('Authentication failed');
-      console.log(`Cliend id:${user.username} connected`);
       await this.dmService.changeUserStatus(user?.username, 'online');
       // console.log(this.connectedUsers);
       await this.channelService.rejoinRooms(user.id, client);
@@ -288,7 +287,6 @@ export class ChatGateway
         isReceiverOnline,
       });
       if (receiver) {
-        isReceiverOnline = true;
         this.io.to(receiver.clientId).emit('roomInvitation', {
           from: sender.username,
           room: data.room,
@@ -519,27 +517,21 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      // console.log("heeeey m heeere friend0");
       const user1 = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       );
-      // console.log("heeeey m heeere friend-1", user1);
       const clientUsername = user1.username;
-      // console.log("ClientUsername", clientUsername);
       const receiver = this.connectedUsers.find(
         (user) => user.username === data.from,
       );
-      // console.log("heeeey m heeere friend-2", receiver.username);
       let isOnline = false;
       if (receiver) isOnline = true;
-      // console.log("heeeey m heeere friend2");
       await this.friendsService.handleFriendRequest(
         clientUsername,
         data.from,
         data.isAccepted,
         isOnline,
       );
-      // console.log("heeeey m heeere friend1");
       if (data.isAccepted) {
         const obj = await this.achievementsService.check20friends(
           clientUsername,
@@ -651,6 +643,28 @@ export class ChatGateway
       );
     } catch (err) {
       client.emit('channelDeleteError', err.message);
+    }
+  }
+  @SubscribeMessage('changeUsername')
+  async changeUsername(
+    @MessageBody() data: Tname,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const user = this.connectedUsers.find(
+        (user) => user.clientId === client.id,
+      );
+      await this.dmService.changeUsername(user.username, data.name);
+      this.connectedUsers = this.connectedUsers.map((user) => {
+        if (user.clientId === client.id) {
+          user.username = data.name;
+        }
+
+        return user;
+      });
+      this.io.to(client.id).emit('usernameChanged');
+    } catch (err) {
+      client.emit('usernameChangeError', err.message);
     }
   }
 }
