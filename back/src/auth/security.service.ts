@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { TwoFaService } from 'src/2fa/two-fa.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Response } from 'express';
 import { ConfirmationService } from 'src/confirmation/confirmation.service';
 import { TAdd42CredentialsData } from 'src/dto';
 import * as argon from 'argon2';
@@ -114,19 +113,5 @@ export class SecurityService {
         avatar: result,
       },
     });
-  }
-  async getUser(user: User) {
-    const usery = await this.prisma.user.findUnique({
-      where: { email: user.email },
-      include: {
-        blocked: true,
-        sentFriendRequests: true,
-      },
-    });
-    if (!usery) {
-      throw new HttpException('User not found', 404);
-    }
-
-    return usery;
   }
 }

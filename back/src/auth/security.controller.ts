@@ -86,9 +86,4 @@ export class SecurityController {
 
     return await this.securityService.uploadAvatar(file, request?.user);
   }
-
-  @Get('me')
-  async me(@Req() request: { user: User }) {
-    return await this.securityService.getUser(request.user);
-  }
 }
