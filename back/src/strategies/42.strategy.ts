@@ -13,7 +13,7 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
     private prisma: PrismaService,
     private readonly configService: ConfigService,
   ) {
-    console.log('strategy 42 called', process.env.BACKEND_URL);
+    // console.log('strategy 42 called', process.env.BACKEND_URL);
     super({
       clientID: configService.get('UID_42'),
       clientSecret: configService.get('SECRET_42'),
@@ -30,7 +30,7 @@ export class Strategy42 extends PassportStrategy(Strategy, '42') {
     refreshToken: string,
     profile: Profile,
   ): Promise<User> {
-    console.log('validate called');
+    // console.log('validate called');
     const { login, email } = profile;
     const user = await this.prisma.user.findUnique({
       where: { email },

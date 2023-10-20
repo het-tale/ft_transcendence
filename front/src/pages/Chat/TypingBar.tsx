@@ -6,11 +6,11 @@ import { useToast } from '@chakra-ui/react';
 const TypingBar = (props: any) => {
     const [message, setMessage] = useState('');
     const socket = React.useContext(SocketContext);
-    console.log('typing socket', socket);
+    // console.log('typing socket', socket);
     const toast = useToast();
     const sendMessageHandler = (e: any) => {
         e.preventDefault();
-        console.log('message sent');
+        // console.log('message sent');
         socket.emit('privateMessage', {
             message: message,
             to: props.userDm.username

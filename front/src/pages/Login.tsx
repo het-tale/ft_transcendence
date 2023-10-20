@@ -35,10 +35,10 @@ function Login(props: any) {
                 navigate('/confirm-email');
             }
         } catch (error: any) {
-            console.log('Login Error', error);
+            // console.log('Login Error', error);
             const errorMessage = error.response.data.message;
             setErrorMessage(errorMessage);
-            console.log('The error message', errorMessage);
+            // console.log('The error message', errorMessage);
             toast({
                 title: 'Login Failed.',
                 description: errorMessage,

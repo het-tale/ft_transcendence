@@ -58,14 +58,14 @@ const ChannelInfo = (props: ChannelInfoProps) => {
     const socket = React.useContext(SocketContext);
     const [room, setRoom] = React.useState<Channel>();
     const handleLeaveChannel = () => {
-        console.log('Hello From Leave Channel');
+        // console.log('Hello From Leave Channel');
         socket.emit('leaveRoom', {
             room: props.ChannelDm?.name
         });
         props.setRender && props.setRender(!props.render);
     };
     const handleChangeAvatar = () => {
-        console.log('Hello From Change Avatar');
+        // console.log('Hello From Change Avatar');
     };
 
     return (

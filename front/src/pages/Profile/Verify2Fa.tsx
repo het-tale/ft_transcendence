@@ -15,12 +15,12 @@ export const Verify2Fa = () => {
     const { register, handleSubmit } = useForm<Verify2FaData>();
     const renderData = useContext(RenderContext);
     const handleVerify2Fa: SubmitHandler<Verify2FaData> = async (data) => {
-        console.log('The verification code', data);
+        // console.log('The verification code', data);
         const sentData = {
             code: data.code
         };
         try {
-            console.log('verify 2fa');
+            // console.log('verify 2fa');
             const response = await client.post(`auth/2fa/verify`, sentData, {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')

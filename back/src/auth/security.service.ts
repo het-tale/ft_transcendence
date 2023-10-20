@@ -27,7 +27,7 @@ export class SecurityService {
         twoFaSecret: secret,
       },
     });
-    console.log("secret in generate", secret);
+    // console.log("secret in generate", secret);
     const qr = await this.tw.generateQRCode(secret, user.email);
 
     return qr;
@@ -40,7 +40,7 @@ export class SecurityService {
     if (user.twoFaSecret === null)
       throw new HttpException('generate 2fa qr code', HttpStatus.FORBIDDEN);
     const isValid = await this.tw.verifyToken(code, user.twoFaSecret);
-    console.log(isValid);
+    // console.log(isValid);
     if (!isValid) throw new HttpException('invalid code', HttpStatus.FORBIDDEN);
     await this.prisma.user.update({
       where: { email: user.email },

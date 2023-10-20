@@ -53,7 +53,7 @@ export class SecurityController {
   @UseZodGuard('body', TwofaCodeDto)
   @Post('2fa/verify')
   async verify2Fa(@Req() request: { user: User }, @Body() dto: TtwofaCodeData) {
-    console.log('The user in verify', request.user)
+    // console.log('The user in verify', request.user)
     await this.securityService.verify2Fa(dto.code, request.user);
   }
 

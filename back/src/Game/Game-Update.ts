@@ -6,7 +6,6 @@ import { stopGame } from './Game_Stop';
 import { TAchievement } from 'src/dto';
 import { Injectable } from '@nestjs/common';
 import { GameInit } from './Game-Init';
-import { match } from 'assert';
 
 
 @Injectable()
@@ -28,14 +27,12 @@ export class GameUpdate {
     room.ball.y >= playerPaddle.y &&
     room.ball.y <= playerPaddle.y + playerPaddle.height
   ) {
-    // console.log('colision 1' + room.ball.x + 'player paddle ' + playerPaddle.x + 'other [adde ' +  otherPaddle.x);
     const relativeIntersectY =
       (room.ball.y - (playerPaddle.y + playerPaddle.height / 2)) /
       (playerPaddle.height / 2);
     const bounceAngle = relativeIntersectY * MAX_ANGLE_CHANGE;
 
-    // Add a random factor to bounceAngle
-    const randomFactor = (Math.random() - 0.5) * 0.5;
+    const randomFactor = (Math.random() - 0.5) * 0.2;
     const finalBounceAngle = bounceAngle + randomFactor;
 
     room.ball.dx *= -1;
@@ -45,13 +42,11 @@ export class GameUpdate {
     room.ball.y >= otherPaddle.y &&
     room.ball.y <= otherPaddle.y + otherPaddle.height
   ) {
-    // console.log('colision 2');
     const relativeIntersectY =
       (room.ball.y - (otherPaddle.y + otherPaddle.height / 2)) /
       (otherPaddle.height / 2);
     const bounceAngle = relativeIntersectY * MAX_ANGLE_CHANGE;
 
-    // Add a random factor to bounceAngle
     const randomFactor = (Math.random() - 0.5) * 0.5;
     const finalBounceAngle = bounceAngle + randomFactor;
 
@@ -166,12 +161,8 @@ async  OtherAvatar(
 ) {
     const player = room.players.find((p) => p.socket === client);
     const otherPlayer = room.players.find((player) => player.socket !== client);
-    // console.log('player', player.socket);
-    // console.log('other player', otherPlayer.socket);
     const user = activeSockets.get(client);
     const otherUser = activeSockets.get(otherPlayer.socket);
-    // console.log('user', user);
-    // console.log('other user', otherUser);
     otherPlayer.socket?.emit('OTHER AVATAR', user.avatar, user.username);
     player.socket?.emit('OTHER AVATAR', otherUser.avatar, otherUser.username);
 }

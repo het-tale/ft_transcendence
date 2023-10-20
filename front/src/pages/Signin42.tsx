@@ -6,14 +6,11 @@ import React from 'react';
 const Signin42 = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    console.log(location);
+    // console.log(location);
     const token = location.search.split('=')[1];
     localStorage.setItem('token', token);
-    console.log('THE TOKEN ', token);
     User()
         .then((res) => {
-            console.log('User', res);
-            console.log('Password', res.isPasswordRequired);
             if (res.isPasswordRequired === true) {
                 navigate('/set-password');
             } else {

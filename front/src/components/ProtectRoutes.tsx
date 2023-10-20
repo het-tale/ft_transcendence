@@ -17,14 +17,14 @@ const ProtectRoutes = (props: any) => {
                     }
                 });
                 if (response.status === 200) {
-                    console.log('response User', response.data);
+                    // console.log('response User', response.data);
                     if (response.data.is2FaEnabled) {
                         if (response.data.is2FaVerified) {
                             setIsLoggedIn(true);
                             socket.auth = { token: token };
                             socket.connect();
                         } else {
-                            console.log('2fa not verified');
+                            // console.log('2fa not verified');
                             navigate('/verify-2fa');
                         }
                     } else {
