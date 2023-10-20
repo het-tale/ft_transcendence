@@ -36,6 +36,7 @@ function App() {
     const [notification, setNotification] = React.useState(false);
     const buttonClicked = useRef<HTMLButtonElement | null>(null);
     const [user, setUser] = React.useState<UserType>();
+    const [firstTime, setFirstTime] = React.useState(true);
     React.useEffect(() => {
         async function fetchUserData() {
             const userData = await User();
@@ -55,7 +56,9 @@ function App() {
                             notification: notification,
                             setNotification: setNotification,
                             buttonClicked: buttonClicked,
-                            user: user
+                            user: user,
+                            firstTime: firstTime,
+                            setFirstTime: setFirstTime
                         }}
                     >
                         <Routes>
@@ -110,9 +113,9 @@ function App() {
                             <Route
                                 path="confirm-email"
                                 element={
-                                    <ProtectConfirmation>
-                                        <ConfirmEmail />
-                                    </ProtectConfirmation>
+                                    // <ProtectConfirmation>
+                                    <ConfirmEmail />
+                                    // </ProtectConfirmation>
                                 }
                             />
                             <Route
