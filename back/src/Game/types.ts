@@ -83,19 +83,49 @@ export class Room {
     const random = Math.random();
     switch (true) {
       case random < 0.2:
-        this.ball = new Ball(CONTAINERWIDTH / 2, CONTAINERHIEGHT / 2, RADIUS, 3, 3);
+        this.ball = new Ball(
+          CONTAINERWIDTH / 2,
+          CONTAINERHIEGHT / 2,
+          RADIUS,
+          3,
+          3,
+        );
         break;
       case random < 0.4:
-        this.ball = new Ball(CONTAINERWIDTH / 2, CONTAINERHIEGHT / 2, RADIUS, 3, -3);
+        this.ball = new Ball(
+          CONTAINERWIDTH / 2,
+          CONTAINERHIEGHT / 2,
+          RADIUS,
+          3,
+          -3,
+        );
         break;
       case random < 0.6:
-        this.ball = new Ball(CONTAINERWIDTH / 2, CONTAINERHIEGHT / 2, RADIUS, -3, 3);
+        this.ball = new Ball(
+          CONTAINERWIDTH / 2,
+          CONTAINERHIEGHT / 2,
+          RADIUS,
+          -3,
+          3,
+        );
         break;
       case random < 0.8:
-        this.ball = new Ball(CONTAINERWIDTH / 2, CONTAINERHIEGHT / 2, RADIUS, -3, -3);
+        this.ball = new Ball(
+          CONTAINERWIDTH / 2,
+          CONTAINERHIEGHT / 2,
+          RADIUS,
+          -3,
+          -3,
+        );
         break;
       default:
-        this.ball = new Ball(CONTAINERWIDTH / 2, CONTAINERHIEGHT / 2, RADIUS, 3, 3);
+        this.ball = new Ball(
+          CONTAINERWIDTH / 2,
+          CONTAINERHIEGHT / 2,
+          RADIUS,
+          3,
+          3,
+        );
         break;
     }
     this.rounds = 5;
@@ -112,7 +142,6 @@ export class Room {
   isinvit: boolean;
 }
 
-
 export const INTERVAL = 16.66;
 export const INCREASE_SPEED = 1;
 export const SPEED_INTERVAL = 1000;
@@ -127,7 +156,6 @@ export const PADDLE = new Paddle(
   8,
   CONTAINERHIEGHT * 0.15,
   3,
-
 );
 
 export const OTHERPADDLE = new Paddle(
@@ -137,4 +165,3 @@ export const OTHERPADDLE = new Paddle(
   CONTAINERHIEGHT * 0.15,
   3,
 );
-

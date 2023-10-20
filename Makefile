@@ -23,4 +23,4 @@ link:
 		ln -s ./.env ./front/.env; \
 	fi
 
-re: stop prune link up
+re: down link up

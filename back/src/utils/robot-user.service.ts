@@ -24,9 +24,7 @@ export class RobotUserService {
     const avatar = this.config.get('ROBOT_AVATAR');
     const password = this.config.get('ROBOT_PASSWORD');
     console.log(password);
-    let hashedPassword = null;
-    if (password)
-      hashedPassword = await argon.hash(password);
+    const hashedPassword = password ? await argon.hash(password) : null;
     robotUser = await this.prisma.user.create({
       data: {
         username: 'ROBOT',
