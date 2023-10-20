@@ -10,11 +10,10 @@ export class UserService {
   async getUserById(id: number) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include:{
+      include: {
         blocked: true,
         sentFriendRequests: true,
-      }
-
+      },
     });
     if (!user) {
       throw new HttpException('User not found', 404);
@@ -82,6 +81,7 @@ export class UserService {
         },
       },
     });
+
     return friendRequests;
   }
 
@@ -105,6 +105,7 @@ export class UserService {
         isGame: true,
       },
     });
+
     return invitations;
   }
   async getAchievements(username: string) {
@@ -127,22 +128,22 @@ export class UserService {
       (achievement) => !achievement.rank,
     );
     filteredAchievements.push(highestRank);
+
     return filteredAchievements;
   }
-  async getMatchHistory(username: string)
-  {
+  async getMatchHistory(username: string) {
     const myUser = await this.prisma.user.findUnique({
       where: { username },
       select: {
         matchHistoryA: {
-          include : {
+          include: {
             playerA: true,
             playerB: true,
             winner: true,
           },
         },
         matchHistoryB: {
-          include : {
+          include: {
             playerA: true,
             playerB: true,
             winner: true,
@@ -150,7 +151,29 @@ export class UserService {
         },
       },
     });
+
     return [...myUser.matchHistoryA, ...myUser.matchHistoryB];
   }
 
+  getLeaderBoard() {
+    const users = this.prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        avatar: true,
+        email: true,
+        g_rank: true,
+        lp: true,
+        matchnumber: true,
+        matchwin: true,
+        matchlose: true,
+        achievements: true,
+      },
+      orderBy: {
+        g_rank: 'asc',
+      },
+    });
+
+    return users;
+  }
 }
