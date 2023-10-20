@@ -22,8 +22,10 @@ const ProtectPassword = (props: any) => {
                     }
                 } else {
                     navigate('/');
+                    console.log('Hello from protecting email', response);
                 }
             } catch (error) {
+                console.log('Hello from protecting email', error);
                 navigate('/');
             }
         };

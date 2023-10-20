@@ -8,16 +8,16 @@ import { ChakraProvider } from '@chakra-ui/react';
 import { GlobalProvider } from './components/GlobalProvider';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+    document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-    {/* <GlobalProvider> */}
-      <ChakraProvider>
-        <App />
-      </ChakraProvider>
-    {/* </GlobalProvider> */}
-  </React.StrictMode>
+    <React.StrictMode>
+        {/* <GlobalProvider> */}
+        <ChakraProvider>
+            <App />
+        </ChakraProvider>
+        {/* </GlobalProvider> */}
+    </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
