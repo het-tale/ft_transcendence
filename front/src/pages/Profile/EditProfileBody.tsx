@@ -24,7 +24,7 @@ interface EditProfileData {
 const EditProfileBody = (props: EditProfileBodyProps) => {
     const { register, handleSubmit } = useForm<EditProfileData>();
     const handleEditProfile: SubmitHandler<EditProfileData> = (data) => {
-        console.log('Edit Profile data', data);
+        // console.log('Edit Profile data', data);
     };
     return (
         <form

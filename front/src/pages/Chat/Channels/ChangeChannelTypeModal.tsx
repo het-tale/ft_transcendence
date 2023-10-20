@@ -35,13 +35,13 @@ const ChangeChannelTypeModal = (props: ChangeChannelTypeModalProps) => {
     const handleRadioChange = (event: any) => {
         setSelectedOption(event.target.value);
         setShowField(event.target.value === 'protected');
-        console.log('RADIOOOOOOO CHAAAANGE', event.target.value);
+        // console.log('RADIOOOOOOO CHAAAANGE', event.target.value);
     };
     const { register, handleSubmit } = useForm<ChangeTypeData>();
     const handleChangeChannelType: SubmitHandler<ChangeTypeData> = async (
         data
     ) => {
-        console.log('Change Channel Type Data', data);
+        // console.log('Change Channel Type Data', data);
         if (!showField) data.password = undefined;
 
         const sentData = {
@@ -62,7 +62,7 @@ const ChangeChannelTypeModal = (props: ChangeChannelTypeModalProps) => {
             props.setRender && props.setRender(!props.render);
             props.onClose();
         } catch (error: any) {
-            console.log('error', error);
+            // console.log('error', error);
             toast({
                 title: 'Error',
                 description: error.response.data.message,

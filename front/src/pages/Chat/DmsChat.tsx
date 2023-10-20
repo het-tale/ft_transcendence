@@ -51,7 +51,6 @@ const DmsChat = (props: any) => {
         async function fetchUserData() {
             const userData = await User();
             setUser(userData);
-            console.log('USERRRRR1', userData);
         }
 
         fetchUserData();
@@ -70,10 +69,7 @@ const DmsChat = (props: any) => {
               })
             : null;
     }, [props.render, props.userDm]);
-    console.log('DMS', messages);
-    console.log('USERRRRR', user);
     const handleBlockedUser = () => {
-        console.log('Blocked user', props.userDm?.username);
         socket.emit('blockUser', {
             target: props.userDm?.username
         });
@@ -82,11 +78,9 @@ const DmsChat = (props: any) => {
         onClose();
     };
     socket.on('userBlocked', (data: any) => {
-        console.log('BLOCK USER DATA', data);
         props.setRender(!props.render);
     });
     socket.on('userBlockError', (data: any) => {
-        console.log('BLOCK USER ERROR DATA', data);
         props.setRender(!props.render);
     });
     const handleUnblockUser = () => {
@@ -98,11 +92,9 @@ const DmsChat = (props: any) => {
         onClose();
     };
     socket.on('userUnblocked', (data: any) => {
-        console.log('unBLOCK USER DATA', data);
         props.setRender(!props.render);
     });
     socket.on('userUnblockError', (data: any) => {
-        console.log('unBLOCK USER ERROR DATA', data);
         props.setRender(!props.render);
     });
 
@@ -111,7 +103,6 @@ const DmsChat = (props: any) => {
             clearOrDelete === 'clear'
                 ? 'clear-conversation'
                 : 'delete-conversation';
-        console.log('Clear chat', props.userDm?.id);
         try {
             const res = await client.delete(
                 `chat/${str}/${props.userDm?.username}`,
@@ -121,12 +112,10 @@ const DmsChat = (props: any) => {
                     }
                 }
             );
-            console.log('RES', res);
             if (res.status === 200) {
                 props.setRender(!props.render);
             }
         } catch (error: any) {
-            console.log('Error', error);
             toast({
                 title: 'Error.',
                 description: error.response.data.message,
@@ -140,15 +129,13 @@ const DmsChat = (props: any) => {
         onClose3();
     };
     const handleProfile = () => {
-        console.log('View Profile');
         <Link to="/user-profile" />;
     };
     const navigate = useNavigate();
     const handleSendGameInvitation = () => {
-        console.log('Send game invitation');
         socketGame.emit('InvitePlayer', props.userDm?.id);
         props.setRender(!props.render);
-        navigate(`/game`);
+        navigate(`/game/`);
     };
     if (!dms || dms.length === 0 || !props.userDm) return <></>;
     return (

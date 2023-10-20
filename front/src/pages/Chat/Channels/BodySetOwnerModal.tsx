@@ -23,7 +23,7 @@ const BodySetOwnerModal = (props: BodySetOwnerModalProps) => {
     const socket = React.useContext(SocketContext);
     const { register, handleSubmit } = useForm<LeaveChannel>();
     const handleLeaveChannelOwner: SubmitHandler<LeaveChannel> = (data) => {
-        console.log('Leave Channel Data from Owner side', data);
+        // console.log('Leave Channel Data from Owner side', data);
         if (data.newOwner === props.channelDm?.owner.username)
             data.newOwner = '';
         socket.emit('leaveRoom', {

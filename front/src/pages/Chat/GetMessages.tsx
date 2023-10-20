@@ -1,7 +1,6 @@
 import client from '../../components/Client';
 
 const GetMessages = async (username: string) => {
-    console.log('USERNAME', username);
     try {
         const res = await client.get(`chat/dms/${username}`, {
             headers: {

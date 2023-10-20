@@ -41,7 +41,7 @@ const ResetPassword = () => {
             }
         } catch (error: any) {
             const errorMessage = error.response.data.message;
-            console.log(errorMessage);
+            // console.log(errorMessage);
             toast({
                 title: 'Error.',
                 description: errorMessage,

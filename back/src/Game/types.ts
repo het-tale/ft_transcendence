@@ -119,7 +119,7 @@ export const SPEED_INTERVAL = 1000;
 export const CONTAINERHIEGHT = 480;
 export const CONTAINERWIDTH = 720;
 export const RADIUS = 10;
-export const MAX_ANGLE_CHANGE = Math.PI / 4;
+export const MAX_ANGLE_CHANGE = Math.PI / 3;
 
 export const PADDLE = new Paddle(
   CONTAINERWIDTH - (CONTAINERWIDTH * 2) / 100,

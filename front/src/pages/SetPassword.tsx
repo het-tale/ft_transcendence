@@ -13,7 +13,7 @@ const SetPassword = (props: any) => {
     const SubmitPassword = async (e: any) => {
         e.preventDefault();
         try {
-            console.log(`Bearer ${localStorage.getItem('token')}`);
+            // console.log(`Bearer ${localStorage.getItem('token')}`);
             const data = {
                 password: password,
                 confirmPassword: confirmPassword,
@@ -29,7 +29,7 @@ const SetPassword = (props: any) => {
                     headers: headers
                 }
             );
-            console.log(resp);
+            // console.log(resp);
             if (resp.status === 201) {
                 toast({
                     title: 'Password Set.',

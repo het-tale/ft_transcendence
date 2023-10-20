@@ -193,21 +193,13 @@ function App() {
                                 />
                             </Route>
                             <Route
-                                path="game/"
+                                path="/game/"
                                 element={
                                     <ProtectRoutes>
                                         <Layout children={<GamePage />} />
                                     </ProtectRoutes>
                                 }
                             >
-                                <Route
-                                    path=":startGame"
-                                    element={
-                                        <ProtectRoutes>
-                                            <Layout children={<GamePage />} />
-                                        </ProtectRoutes>
-                                    }
-                                />
                             </Route>
                             <Route path='testt' element={<Example/>}/>
                         </Routes>

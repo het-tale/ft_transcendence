@@ -23,7 +23,7 @@ export interface ChannelDisplayProps {
 
 const ChannelDisplay = (props: ChannelDisplayProps) => {
     const handleRoomDm = () => {
-        console.log('hello From Room Dm', props.id);
+        // console.log('hello From Room Dm', props.id);
         if (props.setChannelDm && props.setUpdateRoomClass) {
             props.setChannelDm(props.roomDm);
             props.setUpdateRoomClass(props.id);

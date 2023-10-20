@@ -279,7 +279,7 @@ export const Layout = ({ children }: Props) => {
     }, [socket]);
 
     const handleAcceptReject = (notif: Invitation, isAccepted: boolean) => {
-        console.log('m handling notification');
+        // console.log('m handling notification');
         socket.emit('handleRoomInvitation', {
             room: notif.channel.name,
             from: notif.sender.username,
@@ -291,7 +291,7 @@ export const Layout = ({ children }: Props) => {
     const handleAcceptRejectGame = (isAccepted: boolean) => {
         if (isAccepted) {
             socketGame.emit('AcceptInvitation', roomId);
-            navigate(`/game`);
+            navigate(`/game/`);
         } else socketGame.emit('DeclineInvitation', roomId);
         renderData.setRenderData(!renderData.renderData);
         renderData.setNotification &&
@@ -301,7 +301,7 @@ export const Layout = ({ children }: Props) => {
         notif: FriendRequest,
         isAccepted: boolean
     ) => {
-        console.log('m handling friend request');
+        // console.log('m handling friend request');
         socket.emit('handleFriendRequest', {
             from: notif.sender.username,
             isAccepted: isAccepted

@@ -16,10 +16,10 @@ const ModalBodyUi = (props: any) => {
     const socket = React.useContext(SocketContext);
     const { register, handleSubmit } = useForm<CreateChannelData>();
     const handleCreateChannel: SubmitHandler<CreateChannelData> = (data) => {
-        console.log('Create Channel Data', data);
-        console.log('password', data.password);
+        // console.log('Create Channel Data', data);
+        // console.log('password', data.password);
         if (!props.showField) data.password = undefined;
-        console.log('password after', data.password);
+        // console.log('password after', data.password);
         socket.emit('createRoom', {
             room: data.room,
             type: data.type,
