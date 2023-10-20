@@ -9,5 +9,4 @@ import { GameUpdate } from './Game-Update';
   imports: [JwtModule.register({})],
   providers: [Game, GameInit, GameStartEvent, GameUpdate],
 })
-export class GameModule {
-}
+export class GameModule {}

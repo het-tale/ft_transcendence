@@ -55,7 +55,8 @@ export class ChatGateway
         username: user.username,
       });
       if (!user) throw new Error('Authentication failed');
-      await this.dmService.changeUserStatus(user.username, 'online');
+      console.log(`Cliend id:${user.username} connected`);
+      await this.dmService.changeUserStatus(user?.username, 'online');
       // console.log(this.connectedUsers);
       await this.channelService.rejoinRooms(user.id, client);
       const offlineMessages = await this.dmService.getOfflineMessages(user.id);
@@ -65,7 +66,8 @@ export class ChatGateway
         await this.channelService.getOfflineChannelMessages(user.id);
       const offlineFriendRequests =
         await this.dmService.getOfflineFriendRequests(user.id);
-      const offlineAchievements = await this.achievementsService.getOfflineAchievements(user.username);
+      const offlineAchievements =
+        await this.achievementsService.getOfflineAchievements(user.username);
       if (offlineChannelMessages.length > 0) {
         client.emit('offlineChannelMessages', offlineChannelMessages);
         await this.channelService.deleteOfflineChannelMessages(
@@ -78,11 +80,15 @@ export class ChatGateway
       }
       if (offlineInvitations.length > 0) {
         client.emit('offlineInvitations', offlineInvitations);
-        await this.channelService.changeOfflineInvitationsStatus(offlineInvitations);
+        await this.channelService.changeOfflineInvitationsStatus(
+          offlineInvitations,
+        );
       }
       if (offlineFriendRequests.length > 0) {
         client.emit('offlineFriendRequests', offlineFriendRequests);
-        await this.dmService.changeOfflineFriendRequestsStatus(offlineFriendRequests);
+        await this.dmService.changeOfflineFriendRequestsStatus(
+          offlineFriendRequests,
+        );
       }
       if (offlineAchievements.length > 0) {
         client.emit('offlineAchievements', offlineAchievements);
@@ -141,7 +147,9 @@ export class ChatGateway
         from: sender.username,
         message: data.message,
       });
-      const obj = await this.achievementsService.check100SentMessages(sender.username);
+      const obj = await this.achievementsService.check100SentMessages(
+        sender.username,
+      );
       if (obj.isUnlocked)
         this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
     } catch (err) {
@@ -176,7 +184,9 @@ export class ChatGateway
       );
       client.join(data.room);
       this.io.to(data.room).emit('roomCreated', { room: data.room });
-      const obj = await this.achievementsService.check20Channels(owner.username);
+      const obj = await this.achievementsService.check20Channels(
+        owner.username,
+      );
       if (obj.isUnlocked)
         this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
     } catch (err) {
@@ -248,7 +258,9 @@ export class ChatGateway
           this.io.to(user.clientId).emit('roomMessage', data.message);
         }
       }
-      const obj = await this.achievementsService.check100SentMessages(sender.username);
+      const obj = await this.achievementsService.check100SentMessages(
+        sender.username,
+      );
       if (obj.isUnlocked)
         this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
     } catch (err) {
@@ -307,9 +319,7 @@ export class ChatGateway
           .to(data.room)
           .emit('roomJoined', `${clientUsername} joind ${data.room}`);
       } else {
-        client
-          .to(data.room)
-          .emit('roomInvitationDeclined', data.room);
+        client.to(data.room).emit('roomInvitationDeclined', data.room);
       }
     } catch (err) {
       client.emit('roomInvitationError', err.message);
@@ -518,8 +528,8 @@ export class ChatGateway
       // console.log("ClientUsername", clientUsername);
       const receiver = this.connectedUsers.find(
         (user) => user.username === data.from,
-        );
-        // console.log("heeeey m heeere friend-2", receiver.username);
+      );
+      // console.log("heeeey m heeere friend-2", receiver.username);
       let isOnline = false;
       if (receiver) isOnline = true;
       // console.log("heeeey m heeere friend2");
@@ -531,16 +541,22 @@ export class ChatGateway
       );
       // console.log("heeeey m heeere friend1");
       if (data.isAccepted) {
-        const obj = await this.achievementsService.check20friends(clientUsername);
+        const obj = await this.achievementsService.check20friends(
+          clientUsername,
+        );
         if (obj.isUnlocked)
           this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
         this.io.to(client.id).emit('friendRequestAccepted', {
           from: data.from,
         });
         if (receiver) {
-          const obj2 = await this.achievementsService.check20friends(receiver.username);
+          const obj2 = await this.achievementsService.check20friends(
+            receiver.username,
+          );
           if (obj2.isUnlocked)
-            this.io.to(receiver.clientId).emit('achievementUnlocked', obj2.achievement);
+            this.io
+              .to(receiver.clientId)
+              .emit('achievementUnlocked', obj2.achievement);
           this.io.to(receiver.clientId).emit('friendRequestAccepted', {
             from: clientUsername,
           });
@@ -587,13 +603,17 @@ export class ChatGateway
         (user) => user.username === data.target,
       );
       await this.friendsService.blockUser(clientUsername, data.target);
-      const obj = await this.achievementsService.checkFirstBlock(clientUsername);
+      const obj = await this.achievementsService.checkFirstBlock(
+        clientUsername,
+      );
       if (obj.isUnlocked)
         this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
       this.io.to(client.id).emit('userBlocked');
       const obj2 = await this.achievementsService.check20blocks(data.target);
       if (obj2.isUnlocked && target)
-        this.io.to(target.clientId).emit('achievementUnlocked', obj2.achievement);
+        this.io
+          .to(target.clientId)
+          .emit('achievementUnlocked', obj2.achievement);
     } catch (err) {
       client.emit('userBlockError', err.message);
     }

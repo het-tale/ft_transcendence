@@ -2,12 +2,10 @@ import {
   Body,
   Controller,
   Get,
-  Header,
   HttpException,
   HttpStatus,
   Post,
   Req,
-  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -25,7 +23,6 @@ import {
 } from 'src/dto';
 import { UseZodGuard } from 'nestjs-zod';
 import { TwoFaVerificationGuard } from 'src/guards/two-fa-verification.guard';
-import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Authentication protected routes')
@@ -39,6 +36,7 @@ export class SecurityController {
   // @Header('Content-Type', 'image/png')
   async generate2Fa(@Req() request: { user: User }) {
     const code = await this.securityService.generate2Fa(request.user);
+
     return code;
   }
 
@@ -53,7 +51,6 @@ export class SecurityController {
   @UseZodGuard('body', TwofaCodeDto)
   @Post('2fa/verify')
   async verify2Fa(@Req() request: { user: User }, @Body() dto: TtwofaCodeData) {
-    // console.log('The user in verify', request.user)
     await this.securityService.verify2Fa(dto.code, request.user);
   }
 
@@ -78,16 +75,16 @@ export class SecurityController {
   @Post('upload-avatar')
   async uploadAvatar(
     @UploadedFile() file: Express.Multer.File,
-    @Req() request: { user: User },
+    @Req() request: { user?: User },
   ) {
-    if (!file || !file.originalname) {
+    if (!file?.originalname) {
       throw new HttpException(
         'Please provide a file named "file" in the request.',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    return await this.securityService.uploadAvatar(file, request.user);
+    return await this.securityService.uploadAvatar(file, request?.user);
   }
 
   @Get('me')
