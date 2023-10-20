@@ -4,12 +4,14 @@ import '../css/login.css';
 import React, { useState } from 'react';
 import client from '../components/Client';
 import { useToast } from '@chakra-ui/react';
+import { RenderContext } from '../RenderContext';
 function Login(props: any) {
     const [errorMessage, setErrorMessage] = React.useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
     const toast = useToast();
+    const renderData = React.useContext(RenderContext);
 
     const handleLogin = async (event: any) => {
         event.preventDefault();
@@ -22,8 +24,10 @@ function Login(props: any) {
             const response = await client.post(`auth/signin`, sentData);
             localStorage.setItem('token', response.data);
             const condition = await checkAuthentication();
-            if (condition === true) navigate('/home');
-            else {
+            if (condition === true) {
+                renderData.setRenderData(!renderData.renderData);
+                navigate('/home');
+            } else {
                 toast({
                     title: 'Email not Confirmed.',
                     description: 'Your email address has not been verified.',

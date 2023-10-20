@@ -256,6 +256,30 @@ export const Layout = ({ children }: Props) => {
             });
             renderData.setRenderData(!renderData.renderData);
         });
+        socket.on('usernameChanged', () => {
+            console.log('usernameChanged');
+            toast({
+                title: 'success',
+                description: 'Username changed',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('usernameChangeError', (data: string) => {
+            console.log('usernameChangeError', data);
+            toast({
+                title: 'error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            renderData.setRenderData(!renderData.renderData);
+        });
 
         return () => {
             socket.off('roomInvitation');
@@ -275,6 +299,8 @@ export const Layout = ({ children }: Props) => {
             socketGame.off('achievementUnlocked');
             socket.off('offlineMessages');
             socket.off('offlineAchievements');
+            socket.off('usernameChanged');
+            socket.off('usernameChangeError');
         };
     }, [socket]);
 

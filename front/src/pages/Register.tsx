@@ -39,10 +39,12 @@ function Register() {
                     isClosable: true,
                     position: 'bottom-right'
                 });
-                navigate('/confirm-email');
+                // navigate('/confirm-email');
+                navigate('/login');
             })
             .catch((error) => {
-                const errorMessage = error.response.data.message;
+                console.log('register error', error);
+                const errorMessage = error.response?.data?.message;
                 setErrorMessage(errorMessage);
                 console.log(errorMessage);
                 toast({

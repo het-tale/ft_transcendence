@@ -1,6 +1,17 @@
 import React from 'react';
 import Search from './Search';
 import { UserType } from '../Types/User';
+import {
+    Flex,
+    Avatar,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem
+} from '@chakra-ui/react';
+import { RenderContext } from '../RenderContext';
+import { Link } from 'react-router-dom';
+import { BsArrowLeftCircle, BsPersonFill } from 'react-icons/bs';
 
 interface NavbarSearchProps {
     setUsers?: React.Dispatch<React.SetStateAction<UserType[]>>;
@@ -10,6 +21,7 @@ interface NavbarSearchProps {
 
 const NavbarSearch = function (props: NavbarSearchProps) {
     const [name, setName] = React.useState('');
+    const renderData = React.useContext(RenderContext);
 
     return (
         <div className="navbar">
@@ -53,14 +65,54 @@ const NavbarSearch = function (props: NavbarSearchProps) {
                 </svg>
                 <span className="ng">ng</span>
             </div>
-            <Search
-                isSearchGlobal={true}
-                filter={name}
-                setName={setName}
-                setUsers={props.setUsers}
-                showHide={props.showHide}
-                setShowHide={props.setShowHide}
-            />
+            <Flex>
+                <Search
+                    isSearchGlobal={true}
+                    filter={name}
+                    setName={setName}
+                    setUsers={props.setUsers}
+                    showHide={props.showHide}
+                    setShowHide={props.setShowHide}
+                />
+                <Menu>
+                    <MenuButton>
+                        <Avatar
+                            src={renderData.user?.avatar}
+                            size={'sm'}
+                            marginRight={'2'}
+                            marginTop={'-6px'}
+                        />
+                    </MenuButton>
+                    <MenuList
+                        marginRight={'0.5rem'}
+                        backgroundColor={'#a435f0'}
+                    >
+                        <Link to={`/user-profile/${renderData.user?.id}`}>
+                            <MenuItem
+                                color={'white'}
+                                backgroundColor={'#a435f0'}
+                                onClick={() => {
+                                    renderData.setRenderData(
+                                        !renderData.renderData
+                                    );
+                                }}
+                                icon={<BsPersonFill />}
+                            >
+                                See Profile
+                            </MenuItem>
+                        </Link>
+                        <Link to="/logout">
+                            <MenuItem
+                                color={'white'}
+                                backgroundColor={'#a435f0'}
+                                icon={<BsArrowLeftCircle />}
+                            >
+                                LogOut
+                            </MenuItem>
+                        </Link>
+                    </MenuList>
+                </Menu>
+            </Flex>
         </div>
     );
 };

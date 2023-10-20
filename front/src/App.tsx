@@ -25,6 +25,9 @@ import BrowseChannels from './pages/Chat/Channels/BrowseChannels';
 import { RenderContext } from './RenderContext';
 import { Layout } from './pages/Layout';
 import { Verify2Fa } from './pages/Profile/Verify2Fa';
+import Example from './pages/Example';
+import User from './components/User';
+import { UserType } from './Types/User';
 
 function App() {
     const [firstLogin, setFirstLogin] = React.useState(false);
@@ -32,7 +35,16 @@ function App() {
     const [renderData, setRenderData] = React.useState(false);
     const [notification, setNotification] = React.useState(false);
     const buttonClicked = useRef<HTMLButtonElement | null>(null);
+    const [user, setUser] = React.useState<UserType>();
+    const [firstTime, setFirstTime] = React.useState(true);
+    React.useEffect(() => {
+        async function fetchUserData() {
+            const userData = await User();
+            setUser(userData);
+        }
 
+        fetchUserData();
+    }, [renderData]);
     return (
         <BrowserRouter>
             <SocketContext.Provider value={socket}>
@@ -43,7 +55,10 @@ function App() {
                             setRenderData: setRenderData,
                             notification: notification,
                             setNotification: setNotification,
-                            buttonClicked: buttonClicked
+                            buttonClicked: buttonClicked,
+                            user: user,
+                            firstTime: firstTime,
+                            setFirstTime: setFirstTime
                         }}
                     >
                         <Routes>
@@ -98,9 +113,9 @@ function App() {
                             <Route
                                 path="confirm-email"
                                 element={
-                                    <ProtectConfirmation>
-                                        <ConfirmEmail />
-                                    </ProtectConfirmation>
+                                    // <ProtectConfirmation>
+                                    <ConfirmEmail />
+                                    // </ProtectConfirmation>
                                 }
                             />
                             <Route
@@ -198,8 +213,8 @@ function App() {
                                         <Layout children={<GamePage />} />
                                     </ProtectRoutes>
                                 }
-                            >
-                            </Route>
+                            ></Route>
+                            <Route path="testt" element={<Example />} />
                         </Routes>
                     </RenderContext.Provider>
                 </SocketGameContext.Provider>
