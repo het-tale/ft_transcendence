@@ -2,11 +2,7 @@ import { Room } from './types';
 import { Socket } from 'socket.io';
 import { User } from '@prisma/client';
 
-export async function stopGame(
-  room: Room,
-  activeSockets: Map<Socket, User>,
-) {
-  // console.log('stopGame');
+export async function stopGame(room: Room, activeSockets: Map<Socket, User>) {
   const player = room.players[0];
   const otherPlayer = room.players[1];
   const playerSocket = player.socket;
@@ -14,7 +10,6 @@ export async function stopGame(
   const playerUser = activeSockets.get(playerSocket);
   const otherPlayerUser = activeSockets.get(otherPlayerSocket);
   if (!playerUser || !otherPlayerUser) {
-    // console.log('user not found');
     return;
   }
   if (room.gameActive) {
@@ -23,8 +18,4 @@ export async function stopGame(
     playerSocket?.leave(room.roomName);
     otherPlayerSocket?.leave(room.roomName);
   }
-  // console.log('stopina lgame ghayerha ');
-  // rooms.delete(room.roomName);
 }
-
-

@@ -24,6 +24,7 @@ import _42AuthenticationGuard from '../guards/42-authentication.guard';
 import { Response } from 'express';
 import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
+import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
 
 @ApiTags('Authentication non protected routes')
 @Controller('auth')
@@ -43,6 +44,7 @@ export class AuthController {
     return await this.authService.confirmRegister(token);
   }
 
+  @UseGuards(JwtAuthenticationGuard)
   @Get('resend-email')
   async resend(@Req() request: { user: User }) {
     return await this.authService.resendEmail(request.user);
@@ -65,6 +67,7 @@ export class AuthController {
   async signin42Callback(@Req() request: { user: User }, @Res() res: Response) {
     const token = await this.authService.signin42(request.user);
     const url = `${process.env.FRONTEND_URL}/signin42?token=${token}`;
+
     return res.redirect(url);
   }
 
@@ -85,5 +88,4 @@ export class AuthController {
   ) {
     return await this.authService.confirmChangePassword(token, dto);
   }
-
 }

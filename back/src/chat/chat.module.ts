@@ -11,6 +11,12 @@ import { AchievementsService } from './achievements.service';
 @Module({
   imports: [JwtModule.register({}), CloudinaryModule],
   controllers: [ChatController],
-  providers: [ChatGateway, DMService, ChannelService, FriendsService, AchievementsService],
+  providers: [
+    ChatGateway,
+    DMService,
+    ChannelService,
+    FriendsService,
+    AchievementsService,
+  ],
 })
 export class ChatModule {}
