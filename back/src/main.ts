@@ -13,7 +13,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   await app.get(RobotUserService).createRobotUser();
   await app.get(AchievementService).createAchievements();
-  
+
   app.enableCors({
     origin: [process.env.FRONTEND_URL, process.env.BACKEND_URL],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -22,14 +22,14 @@ async function bootstrap() {
     preflightContinue: false,
     allowedHeaders: 'Authorization, Content-Type',
   });
-  
+
   app.useWebSocketAdapter(new IoAdapter(app));
   const config = new DocumentBuilder()
-  .setTitle('ft_transcendence API')
-  .setDescription('Showing all the routes of the API')
-  .setVersion('1.0')
-  .addTag('ft_transcendence')
-  .build();
+    .setTitle('ft_transcendence API')
+    .setDescription('Showing all the routes of the API')
+    .setVersion('1.0')
+    .addTag('ft_transcendence')
+    .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 

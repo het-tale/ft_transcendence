@@ -25,7 +25,7 @@ import { UseZodGuard } from 'nestjs-zod';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
-  
+
   @Get('search-users/:beginWith')
   async searchUsers(
     @Req() request: { user: User },
@@ -35,7 +35,6 @@ export class UserController {
 
     return users;
   }
-
 
   @UseZodGuard('body', NameDto)
   @Post('change-username')
@@ -64,17 +63,20 @@ export class UserController {
 
   @Get('match-history/:username')
   async getMatchHistory(@Param('username') username: string) {
-    return await this.userService.getMatchHistory( username);
+    return await this.userService.getMatchHistory(username);
   }
 
   @Get('achievements/:username')
   async getAchievements(@Param('username') username: string) {
     return await this.userService.getAchievements(username);
   }
+  @Get('leader-board')
+  async getLeaderBoard() {
+    return await this.userService.getLeaderBoard();
+  }
 
   @Get(':id')
   async getUserById(@Param('id', ParseIntPipe) id: number) {
     return await this.userService.getUserById(id);
   }
-
 }

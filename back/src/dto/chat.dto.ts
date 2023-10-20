@@ -1,19 +1,26 @@
-import { IsString, IsInt, IsNotEmpty, isEnum, isString, IsStrongPassword, Min, Max, IsBoolean } from 'class-validator';
-import { IsEnum, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsStrongPassword,
+  Min,
+  Max,
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+} from 'class-validator';
 export class TDM {
   @IsString()
   @IsNotEmpty()
   to: string;
   @IsString()
   message: string;
-};
+}
 
 export enum typeEnum {
   'public',
   'private',
   'protected',
-};
-
+}
 
 export class TCreateRoom {
   @IsEnum(typeEnum)
@@ -26,7 +33,7 @@ export class TCreateRoom {
   @IsOptional()
   @IsStrongPassword()
   password?: string;
-};
+}
 
 export class TRoom {
   @IsNotEmpty()
@@ -35,7 +42,7 @@ export class TRoom {
   @IsOptional()
   @IsString()
   password?: string;
-};
+}
 
 export class TRoomMessage {
   @IsString()
@@ -44,7 +51,7 @@ export class TRoomMessage {
   @IsString()
   @IsNotEmpty()
   message: string;
-};
+}
 
 export class TRoomTarget {
   @IsString()
@@ -53,7 +60,7 @@ export class TRoomTarget {
   @IsString()
   @IsNotEmpty()
   target: string;
-};
+}
 
 export class TInvitation {
   @IsString()
@@ -65,13 +72,13 @@ export class TInvitation {
   @IsBoolean()
   @IsNotEmpty()
   isAccepted: boolean;
-};
+}
 
 export class TUserTarget {
   @IsString()
   @IsNotEmpty()
   target: string;
-};
+}
 
 export class TFriendReq {
   @IsString()
@@ -80,7 +87,7 @@ export class TFriendReq {
   @IsString()
   @IsNotEmpty()
   isAccepted: boolean;
-};
+}
 
 export class TLeaveRoom {
   @IsString()
@@ -89,4 +96,4 @@ export class TLeaveRoom {
   @IsString()
   @IsOptional()
   newOwner?: string;
-};
+}
