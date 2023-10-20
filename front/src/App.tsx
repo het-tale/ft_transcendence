@@ -44,7 +44,7 @@ function App() {
         }
 
         fetchUserData();
-    }, []);
+    }, [renderData]);
     return (
         <BrowserRouter>
             <SocketContext.Provider value={socket}>
