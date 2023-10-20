@@ -20,7 +20,8 @@ export function ListenOnSocket(
   setInit: React.Dispatch<React.SetStateAction<boolean>>,
   setOtherUsername: React.Dispatch<React.SetStateAction<string | null>>,
   setGameStarted: React.Dispatch<React.SetStateAction<boolean>>,
-  setGameinvite: React.Dispatch<React.SetStateAction<boolean>>
+  setGameinvite: React.Dispatch<React.SetStateAction<boolean>>,
+  setGameDeclined: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   socket.on("connect", () => {
   });
@@ -37,6 +38,10 @@ export function ListenOnSocket(
 	setOtherAvatar(avatar);
 	setOtherUsername(username);
 	  });
+
+  socket.on("InvitationDeclined", (message: string) => {
+    setGameDeclined(true);
+  });
 	
   socket.on("JoinRoom", (message: string) => {
   });
