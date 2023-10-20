@@ -30,14 +30,6 @@ export class DMService {
     return user;
   }
   async changeUserStatus(username: string, status: string) {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        username,
-      },
-    });
-    if (!user) {
-      throw new HttpException('user not found', 404);
-    }
     const updatedUser = await this.prisma.user.update({
       where: {
         username,
@@ -410,5 +402,17 @@ export class DMService {
     const users = list.filter((one) => one.username.startsWith(beginWith));
 
     return users;
+  }
+
+  async changeUsername(username: string, newName: string) {
+    try {
+      await this.prisma.user.update({
+        where: { username },
+        data: { username: newName },
+      });
+    } catch (error) {
+      if (error.code === 'P2002') throw new Error('Username already taken');
+      else throw new Error(error.message);
+    }
   }
 }
