@@ -19,6 +19,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { generateRandomAvatar } from 'src/utils/generate-random-avatar';
 import { User } from '@prisma/client';
+import { exclude } from 'src/utils';
 
 @Injectable()
 export class AuthService {
@@ -171,5 +172,16 @@ export class AuthService {
   async confirmChangePassword(token: string, dto: TSetPasswordData) {
     const email = await this.confirmationService.confirmEmail(token);
     await this.updatePassword(dto, email);
+  }
+  async getUser(user: User) {
+    const myUser = await this.prisma.user.findUnique({
+      where: { email: user.email },
+      include: {
+        blocked: true,
+        sentFriendRequests: true,
+      },
+    });
+
+    return myUser;
   }
 }
