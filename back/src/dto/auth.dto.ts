@@ -1,5 +1,5 @@
 import { createZodDto } from 'nestjs-zod';
-import { custom, z } from 'nestjs-zod/z';
+import { z } from 'nestjs-zod/z';
 
 export const customEmailValidator = z.string().refine(
   (value) => {
@@ -17,7 +17,9 @@ export const customEmailValidator = z.string().refine(
 
 export const customPasswordValidator = z.string().refine(
   (value) => {
-    const passwordRegex = /^(?=(.*[a-z]){3,})(?=(.*[A-Z]){2,})(?=(.*[0-9]){2,})(?=(.*[!@#$%^&*()\-__+.]){1,}).{8,}$/;
+    const passwordRegex =
+      /^(?=(.*[a-z]){3,})(?=(.*[A-Z]){2,})(?=(.*[0-9]){2,})(?=(.*[!@#$%^&*()\-__+.]){1,}).{8,}$/;
+
     return passwordRegex.test(value);
   },
   {
@@ -28,11 +30,13 @@ export const customPasswordValidator = z.string().refine(
 
 export const customUsernameValidator = z.string().refine(
   (value) => {
-    const usernameRegex = /^[a-zA-Z0-9._-]{3,}$/;
+    const usernameRegex = /^[a-zA-Z0-9._-]{3,15}$/;
+
     return usernameRegex.test(value);
   },
   {
-    message: 'Username must contain at least 3 characters and no special characters',
+    message:
+      'Username must contain at least 3 characters and no special characters except . _ - max 15 characters',
   },
 );
 
