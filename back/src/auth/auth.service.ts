@@ -172,4 +172,15 @@ export class AuthService {
     const email = await this.confirmationService.confirmEmail(token);
     await this.updatePassword(dto, email);
   }
+  async getUser(user: User) {
+    const myUser = await this.prisma.user.findUnique({
+      where: { email: user.email },
+      include: {
+        blocked: true,
+        sentFriendRequests: true,
+      },
+    });
+
+    return myUser;
+  }
 }
