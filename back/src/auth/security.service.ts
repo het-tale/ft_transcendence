@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { TwoFaService } from 'src/2fa/two-fa.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Response } from 'express';
 import { ConfirmationService } from 'src/confirmation/confirmation.service';
 import { TAdd42CredentialsData } from 'src/dto';
 import * as argon from 'argon2';

@@ -19,7 +19,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { generateRandomAvatar } from 'src/utils/generate-random-avatar';
 import { User } from '@prisma/client';
-import { exclude } from 'src/utils';
 
 @Injectable()
 export class AuthService {
