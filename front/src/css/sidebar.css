@@ -6,7 +6,7 @@ aside {
     padding-left: 15px;
     height: 92vh;
     background-image: linear-gradient(30deg , var(--fakhti), var(--koki));
-    border-top-right-radius: 80px;
+    /* border-top-right-radius: 80px; */
     font-family: 'Krona One';
     z-index: 1;
   }
@@ -30,8 +30,8 @@ aside {
     outline: none;
     position: relative;
     background-color: var(--white);
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
+    /* border-top-left-radius: 20px; */
+    /* border-bottom-left-radius: 20px; */
   }
   
   aside a .fa {
@@ -47,7 +47,7 @@ aside {
     right: 0;
     height: 35px;
     width: 35px;
-    border-bottom-right-radius: 18px;
+    /* border-bottom-right-radius: 18px; */
     box-shadow: 0 20px 0 0 var(--white);
   }
   
@@ -59,7 +59,7 @@ aside {
     right: 0;
     height: 35px;
     width: 35px;
-    border-top-right-radius: 18px;
+    /* border-top-right-radius: 18px; */
     box-shadow: 0 -20px 0 0 var(--white);
   }
   
@@ -69,8 +69,8 @@ aside {
     outline: none;
     position: relative;
     background-color: var(--white);
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
+    /* border-top-left-radius: 20px; */
+    /* border-bottom-left-radius: 20px; */
   }
   
   aside #more {
