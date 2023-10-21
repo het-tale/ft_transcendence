@@ -83,7 +83,7 @@ const Game: React.FC = () => {
     const socketGame = React.useContext(SocketGameContext);
     const [gameinvite, setGameinvite] = useState(false);
     const [loaded, setDataLoaded] = useState(false);
-    const [setGamedeclined, setGameDeclined] = useState(false);
+    const [Gamedeclined, setGameDeclined] = useState(false);
     const intialise = useRef(false);
     let paddRef = useRef<Paddle | null>(null);
     let otherpaddRef = useRef<Paddle | null>(null);
@@ -197,6 +197,12 @@ const Game: React.FC = () => {
         }
     }, [socket]);
 
+    if (Gamedeclined){
+        setTimeout(() => {
+            window.location.href = '/home';
+        }, 3000);
+    }
+
     const handleHomeNavigation = () => {
         window.location.href = '/home';
         socket?.disconnect();
@@ -294,18 +300,12 @@ const Game: React.FC = () => {
                             </>
                         )}
                     </div>
-                    {setGamedeclined ? (
+                    {Gamedeclined ? (
                         <div className="overlay">
                             <div className="game-over-container">
                                 <div className="game-over">
                                     <p className="paraInfo">Game Declined .</p>
                                 </div>
-                                <button
-                                    className="home-button"
-                                    onClick={handleHomeNavigation}
-                                >
-                                    Go to Home
-                                </button>
                             </div>
                         </div>
                     ) : null}

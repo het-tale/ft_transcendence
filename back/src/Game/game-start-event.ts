@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import { GameData, INTERVAL, OTHERPADDLE, PADDLE, Player, Room } from './types';
+import { GameData, INTERVAL, OTHERPADDLE, PADDLE, Player, Room, SPEED_INTERVAL } from './types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
@@ -133,7 +133,8 @@ export class GameStartEvent {
     this.serviceUpdate.OtherAvatar(client, room, activeSockets);
     if (!room.gameActive) {
       room.gameActive = true;
-      room.gameInterval = interval(INTERVAL).subscribe(() => {
+      let speed = INTERVAL;
+      room.gameInterval = interval(speed).subscribe(() => {
         if (!room.gameActive) {
           cancelgamesart(room, rooms);
 
