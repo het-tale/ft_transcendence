@@ -1,5 +1,6 @@
 import { Socket } from 'socket.io';
 import {
+  BALLDX,
   Ball,
   CONTAINERHIEGHT,
   CONTAINERWIDTH,
@@ -25,8 +26,8 @@ export class GameUpdate {
     if (
       room.ball.x - room.ball.radius <
         playerPaddle.x + playerPaddle.width / 2 &&
-      room.ball.y >= playerPaddle.y &&
-      room.ball.y <= playerPaddle.y + playerPaddle.height
+      room.ball.y > playerPaddle.y &&
+      room.ball.y < playerPaddle.y + playerPaddle.height
     ) {
       const relativeIntersectY =
         (room.ball.y - (playerPaddle.y + playerPaddle.height / 2)) /
@@ -40,15 +41,15 @@ export class GameUpdate {
       room.ball.dy = Math.sin(finalBounceAngle) * 3;
     } else if (
       room.ball.x + room.ball.radius > otherPaddle.x - otherPaddle.width &&
-      room.ball.y >= otherPaddle.y &&
-      room.ball.y <= otherPaddle.y + otherPaddle.height
+      room.ball.y > otherPaddle.y &&
+      room.ball.y < otherPaddle.y + otherPaddle.height
     ) {
       const relativeIntersectY =
         (room.ball.y - (otherPaddle.y + otherPaddle.height / 2)) /
         (otherPaddle.height / 2);
       const bounceAngle = relativeIntersectY * MAX_ANGLE_CHANGE;
 
-      const randomFactor = (Math.random() - 0.5) * 0.5;
+      const randomFactor = (Math.random() - 0.5) * 0.2;
       const finalBounceAngle = bounceAngle + randomFactor;
 
       room.ball.dx *= -1;
@@ -64,7 +65,7 @@ export class GameUpdate {
     const playerPaddle = player.paddle;
     const otherPaddle = otherPlayer.paddle;
     this.intersections(room, playerPaddle, otherPaddle);
-    if (room.ball.x + room.ball.radius >= CONTAINERWIDTH) {
+    if (room.ball.x + room.ball.radius > CONTAINERWIDTH) {
       player.score++;
       room.rounds--;
       if (room.rounds === 0) this.dataupdatetostop(room, activeSockets);
@@ -203,20 +204,20 @@ export class GameUpdate {
     const random = Math.random();
     switch (true) {
       case random < 0.25:
-        ball.dx = 3;
-        ball.dy = 3;
+        ball.dx = BALLDX;
+        ball.dy = BALLDX;
         break;
       case random < 0.5:
-        ball.dx = 3;
-        ball.dy = -3;
+        ball.dx = BALLDX;
+        ball.dy = -BALLDX;
         break;
       case random < 0.75:
-        ball.dx = -3;
-        ball.dy = 3;
+        ball.dx = -BALLDX;
+        ball.dy = BALLDX;
         break;
       default:
-        ball.dx = -3;
-        ball.dy = -3;
+        ball.dx = -BALLDX;
+        ball.dy = -BALLDX;
         break;
     }
   }
