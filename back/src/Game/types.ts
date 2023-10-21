@@ -87,8 +87,8 @@ export class Room {
           CONTAINERWIDTH / 2,
           CONTAINERHIEGHT / 2,
           RADIUS,
-          3,
-          3,
+          BALLDX,
+          BALLDX,
         );
         break;
       case random < 0.4:
@@ -96,8 +96,8 @@ export class Room {
           CONTAINERWIDTH / 2,
           CONTAINERHIEGHT / 2,
           RADIUS,
-          3,
-          -3,
+          BALLDX,
+          -BALLDX,
         );
         break;
       case random < 0.6:
@@ -105,8 +105,8 @@ export class Room {
           CONTAINERWIDTH / 2,
           CONTAINERHIEGHT / 2,
           RADIUS,
-          -3,
-          3,
+          -BALLDX,
+          BALLDX,
         );
         break;
       case random < 0.8:
@@ -114,8 +114,8 @@ export class Room {
           CONTAINERWIDTH / 2,
           CONTAINERHIEGHT / 2,
           RADIUS,
-          -3,
-          -3,
+          -BALLDX,
+          -BALLDX,
         );
         break;
       default:
@@ -123,8 +123,8 @@ export class Room {
           CONTAINERWIDTH / 2,
           CONTAINERHIEGHT / 2,
           RADIUS,
-          3,
-          3,
+          BALLDX,
+          BALLDX,
         );
         break;
     }
@@ -142,12 +142,13 @@ export class Room {
   isinvit: boolean;
 }
 
-export const INTERVAL = 16.66;
+export const INTERVAL = 20;
 export const INCREASE_SPEED = 1;
 export const SPEED_INTERVAL = 1000;
 export const CONTAINERHIEGHT = 480;
 export const CONTAINERWIDTH = 720;
 export const RADIUS = 10;
+export const BALLDX = 5;
 export const MAX_ANGLE_CHANGE = Math.PI / 3;
 
 export const PADDLE = new Paddle(
