@@ -39,22 +39,23 @@ function Register() {
                     isClosable: true,
                     position: 'bottom-right'
                 });
-                // navigate('/confirm-email');
-                navigate('/login');
+                navigate('/confirm-email');
+                // navigate('/login');
             })
             .catch((error) => {
                 console.log('register error', error);
-                const errorMessage = error.response?.data?.message;
-                setErrorMessage(errorMessage);
-                console.log(errorMessage);
+                const errors = error?.response?.data?.errors;
+            for (let index = 0; index < errors.length; index++) {
                 toast({
-                    title: 'Registration Failed.',
-                    description: errorMessage,
+                    title: 'Error.',
+                    description: errors[index].message,
                     status: 'error',
-                    duration: 9000,
+                    duration: 5000,
                     isClosable: true,
                     position: 'bottom-right'
                 });
+                break;
+            }
             });
     };
 
