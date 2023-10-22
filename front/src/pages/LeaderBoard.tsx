@@ -105,7 +105,8 @@ export const LeaderBoard = () => {
                     'You Have No Place in this ladder'
                 )}
             </Flex>
-            <TableContainer borderWidth="1px" borderRadius="lg" p={4}>
+            {
+                users?.length > 0 ? <TableContainer borderWidth="1px" borderRadius="lg" p={4}>
                 <Table variant="simple">
                     <Thead>
                         <Tr>
@@ -154,7 +155,9 @@ export const LeaderBoard = () => {
                         })}
                     </Tbody>
                 </Table>
-            </TableContainer>
+            </TableContainer>: null
+            }
+           
         </Flex>
     );
 };

@@ -113,9 +113,9 @@ function App() {
                             <Route
                                 path="confirm-email"
                                 element={
-                                    // <ProtectConfirmation>
+                                    <ProtectConfirmation>
                                     <ConfirmEmail />
-                                    // </ProtectConfirmation>
+                                    </ProtectConfirmation>
                                 }
                             />
                             <Route
@@ -142,9 +142,9 @@ function App() {
                             <Route
                                 path="resend-email"
                                 element={
-                                    // <ProtectConfirmation>
+                                    <ProtectConfirmation>
                                     <ResendEmail />
-                                    // </ProtectConfirmation>
+                                    </ProtectConfirmation>
                                 }
                             />
                             <Route
