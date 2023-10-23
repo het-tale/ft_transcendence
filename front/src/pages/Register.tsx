@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@chakra-ui/react';
+import { error } from 'console';
 
 function Register() {
     const [username, setUsername] = useState('');
@@ -45,17 +46,27 @@ function Register() {
             .catch((error) => {
                 console.log('register error', error);
                 const errors = error?.response?.data?.errors;
-            for (let index = 0; index < errors.length; index++) {
-                toast({
-                    title: 'Error.',
-                    description: errors[index].message,
-                    status: 'error',
-                    duration: 5000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                break;
-            }
+                if (errors) {
+                    for (let index = 0; index < errors?.length; index++) {
+                        toast({
+                            title: 'Error.',
+                            description: errors[index].message,
+                            status: 'error',
+                            duration: 5000,
+                            isClosable: true,
+                            position: 'bottom-right'
+                        });
+                    }
+                } else {
+                    toast({
+                        title: 'Error.',
+                        description: error?.response?.data?.message,
+                        status: 'error',
+                        duration: 5000,
+                        isClosable: true,
+                        position: 'bottom-right'
+                    });
+                }
             });
     };
 
