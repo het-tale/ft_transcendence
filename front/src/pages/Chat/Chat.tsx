@@ -74,7 +74,7 @@ export default function Chat(props: BrowseChannelsProps) {
         return () => {
             clearTimeout(timer);
         };
-    }, []);
+    });
     socket.on('roomMessage', (data: any) => {
         // console.log('ROOM MESSAGE DATA', data);
         setRender(!render);

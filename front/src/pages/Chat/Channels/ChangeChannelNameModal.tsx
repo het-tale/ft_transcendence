@@ -1,6 +1,5 @@
 import { Button, ButtonGroup, useToast } from '@chakra-ui/react';
 import React from 'react';
-import { SocketContext } from '../../../socket';
 import { Channel } from '../../../Types/Channel';
 import { UserType } from '../../../Types/User';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -19,7 +18,6 @@ interface ChangeChannelNameModalProps {
 }
 
 const ChangeChannelNameModal = (props: ChangeChannelNameModalProps) => {
-    const socket = React.useContext(SocketContext);
     const toast = useToast();
     const { register, handleSubmit } = useForm<changeName>();
     const handleChangeName: SubmitHandler<changeName> = async (data) => {
@@ -28,7 +26,7 @@ const ChangeChannelNameModal = (props: ChangeChannelNameModalProps) => {
             name: data.name
         };
         try {
-            const response = await client.post(
+            await client.post(
                 `chat/change-channel-name/${props.channelDm?.name}`,
                 sentData,
                 {

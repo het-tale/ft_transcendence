@@ -11,7 +11,6 @@ import {
 } from '@chakra-ui/react';
 
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { SocketContext } from '../../../socket';
 import client from '../../../components/Client';
 
 interface ChangeTypeData {
@@ -28,7 +27,6 @@ interface ChangeChannelTypeModalProps {
 }
 
 const ChangeChannelTypeModal = (props: ChangeChannelTypeModalProps) => {
-    const socket = React.useContext(SocketContext);
     const [selectedOption, setSelectedOption] = React.useState('');
     const [showField, setShowField] = React.useState(false);
     const toast = useToast();
@@ -50,15 +48,11 @@ const ChangeChannelTypeModal = (props: ChangeChannelTypeModalProps) => {
             type: data.type
         };
         try {
-            const response = await client.post(
-                `chat/change-channel-type/`,
-                sentData,
-                {
-                    headers: {
-                        Authorization: 'Bearer ' + localStorage.getItem('token')
-                    }
+            await client.post(`chat/change-channel-type/`, sentData, {
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
-            );
+            });
             props.setRender && props.setRender(!props.render);
             props.onClose();
         } catch (error: any) {

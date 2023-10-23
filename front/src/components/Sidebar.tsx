@@ -8,7 +8,6 @@ import {
 } from 'react-icons/bs';
 import { UserType } from '../Types/User';
 import User from './User';
-import { Button } from '@chakra-ui/react';
 import { Notification } from '../Types/Notification';
 import { RenderContext, RenderContextType } from '../RenderContext';
 

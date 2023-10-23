@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, useToast } from '@chakra-ui/react';
+import { Button, ButtonGroup } from '@chakra-ui/react';
 import React from 'react';
 import { SocketContext } from '../../../socket';
 import { Channel } from '../../../Types/Channel';
@@ -19,7 +19,6 @@ interface deleteChannelProps {
 
 const DeletChannelModal = (props: deleteChannelProps) => {
     const socket = React.useContext(SocketContext);
-    const toast = useToast();
     const { register, handleSubmit } = useForm<deleteChannel>();
     const handleDeleteChannel: SubmitHandler<deleteChannel> = (data) => {
         // console.log('Delete Channel Data', data);

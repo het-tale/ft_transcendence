@@ -26,7 +26,7 @@ const EditAvatarBody = (props: EditAvatarProps) => {
     const handleEditAvatar: SubmitHandler<EditAvatarData> = async (data) => {
         // console.log('Edit Profile data', data);
         try {
-            const response = await client.post(`auth/upload-avatar`, formData, {
+            await client.post(`auth/upload-avatar`, formData, {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }

@@ -1,6 +1,5 @@
 import { useContext } from 'react';
 import { UserType } from '../../Types/User';
-import client from '../../components/Client';
 import '../../css/chat/modal.css';
 import { Button, ButtonGroup, useToast } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -17,7 +16,6 @@ interface EditUserNameData {
 }
 
 const EditUserNameBody = (props: EditUserNameBodyProps) => {
-    const toast = useToast();
     const renderData = useContext(RenderContext);
     const { register, handleSubmit } = useForm<EditUserNameData>();
     const socket = React.useContext(SocketContext);
