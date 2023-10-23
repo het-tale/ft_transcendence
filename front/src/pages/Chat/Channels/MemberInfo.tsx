@@ -61,7 +61,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
         };
         // console.log('remove admin logic');
         try {
-            const response = await client.post('chat/remove-admin', data, {
+            await client.post('chat/remove-admin', data, {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
@@ -303,7 +303,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
         return () => {
             clearTimeout(timer);
         };
-    }, []);
+    });
     // console.log('ROOMMMMMMM', props.room);
     return (
         <Flex bg={'#F5F5F5'} p={'10px'} marginBottom={8} marginTop={-6}>

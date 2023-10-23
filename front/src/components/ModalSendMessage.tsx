@@ -3,7 +3,7 @@ import { ModalBody, ModalFooter } from 'react-bootstrap';
 import '../css/chat/modal.css';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { SentData } from '../pages/Chat/Dms';
-import { Button, ButtonGroup, Flex } from '@chakra-ui/react';
+import { Button, ButtonGroup } from '@chakra-ui/react';
 import { SocketContext } from '../socket';
 
 const ModalSendMessage = (props: any) => {

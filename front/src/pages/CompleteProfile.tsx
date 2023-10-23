@@ -18,7 +18,6 @@ export default function CompleteProfile(props: any) {
     const { register, handleSubmit } = useForm<DataInput>();
     const handleAvatar: SubmitHandler<DataInput> = async (data) => {
         try {
-            const token = localStorage.getItem('token');
             const headers = {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             };

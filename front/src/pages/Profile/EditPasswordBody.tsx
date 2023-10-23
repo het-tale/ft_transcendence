@@ -30,15 +30,11 @@ const EditPasswordBody = (props: EditPasswordBodyProps) => {
             newPasswordConfirm: data.newPasswordConfirm
         };
         try {
-            const response = await client.post(
-                `user/change-password`,
-                sentData,
-                {
-                    headers: {
-                        Authorization: 'Bearer ' + localStorage.getItem('token')
-                    }
+            await client.post(`user/change-password`, sentData, {
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
-            );
+            });
             renderData.setRenderData(!renderData.renderData);
             props.onClose();
         } catch (error: any) {

@@ -45,7 +45,7 @@ const ProtectRoutes = (props: any) => {
         if (props.firstLogin === false) {
             navigate('/home');
         }
-    }, [navigate]);
+    });
 
     if (isLoggedIn) {
         return <React.Fragment>{props.children}</React.Fragment>;
