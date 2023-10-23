@@ -10,7 +10,9 @@ const RequireNoAuth = (props: any) => {
             try {
                 const response = await User();
                 if (
-                    (response !== null && !response.is2FaEnabled) ||
+                    (response !== null &&
+                        response.isEmailConfirmed &&
+                        !response.is2FaEnabled) ||
                     (response.is2FaEnabled && response.is2FaVerified)
                 ) {
                     navigate('/home');
