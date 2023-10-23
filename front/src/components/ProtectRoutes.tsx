@@ -16,7 +16,7 @@ const ProtectRoutes = (props: any) => {
                         Authorization: 'Bearer ' + token
                     }
                 });
-                if (response.status === 200) {
+                if (response.status === 200 && response.data.isEmailConfirmed) {
                     // console.log('response User', response.data);
                     if (response.data.is2FaEnabled) {
                         if (response.data.is2FaVerified) {
