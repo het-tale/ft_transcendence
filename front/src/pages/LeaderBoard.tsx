@@ -10,8 +10,7 @@ import {
     Text,
     AvatarGroup,
     Avatar,
-    AvatarBadge,
-    Button
+    AvatarBadge
 } from '@chakra-ui/react';
 import React, { useEffect } from 'react';
 import { RenderContext } from '../RenderContext';

@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import '../../../css/chat/Right.css';
-import { useToast } from '@chakra-ui/react';
 import { SocketContext } from '../../../socket';
 import { Channel } from '../../../Types/Channel';
 import { UserType } from '../../../Types/User';
@@ -15,7 +14,7 @@ export interface ChannelTypingBarProps {
 const ChannelTypingBar = (props: ChannelTypingBarProps) => {
     const [message, setMessage] = useState('');
     const socket = React.useContext(SocketContext);
-    const toast = useToast();
+
     const sendRoomMessageHandler = (e: any) => {
         e.preventDefault();
         // console.log('message sent');
