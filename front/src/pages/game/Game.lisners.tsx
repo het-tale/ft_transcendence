@@ -40,6 +40,7 @@ export function ListenOnSocket(
 	  });
 
   socket.on("InvitationDeclined", (message: string) => {
+    console.log("\x1b[36m  InvitationDeclined", message);
     setGameDeclined(true);
   });
 	
