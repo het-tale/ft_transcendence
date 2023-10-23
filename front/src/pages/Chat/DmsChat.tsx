@@ -30,7 +30,6 @@ import ModalConfirm from './ModalConfirm';
 import client from '../../components/Client';
 import { Link, useNavigate } from 'react-router-dom';
 import UserDmInfo from './UserDmInfo';
-import { RenderContext } from '../../RenderContext';
 
 const DmsChat = (props: any) => {
     const toast = useToast();

@@ -12,7 +12,7 @@ const Logout = () => {
         // console.log('The token after logout', localStorage.getItem('token'));
         socket.disconnect();
         navigate('/');
-    }, []);
+    });
     return <></>;
 };
 

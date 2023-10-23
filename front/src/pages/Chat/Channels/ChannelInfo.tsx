@@ -1,6 +1,4 @@
 import {
-    Avatar,
-    Box,
     Button,
     Card,
     CardBody,
@@ -56,16 +54,13 @@ const ChannelInfo = (props: ChannelInfoProps) => {
         onClose: onClose4
     } = useDisclosure();
     const socket = React.useContext(SocketContext);
-    const [room, setRoom] = React.useState<Channel>();
+
     const handleLeaveChannel = () => {
         // console.log('Hello From Leave Channel');
         socket.emit('leaveRoom', {
             room: props.ChannelDm?.name
         });
         props.setRender && props.setRender(!props.render);
-    };
-    const handleChangeAvatar = () => {
-        // console.log('Hello From Change Avatar');
     };
 
     return (

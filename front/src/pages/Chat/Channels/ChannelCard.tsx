@@ -91,7 +91,7 @@ const ChannelCard = (props: BrowseChannelsCardProps) => {
         return () => {
             clearTimeout(timer);
         };
-    }, []);
+    });
 
     return (
         <Card maxW="sm">

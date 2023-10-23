@@ -30,7 +30,6 @@ import User from '../components/User';
 import { SearchUsers } from '../components/SearchUsers';
 import { AchievementUnlocked } from './AchievementUnlocked';
 import { Achievement } from '../Types/Achievement';
-import { set } from 'react-hook-form';
 import { MessageType } from '../Types/Message';
 
 interface Props {
@@ -46,21 +45,21 @@ export const Layout = ({ children }: Props) => {
     const toast = useToast();
     const token = localStorage.getItem('token');
     const [roomId, setRoomId] = useState<string>('');
-    const [user, setUser] = React.useState<UserType>();
+    // const [user, setUser] = React.useState<UserType>();
     const [users, setUsers] = React.useState<UserType[]>([]);
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [showHide, setShowHide] = React.useState(false);
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [achievements, setAchievements] = React.useState<Achievement[]>([]);
-    React.useEffect(() => {
-        async function fetchUserData() {
-            const currentUserData = await User();
-            setUser(currentUserData);
-        }
+    // React.useEffect(() => {
+    //     async function fetchUserData() {
+    //         const currentUserData = await User();
+    //         setUser(currentUserData);
+    //     }
 
-        fetchUserData();
-    }, []);
+    //     fetchUserData();
+    // }, []);
     useEffect(() => {
         socket.auth = { token: token };
         socket.connect();

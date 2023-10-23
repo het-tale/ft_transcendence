@@ -69,7 +69,7 @@ function EmailRedirection(props: any) {
         return () => {
             clearTimeout(timer);
         };
-    }, [navigate]);
+    });
     return <></>;
 }
 

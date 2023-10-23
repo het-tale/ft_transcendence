@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import '../../css/chat/Right.css';
 import { SocketContext } from '../../socket';
-import { useToast } from '@chakra-ui/react';
 
 const TypingBar = (props: any) => {
     const [message, setMessage] = useState('');
     const socket = React.useContext(SocketContext);
     // console.log('typing socket', socket);
-    const toast = useToast();
+
     const sendMessageHandler = (e: any) => {
         e.preventDefault();
         // console.log('message sent');

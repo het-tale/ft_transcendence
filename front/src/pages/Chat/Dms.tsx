@@ -11,7 +11,7 @@ import RoomsChat from './Channels/RoomsChat';
 import ModalBodyUi from '../../components/ModalBodyUi';
 import { UserType } from '../../Types/User';
 import ModalSendMessage from '../../components/ModalSendMessage';
-import { SubmitHandler, set, useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { Channel } from '../../Types/Channel';
 import ChannelDisplay from './Channels/ChannelDisplay';
 import { Link } from 'react-router-dom';
@@ -48,17 +48,6 @@ const Dms = (props: any) => {
         setSelectedOption(event.target.value);
         setShowField(event.target.value === 'protected');
         // console.log('RADIOOOOOOO CHAAAANGE', event.target.value);
-    };
-
-    const handleSubmit1 = () => {
-        const data = new FormData(formRef.current ?? undefined);
-        const formData = {
-            name: data.get('name'),
-            avatar: data.get('avatar'),
-            type: data.get('group1'),
-            password: data.get('password')
-        };
-        // console.log('FORMDATA', formData);
     };
 
     const { register, handleSubmit } = useForm<SentData>();
@@ -195,7 +184,6 @@ const Dms = (props: any) => {
                             onOpen={onOpen}
                             onClose={onClose}
                             title={'Add new Channel'}
-                            handleData={handleSubmit1}
                             body={
                                 <ModalBodyUi
                                     formRef={formRef}

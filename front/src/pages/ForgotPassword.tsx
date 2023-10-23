@@ -1,13 +1,10 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import '../css/forgot-password.css';
-import { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import client from '../components/Client';
 import { useToast } from '@chakra-ui/react';
 
 const ForgotPassword = () => {
-    const [email, setEmail] = useState('');
-    let navigate = useNavigate();
     const toast = useToast();
     interface EmailInput {
         email: String;
@@ -253,7 +250,6 @@ const ForgotPassword = () => {
                         className="passInput"
                         placeholder="Email address"
                         {...register('email', { required: true })}
-                        onChange={(e) => setEmail(e.target.value)}
                     />
                     <button type="submit">Send My Password</button>
                 </form>
