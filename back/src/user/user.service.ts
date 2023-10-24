@@ -66,10 +66,21 @@ export class UserService {
     return users;
   }
   async getPendingFriendRequests(user: User) {
+    //sender should not be friend with receiver
+
     const friendRequests = await this.prisma.friendRequest.findMany({
       where: {
         receiverId: user.id,
         status: 'pending',
+        sender: {
+          NOT: {
+            friends: {
+              some: {
+                id: user.id,
+              },
+            },
+          },
+        },
       },
       select: {
         sender: {
@@ -155,11 +166,28 @@ export class UserService {
     return [...myUser.matchHistoryA, ...myUser.matchHistoryB];
   }
 
+  async calculateRank() {
+    const users = await this.prisma.user.findMany({
+      select: {
+        id: true,
+      },
+      orderBy: {
+        lp: 'desc',
+      },
+    });
+    for (let i = 0; i < users.length; i++) {
+      await this.prisma.user.update({
+        where: { id: users[i].id },
+        data: { g_rank: i + 1 },
+      });
+    }
+  }
   async getLeaderBoard() {
     //if no match played yet?
     if ((await this.prisma.match.count()) === 0) {
       return [];
     }
+    await this.calculateRank();
     const users = await this.prisma.user.findMany({
       select: {
         id: true,
