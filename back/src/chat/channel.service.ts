@@ -1131,13 +1131,14 @@ export class ChannelService {
     });
   }
   async changeChannelType(dto: Troom, user: User) {
+    console.log(dto);
     const channel = await this.prisma.channel.findUnique({
       where: {
         name: dto.name,
       },
     });
     if (!channel) {
-      throw new Error('channel not found');
+      throw new HttpException('channel not found', 404);
     }
     if (channel.ownerId !== user.id)
       throw new HttpException('user is not the owner', 400);
@@ -1178,7 +1179,7 @@ export class ChannelService {
       },
     });
     if (!channel) {
-      throw new Error('channel not found');
+      throw new HttpException('channel not found', 404);
     }
     if (channel.ownerId !== user.id)
       throw new HttpException('user is not the owner', 400);
@@ -1186,7 +1187,7 @@ export class ChannelService {
       (admin) => admin.username === dto.admin,
     );
     if (!isAdmin) {
-      throw new Error('user provided is not an admin');
+      throw new HttpException('user is not an admin', 400);
     }
     await this.prisma.channel.update({
       where: {

@@ -23,11 +23,15 @@ import {
   TRoomMessage,
   TRoomTarget,
   TUserTarget,
-  Tname,
+  TUsername,
 } from 'src/dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { AchievementsService } from './achievements.service';
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { BadRequestTransformationFilter } from './validation.filter';
 
+@UseFilters(BadRequestTransformationFilter)
+@UsePipes(new ValidationPipe({ transform: true }))
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -46,16 +50,16 @@ export class ChatGateway
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    const token = client.handshake.auth.token;
-    // const token = client.handshake.headers.token;
+    const token = client.handshake.auth.token ?? client.handshake.headers.token;
     try {
-      this.io.emit('userOnline', client.id);
       const user = await this.dmService.verifyToken(token);
       this.connectedUsers.push({
         clientId: client.id,
         username: user.username,
       });
-      await this.dmService.changeUserStatus(user?.username, 'online');
+      console.log(this.connectedUsers);
+      await this.dmService.changeUserStatus(user.username, 'online');
+      this.io.emit('userOnline', client.id);
       // console.log(this.connectedUsers);
       await this.channelService.rejoinRooms(user.id, client);
       const offlineMessages = await this.dmService.getOfflineMessages(user.id);
@@ -100,13 +104,13 @@ export class ChatGateway
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    this.io.emit('userOffline', client.id);
     const user = this.connectedUsers.find(
       (user) => user.clientId === client.id,
-    );
-    // console.log(`Cliend id:${client.id} disconnected`);
-    if (!user) return;
-    await this.dmService.changeUserStatus(user.username, 'offline');
+      );
+      // console.log(`Cliend id:${client.id} disconnected`);
+      if (!user) return;
+      await this.dmService.changeUserStatus(user.username, 'offline');
+      this.io.emit('userOffline', client.id);
     this.connectedUsers = this.connectedUsers.filter(
       (user) => user.clientId !== client.id,
     );
@@ -162,16 +166,6 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      if (
-        data.type !== 'public' &&
-        data.type !== 'protected' &&
-        data.type !== 'private'
-      ) {
-        throw new Error('invalid room type');
-      }
-      if (data.type === 'protected' && !data.password) {
-        throw new Error('password is required for protected rooms');
-      }
       const owner = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       );
@@ -521,6 +515,7 @@ export class ChatGateway
         (user) => user.clientId === client.id,
       );
       const clientUsername = user1.username;
+      console.log(clientUsername, "clientUsername");
       const receiver = this.connectedUsers.find(
         (user) => user.username === data.from,
       );
@@ -647,7 +642,7 @@ export class ChatGateway
   }
   @SubscribeMessage('changeUsername')
   async changeUsername(
-    @MessageBody() data: Tname,
+    @MessageBody() data: TUsername,
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -655,9 +650,9 @@ export class ChatGateway
         (user) => user.clientId === client.id,
       );
       await this.dmService.changeUsername(user.username, data.name);
-      this.connectedUsers = this.connectedUsers.map((user) => {
-        if (user.clientId === client.id) {
-          user.username = data.name;
+      this.connectedUsers = this.connectedUsers.map((current) => {
+        if (current.username === user.username) {
+          current.username = data.name;
         }
 
         return user;

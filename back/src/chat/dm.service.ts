@@ -30,6 +30,14 @@ export class DMService {
     return user;
   }
   async changeUserStatus(username: string, status: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
+    if (!user) {
+      throw new HttpException('user not found', 404);
+    }
     const updatedUser = await this.prisma.user.update({
       where: {
         username,
