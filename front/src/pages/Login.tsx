@@ -40,9 +40,9 @@ function Login(props: any) {
             }
         } catch (error: any) {
             // console.log('Login Error', error);
-            const errorMessage = error.response.data.message;
-            setErrorMessage(errorMessage);
-            // console.log('The error message', errorMessage);
+            const errorMessage1 = error?.response?.data?.message;
+            setErrorMessage(errorMessage1);
+            console.log('The error message', errorMessage);
             toast({
                 title: 'Login Failed.',
                 description: errorMessage,

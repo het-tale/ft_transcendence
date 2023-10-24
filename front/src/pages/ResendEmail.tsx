@@ -15,8 +15,8 @@ function ResendEmail() {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
             });
-            console.log('STATUS', response.status);
-            console.log('MESSAGE', response.data.message);
+            console.log('STATUS', response?.status);
+            console.log('MESSAGE', response?.data?.message);
             if (response.status === 200) {
                 toast({
                     title: 'Email Sent.',
@@ -30,8 +30,8 @@ function ResendEmail() {
                 navigate('/login');
             }
         } catch (error: any) {
-            const errorMessage = error.response.data.message;
-            const errorStatus = error.response.status;
+            const errorMessage = error?.response?.data?.message;
+            const errorStatus = error?.response?.status;
             if (
                 errorMessage === 'email already confirmed' &&
                 errorStatus === 403

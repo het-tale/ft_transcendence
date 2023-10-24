@@ -26,7 +26,7 @@ const Manage2fa = (props: Manage2faProps) => {
         };
         try {
             // console.log('enable 2fa');
-            const response = await client.post(`auth/2fa/enable`, sentData, {
+            await client.post(`auth/2fa/enable`, sentData, {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
@@ -78,7 +78,7 @@ const Manage2fa = (props: Manage2faProps) => {
             }
         };
         generate2fa();
-    }, []);
+    });
     // console.log('qr code', qrCodeImageUrl);
     return (
         <>

@@ -17,6 +17,7 @@ import { RenderContext } from '../RenderContext';
 import { UserType } from '../Types/User';
 import { GetLeaderBoard } from './GetLeaderBoard';
 import { GetFriendsList } from './Profile/GetFriendsList';
+import { Link } from 'react-router-dom';
 
 export const LeaderBoard = () => {
     const renderData = React.useContext(RenderContext);
@@ -105,56 +106,80 @@ export const LeaderBoard = () => {
                     'You Have No Place in this ladder'
                 )}
             </Flex>
-            <TableContainer borderWidth="1px" borderRadius="lg" p={4}>
-                <Table variant="simple">
-                    <Thead>
-                        <Tr>
-                            <Th color={'#a435f0'}>Rank</Th>
-                            <Th color={'#a435f0'}>User</Th>
-                            <Th isNumeric color={'#a435f0'}>
-                                Win Rate,%
-                            </Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        {users?.map((user) => {
-                            return (
-                                <Tr>
-                                    <Td>{user?.g_rank}</Td>
-                                    <Td>
-                                        <Flex
-                                            flexDirection={'row'}
-                                            alignItems={'center'}
-                                        >
-                                            <Avatar
-                                                src={user?.avatar}
-                                                marginRight={'2'}
+            {users?.length > 0 ? (
+                <TableContainer borderWidth="1px" borderRadius="lg" p={4}>
+                    <Table variant="simple">
+                        <Thead>
+                            <Tr>
+                                <Th color={'#a435f0'}>Rank</Th>
+                                <Th color={'#a435f0'}>User</Th>
+                                <Th isNumeric color={'#a435f0'}>
+                                    Win Rate,%
+                                </Th>
+                            </Tr>
+                        </Thead>
+                        <Tbody>
+                            {users?.map((user) => {
+                                return (
+                                    <Tr>
+                                        <Td>{user?.g_rank}</Td>
+                                        <Td>
+                                            <Flex
+                                                flexDirection={'row'}
+                                                alignItems={'center'}
                                             >
-                                                <AvatarBadge
-                                                    boxSize="1.25em"
-                                                    bg={
-                                                        user?.status ===
-                                                        'offline'
-                                                            ? '#ccc'
-                                                            : 'green.500'
-                                                    }
-                                                />
-                                            </Avatar>
-                                            <Text
-                                                marginTop={'1rem'}
-                                                fontSize={'md'}
-                                            >
-                                                {user?.username}
-                                            </Text>
-                                        </Flex>
-                                    </Td>
-                                    <Td isNumeric>{user?.win_rate}</Td>
-                                </Tr>
-                            );
-                        })}
-                    </Tbody>
-                </Table>
-            </TableContainer>
+                                                <Avatar
+                                                    src={user?.avatar}
+                                                    marginRight={'2'}
+                                                >
+                                                    <AvatarBadge
+                                                        boxSize="1.25em"
+                                                        bg={
+                                                            user?.status ===
+                                                            'offline'
+                                                                ? '#ccc'
+                                                                : 'green.500'
+                                                        }
+                                                    />
+                                                </Avatar>
+                                                <Text
+                                                    marginTop={'1rem'}
+                                                    fontSize={'md'}
+                                                >
+                                                    {user?.username}
+                                                </Text>
+                                            </Flex>
+                                        </Td>
+                                        <Td isNumeric>{user?.win_rate}</Td>
+                                    </Tr>
+                                );
+                            })}
+                        </Tbody>
+                    </Table>
+                </TableContainer>
+            ) : (
+                <>
+                    <Text className="text-center font-bold text-lg">
+                        It seems that there are no users in this ladder yet.
+                    </Text>
+                    <Link
+                        to="/game"
+                        style={{
+                            backgroundColor: '#a435f0',
+                            color: 'white',
+                            width: 'fit-content',
+                            textAlign: 'center',
+                            marginTop: '10',
+                            marginLeft: '45%',
+                            padding: '10px',
+                            borderRadius: '5px',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        Start The first Match
+                    </Link>
+                </>
+            )}
         </Flex>
     );
 };

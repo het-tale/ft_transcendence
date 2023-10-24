@@ -155,8 +155,12 @@ export class UserService {
     return [...myUser.matchHistoryA, ...myUser.matchHistoryB];
   }
 
-  getLeaderBoard() {
-    const users = this.prisma.user.findMany({
+  async getLeaderBoard() {
+    //if no match played yet?
+    if ((await this.prisma.match.count()) === 0) {
+      return [];
+    }
+    const users = await this.prisma.user.findMany({
       select: {
         id: true,
         username: true,

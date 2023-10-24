@@ -1,6 +1,5 @@
 import { Button, ButtonGroup, useToast } from '@chakra-ui/react';
 import React from 'react';
-import { SocketContext } from '../../../socket';
 import { Channel } from '../../../Types/Channel';
 import { UserType } from '../../../Types/User';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -19,7 +18,6 @@ interface ChangeChannelAvatarModalProps {
 }
 
 const ChangeChannelAvatarModal = (props: ChangeChannelAvatarModalProps) => {
-    const socket = React.useContext(SocketContext);
     const [image, setImage] = React.useState<any>();
     const toast = useToast();
     const { register, handleSubmit } = useForm<changeAvatar>();
@@ -27,12 +25,8 @@ const ChangeChannelAvatarModal = (props: ChangeChannelAvatarModalProps) => {
     formData.append('file', image);
     const handleChangeAvatar: SubmitHandler<changeAvatar> = async (data) => {
         // console.log('Change Channel Avatar Data', data);
-
-        const sentData = {
-            file: data.file
-        };
         try {
-            const response = await client.post(
+            await client.post(
                 `chat/channel-avatar/${props.channelDm?.name}`,
                 formData,
                 {

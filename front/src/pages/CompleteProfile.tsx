@@ -18,7 +18,6 @@ export default function CompleteProfile(props: any) {
     const { register, handleSubmit } = useForm<DataInput>();
     const handleAvatar: SubmitHandler<DataInput> = async (data) => {
         try {
-            const token = localStorage.getItem('token');
             const headers = {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             };
@@ -226,7 +225,12 @@ export default function CompleteProfile(props: any) {
                         <div className="form-group">
                             <label htmlFor="file">Choose Avatar</label>
                             <input
-                                className="form-control"
+                                className="form-control block w-full text-sm text-slate-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-violet-50 file:text-violet-700
+                                hover:file:bg-violet-100"
                                 type="file"
                                 {...register('file')}
                                 onChange={(e) => {

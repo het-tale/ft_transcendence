@@ -25,7 +25,6 @@ import BrowseChannels from './pages/Chat/Channels/BrowseChannels';
 import { RenderContext } from './RenderContext';
 import { Layout } from './pages/Layout';
 import { Verify2Fa } from './pages/Profile/Verify2Fa';
-import Example from './pages/Example';
 import User from './components/User';
 import { UserType } from './Types/User';
 
@@ -113,9 +112,9 @@ function App() {
                             <Route
                                 path="confirm-email"
                                 element={
-                                    // <ProtectConfirmation>
-                                    <ConfirmEmail />
-                                    // </ProtectConfirmation>
+                                    <ProtectConfirmation>
+                                        <ConfirmEmail />
+                                    </ProtectConfirmation>
                                 }
                             />
                             <Route
@@ -142,9 +141,9 @@ function App() {
                             <Route
                                 path="resend-email"
                                 element={
-                                    // <ProtectConfirmation>
-                                    <ResendEmail />
-                                    // </ProtectConfirmation>
+                                    <ProtectConfirmation>
+                                        <ResendEmail />
+                                    </ProtectConfirmation>
                                 }
                             />
                             <Route
@@ -214,7 +213,6 @@ function App() {
                                     </ProtectRoutes>
                                 }
                             ></Route>
-                            <Route path="testt" element={<Example />} />
                         </Routes>
                     </RenderContext.Provider>
                 </SocketGameContext.Provider>
