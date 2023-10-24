@@ -155,11 +155,28 @@ export class UserService {
     return [...myUser.matchHistoryA, ...myUser.matchHistoryB];
   }
 
+  async calculateRank() {
+    const users = await this.prisma.user.findMany({
+      select: {
+        id: true,
+      },
+      orderBy: {
+        lp: 'desc',
+      },
+    });
+    for (let i = 0; i < users.length; i++) {
+      await this.prisma.user.update({
+        where: { id: users[i].id },
+        data: { g_rank: i + 1 },
+      });
+    }
+  }
   async getLeaderBoard() {
     //if no match played yet?
     if ((await this.prisma.match.count()) === 0) {
       return [];
     }
+    await this.calculateRank();
     const users = await this.prisma.user.findMany({
       select: {
         id: true,
