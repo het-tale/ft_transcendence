@@ -95,7 +95,7 @@ const Game: React.FC = () => {
             setUser(response);
         };
         fetchUser();
-    }, []);
+    });
 
     const setupSocket = () => {
         setSocket(socketGame);
@@ -157,7 +157,6 @@ const Game: React.FC = () => {
     useEffect(() => {
         console.log('ctx check ');
         if (init && !intialise.current && canvasRef.current && ctx) {
-            // const ctx = canvasRef.current?.getContext('2d');
             intialise.current = true;
             draw(ctx, canvasRef.current, paddRef, otherpaddRef, ballRef);
         }

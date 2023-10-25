@@ -14,7 +14,6 @@ import { GameInit } from './Game-Init';
 import { GameStartEvent } from './game-start-event';
 import { User } from '@prisma/client';
 import { GameUpdate } from './Game-Update';
-import { set } from 'nestjs-zod/z';
 
 @WebSocketGateway({ namespace: 'game' })
 @Injectable()
@@ -174,11 +173,18 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         (user) => user.id === targetUserId,
         );
         if (!receiver) {
-          console.log('receiver not found ========== ');
           setTimeout(() => {
             client.emit('InvitationDeclined');
+            client.disconnect();
           } , 1000);
-          client.disconnect();
+          return;
+        }
+
+        if (receiver === sender) {
+          setTimeout(() => {
+            client.emit('InvitationDeclined');
+            client.disconnect();
+          } , 1000);
           return;
         }
         
