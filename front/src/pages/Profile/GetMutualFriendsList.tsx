@@ -7,7 +7,6 @@ export const GetMutualFriendsList = async (username: string | undefined) => {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         });
-        // console.log('RES', res);
         if (res.status === 200) {
             console.log('Mutual Friends data', res);
             return res.data;

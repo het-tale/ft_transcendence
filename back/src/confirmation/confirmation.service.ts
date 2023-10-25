@@ -23,10 +23,8 @@ export class ConfirmationService {
       if (subject === 'Confirm your email')
         front_url = this.conf.get('FRONTEND_CONFIRM_EMAIL_URL');
       else front_url = this.conf.get('FRONTEND_SET_PASSWORD_URL');
-      // console.log(token);
       const url = `${front_url}/?token=${token}`;
       const html = `<a href="${url}">${subject}</a>`;
-      // console.log(html);
       await this.mailer.sendMail({
         from: this.conf.get('EMAIL_USER'),
         to: email,

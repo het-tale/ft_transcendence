@@ -46,7 +46,6 @@ export class ChatGateway
   private connectedUsers: { clientId: string; username: string }[] = [];
 
   afterInit() {
-    // console.log('Initialized');
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
@@ -57,10 +56,8 @@ export class ChatGateway
         clientId: client.id,
         username: user.username,
       });
-      console.log(this.connectedUsers);
       await this.dmService.changeUserStatus(user.username, 'online');
       this.io.emit('userOnline', client.id);
-      // console.log(this.connectedUsers);
       await this.channelService.rejoinRooms(user.id, client);
       const offlineMessages = await this.dmService.getOfflineMessages(user.id);
       const offlineInvitations =
@@ -107,7 +104,6 @@ export class ChatGateway
     const user = this.connectedUsers.find(
       (user) => user.clientId === client.id,
       );
-      // console.log(`Cliend id:${client.id} disconnected`);
       if (!user) return;
       await this.dmService.changeUserStatus(user.username, 'offline');
       this.io.emit('userOffline', client.id);
@@ -122,7 +118,6 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      // console.log(data);
       if (data.message === '') return;
       const sender = this.connectedUsers.find(
         (user) => user.clientId === client.id,
@@ -156,7 +151,6 @@ export class ChatGateway
       if (obj.isUnlocked)
         this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
     } catch (err) {
-      // console.log(err.message, 'privateMessageError');
       client.emit('privateMessageError', err.message);
     }
   }
@@ -515,7 +509,6 @@ export class ChatGateway
         (user) => user.clientId === client.id,
       );
       const clientUsername = user1.username;
-      console.log(clientUsername, "clientUsername");
       const receiver = this.connectedUsers.find(
         (user) => user.username === data.from,
       );

@@ -97,7 +97,6 @@ export class UserService {
   }
 
   async getPendingInvitations(user: User) {
-    console.log(user.username);
 
     const invitations = await this.prisma.invitation.findMany({
       where: {

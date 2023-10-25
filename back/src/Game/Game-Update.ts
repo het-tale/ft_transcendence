@@ -134,7 +134,7 @@ export class GameUpdate {
     room.ball.y += room.ball.dy;
   }
 
-  async UpdatePaddle(client: Socket, eventData: any, rooms: Map<string, Room>) {
+  async UpdatePaddle(client: Socket, eventData: {relativeMouseY: number}, rooms: Map<string, Room>) {
     const room = this.serviceInit.findRoomByPlayerSocket(client, rooms);
 
     if (room) {

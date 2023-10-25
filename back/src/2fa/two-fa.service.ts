@@ -20,9 +20,7 @@ export class TwoFaService {
     return otpAuthUrl;
   }
   async verifyToken(token: string, secret: string) {
-    // console.log(token, secret, 'token, secret');
     const isValid = authenticator.verify({ token, secret });
-    // console.log(isValid, 'isValid');
 
     return isValid;
   }

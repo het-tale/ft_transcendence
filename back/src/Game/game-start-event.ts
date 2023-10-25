@@ -150,8 +150,6 @@ export class GameStartEvent {
 }
 
 export function cancelgamesart(room: Room, rooms: Map<string, Room>) {
-  // console.log('cancelgamesart');
-  //dell room from map
   rooms.delete(room.roomName);
   room.gameActive = false;
   if (room.gameInterval) {

@@ -26,7 +26,6 @@ const EditUserNameBody = (props: EditUserNameBodyProps) => {
             name: data.username
         });
         renderData.setRenderData(!renderData.renderData);
-        // console.log('Edit Profile data', data);
         // const sentData = {
         //     name: data.username
         // };

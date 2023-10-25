@@ -33,7 +33,6 @@ const Search = (props: SearchProps) => {
                     }
                 }
             );
-            // console.log('THIS IS THE RESULTTTT', res);
             if (res.data.length > 0) {
                 props.setDms && props.setDms(res.data);
             } else {
@@ -43,7 +42,6 @@ const Search = (props: SearchProps) => {
             GetDms().then((data) => {
                 props.setDms && props.setDms(data);
             });
-            // console.log('THIS IS THE ERROR', error);
         }
     };
     const reset = () => {
@@ -86,7 +84,6 @@ const Search = (props: SearchProps) => {
         }
     };
     const HandleGlobalSearch = async () => {
-        // console.log('THIS IS THE GLOBAL SEARCH');
         try {
             props.setShowHide && props.setShowHide(true);
             setOpa(1);
@@ -95,7 +92,6 @@ const Search = (props: SearchProps) => {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
             });
-            // console.log('THIS IS THE RESULTTTT', res);
             if (res.data.length > 0) {
                 props.setUsers && props.setUsers(res.data);
             } else {

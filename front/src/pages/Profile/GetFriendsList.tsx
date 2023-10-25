@@ -7,7 +7,6 @@ export const GetFriendsList = async () => {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         });
-        // console.log('RES', res);
         if (res.status === 200) {
             console.log('Friends data', res);
             return res.data;

@@ -100,7 +100,6 @@ export class DMService {
     if (senderIsBlocked) {
       throw new Error('You are blocked by this user.');
     }
-    // console.log(user1, user2);
 
     let { conversation, name } = await this.getConversationByParticipants(
       user1.username,
