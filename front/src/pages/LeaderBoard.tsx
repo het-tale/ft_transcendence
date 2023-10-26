@@ -28,13 +28,13 @@ export const LeaderBoard = () => {
     useEffect(() => {
         setTimeout(() => {
             setIsLoading(false);
-            GetLeaderBoard().then((data) => {
-                setUsers(data);
-            });
-            GetFriendsList().then((data) => {
-                setFriends(data);
-            });
         }, 1000);
+        GetLeaderBoard().then((data) => {
+            setUsers(data);
+        });
+        GetFriendsList().then((data) => {
+            setFriends(data);
+        });
     }, [renderData.renderData]);
     return (
         <Flex flexDirection={'column'} w={'full'} p={'2rem'}>
@@ -67,6 +67,7 @@ export const LeaderBoard = () => {
                     </AvatarGroup>
                 </Flex>
             </Flex>
+
             <Flex flexDirection={'column'} marginBottom={'2rem'}>
                 <Text
                     fontSize={'xs'}
@@ -76,7 +77,17 @@ export const LeaderBoard = () => {
                 >
                     Your Place in this ladder:
                 </Text>
-                {users?.some((user) => user.id === renderData.user?.id) ? (
+                {isLoading ? (
+                    <Spinner
+                        thickness="4px"
+                        speed="0.65s"
+                        emptyColor="gray.200"
+                        color="#a435f0"
+                        size="xl"
+                        marginTop="10"
+                        marginLeft="45%"
+                    />
+                ) : users?.some((user) => user.id === renderData.user?.id) ? (
                     <Table boxShadow={'md'}>
                         <Tr>
                             <Td>{renderData.user?.g_rank}</Td>
@@ -110,6 +121,40 @@ export const LeaderBoard = () => {
                 ) : (
                     'You Have No Place in this ladder'
                 )}
+                {/* {users?.some((user) => user.id === renderData.user?.id) ? (
+                    <Table boxShadow={'md'}>
+                        <Tr>
+                            <Td>{renderData.user?.g_rank}</Td>
+                            <Td>
+                                <Flex
+                                    flexDirection={'row'}
+                                    alignItems={'center'}
+                                >
+                                    <Avatar
+                                        src={renderData.user?.avatar}
+                                        marginRight={'2'}
+                                    >
+                                        <AvatarBadge
+                                            boxSize="1.25em"
+                                            bg={
+                                                renderData.user?.status ===
+                                                'offline'
+                                                    ? '#ccc'
+                                                    : 'green.500'
+                                            }
+                                        />
+                                    </Avatar>
+                                    <Text marginTop={'1rem'} fontSize={'md'}>
+                                        {renderData.user?.username}
+                                    </Text>
+                                </Flex>
+                            </Td>
+                            <Td>{renderData.user?.win_rate}</Td>
+                        </Tr>
+                    </Table>
+                ) : (
+                    'You Have No Place in this ladder'
+                )} */}
             </Flex>
             {isLoading ? (
                 <Spinner
