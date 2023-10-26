@@ -3,8 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpException,
-  HttpStatus,
   Param,
   Post,
   Req,
@@ -22,7 +20,8 @@ import { FriendsService } from './friends.service';
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UseZodGuard } from 'nestjs-zod';
-import { AdminDto, NameDto, RoomDto, TRoom, Tadmin, Tname } from 'src/dto';
+import { AdminDto, NameDto, RoomDto, Troom, Tadmin, Tname } from 'src/dto';
+import { FileValidationPipe } from 'src/utils/file-validation.pipe';
 
 ApiTags('Chat');
 @Controller('chat')
@@ -121,17 +120,10 @@ export class ChatController {
   @UseInterceptors(FileInterceptor('file'))
   @Post('channel-avatar/:channelName')
   async uploadAvatar(
-    @UploadedFile() file: Express.Multer.File,
-    @Param('channelName') channelName: string,
+    @UploadedFile(new FileValidationPipe()) file: Express.Multer.File,
     @Req() request: { user: User },
+    @Param('channelName') channelName: string,
   ) {
-    if (!file?.originalname) {
-      throw new HttpException(
-        'Please provide a file named "file" in the request.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
     return await this.channelService.uploadAvatar(
       file,
       request.user,
@@ -153,8 +145,8 @@ export class ChatController {
   }
 
   @UseZodGuard('body', RoomDto)
-  @Post('change-channel-type/')
-  async changeChannelType(@Req() request: { user: User }, @Body() dto: TRoom) {
+  @Post('change-channel-type')
+  async changeChannelType(@Req() request: { user: User }, @Body() dto: Troom) {
     return await this.channelService.changeChannelType(dto, request.user);
   }
 

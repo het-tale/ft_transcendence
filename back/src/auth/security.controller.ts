@@ -2,13 +2,13 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
   Post,
   Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { SecurityService } from './security.service';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
@@ -24,6 +24,7 @@ import {
 import { UseZodGuard } from 'nestjs-zod';
 import { TwoFaVerificationGuard } from 'src/guards/two-fa-verification.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FileValidationPipe } from 'src/utils/file-validation.pipe';
 
 @ApiTags('Authentication protected routes')
 @ApiBearerAuth()
@@ -71,19 +72,13 @@ export class SecurityController {
   }
 
   @UseInterceptors(FileInterceptor('file'))
+  @UsePipes(new ValidationPipe({ transform: true }))
   @UseGuards(TwoFaVerificationGuard)
   @Post('upload-avatar')
   async uploadAvatar(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(new FileValidationPipe()) file: Express.Multer.File,
     @Req() request: { user?: User },
   ) {
-    if (!file?.originalname) {
-      throw new HttpException(
-        'Please provide a file named "file" in the request.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
     return await this.securityService.uploadAvatar(file, request?.user);
   }
 }

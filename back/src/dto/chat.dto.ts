@@ -2,16 +2,26 @@ import {
   IsString,
   IsNotEmpty,
   IsStrongPassword,
-  Min,
-  Max,
   IsBoolean,
   IsEnum,
   IsOptional,
+  ValidateIf,
+  Matches,
 } from 'class-validator';
+
+export class TUsername {
+  //no special characters
+  @Matches(/^[a-zA-Z0-9._-]{3,15}$/, {
+    message:
+      'Username must contain at least 3 characters and no special characters except . _ - max 15 characters',
+  })
+  name: string;
+}
 export class TDM {
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   to: string;
+
   @IsString()
   message: string;
 }
@@ -23,15 +33,17 @@ export enum typeEnum {
 }
 
 export class TCreateRoom {
-  @IsEnum(typeEnum)
+  @IsEnum(typeEnum, { message: 'type must be public, private or protected' })
   type: string;
-  @IsNotEmpty()
-  @IsString()
-  @Min(3)
-  @Max(20)
+
+  @Matches(/^[a-zA-Z0-9._-]{3,15}$/, {
+    message:
+      'Room name must contain at least 3 characters and no special characters except . _ - max 15 characters',
+  })
   room: string;
-  @IsOptional()
+
   @IsStrongPassword()
+  @ValidateIf((o) => o.type === 'protected')
   password?: string;
 }
 
@@ -39,61 +51,68 @@ export class TRoom {
   @IsNotEmpty()
   @IsString()
   room: string;
+
   @IsOptional()
   @IsString()
   password?: string;
 }
 
 export class TRoomMessage {
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   room: string;
-  @IsString()
+
   @IsNotEmpty()
+  @IsString()
   message: string;
 }
 
 export class TRoomTarget {
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   room: string;
-  @IsString()
+
   @IsNotEmpty()
+  @IsString()
   target: string;
 }
 
 export class TInvitation {
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   room: string;
+
+  @IsNotEmpty()
   @IsString()
-  @IsNotEmpty()
   from: string;
-  @IsBoolean()
+
   @IsNotEmpty()
+  @IsBoolean()
   isAccepted: boolean;
 }
 
 export class TUserTarget {
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   target: string;
 }
 
 export class TFriendReq {
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   from: string;
-  @IsString()
+
   @IsNotEmpty()
+  @IsBoolean()
   isAccepted: boolean;
 }
 
 export class TLeaveRoom {
-  @IsString()
   @IsNotEmpty()
-  room: string;
   @IsString()
+  room: string;
+
   @IsOptional()
+  @IsString()
   newOwner?: string;
 }

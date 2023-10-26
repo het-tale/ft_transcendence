@@ -6,6 +6,7 @@ import { IoAdapter } from '@nestjs/platform-socket.io';
 import { RobotUserService } from './utils/robot-user.service';
 import { AchievementService } from './utils/achievements-creation.service';
 import { ValidationPipe } from '@nestjs/common';
+import { CustomExceptionFilter } from './utils/custom-exception.filter';
 
 async function bootstrap() {
   patchNestJsSwagger();
@@ -23,6 +24,7 @@ async function bootstrap() {
     allowedHeaders: 'Authorization, Content-Type',
   });
 
+  app.useGlobalFilters(new CustomExceptionFilter());
   app.useWebSocketAdapter(new IoAdapter(app));
   const config = new DocumentBuilder()
     .setTitle('ft_transcendence API')

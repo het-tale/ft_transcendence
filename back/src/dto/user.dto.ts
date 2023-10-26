@@ -7,9 +7,9 @@ export const nameSchema = z.object({
 });
 
 export const roomSchema = z.object({
-  name: customUsernameValidator.describe('channel name'),
-  password: customPasswordValidator.optional().describe('password'),
+  name: z.string().min(1, { message: 'Required' }).describe('Room name'),
   type: z.enum(['public', 'private', 'protected']),
+  password: customPasswordValidator.optional(),
 });
 
 export const adminSchema = z.object({
