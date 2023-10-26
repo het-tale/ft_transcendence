@@ -29,16 +29,16 @@ export default function Chat(props: BrowseChannelsProps) {
         // console.log('MESSAGE DATA', data);
         setRender(!render);
     });
-    socket.on('userOffline', (data: any) => {
-        // console.log('USER OFFLINE', data);
-        // console.log('RENDER Before', render);
-        setRender(!render);
-        // console.log('RENDER after', render);
-    });
-    socket.on('userOnline', (data: any) => {
-        // console.log('USER ONLINE', data);
-        setRender(!render);
-    });
+    // socket.on('userOffline', (data: any) => {
+    //     // console.log('USER OFFLINE', data);
+    //     // console.log('RENDER Before', render);
+    //     setRender(!render);
+    //     // console.log('RENDER after', render);
+    // });
+    // socket.on('userOnline', (data: any) => {
+    //     // console.log('USER ONLINE', data);
+    //     setRender(!render);
+    // });
     socket.on('roomCreateError', (data: any) => {
         // console.log('ROOM ERROR DATAAA', data);
         setRender(!render);

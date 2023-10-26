@@ -25,10 +25,10 @@ export const LeaderBoard = () => {
     const [users, setUsers] = React.useState<UserType[]>([]);
     const [friends, setFriends] = React.useState<UserType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    setTimeout(() => {
+        setIsLoading(false);
+    }, 1000);
     useEffect(() => {
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 1000);
         GetLeaderBoard().then((data) => {
             setUsers(data);
         });
@@ -121,40 +121,6 @@ export const LeaderBoard = () => {
                 ) : (
                     'You Have No Place in this ladder'
                 )}
-                {/* {users?.some((user) => user.id === renderData.user?.id) ? (
-                    <Table boxShadow={'md'}>
-                        <Tr>
-                            <Td>{renderData.user?.g_rank}</Td>
-                            <Td>
-                                <Flex
-                                    flexDirection={'row'}
-                                    alignItems={'center'}
-                                >
-                                    <Avatar
-                                        src={renderData.user?.avatar}
-                                        marginRight={'2'}
-                                    >
-                                        <AvatarBadge
-                                            boxSize="1.25em"
-                                            bg={
-                                                renderData.user?.status ===
-                                                'offline'
-                                                    ? '#ccc'
-                                                    : 'green.500'
-                                            }
-                                        />
-                                    </Avatar>
-                                    <Text marginTop={'1rem'} fontSize={'md'}>
-                                        {renderData.user?.username}
-                                    </Text>
-                                </Flex>
-                            </Td>
-                            <Td>{renderData.user?.win_rate}</Td>
-                        </Tr>
-                    </Table>
-                ) : (
-                    'You Have No Place in this ladder'
-                )} */}
             </Flex>
             {isLoading ? (
                 <Spinner
@@ -216,7 +182,6 @@ export const LeaderBoard = () => {
                             })}
                         </Tbody>
                     </Table>
-                    ;
                 </TableContainer>
             ) : (
                 <>
