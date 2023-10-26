@@ -43,18 +43,29 @@ const SetPassword = (props: any) => {
                 navigate('/complete-profile');
             }
         } catch (error: any) {
-            console.log("Error", error);
+            console.log('Error', error);
             const errors = error?.response?.data?.errors;
-            for (let index = 0; index < errors.length; index++) {
+            if (errors) {
+                for (let index = 0; index < errors?.length; index++) {
+                    toast({
+                        title: 'Error.',
+                        description: errors[index].message,
+                        status: 'error',
+                        duration: 5000,
+                        isClosable: true,
+                        position: 'bottom-right'
+                    });
+                    break;
+                }
+            } else {
                 toast({
                     title: 'Error.',
-                    description: errors[index].message,
+                    description: error?.response?.data?.message,
                     status: 'error',
                     duration: 5000,
                     isClosable: true,
                     position: 'bottom-right'
                 });
-                break;
             }
         }
     };
@@ -261,7 +272,12 @@ const SetPassword = (props: any) => {
 
                     <form onSubmit={(e) => SubmitPassword(e)}>
                         <div className="form-group">
-                            <label htmlFor="username" className="after:content-['*'] after:ml-0.5 after:text-red-500">username</label>
+                            <label
+                                htmlFor="username"
+                                className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                            >
+                                username
+                            </label>
                             <input
                                 className="form-control"
                                 type="text"
@@ -272,7 +288,12 @@ const SetPassword = (props: any) => {
                                 onChange={(e) => setUsername(e.target.value)}
                                 required
                             />
-                            <label htmlFor="password" className="after:content-['*'] after:ml-0.5 after:text-red-500">Password</label>
+                            <label
+                                htmlFor="password"
+                                className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                            >
+                                Password
+                            </label>
                             <input
                                 className="form-control"
                                 type="password"
@@ -283,7 +304,12 @@ const SetPassword = (props: any) => {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                             />
-                            <label htmlFor="password" className="after:content-['*'] after:ml-0.5 after:text-red-500">Confirm Password</label>
+                            <label
+                                htmlFor="password"
+                                className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                            >
+                                Confirm Password
+                            </label>
                             <input
                                 className="form-control"
                                 type="password"
