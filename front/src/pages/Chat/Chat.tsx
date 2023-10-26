@@ -7,9 +7,11 @@ import { UserType } from '../../Types/User';
 import GetRoomDms from './GetRoomDms';
 import { Channel } from '../../Types/Channel';
 import { BrowseChannelsProps } from './Channels/BrowseChannels';
+import { RenderContext } from '../../RenderContext';
 
 export default function Chat(props: BrowseChannelsProps) {
     const socket = React.useContext(SocketContext);
+    const renderData = React.useContext(RenderContext);
     const [render, setRender] = React.useState(false);
     const toast = useToast();
     const [dms, setDms] = React.useState<UserType[]>([]);
@@ -25,60 +27,51 @@ export default function Chat(props: BrowseChannelsProps) {
             setRoomDms(data);
         });
     }, [render, props.update]);
-    socket.on('privateMessage', (data: any) => {
-        // console.log('MESSAGE DATA', data);
-        setRender(!render);
-    });
-    // socket.on('userOffline', (data: any) => {
-    //     // console.log('USER OFFLINE', data);
-    //     // console.log('RENDER Before', render);
+    // socket.on('privateMessage', (data: any) => {
+    //     // console.log('MESSAGE DATA', data);
     //     setRender(!render);
-    //     // console.log('RENDER after', render);
+    //     renderData.setRenderData(!renderData.renderData);
     // });
-    // socket.on('userOnline', (data: any) => {
-    //     // console.log('USER ONLINE', data);
+    // socket.on('roomCreateError', (data: any) => {
+    //     // console.log('ROOM ERROR DATAAA', data);
     //     setRender(!render);
     // });
-    socket.on('roomCreateError', (data: any) => {
-        // console.log('ROOM ERROR DATAAA', data);
-        setRender(!render);
-    });
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            socket.on('privateMessageError', (data: any) => {
-                // console.log('MESSAGE ERROR DATAAA', data);
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         socket.on('privateMessageError', (data: any) => {
+    //             // console.log('MESSAGE ERROR DATAAA', data);
 
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'top-right'
-                });
-            });
-            socket.on('roomMessageError', (data: any) => {
-                // console.log('ROOM MESSAGE ERROR DATAAA', data);
+    //             toast({
+    //                 title: 'Error',
+    //                 description: data,
+    //                 status: 'error',
+    //                 duration: 9000,
+    //                 isClosable: true,
+    //                 position: 'top-right'
+    //             });
+    //         });
+    //         socket.on('roomMessageError', (data: any) => {
+    //             // console.log('ROOM MESSAGE ERROR DATAAA', data);
 
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'top-right'
-                });
-            });
-        }, 500);
+    //             toast({
+    //                 title: 'Error',
+    //                 description: data,
+    //                 status: 'error',
+    //                 duration: 9000,
+    //                 isClosable: true,
+    //                 position: 'top-right'
+    //             });
+    //         });
+    //     }, 500);
 
-        return () => {
-            clearTimeout(timer);
-        };
-    });
-    socket.on('roomMessage', (data: any) => {
-        // console.log('ROOM MESSAGE DATA', data);
-        setRender(!render);
-    });
+    //     return () => {
+    //         clearTimeout(timer);
+    //     };
+    // });
+    // socket.on('roomMessage', (data: any) => {
+    //     // console.log('ROOM MESSAGE DATA', data);
+    //     setRender(!render);
+    // });
     return (
         <Dms
             socket={socket}

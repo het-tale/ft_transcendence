@@ -19,7 +19,7 @@ import {
     useDisclosure,
     useToast
 } from '@chakra-ui/react';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { SocketContext, SocketGameContext } from '../../socket';
 import GetDms from './GetDms';
 import { UserType } from '../../Types/User';
@@ -30,9 +30,12 @@ import ModalConfirm from './ModalConfirm';
 import client from '../../components/Client';
 import { Link, useNavigate } from 'react-router-dom';
 import UserDmInfo from './UserDmInfo';
+import { render } from '@testing-library/react';
+import { RenderContext } from '../../RenderContext';
 
 const DmsChat = (props: any) => {
     const toast = useToast();
+    const renderData = useContext(RenderContext);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const {
         isOpen: isOpen2,
@@ -53,11 +56,12 @@ const DmsChat = (props: any) => {
         }
 
         fetchUserData();
-    }, [props.render]);
+    }, [props.render, renderData.renderData]);
     const [dms, setDms] = React.useState<UserType[]>([]);
     const socket = React.useContext(SocketContext);
     const socketGame = React.useContext(SocketGameContext);
     const [messages, setMessages] = React.useState<MessageType[]>([]);
+    const chatContainerRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
         const res = GetDms().then((data) => {
             setDms(data);
@@ -67,7 +71,13 @@ const DmsChat = (props: any) => {
                   setMessages(data);
               })
             : null;
-    }, [props.render, props.userDm]);
+    }, [props.render, props.userDm, renderData.renderData]);
+    useEffect(() => {
+        chatContainerRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    }, [messages]);
     const handleBlockedUser = () => {
         socket.emit('blockUser', {
             target: props.userDm?.username
@@ -288,6 +298,7 @@ const DmsChat = (props: any) => {
                         />
                     );
                 })}
+                <div ref={chatContainerRef}></div>
             </div>
             <TypingBar
                 userDm={props.userDm}

@@ -11,6 +11,7 @@ import User from './User';
 import { Notification } from '../Types/Notification';
 import { RenderContext, RenderContextType } from '../RenderContext';
 import { SocketContext } from '../socket';
+import { useToast } from '@chakra-ui/react';
 
 interface sidebarProps {
     notification?: boolean;
@@ -23,6 +24,7 @@ interface sidebarProps {
 
 const Sidebar = (props: sidebarProps) => {
     const [user, setUser] = React.useState<UserType>();
+    const toast = useToast();
     const renderData: RenderContextType = React.useContext(RenderContext);
     const socket = React.useContext(SocketContext);
     useEffect(() => {
@@ -42,9 +44,53 @@ const Sidebar = (props: sidebarProps) => {
             console.log('userOnline', data);
             renderData.setRenderData(!renderData.renderData);
         });
+        socket.on('privateMessage', (data: any) => {
+            console.log('privateMessage', data);
+            toast({
+                title: 'New Message',
+                description: data.message,
+                status: 'info',
+                duration: 9000,
+                isClosable: true,
+                position: 'top-right'
+            });
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('roomCreateError', (data: any) => {
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('privateMessageError', (data: any) => {
+            console.log('privateMessageError', data);
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'top-right'
+            });
+        });
+        socket.on('roomMessageError', (data: any) => {
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'top-right'
+            });
+        });
+        socket.on('roomMessage', (data: any) => {
+            renderData.setRenderData(!renderData.renderData);
+        });
         return () => {
             socket.off('userOffline');
             socket.off('userOnline');
+            socket.off('privateMessage');
+            socket.off('roomCreateError');
+            socket.off('privateMessageError');
+            socket.off('roomMessageError');
+            socket.off('roomMessage');
         };
     });
     return (

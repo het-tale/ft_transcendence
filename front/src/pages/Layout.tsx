@@ -280,6 +280,7 @@ export const Layout = ({ children }: Props) => {
             });
             renderData.setRenderData(!renderData.renderData);
         });
+
         return () => {
             socket.off('roomInvitation');
             socket.off('roomInvitationError');
