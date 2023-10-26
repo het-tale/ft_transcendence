@@ -734,7 +734,6 @@ export class ChannelService {
     clientUsername: string,
     bannedUsername: string,
   ) {
-    // console.log('First channel name', channelName);
     const { target, channel } = await this.checkInput(
       channelName,
       clientUsername,
@@ -775,38 +774,36 @@ export class ChannelService {
     clientUsername: string,
     targetUsername: string,
   ) {
-    {
-      const client = await this.prisma.user.findUnique({
-        where: {
-          username: clientUsername,
-        },
-      });
-      const target = await this.prisma.user.findUnique({
-        where: {
-          username: targetUsername,
-        },
-      });
-      const channel = await this.prisma.channel.findUnique({
-        where: {
-          name: channelName,
-        },
-        include: {
-          participants: true,
-          banned: true,
-          admins: true,
-          muted: true,
-        },
-      });
-      if (!channel || !client || !target) {
-        throw new Error('channel not found or user not found');
-      }
-      const isAdmin = channel.admins.some((admin) => admin.id === client.id);
-      if (!isAdmin) {
-        throw new Error('user is not an admin');
-      }
-
-      return { target, channel };
+    const client = await this.prisma.user.findUnique({
+      where: {
+        username: clientUsername,
+      },
+    });
+    const target = await this.prisma.user.findUnique({
+      where: {
+        username: targetUsername,
+      },
+    });
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: {
+        participants: true,
+        banned: true,
+        admins: true,
+        muted: true,
+      },
+    });
+    if (!channel || !client || !target) {
+      throw new Error('channel not found or user not found');
     }
+    const isAdmin = channel.admins.some((admin) => admin.id === client.id);
+    if (!isAdmin) {
+      throw new Error('user is not an admin');
+    }
+
+    return { target, channel };
   }
   async unbanUser(
     channelName: string,
@@ -1137,11 +1134,10 @@ export class ChannelService {
       },
     });
     if (!channel) {
-      throw new Error('channel not found');
+      throw new HttpException('channel not found', 404);
     }
     if (channel.ownerId !== user.id)
       throw new HttpException('user is not the owner', 400);
-    // console.log(dto);
     if (
       dto.type === 'protected' &&
       (dto.password === undefined || dto.password === null)
@@ -1150,7 +1146,6 @@ export class ChannelService {
     let hash = null;
     if (dto.type === 'protected') {
       if (channel.type === 'protected') {
-        // console.log(channel.hash);
         if (channel.hash !== null) {
           const isSame = await argon.verify(channel.hash, dto.password);
           if (isSame) throw new HttpException('same password', 400);
@@ -1178,7 +1173,7 @@ export class ChannelService {
       },
     });
     if (!channel) {
-      throw new Error('channel not found');
+      throw new HttpException('channel not found', 404);
     }
     if (channel.ownerId !== user.id)
       throw new HttpException('user is not the owner', 400);
@@ -1186,7 +1181,7 @@ export class ChannelService {
       (admin) => admin.username === dto.admin,
     );
     if (!isAdmin) {
-      throw new Error('user provided is not an admin');
+      throw new HttpException('user is not an admin', 400);
     }
     await this.prisma.channel.update({
       where: {
