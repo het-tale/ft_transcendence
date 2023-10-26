@@ -12,6 +12,7 @@ const RequireNoAuth = (props: any) => {
                 if (
                     (response !== null &&
                         response.isEmailConfirmed &&
+                        response.username !== null &&
                         !response.is2FaEnabled) ||
                     (response.is2FaEnabled && response.is2FaVerified)
                 ) {
