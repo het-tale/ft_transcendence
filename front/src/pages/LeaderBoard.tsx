@@ -10,9 +10,10 @@ import {
     Text,
     AvatarGroup,
     Avatar,
-    AvatarBadge
+    AvatarBadge,
+    Spinner
 } from '@chakra-ui/react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RenderContext } from '../RenderContext';
 import { UserType } from '../Types/User';
 import { GetLeaderBoard } from './GetLeaderBoard';
@@ -23,13 +24,17 @@ export const LeaderBoard = () => {
     const renderData = React.useContext(RenderContext);
     const [users, setUsers] = React.useState<UserType[]>([]);
     const [friends, setFriends] = React.useState<UserType[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
-        GetLeaderBoard().then((data) => {
-            setUsers(data);
-        });
-        GetFriendsList().then((data) => {
-            setFriends(data);
-        });
+        setTimeout(() => {
+            setIsLoading(false);
+            GetLeaderBoard().then((data) => {
+                setUsers(data);
+            });
+            GetFriendsList().then((data) => {
+                setFriends(data);
+            });
+        }, 1000);
     }, [renderData.renderData]);
     return (
         <Flex flexDirection={'column'} w={'full'} p={'2rem'}>
@@ -106,7 +111,17 @@ export const LeaderBoard = () => {
                     'You Have No Place in this ladder'
                 )}
             </Flex>
-            {users?.length > 0 ? (
+            {isLoading ? (
+                <Spinner
+                    thickness="4px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color="#a435f0"
+                    size="xl"
+                    marginTop="10"
+                    marginLeft="45%"
+                />
+            ) : users?.length > 0 ? (
                 <TableContainer borderWidth="1px" borderRadius="lg" p={4}>
                     <Table variant="simple">
                         <Thead>
@@ -156,6 +171,7 @@ export const LeaderBoard = () => {
                             })}
                         </Tbody>
                     </Table>
+                    ;
                 </TableContainer>
             ) : (
                 <>
