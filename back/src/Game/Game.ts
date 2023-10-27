@@ -14,7 +14,6 @@ import { GameInit } from './Game-Init';
 import { GameStartEvent } from './game-start-event';
 import { User } from '@prisma/client';
 import { GameUpdate } from './Game-Update';
-import { set } from 'nestjs-zod/z';
 
 @WebSocketGateway({ namespace: 'game' })
 @Injectable()
@@ -55,16 +54,18 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       !this.robot ? this.AddRobotToSOckets() : null;
       const token = client.handshake.auth.token;
       const user = await this.serviceInit.verifyToken(token);
-      if (user) {
+      console.log('user id ', user.id);
+      if (!user) throw new Error('undefined user ');
         if (user.status === 'InGame') {
+          console.log('user is in game');
+          setTimeout(() => {
+          client.emit('InvitationDeclined');
           client.disconnect();
+          }, 1000);
 
           return;
         }
         this.activeSockets.set(client, user);
-      } else {
-        client.disconnect();
-      }
     } catch (e) {
       console.log('error', e);
       client.disconnect();
@@ -76,9 +77,19 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('StartGame')
   async handleStartGame(client: Socket) {
     try {
-      const user = this.activeSockets.get(client);
-      if (!user) throw new Error('undefined user ');
+      const user_player = this.activeSockets.get(client);
+      if (!user_player) throw new Error('undefined user ');
+      const user = await this.prisma.user.findFirst({
+        where: {
+          id: user_player.id,
+        },
+      });
       if (user.status === 'InGame') {
+        console.log('user is in game');
+        setTimeout(() => {
+          client.emit('InvitationDeclined');
+          client.disconnect();
+        }, 2000);
         return;
       } else {
         await this.prisma.user.update({
@@ -109,8 +120,11 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       const user = this.activeSockets.get(client);
       if (!user) throw new Error('undefined user ');
       if (user.status === 'InGame') {
-        // console.log('user is already in game handle start game');
-        // console.log('user is already in game handle start game');
+        console.log('user is in game');
+        setTimeout(() => {
+          client.emit('InvitationDeclined');
+          client.disconnect();
+          }, 2000);
         return;
       } else {
         await this.prisma.user.update({
@@ -138,9 +152,9 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   async handleDisconnect(client: Socket) {
     const room = this.serviceInit.findRoomByPlayerSocket(client, this.rooms);
     const user = this.activeSockets.get(client);
+    console.log('user disconnected');
     if (user) {
-      // console.log('disconnecting client ', user.login);
-      // console.log('disconnecting client ', user.login);
+      console.log('user found changing status');
       await this.prisma.user.update({
         where: {
           id: user.id,
@@ -151,8 +165,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       });
     }
     if (room) {
-      // console.log('room found to make force leave ');
-      // console.log('room found to make force leave ');
+      console.log('room found');
       if (room.players.length === 2) {
         const playerindex = room.players.indexOf(
           room.players.find((player) => player.socket === client),
@@ -161,6 +174,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         room.players[playerindex === 0 ? 1 : 0].score = 5;
         this.serviceUpdate.dataupdatetostop(room, this.activeSockets);
       } else {
+        if (room.players.length === 1) client.leave(room.roomName);
         this.prisma.match.delete({
           where: {
             id: room.id,
@@ -181,7 +195,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         (user) => user.id === targetUserId,
         );
         if (!receiver) {
-          console.log('receiver not found ========== ');
+          console.log('receiver not found ========= ');
           
           return;
         }
@@ -228,16 +242,15 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       id: player.number,
     };
     setTimeout(() => {
-      if (client.emit('GAME INVITE', true)) console.log('game invite sent');
+      client.emit('GAME INVITE', true);
       client.emit('InitGame', gamedata);
       client.emit('JoinRoom', invitationRoom.roomName);
     }, 1000);
-    // client.emit('GAME STARTED', true);
   }
   catch(e){
     console.log('error', e);
   }
-}
+  }
   
   @SubscribeMessage('AcceptInvitation')
   async handleAcceptInvitation(client: Socket, roomId: string) {
@@ -245,7 +258,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
 
       const invitationRoom = this.rooms.get(roomId);
       if (!invitationRoom) {
-        //sett colored console log
         console.log('\x1b[36m invitation room not found');
         const pendingInvitation = await this.prisma.invitation.findFirst({
           where: {
@@ -317,8 +329,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         client.emit('InitGame', gamedata);
         client.emit('JoinRoom', roomId);
       }, 1000);
-      // client.emit('GAME STARTED', true);
-      // this.server.to(roomId).emit('StartGame', roomId);
       setTimeout(() => {
         invitationRoom.players.forEach((player) => {
           player.socket?.emit('GAME STARTED', true);
@@ -338,7 +348,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     }
     }
     
-    // Add a method to handle declining invitations if needed
     @SubscribeMessage('DeclineInvitation')
     async handleDeclineInvitation(client: Socket, roomId: string) {
       try{

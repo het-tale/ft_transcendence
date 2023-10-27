@@ -20,8 +20,8 @@ import { FriendsService } from './friends.service';
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UseZodGuard } from 'nestjs-zod';
-import { AdminDto, NameDto, RoomDto, Troom, Tadmin, Tname } from 'src/dto';
 import { FileValidationPipe } from 'src/utils/file-validation.pipe';
+import { AdminDto, NameDto, RoomDto, Troom, Tadmin, Tname } from 'src/dto';
 
 ApiTags('Chat');
 @Controller('chat')
@@ -146,6 +146,7 @@ export class ChatController {
 
   @UseZodGuard('body', RoomDto)
   @Post('change-channel-type')
+  async changeChannelType(@Req() request: { user: User }, @Body() dto: Troom) {
   async changeChannelType(@Req() request: { user: User }, @Body() dto: Troom) {
     return await this.channelService.changeChannelType(dto, request.user);
   }

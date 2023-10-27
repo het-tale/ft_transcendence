@@ -100,9 +100,11 @@ export class GameUpdate {
     const yDifference = ballY - paddleCenterY;
 
     if (randomError < errorFactor) {
+      // Apply random error to robot's movement
       room.players[1].paddle.y +=
         Math.random() * 2 * robotpaddle.dy - robotpaddle.dy;
     } else {
+      // Maintain normal robot behavior
       room.players[1].paddle.y +=
         yDifference > 0 ? robotpaddle.dy : -robotpaddle.dy;
     }
@@ -113,10 +115,12 @@ export class GameUpdate {
     } else if (room.players[1].paddle.y > maxY) {
       room.players[1].paddle.y = maxY;
     }
+    // Check for collisions with top and bottom walls
     if (
       room.ball.y - room.ball.radius <= 0 ||
       room.ball.y + room.ball.radius >= CONTAINERHIEGHT
     ) {
+      // Reverse the vertical velocity of the ball
       room.ball.dy *= -1;
     }
     this.colisionrobot(room, activeSockets);
@@ -125,6 +129,7 @@ export class GameUpdate {
       room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
       room.ball.dy += room.ball.dy > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
     }
+    // room.ball.setXY(room.ball.x + room.ball.dx, room.ball.y + room.ball.dy);
     room.ball.x += room.ball.dx;
     room.ball.y += room.ball.dy;
   }
@@ -167,6 +172,7 @@ export class GameUpdate {
       room.ball.y - room.ball.radius <= 0 ||
       room.ball.y + room.ball.radius > CONTAINERHIEGHT
     ) {
+      // Reverse the vertical velocity of the ball
       room.ball.dy *= -1;
     }
     this.colisionrobot(room, activeSockets);
