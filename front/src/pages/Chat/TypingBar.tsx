@@ -17,7 +17,7 @@ const TypingBar = (props: any) => {
         });
         setMessage('');
         props.setRender(!props.render);
-        renderData.setRenderData(!renderData.renderData);
+        // renderData.setRenderData(!renderData.renderData);
     };
     return (
         <form className="typing-bar" onSubmit={sendMessageHandler}>

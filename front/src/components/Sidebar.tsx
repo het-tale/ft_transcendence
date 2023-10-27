@@ -46,14 +46,6 @@ const Sidebar = (props: sidebarProps) => {
         });
         socket.on('privateMessage', (data: any) => {
             console.log('privateMessage', data);
-            toast({
-                title: 'New Message',
-                description: data.message,
-                status: 'info',
-                duration: 9000,
-                isClosable: true,
-                position: 'top-right'
-            });
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('roomCreateError', (data: any) => {

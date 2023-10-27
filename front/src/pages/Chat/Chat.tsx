@@ -12,7 +12,6 @@ import { RenderContext } from '../../RenderContext';
 export default function Chat(props: BrowseChannelsProps) {
     const socket = React.useContext(SocketContext);
     const renderData = React.useContext(RenderContext);
-    const [render, setRender] = React.useState(false);
     const toast = useToast();
     const [dms, setDms] = React.useState<UserType[]>([]);
     const [roomDms, setRoomDms] = React.useState<Channel[]>([]);
@@ -25,57 +24,13 @@ export default function Chat(props: BrowseChannelsProps) {
         GetRoomDms().then((data) => {
             setRoomDms(data);
         });
-    }, [render, props.update]);
-    // socket.on('privateMessage', (data: any) => {
-    //     // console.log('MESSAGE DATA', data);
-    //     setRender(!render);
-    //     renderData.setRenderData(!renderData.renderData);
-    // });
-    // socket.on('roomCreateError', (data: any) => {
-    //     // console.log('ROOM ERROR DATAAA', data);
-    //     setRender(!render);
-    // });
-    // useEffect(() => {
-    //     const timer = setTimeout(() => {
-    //         socket.on('privateMessageError', (data: any) => {
-    //             // console.log('MESSAGE ERROR DATAAA', data);
+    }, [props.update, renderData.renderData]);
 
-    //             toast({
-    //                 title: 'Error',
-    //                 description: data,
-    //                 status: 'error',
-    //                 duration: 9000,
-    //                 isClosable: true,
-    //                 position: 'top-right'
-    //             });
-    //         });
-    //         socket.on('roomMessageError', (data: any) => {
-    //             // console.log('ROOM MESSAGE ERROR DATAAA', data);
-
-    //             toast({
-    //                 title: 'Error',
-    //                 description: data,
-    //                 status: 'error',
-    //                 duration: 9000,
-    //                 isClosable: true,
-    //                 position: 'top-right'
-    //             });
-    //         });
-    //     }, 500);
-
-    //     return () => {
-    //         clearTimeout(timer);
-    //     };
-    // });
-    // socket.on('roomMessage', (data: any) => {
-    //     // console.log('ROOM MESSAGE DATA', data);
-    //     setRender(!render);
-    // });
     return (
         <Dms
             socket={socket}
-            render={render}
-            setRender={setRender}
+            render={renderData.renderData}
+            setRender={renderData.setRenderData}
             toast={toast}
             dms={dms}
             setDms={setDms}

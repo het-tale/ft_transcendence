@@ -50,8 +50,7 @@ const Dms = (props: any) => {
     };
 
     const { register, handleSubmit } = useForm<SentData>();
-    const handleSendMessage: SubmitHandler<SentData> = (data) => {
-    };
+    const handleSendMessage: SubmitHandler<SentData> = (data) => {};
 
     const tabs = [
         {
