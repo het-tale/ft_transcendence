@@ -24,7 +24,7 @@ export class GameUpdate {
 
   async intersections(room: Room, playerPaddle: Paddle, otherPaddle: Paddle) {
     if (Date.now() - room.ball.lastcolision < 100) return;
-    
+
     if (
       room.ball.x - room.ball.radius <
         playerPaddle.x + playerPaddle.width / 2 &&
@@ -339,6 +339,11 @@ export class GameUpdate {
 
   async calculateRank() {
     const users = await this.prisma.user.findMany({
+      where: {
+        id: {
+          not: 1,
+        },
+      },
       select: {
         id: true,
       },

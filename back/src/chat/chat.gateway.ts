@@ -59,6 +59,7 @@ export class ChatGateway
         username: user.username,
       });
       await this.dmService.changeUserStatus(user.username, 'online');
+      console.log(this.connectedUsers);
       this.io.emit('userOnline', client.id);
       await this.channelService.rejoinRooms(user.id, client);
       const offlineMessages = await this.dmService.getOfflineMessages(user.id);
@@ -94,6 +95,7 @@ export class ChatGateway
       }
       if (offlineAchievements.length > 0) {
         client.emit('offlineAchievements', offlineAchievements);
+        console.log(offlineAchievements);
         await this.achievementsService.removeOfflineAchievements(user.username);
       }
     } catch (err) {
@@ -107,6 +109,7 @@ export class ChatGateway
       (user) => user.clientId === client.id,
     );
     if (!user) return;
+    console.log(user.username, 'disconnected');
     await this.dmService.changeUserStatus(user.username, 'offline');
     this.io.emit('userOffline', client.id);
     this.connectedUsers = this.connectedUsers.filter(
@@ -124,6 +127,7 @@ export class ChatGateway
       const sender = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       );
+      console.log(sender.clientId, client.id, 'Im in send message');
       const receiver = this.connectedUsers.find(
         (user) => user.username === data.to,
       );

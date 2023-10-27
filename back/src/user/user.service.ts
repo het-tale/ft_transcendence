@@ -3,10 +3,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { TChangePassword } from 'src/dto';
 import * as argon from 'argon2';
+import { GameUpdate } from 'src/Game/Game-Update';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private gameService: GameUpdate) {}
   async getUserById(id: number) {
     const user = await this.prisma.user.findUnique({
       where: { id },
@@ -164,29 +165,18 @@ export class UserService {
     return [...myUser.matchHistoryA, ...myUser.matchHistoryB];
   }
 
-  async calculateRank() {
-    const users = await this.prisma.user.findMany({
-      select: {
-        id: true,
-      },
-      orderBy: {
-        lp: 'desc',
-      },
-    });
-    for (let i = 0; i < users.length; i++) {
-      await this.prisma.user.update({
-        where: { id: users[i].id },
-        data: { g_rank: i + 1 },
-      });
-    }
-  }
   async getLeaderBoard() {
     //if no match played yet?
     if ((await this.prisma.match.count()) === 0) {
       return [];
     }
-    await this.calculateRank();
+    await this.gameService.calculateRank();
     const users = await this.prisma.user.findMany({
+      where: {
+        id: {
+          not: 1,
+        },
+      },
       select: {
         id: true,
         username: true,
