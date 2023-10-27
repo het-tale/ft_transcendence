@@ -52,7 +52,6 @@ const UserInfo = (props: UserInfoProps) => {
     const user = props.isMyProfile ? props.currentUser : props.user;
     const socket = React.useContext(SocketContext);
     const handleAddFriend = () => {
-        // console.log('ADD FRIEND');
         socket.emit('sendFriendRequest', {
             target: props.user?.username
         });
@@ -64,7 +63,6 @@ const UserInfo = (props: UserInfoProps) => {
     const toast = useToast();
     const disable2fa = async () => {
         try {
-            // console.log('disable 2fa');
             const response = await client.get(`auth/2fa/disable`, {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
@@ -72,7 +70,6 @@ const UserInfo = (props: UserInfoProps) => {
             });
             renderData.setRenderData(!renderData.renderData);
         } catch (error: any) {
-            console.log('error', error);
             toast({
                 title: 'Error',
                 description: error.response.data.message,

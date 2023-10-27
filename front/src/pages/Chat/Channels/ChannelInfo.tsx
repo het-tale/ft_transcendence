@@ -56,7 +56,6 @@ const ChannelInfo = (props: ChannelInfoProps) => {
     const socket = React.useContext(SocketContext);
 
     const handleLeaveChannel = () => {
-        // console.log('Hello From Leave Channel');
         socket.emit('leaveRoom', {
             room: props.ChannelDm?.name
         });

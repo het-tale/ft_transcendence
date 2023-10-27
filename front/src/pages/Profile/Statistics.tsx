@@ -30,7 +30,6 @@ const Statistics = (props: StatisticsProps) => {
             setAchievements(data);
         });
     }, [renderData.renderData]);
-    console.log(achievements);
     return (
         <Flex flexDirection={'column'}>
             <Flex flexDirection={'column'} marginTop={'1rem'}>

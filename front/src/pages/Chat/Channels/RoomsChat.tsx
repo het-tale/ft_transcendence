@@ -72,13 +72,11 @@ const RoomsChat = (props: RoomsChatProps) => {
         fetchRoomData();
     }, [props.render, props.update, props.channelDm]);
     const handleDeleteChannel = () => {
-        // console.log('delete channel');
         socket.emit('deleteChannel', {
             room: props.channelDm?.name
         });
     };
     socket.on('channelDeleted', (data: any) => {
-        // console.log('channelDeleted', data);
         toast({
             title: 'Success',
             description: data,
@@ -90,7 +88,6 @@ const RoomsChat = (props: RoomsChatProps) => {
         props.setRender && props.setRender(!props.render);
     });
     socket.on('channelDeleteError', (data: any) => {
-        // console.log('channelDeleteError', data);
         toast({
             title: 'Error',
             description: data,

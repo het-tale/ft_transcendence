@@ -147,7 +147,6 @@ export class ChatController {
   @UseZodGuard('body', RoomDto)
   @Post('change-channel-type')
   async changeChannelType(@Req() request: { user: User }, @Body() dto: Troom) {
-  async changeChannelType(@Req() request: { user: User }, @Body() dto: Troom) {
     return await this.channelService.changeChannelType(dto, request.user);
   }
 

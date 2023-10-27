@@ -35,7 +35,6 @@ interface FriendsProps {
 const Friends = (props: FriendsProps) => {
     const socket = React.useContext(SocketContext);
     const handleRemoveFriend = (username: string) => {
-        // console.log('REMOVE FRIEND');
         socket.emit('removeFriend', {
             target: username
         });

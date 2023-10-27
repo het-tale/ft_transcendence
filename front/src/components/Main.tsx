@@ -2,7 +2,6 @@ import React from 'react';
 
 const Main = () => {
     const url = `${process.env.REACT_APP_BACKEND_URL}/auth/42signin`;
-    console.log(url);
     return (
         <div className="main">
             <p className="enjoy">

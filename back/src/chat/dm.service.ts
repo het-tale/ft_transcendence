@@ -100,7 +100,6 @@ export class DMService {
     if (senderIsBlocked) {
       throw new Error('You are blocked by this user.');
     }
-    // console.log(user1, user2);
 
     let { conversation, name } = await this.getConversationByParticipants(
       user1.username,
@@ -165,7 +164,6 @@ export class DMService {
     }
     const messages = await this.prisma.message.findMany({
       where: {
-        //MessageIsDeletedby not user id
         MessageIsDeletedBy: {
           not: user.id,
         },
@@ -315,7 +313,6 @@ export class DMService {
     if (!client || !receiver) {
       throw new Error('User not found.');
     }
-    //check if already friends
     const alreadyFriends = client.friends.find(
       (friend) => friend.id === receiver.id,
     );

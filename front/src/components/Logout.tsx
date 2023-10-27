@@ -7,9 +7,7 @@ const Logout = () => {
     const navigate = useNavigate();
     const socket = React.useContext(SocketContext);
     useEffect(() => {
-        // console.log('The token before logout', localStorage.getItem('token'));
         localStorage.clear();
-        // console.log('The token after logout', localStorage.getItem('token'));
         socket.disconnect();
         navigate('/');
     });

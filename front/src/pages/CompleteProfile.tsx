@@ -14,7 +14,6 @@ export default function CompleteProfile(props: any) {
     }
     const formData = new FormData();
     formData.append('file', image);
-    // console.log('Form Data', formData);
     const { register, handleSubmit } = useForm<DataInput>();
     const handleAvatar: SubmitHandler<DataInput> = async (data) => {
         try {
@@ -28,7 +27,6 @@ export default function CompleteProfile(props: any) {
                     headers: headers
                 }
             );
-            // console.log(response);
             if (response.status === 201) {
                 toast({
                     title: 'Avatar updated.',
