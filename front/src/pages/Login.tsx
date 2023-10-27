@@ -26,7 +26,10 @@ function Login(props: any) {
             const condition = await checkAuthentication();
             if (condition === true) {
                 renderData.setRenderData(!renderData.renderData);
-                navigate('/home');
+                if (props.setFirstLogin === true) {
+                    navigate('/complete-profile');
+                    props.setFirstLogin(false);
+                } else navigate('/home');
             } else {
                 toast({
                     title: 'Email not Confirmed.',
