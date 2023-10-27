@@ -1,6 +1,5 @@
 import { Ball, GameData, Paddle } from "./Game.types";
 import { MySocket } from "./Game";
-import { set } from "react-hook-form";
 
 type numberstate = React.Dispatch<React.SetStateAction<number>>;
 type ballstate = React.Dispatch<React.SetStateAction<Ball | null>>;
