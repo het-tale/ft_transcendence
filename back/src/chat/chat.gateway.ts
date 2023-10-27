@@ -512,7 +512,6 @@ export class ChatGateway
         (user) => user.clientId === client.id,
       );
       const clientUsername = user1.username;
-      console.log(clientUsername, 'clientUsername');
       const receiver = this.connectedUsers.find(
         (user) => user.username === data.from,
       );

@@ -1128,6 +1128,7 @@ export class ChannelService {
     });
   }
   async changeChannelType(dto: Troom, user: User) {
+    console.log(dto);
     const channel = await this.prisma.channel.findUnique({
       where: {
         name: dto.name,

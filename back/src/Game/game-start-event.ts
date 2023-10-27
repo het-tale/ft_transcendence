@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import { GameData, INTERVAL, OTHERPADDLE, PADDLE, Player, Room, SPEED_INTERVAL } from './types';
+import { GameData, INTERVAL, OTHERPADDLE, PADDLE, Player, Room } from './types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
@@ -150,8 +150,6 @@ export class GameStartEvent {
 }
 
 export function cancelgamesart(room: Room, rooms: Map<string, Room>) {
-  // console.log('cancelgamesart');
-  //dell room from map
   rooms.delete(room.roomName);
   room.gameActive = false;
   if (room.gameInterval) {

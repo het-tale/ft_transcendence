@@ -64,7 +64,7 @@ const Game: React.FC = () => {
     const [user, setUser] = useState<UserType | null>(null);
     const [otherAvatar, setOtherAvatar] = useState<string | null>(null);
     const [otherUsername, setOtherUsername] = useState<string | null>(null);
-    let listning = false;
+    const [listning, setListning] = useState(false);
     const [playerScore, setPlayerScore] = useState(0);
     const [otherScore, setOtherScore] = useState(0);
     const [id, setId] = useState<number | null>(null);
@@ -88,6 +88,14 @@ const Game: React.FC = () => {
     let paddRef = useRef<Paddle | null>(null);
     let otherpaddRef = useRef<Paddle | null>(null);
     let ballRef = useRef<Ball | null>(null);
+
+    // refresh the socket connection one time when the component is mounted
+
+    useEffect(() => {
+        if (gameContainer.current) {
+            gameContainer.current.focus();
+        }
+    }, [gameContainer.current]);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -128,25 +136,6 @@ const Game: React.FC = () => {
 
     useEffectOnce(() => {
         setupSocket();
-        return () => {
-            if (socket) {
-                socket.off('InitGame');
-                socket.off('UPDATE');
-                socket.off('UPDATE SCORE');
-                socket.off('GAME OVER');
-                socket.off('OTHER AVATAR');
-                socket.off('JoinRoom');
-                socket.off('StartGame');
-                socket.off('connect');
-                socket.off('error');
-                socket.off('connected');
-                socket.disconnect();
-            }
-            canvasRef.current?.removeEventListener(
-                'mousemove',
-                throttleHandleMouseMove
-            );
-        };
     });
 
     useEffect(() => {
@@ -154,18 +143,16 @@ const Game: React.FC = () => {
         otherpaddRef.current = otherpad;
         ballRef.current = ball;
     }, [ball]);
+
     useEffect(() => {
-        console.log('ctx check ');
         if (init && !intialise.current && canvasRef.current && ctx) {
-            // const ctx = canvasRef.current?.getContext('2d');
             intialise.current = true;
             draw(ctx, canvasRef.current, paddRef, otherpaddRef, ballRef);
         }
     }, [ctx]);
     useEffect(() => {
         if (init && canvasRef.current) setupEventListeners();
-        console.log('init', init);
-    }, [init, canvasRef.current]);
+    }, [init]);
 
     useEffect(() => {
         if (socket && !listning) {
@@ -187,7 +174,7 @@ const Game: React.FC = () => {
                 setGameinvite,
                 setGameDeclined
             );
-            listning = true;
+            setListning(true);
             const loadDataFromBackend = async () => {
                 await new Promise((resolve) => setTimeout(resolve, 1000));
                 setDataLoaded(true);
@@ -195,6 +182,27 @@ const Game: React.FC = () => {
 
             loadDataFromBackend();
         }
+        return () => {
+            canvasRef.current?.removeEventListener(
+                'mousemove',
+                throttleHandleMouseMove
+                );
+            if (socket) {
+                socket.off('InitGame');
+                socket.off('UPDATE');
+                socket.off('UPDATE SCORE');
+                socket.off('GAME OVER');
+                socket.off('OTHER AVATAR');
+                socket.off('JoinRoom');
+                socket.off('StartGame');
+                socket.off('connect');
+                socket.off('error');
+                socket.off('connected');
+                console.log('unmounting');
+                socket.disconnect();
+            }
+        };
+
     }, [socket]);
 
     if (Gamedeclined){
