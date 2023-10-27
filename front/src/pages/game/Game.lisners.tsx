@@ -40,7 +40,6 @@ export function ListenOnSocket(
 	  });
 
   socket.on("InvitationDeclined", (message: string) => {
-    console.log("\x1b[36m  InvitationDeclined", message);
     setGameDeclined(true);
   });
 	
@@ -51,13 +50,11 @@ export function ListenOnSocket(
   });
 
   socket.on("GAME STARTED", (message: boolean) => {
-    console.log("GAME STARTED", message);
     setGameStarted(true);
     // setGameinvite(false);
   });
 
   socket.on("GAME INVITE", (message: boolean) => {
-    console.log("GAME INVITE", message);
     setGameinvite(true);
   });
 
@@ -85,12 +82,6 @@ export function ListenOnSocket(
 	setBall(game.ball);
 	setPadd(game.playerpad);
 	setOtherpad(game.otherpad);
-	console.log(
-	  "InitGame",
-	  game.playerpad,
-	  " other paddle ",
-	  game.otherpad
-	);
 	if (game.id) setId(game.id);
 	if (game.playerScore) setPlayerScore(game.playerScore);
 	if (game.otherScore) setOtherScore(game.otherScore);

@@ -28,7 +28,6 @@ const ProtectRoutes = (props: any) => {
                             socket.auth = { token: token };
                             socket.connect();
                         } else {
-                            // console.log('2fa not verified');
                             navigate('/verify-2fa');
                         }
                     } else {

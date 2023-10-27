@@ -14,6 +14,7 @@ import { GameInit } from './Game-Init';
 import { GameStartEvent } from './game-start-event';
 import { User } from '@prisma/client';
 import { GameUpdate } from './Game-Update';
+import { set } from 'nestjs-zod/z';
 
 @WebSocketGateway({ namespace: 'game' })
 @Injectable()
@@ -45,7 +46,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       this.robot = true;
     }
     catch (e) {
-      console.log('error', e);
+      return ;
     }
   }
 
@@ -54,10 +55,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       !this.robot ? this.AddRobotToSOckets() : null;
       const token = client.handshake.auth.token;
       const user = await this.serviceInit.verifyToken(token);
-      console.log('user id ', user.id);
       if (!user) throw new Error('undefined user ');
         if (user.status === 'InGame') {
-          console.log('user is in game');
           setTimeout(() => {
           client.emit('InvitationDeclined');
           client.disconnect();
@@ -67,7 +66,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         }
         this.activeSockets.set(client, user);
     } catch (e) {
-      console.log('error', e);
       client.disconnect();
   
       return;
@@ -85,7 +83,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         },
       });
       if (user.status === 'InGame') {
-        console.log('user is in game');
         setTimeout(() => {
           client.emit('InvitationDeclined');
           client.disconnect();
@@ -108,7 +105,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         this.server,
       );
     } catch (e) {
-      console.log('error', e);
 
       return;
     }
@@ -120,7 +116,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       const user = this.activeSockets.get(client);
       if (!user) throw new Error('undefined user ');
       if (user.status === 'InGame') {
-        console.log('user is in game');
         setTimeout(() => {
           client.emit('InvitationDeclined');
           client.disconnect();
@@ -143,7 +138,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         this.server,
       );
     } catch (e) {
-      console.log('error', e);
   
       return;
     }
@@ -152,9 +146,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   async handleDisconnect(client: Socket) {
     const room = this.serviceInit.findRoomByPlayerSocket(client, this.rooms);
     const user = this.activeSockets.get(client);
-    console.log('user disconnected');
     if (user) {
-      console.log('user found changing status');
       await this.prisma.user.update({
         where: {
           id: user.id,
@@ -165,7 +157,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       });
     }
     if (room) {
-      console.log('room found');
       if (room.players.length === 2) {
         const playerindex = room.players.indexOf(
           room.players.find((player) => player.socket === client),
@@ -195,7 +186,9 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         (user) => user.id === targetUserId,
         );
         if (!receiver) {
-          console.log('receiver not found ========= ');
+          setTimeout(() => {
+          client.emit('InvitationDeclined');
+          }, 1000);
           
           return;
         }
@@ -248,7 +241,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     }, 1000);
   }
   catch(e){
-    console.log('error', e);
+
+    return ;
   }
   }
   
@@ -258,7 +252,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
 
       const invitationRoom = this.rooms.get(roomId);
       if (!invitationRoom) {
-        console.log('\x1b[36m invitation room not found');
         const pendingInvitation = await this.prisma.invitation.findFirst({
           where: {
             receiverId: this.activeSockets.get(client).id,
@@ -267,7 +260,11 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
           },
         });
         if (!pendingInvitation) {
-          console.log('pending invitation not found');
+          setTimeout(() => {
+          client.emit('InvitationDeclined');
+          }
+          , 1000);
+  
           return;
         }
         await this.prisma.invitation.update({
@@ -344,7 +341,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }
     catch(e){
-      console.log('error', e);
+    
+      return ;
     }
     }
     
@@ -393,7 +391,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     this.rooms.delete(roomId);
   }
   catch(e){
-    console.log('error', e);
+
+    return ;
   }
   }
 
@@ -402,7 +401,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       this.serviceUpdate.UpdatePaddle(client, eventData, this.rooms);
     } catch (e) {
-      console.log('error', e);
+      return ;
     }
   }
 }

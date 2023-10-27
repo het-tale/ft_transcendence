@@ -39,7 +39,6 @@ function Login(props: any) {
                 navigate('/confirm-email');
             }
         } catch (error: any) {
-            // console.log('Login Error', error);
             const errorMessage1 = error?.response?.data?.message;
             setErrorMessage(errorMessage1);
             console.log('The error message', errorMessage);

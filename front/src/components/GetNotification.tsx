@@ -7,7 +7,6 @@ export const GetPendingFriendRequests = async () => {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         });
-        // console.log('RES', res);
         if (res.status === 200) {
             return res.data;
         } else {
@@ -26,7 +25,6 @@ export const GetPendingInvitations = async () => {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         });
-        // console.log('RES pending invitations', res);
         if (res.status === 200) {
             return res.data;
         } else {

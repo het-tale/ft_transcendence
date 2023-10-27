@@ -47,12 +47,10 @@ const Dms = (props: any) => {
     const handleRadioChange = (event: any) => {
         setSelectedOption(event.target.value);
         setShowField(event.target.value === 'protected');
-        // console.log('RADIOOOOOOO CHAAAANGE', event.target.value);
     };
 
     const { register, handleSubmit } = useForm<SentData>();
     const handleSendMessage: SubmitHandler<SentData> = (data) => {
-        // console.log('FORMDATA', data);
     };
 
     const tabs = [
@@ -202,7 +200,6 @@ const Dms = (props: any) => {
                     {props.roomDms ? (
                         props.roomDms.length > 0 ? (
                             props.roomDms?.map((room: Channel) => {
-                                // console.log('Room looop', room);
                                 return (
                                     <ChannelDisplay
                                         profile={room.avatar}

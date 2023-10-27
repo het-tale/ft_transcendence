@@ -44,7 +44,6 @@ export class GameInit {
           },
         })
         .then((match) => {
-          // console.log(`Created match with ID: ${match.id}`);
           room.id = match.id;
         })
         .catch((error) => {

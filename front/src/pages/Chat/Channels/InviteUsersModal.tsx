@@ -21,7 +21,6 @@ const InviteUsersModal = (props: InviteUsersModalProps) => {
     const socket = React.useContext(SocketContext);
     const { register, handleSubmit } = useForm<Invitation>();
     const handleInvitation: SubmitHandler<Invitation> = (data) => {
-        // console.log('Invitation Data', data);
         socket.emit('sendRoomInvitation', {
             room: props.channelDm?.name,
             target: data.username

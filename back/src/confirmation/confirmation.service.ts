@@ -74,7 +74,6 @@ export class ConfirmationService {
         subject === 'Confirm your email'
           ? this.generateEmailTemplate(url, 'confirmation')
           : this.generateEmailTemplate(url, 'set new password');
-      console.log(html);
       await this.mailer.sendMail({
         from: this.conf.get('EMAIL_USER'),
         to: email,

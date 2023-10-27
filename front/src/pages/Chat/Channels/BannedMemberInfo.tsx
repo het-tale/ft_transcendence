@@ -34,7 +34,6 @@ const BannedMemberInfo = (props: BannedMemberInfoProps) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handleUnbanUser = () => {
-        // console.log('unban user logic');
         socket.emit('unbanUser', {
             room: props.room?.name,
             target: props.bannedMember?.username

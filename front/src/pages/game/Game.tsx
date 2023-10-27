@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'; // Clear the canvas
+import React, { useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import { throttle } from 'lodash';
 import { Paddle, Ball } from './Game.types';
@@ -89,8 +89,6 @@ const Game: React.FC = () => {
     let otherpaddRef = useRef<Paddle | null>(null);
     let ballRef = useRef<Ball | null>(null);
 
-    // refresh the socket connection one time when the component is mounted
-
     useEffect(() => {
         if (gameContainer.current) {
             gameContainer.current.focus();
@@ -125,7 +123,7 @@ const Game: React.FC = () => {
 
     const throttleHandleMouseMove = throttle((event: MouseEvent) => {
         handleMouseMove(event);
-    }, 16.66);
+    }, 17);
 
     const setupEventListeners = () => {
         canvasRef.current?.addEventListener(
@@ -139,10 +137,14 @@ const Game: React.FC = () => {
     });
 
     useEffect(() => {
-        paddRef.current = padd;
-        otherpaddRef.current = otherpad;
         ballRef.current = ball;
     }, [ball]);
+    useEffect(() => {
+        paddRef.current = padd;
+    }, [padd]);
+    useEffect(() => {
+        otherpaddRef.current = otherpad;
+    }, [otherpad]);
 
     useEffect(() => {
         if (init && !intialise.current && canvasRef.current && ctx) {

@@ -24,7 +24,6 @@ const EditAvatarBody = (props: EditAvatarProps) => {
     const formData = new FormData();
     formData.append('file', image);
     const handleEditAvatar: SubmitHandler<EditAvatarData> = async (data) => {
-        // console.log('Edit Profile data', data);
         try {
             await client.post(`auth/upload-avatar`, formData, {
                 headers: {

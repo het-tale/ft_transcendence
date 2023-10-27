@@ -24,7 +24,6 @@ const ChangeChannelAvatarModal = (props: ChangeChannelAvatarModalProps) => {
     const formData = new FormData();
     formData.append('file', image);
     const handleChangeAvatar: SubmitHandler<changeAvatar> = async (data) => {
-        // console.log('Change Channel Avatar Data', data);
         try {
             await client.post(
                 `chat/channel-avatar/${props.channelDm?.name}`,
@@ -38,7 +37,6 @@ const ChangeChannelAvatarModal = (props: ChangeChannelAvatarModalProps) => {
             props.setRender && props.setRender(!props.render);
             props.onClose();
         } catch (error: any) {
-            // console.log('error', error);
             toast({
                 title: 'Error',
                 description: error.response.data.message,

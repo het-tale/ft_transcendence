@@ -1,5 +1,5 @@
 // import { Socket } from 'dgram';
-import { number } from 'nestjs-zod/z';
+import { date, number } from 'nestjs-zod/z';
 import { Subscription } from 'rxjs';
 import { Socket } from 'socket.io';
 export class Paddle {
@@ -18,18 +18,20 @@ export class Paddle {
 }
 
 export class Ball {
-  constructor(x: number, y: number, radius: number, dx: number, dy: number) {
+  constructor(x: number, y: number, radius: number, dx: number, dy: number, lastcolision: number) {
     this.x = x;
     this.y = y;
     this.radius = radius;
     this.dx = dx;
     this.dy = dy;
+    this.lastcolision = lastcolision;
   }
   x: number;
   y: number;
   radius: number;
   dx: number;
   dy: number;
+  lastcolision: number;
 }
 export interface GameData {
   playerpad: Paddle;
@@ -89,6 +91,7 @@ export class Room {
           RADIUS,
           BALLDX,
           BALLDX,
+          Date.now(),
         );
         break;
       case random < 0.4:
@@ -98,6 +101,7 @@ export class Room {
           RADIUS,
           BALLDX,
           -BALLDX,
+        Date.now(),
         );
         break;
       case random < 0.6:
@@ -107,6 +111,7 @@ export class Room {
           RADIUS,
           -BALLDX,
           BALLDX,
+        Date.now(),
         );
         break;
       case random < 0.8:
@@ -116,6 +121,7 @@ export class Room {
           RADIUS,
           -BALLDX,
           -BALLDX,
+        Date.now(),
         );
         break;
       default:
@@ -125,6 +131,7 @@ export class Room {
           RADIUS,
           BALLDX,
           BALLDX,
+        Date.now(),
         );
         break;
     }
