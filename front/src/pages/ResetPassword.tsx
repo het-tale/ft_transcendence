@@ -3,7 +3,6 @@ import '../css/forgot-password.css';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import client from '../components/Client';
 import { useToast } from '@chakra-ui/react';
-import { useState } from 'react';
 
 const ResetPassword = () => {
     let navigate = useNavigate();

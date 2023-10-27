@@ -21,7 +21,6 @@ const ProtectRoutes = (props: any) => {
                     response.data.isEmailConfirmed &&
                     response.data.username !== null
                 ) {
-                    console.log('response User', response.data);
                     if (response.data.is2FaEnabled) {
                         if (response.data.is2FaVerified) {
                             setIsLoggedIn(true);

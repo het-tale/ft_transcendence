@@ -21,6 +21,29 @@ export class GameStartEvent {
     server: Server,
   ) {
     let exist = false;
+    const user_player = activeSockets.get(client);
+    if (!user_player) throw new Error('undefined user ');
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: user_player.id,
+      },
+    });
+    if (user.status === 'InGame') {
+      setTimeout(() => {
+        client.emit('InvitationDeclined');
+        client.disconnect();
+      }, 2000);
+      return;
+    } else {
+      await this.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          status: 'InGame',
+        },
+      });
+    }
     for (const existRoom of rooms.values()) {
       if (existRoom.players.length === 1 && !existRoom.isinvit) {
         exist = true;
@@ -88,9 +111,32 @@ export class GameStartEvent {
     activeSockets: Map<Socket, User>,
     server: Server,
   ) {
+    const user_player = activeSockets.get(client);
+    if (!user_player) throw new Error('undefined user ');
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: user_player.id,
+      },
+      });
+      if (!user) throw new Error('undefined user ');
+      if (user.status === 'InGame') {
+        setTimeout(() => {
+          client.emit('InvitationDeclined');
+          client.disconnect();
+        }, 2000);
+        return;
+      } else {
+        await this.prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            status: 'InGame',
+          },
+        });
+      }
     const room = new Room(Math.random().toString(36).substring(7));
     rooms.set(room.roomName, room);
-    const user = activeSockets.get(client);
     const player = new Player(
       1,
       user.id,
