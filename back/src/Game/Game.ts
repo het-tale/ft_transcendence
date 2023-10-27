@@ -8,7 +8,6 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Room } from './types';
-
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GameInit } from './Game-Init';
 import { GameStartEvent } from './game-start-event';
@@ -54,15 +53,19 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       !this.robot ? this.AddRobotToSOckets() : null;
       const token = client.handshake.auth.token;
       const user = await this.serviceInit.verifyToken(token);
+      // console.log('user is connected');
       if (!user) throw new Error('undefined user ');
       if (user.status === 'InGame') {
+        // console.log('user is in game at connection');
         setTimeout(() => {
           client.emit('InvitationDeclined');
           client.disconnect();
-        }, 1000);
+          
+        }, 2000);
+  
+          return;
+        }
 
-        return;
-      }
       this.activeSockets.set(client, user);
     } catch (e) {
       client.disconnect();
@@ -156,6 +159,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     const room = this.serviceInit.findRoomByPlayerSocket(client, this.rooms);
     const user = this.activeSockets.get(client);
     if (user) {
+      console.log('user is going to be disconnected');
       await this.prisma.user.update({
         where: {
           id: user.id,
