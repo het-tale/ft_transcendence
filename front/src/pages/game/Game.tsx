@@ -19,6 +19,7 @@ function draw(
 ) {
     if (!ctx) ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     if (ctx && padd.current && otherpad.current && ball.current) {
+        // console.log(padd.current.y + ' ' + ball.current.x + ' ' + otherpad.current.y );
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'rgba(235, 182, 145, 1)';
         ctx.fillRect(
@@ -147,7 +148,7 @@ const Game: React.FC = () => {
     }, [otherpad]);
 
     useEffect(() => {
-        if (init && !intialise.current && canvasRef.current && ctx) {
+        if (init && !intialise.current && canvasRef.current) {
             intialise.current = true;
             draw(ctx, canvasRef.current, paddRef, otherpaddRef, ballRef);
         }
@@ -219,11 +220,11 @@ const Game: React.FC = () => {
     };
 
     const handleStartGame = () => {
-        socket?.emit('StartGame');
+        socket? socket.emit('StartGame') : console.log('socket not found');
         setGameStarted(true);
     };
     const handleStartGamerobot = () => {
-        socket?.emit('StartGameRobot');
+        socket? socket.emit('StartGameRobot') : console.log('socket not found');
         setGameStarted(true);
     };
 

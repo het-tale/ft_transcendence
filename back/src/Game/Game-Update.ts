@@ -153,8 +153,16 @@ export class GameUpdate {
   ) {
     const player = room.players.find((p) => p.socket === client);
     const otherPlayer = room.players.find((player) => player.socket !== client);
-    const user = activeSockets.get(client);
-    const otherUser = activeSockets.get(otherPlayer.socket);
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: player?.id,
+      },
+    });
+    const otherUser = await this.prisma.user.findUnique({
+      where: {
+        id: otherPlayer?.id,
+      },
+    });
     otherPlayer.socket?.emit('OTHER AVATAR', user.avatar, user.username);
     player.socket?.emit('OTHER AVATAR', otherUser.avatar, otherUser.username);
   }
