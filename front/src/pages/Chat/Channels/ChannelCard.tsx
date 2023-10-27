@@ -40,8 +40,6 @@ const ChannelCard = (props: BrowseChannelsCardProps) => {
         fetchUserData();
     }, []);
     const JoinLogic = () => {
-        // console.log('Hello From Join Logic');
-        // console.log('FORMDATA for JOIN', message);
         socket.emit('joinRoom', {
             room: props.ChannelInfo?.name,
             username: user?.username,
@@ -57,26 +55,20 @@ const ChannelCard = (props: BrowseChannelsCardProps) => {
     };
 
     socket.on('roomCreated', (data: any) => {
-        // console.log('Create Room Data', data);
         if (props.setUpdateChannel)
             props.setUpdateChannel(!props.updateChannel);
     });
     socket.on('roomCreateError', (data: any) => {
-        // console.log('Create Room Error', data);
         if (props.setUpdateChannel)
             props.setUpdateChannel(!props.updateChannel);
     });
     socket.on('roomJoined', (data: any) => {
-        // console.log('Join Room Data', data);
         if (props.setUpdateChannel)
             props.setUpdateChannel(!props.updateChannel);
     });
     useEffect(() => {
         const timer = setTimeout(() => {
             socket.on('roomJoinError', (data: any) => {
-                // console.log('Join Room Error', data);
-                // if (props.setUpdateChannel)
-                //     props.setUpdateChannel(!props.updateChannel);
                 toast({
                     title: 'Error',
                     description: data,

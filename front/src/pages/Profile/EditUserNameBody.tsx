@@ -26,7 +26,6 @@ const EditUserNameBody = (props: EditUserNameBodyProps) => {
             name: data.username
         });
         renderData.setRenderData(!renderData.renderData);
-        // console.log('Edit Profile data', data);
         // const sentData = {
         //     name: data.username
         // };
@@ -43,7 +42,6 @@ const EditUserNameBody = (props: EditUserNameBodyProps) => {
         //     renderData.setRenderData(!renderData.renderData);
         //     props.onClose();
         // } catch (error: any) {
-        //     console.log('error', error);
         //     toast({
         //         title: 'Error',
         //         description: error.response.data.message,

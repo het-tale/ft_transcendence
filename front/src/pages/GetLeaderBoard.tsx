@@ -8,7 +8,6 @@ export const GetLeaderBoard = async () => {
             }
         });
         if (res.status === 200) {
-            console.log('Leaderboard data', res);
             return res.data;
         } else {
             return null;

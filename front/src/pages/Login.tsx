@@ -39,13 +39,11 @@ function Login(props: any) {
                 navigate('/confirm-email');
             }
         } catch (error: any) {
-            // console.log('Login Error', error);
             const errorMessage1 = error?.response?.data?.message;
             setErrorMessage(errorMessage1);
-            console.log('The error message', errorMessage);
             toast({
                 title: 'Login Failed.',
-                description: errorMessage,
+                description: errorMessage1,
                 status: 'error',
                 duration: 9000,
                 isClosable: true,
@@ -275,7 +273,12 @@ function Login(props: any) {
                 </div>
                 <form onSubmit={(e) => handleLogin(e)}>
                     <div className="form-group">
-                        <label htmlFor="email">Email</label>
+                        <label
+                            htmlFor="email"
+                            className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                        >
+                            Email or Username
+                        </label>
                         <input
                             className="form-control"
                             type="text"
@@ -288,7 +291,12 @@ function Login(props: any) {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="password">Password</label>
+                        <label
+                            htmlFor="password"
+                            className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                        >
+                            Password
+                        </label>
                         <input
                             className="form-control"
                             type="password"

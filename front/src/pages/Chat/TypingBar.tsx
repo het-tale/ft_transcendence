@@ -11,7 +11,6 @@ const TypingBar = (props: any) => {
 
     const sendMessageHandler = (e: any) => {
         e.preventDefault();
-        // console.log('message sent');
         socket.emit('privateMessage', {
             message: message,
             to: props.userDm.username

@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@chakra-ui/react';
-import { error } from 'console';
 
 function Register() {
     const [username, setUsername] = useState('');

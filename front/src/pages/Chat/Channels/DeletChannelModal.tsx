@@ -21,8 +21,6 @@ const DeletChannelModal = (props: deleteChannelProps) => {
     const socket = React.useContext(SocketContext);
     const { register, handleSubmit } = useForm<deleteChannel>();
     const handleDeleteChannel: SubmitHandler<deleteChannel> = (data) => {
-        // console.log('Delete Channel Data', data);
-        // console.log('pass', data.password);
         socket.emit('deleteChannel', {
             room: props.channelDm?.name,
             password: data.password

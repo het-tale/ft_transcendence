@@ -58,7 +58,6 @@ export class ChatGateway
         clientId: client.id,
         username: user.username,
       });
-      console.log(this.connectedUsers);
       await this.dmService.changeUserStatus(user.username, 'online');
       this.io.emit('userOnline', client.id);
       await this.channelService.rejoinRooms(user.id, client);
@@ -512,7 +511,6 @@ export class ChatGateway
         (user) => user.clientId === client.id,
       );
       const clientUsername = user1.username;
-      console.log(clientUsername, 'clientUsername');
       const receiver = this.connectedUsers.find(
         (user) => user.username === data.from,
       );

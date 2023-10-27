@@ -535,7 +535,6 @@ export class ChannelService {
       throw new Error('user is not in the channel');
     }
     const isOwner = channel.ownerId === user.id;
-    // console.log(channel.participants.length);
     if (
       isOwner &&
       (data.newOwner === undefined || data.newOwner === null) &&

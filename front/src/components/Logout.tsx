@@ -9,9 +9,7 @@ const Logout = () => {
     const socket = React.useContext(SocketContext);
     const renderData = React.useContext(RenderContext);
     useEffect(() => {
-        // console.log('The token before logout', localStorage.getItem('token'));
         localStorage.clear();
-        // console.log('The token after logout', localStorage.getItem('token'));
         socket.disconnect();
         renderData.setRenderData(!renderData.renderData);
         navigate('/');

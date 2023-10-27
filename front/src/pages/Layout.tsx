@@ -26,11 +26,11 @@ import {
 } from '../components/GetNotification';
 import { useNavigate } from 'react-router-dom';
 import { UserType } from '../Types/User';
-import User from '../components/User';
 import { SearchUsers } from '../components/SearchUsers';
 import { AchievementUnlocked } from './AchievementUnlocked';
 import { Achievement } from '../Types/Achievement';
 import { MessageType } from '../Types/Message';
+import User from '../components/User';
 
 interface Props {
     children?: React.ReactNode;
@@ -67,7 +67,6 @@ export const Layout = ({ children }: Props) => {
         socketGame.auth = { token: token };
         socketGame.connect();
         socket.on('roomInvitation', (data: any) => {
-            console.log('roomInvitation', data);
             toast({
                 title: 'success',
                 description: data.from,
@@ -79,7 +78,6 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('roomInvitationError', (data: any) => {
-            console.log('roomInvitationError', data);
             toast({
                 title: 'Error',
                 description: data,
@@ -92,7 +90,6 @@ export const Layout = ({ children }: Props) => {
         });
 
         socket.on('roomJoined', (data: any) => {
-            console.log('roomJoined', data);
             toast({
                 title: 'succes',
                 description: data,
@@ -105,7 +102,6 @@ export const Layout = ({ children }: Props) => {
         });
 
         socket.on('roomInvitationDeclined', (data: any) => {
-            console.log('roomDeclined', data);
             toast({
                 title: 'Error',
                 description: data,
@@ -117,7 +113,6 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socketGame.on('ReceiveInvitation', (data: any) => {
-            console.log('ReceiveInvitation', data);
             toast({
                 title: 'success',
                 description: data.senderName,
@@ -130,7 +125,6 @@ export const Layout = ({ children }: Props) => {
             setRoomId(data.roomId);
         });
         socketGame.on('InvitationDeclined', () => {
-            console.log('InvitationDeclined');
             toast({
                 title: 'InvitationDeclined',
                 description: '',
@@ -142,7 +136,6 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('frienRequest', (data: any) => {
-            console.log('frienRequest', data);
             toast({
                 title: 'success',
                 description: data.from,
@@ -154,7 +147,6 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('friendRequestSent', () => {
-            console.log('friendRequestSent');
             toast({
                 title: 'success',
                 description: 'Friend request sent',
@@ -166,7 +158,6 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('friendRequestError', (data: any) => {
-            console.log('friendRequestError', data);
             toast({
                 title: 'error',
                 description: data,
@@ -178,7 +169,6 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('friendRequestAccepted', (data: any) => {
-            console.log('friendRequestAccepted', data);
             toast({
                 title: 'success',
                 description: data.from,
@@ -190,7 +180,6 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('friendRequestDeclined', (data: any) => {
-            console.log('friendRequestDeclined', data);
             toast({
                 title: 'error',
                 description: data.from,
@@ -203,7 +192,6 @@ export const Layout = ({ children }: Props) => {
         });
 
         socket.on('friendRemoved', () => {
-            console.log('friendRemoved');
             toast({
                 title: 'success',
                 description: 'Friend removed',
@@ -215,7 +203,6 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('friendRemoveError', (data: any) => {
-            console.log('friendRemoveError', data);
             toast({
                 title: 'error',
                 description: data,
@@ -227,25 +214,21 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('achievementUnlocked', (data: Achievement) => {
-            console.log('achievementUnlocked', data);
             setAchievements([...achievements, data]);
             setIsModalOpen(true);
             renderData.setRenderData(!renderData.renderData);
         });
         socketGame.on('achievementUnlocked', (data: Achievement) => {
-            console.log('achievementUnlocked', data);
             setAchievements([...achievements, data]);
             setIsModalOpen(true);
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('offlineAchievements', (data: Achievement[]) => {
-            console.log('offlineAchievements', data);
             setAchievements(data);
             setIsModalOpen(true);
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('offlineMessages', (data: MessageType[]) => {
-            console.log('offlineMessages', data);
             toast({
                 title: 'success',
                 description: 'You have new messages',
@@ -257,7 +240,6 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('usernameChanged', () => {
-            console.log('usernameChanged');
             toast({
                 title: 'success',
                 description: 'Username changed',
@@ -269,7 +251,6 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('usernameChangeError', (data: string) => {
-            console.log('usernameChangeError', data);
             toast({
                 title: 'error',
                 description: data,
@@ -305,7 +286,6 @@ export const Layout = ({ children }: Props) => {
     }, [socket]);
 
     const handleAcceptReject = (notif: Invitation, isAccepted: boolean) => {
-        // console.log('m handling notification');
         socket.emit('handleRoomInvitation', {
             room: notif.channel.name,
             from: notif.sender.username,
@@ -327,7 +307,6 @@ export const Layout = ({ children }: Props) => {
         notif: FriendRequest,
         isAccepted: boolean
     ) => {
-        // console.log('m handling friend request');
         socket.emit('handleFriendRequest', {
             from: notif.sender.username,
             isAccepted: isAccepted

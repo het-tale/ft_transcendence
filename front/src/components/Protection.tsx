@@ -14,7 +14,6 @@ const ProtectPassword = (props: any) => {
                 if (response !== null) {
                     setIsLoggedIn(true);
                     if (props.name === 'password') {
-                        console.log('Password', response.isPasswordRequired);
                         setIsProtected(response.isPasswordRequired);
                     } else if (props.name === 'confirmation') {
                         setIsProtected(!response.isEmailConfirmed);

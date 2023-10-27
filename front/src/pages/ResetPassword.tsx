@@ -3,7 +3,6 @@ import '../css/forgot-password.css';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import client from '../components/Client';
 import { useToast } from '@chakra-ui/react';
-import { useState } from 'react';
 
 const ResetPassword = () => {
     let navigate = useNavigate();
@@ -21,13 +20,10 @@ const ResetPassword = () => {
                 password: data.password,
                 confirmPassword: data.confirmPassword
             };
-            console.log(data1);
-            console.log('Token', token);
             const response = await client.post(
                 '/auth/change-password?token=' + token,
                 data1
             );
-            console.log(response);
             if (response.status === 201) {
                 toast({
                     title: 'Password updated.',
@@ -41,7 +37,6 @@ const ResetPassword = () => {
             }
         } catch (error: any) {
             const errorMessage = error.response.data.message;
-            // console.log(errorMessage);
             toast({
                 title: 'Error.',
                 description: errorMessage,

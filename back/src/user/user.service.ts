@@ -66,6 +66,8 @@ export class UserService {
     return users;
   }
   async getPendingFriendRequests(user: User) {
+    //sender should not be friend with receiver
+
     const friendRequests = await this.prisma.friendRequest.findMany({
       where: {
         receiverId: user.id,
@@ -95,8 +97,6 @@ export class UserService {
   }
 
   async getPendingInvitations(user: User) {
-    console.log(user.username);
-
     const invitations = await this.prisma.invitation.findMany({
       where: {
         receiverId: user.id,

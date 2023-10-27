@@ -41,7 +41,6 @@ const MessageUser = ({
     activeCard
 }: MessageUserProps) => {
     const HandleDm = (id: number | undefined) => {
-        // console.log('Hellooo user', isUserDm);
         if (
             setUserDm &&
             dm &&
@@ -49,16 +48,13 @@ const MessageUser = ({
             setUpdateUser &&
             setUpdateClass
         ) {
-            // console.log('Helloooooooooooooooo');
             setFirstLoad('firstLoad');
             setUserDm(dm);
             setUpdateUser(!updateUser);
             setUpdateClass(id);
         }
-        // console.log('Hellooo userDm', dm);
     };
     useEffect(() => {
-        // console.log('The update class', updateClass);
     }, [updateClass]);
     return (
         <div>

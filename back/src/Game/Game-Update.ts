@@ -23,12 +23,15 @@ export class GameUpdate {
   constructor(private prisma: PrismaService, private serviceInit: GameInit) {}
 
   async intersections(room: Room, playerPaddle: Paddle, otherPaddle: Paddle) {
+    if (Date.now() - room.ball.lastcolision < 100) return;
+    
     if (
       room.ball.x - room.ball.radius <
         playerPaddle.x + playerPaddle.width / 2 &&
       room.ball.y > playerPaddle.y &&
       room.ball.y < playerPaddle.y + playerPaddle.height
     ) {
+      room.ball.lastcolision = Date.now();
       const relativeIntersectY =
         (room.ball.y - (playerPaddle.y + playerPaddle.height / 2)) /
         (playerPaddle.height / 2);
@@ -44,6 +47,7 @@ export class GameUpdate {
       room.ball.y > otherPaddle.y &&
       room.ball.y < otherPaddle.y + otherPaddle.height
     ) {
+      room.ball.lastcolision = Date.now();
       const relativeIntersectY =
         (room.ball.y - (otherPaddle.y + otherPaddle.height / 2)) /
         (otherPaddle.height / 2);
@@ -100,11 +104,9 @@ export class GameUpdate {
     const yDifference = ballY - paddleCenterY;
 
     if (randomError < errorFactor) {
-      // Apply random error to robot's movement
       room.players[1].paddle.y +=
         Math.random() * 2 * robotpaddle.dy - robotpaddle.dy;
     } else {
-      // Maintain normal robot behavior
       room.players[1].paddle.y +=
         yDifference > 0 ? robotpaddle.dy : -robotpaddle.dy;
     }
@@ -115,12 +117,10 @@ export class GameUpdate {
     } else if (room.players[1].paddle.y > maxY) {
       room.players[1].paddle.y = maxY;
     }
-    // Check for collisions with top and bottom walls
     if (
       room.ball.y - room.ball.radius <= 0 ||
       room.ball.y + room.ball.radius >= CONTAINERHIEGHT
     ) {
-      // Reverse the vertical velocity of the ball
       room.ball.dy *= -1;
     }
     this.colisionrobot(room, activeSockets);
@@ -129,7 +129,6 @@ export class GameUpdate {
       room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
       room.ball.dy += room.ball.dy > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
     }
-    // room.ball.setXY(room.ball.x + room.ball.dx, room.ball.y + room.ball.dy);
     room.ball.x += room.ball.dx;
     room.ball.y += room.ball.dy;
   }
@@ -154,23 +153,28 @@ export class GameUpdate {
   ) {
     const player = room.players.find((p) => p.socket === client);
     const otherPlayer = room.players.find((player) => player.socket !== client);
-    const user = activeSockets.get(client);
-    const otherUser = activeSockets.get(otherPlayer.socket);
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: player?.id,
+      },
+    });
+    const otherUser = await this.prisma.user.findUnique({
+      where: {
+        id: otherPlayer?.id,
+      },
+    });
     otherPlayer.socket?.emit('OTHER AVATAR', user.avatar, user.username);
     player.socket?.emit('OTHER AVATAR', otherUser.avatar, otherUser.username);
   }
 
   async updateGame(room: Room, activeSockets: Map<Socket, User>) {
-    // Calculate the new ball position based on its current position and velocity
     if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL) {
       room.lastspeedincrease = Date.now();
       room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
       room.ball.dy += room.ball.dy > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
     }
-    // room.ball.setXY(room.ball.x + room.ball.dx, room.ball.y + room.ball.dy);
     room.ball.x += room.ball.dx;
     room.ball.y += room.ball.dy;
-    // Check for collisions with top and bottom walls
     if (
       room.ball.y - room.ball.radius <= 0 ||
       room.ball.y + room.ball.radius > CONTAINERHIEGHT
@@ -201,6 +205,7 @@ export class GameUpdate {
     });
     ball.x = CONTAINERWIDTH / 2;
     ball.y = CONTAINERHIEGHT / 2;
+    ball.lastcolision = Date.now();
     const random = Math.random();
     switch (true) {
       case random < 0.25:

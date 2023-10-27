@@ -21,7 +21,6 @@ export default function Chat(props: BrowseChannelsProps) {
     useEffect(() => {
         GetDms().then((data) => {
             setDms(data);
-            // console.log('UPDATE DM');
         });
         GetRoomDms().then((data) => {
             setRoomDms(data);
