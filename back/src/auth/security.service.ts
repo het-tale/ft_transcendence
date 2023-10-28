@@ -92,7 +92,6 @@ export class SecurityService {
         },
       });
     } catch (error) {
-      console.log(error);
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002')
           throw new HttpException(

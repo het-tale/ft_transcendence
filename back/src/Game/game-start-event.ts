@@ -36,6 +36,7 @@ export class GameStartEvent {
         client.emit('InvitationDeclined');
         client.disconnect();
       }, 2000);
+
       return;
     } else {
       // console.log('user update status');
@@ -122,24 +123,25 @@ export class GameStartEvent {
       where: {
         id: user_player.id,
       },
+    });
+    if (!user) throw new Error('undefined user ');
+    if (user.status === 'InGame') {
+      setTimeout(() => {
+        client.emit('InvitationDeclined');
+        client.disconnect();
+      }, 2000);
+
+      return;
+    } else {
+      await this.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          status: 'InGame',
+        },
       });
-      if (!user) throw new Error('undefined user ');
-      if (user.status === 'InGame') {
-        setTimeout(() => {
-          client.emit('InvitationDeclined');
-          client.disconnect();
-        }, 2000);
-        return;
-      } else {
-        await this.prisma.user.update({
-          where: {
-            id: user.id,
-          },
-          data: {
-            status: 'InGame',
-          },
-        });
-      }
+    }
     const room = new Room(Math.random().toString(36).substring(7));
     rooms.set(room.roomName, room);
     const player = new Player(
@@ -184,7 +186,7 @@ export class GameStartEvent {
     this.serviceUpdate.OtherAvatar(client, room, activeSockets);
     if (!room.gameActive) {
       room.gameActive = true;
-      let speed = INTERVAL;
+      const speed = INTERVAL;
       room.gameInterval = interval(speed).subscribe(() => {
         if (!room.gameActive) {
           cancelgamesart(room, rooms);

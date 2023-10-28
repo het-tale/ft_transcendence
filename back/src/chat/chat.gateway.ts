@@ -46,7 +46,7 @@ export class ChatGateway
   private connectedUsers: { clientId: string; username: string }[] = [];
 
   afterInit() {
-    console.log('Initialized');
+    console.log('Chat gateway initialized');
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
@@ -59,6 +59,7 @@ export class ChatGateway
         username: user.username,
       });
       await this.dmService.changeUserStatus(user.username, 'online');
+      console.log(this.connectedUsers);
       this.io.emit('userOnline', client.id);
       await this.channelService.rejoinRooms(user.id, client);
       const offlineMessages = await this.dmService.getOfflineMessages(user.id);

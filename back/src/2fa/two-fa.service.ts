@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
 
 @Injectable()
 export class TwoFaService {
@@ -17,7 +18,9 @@ export class TwoFaService {
       secret,
     );
 
-    return otpAuthUrl;
+    const qrCode = await toDataURL(otpAuthUrl);
+
+    return qrCode;
   }
   async verifyToken(token: string, secret: string) {
     const isValid = authenticator.verify({ token, secret });

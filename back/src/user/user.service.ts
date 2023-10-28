@@ -3,24 +3,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { TChangePassword } from 'src/dto';
 import * as argon from 'argon2';
+import { GameUpdate } from 'src/Game/Game-Update';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
-  async getUserById(id: number) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-      include: {
-        blocked: true,
-        sentFriendRequests: true,
-      },
-    });
-    if (!user) {
-      throw new HttpException('User not found', 404);
-    }
-
-    return user;
-  }
+  constructor(private prisma: PrismaService, private gameService: GameUpdate) {}
   async changeUsername(username: string, user: User) {
     try {
       await this.prisma.user.update({
@@ -146,16 +133,58 @@ export class UserService {
       select: {
         matchHistoryA: {
           include: {
-            playerA: true,
-            playerB: true,
-            winner: true,
+            playerA: {
+              select: {
+                username: true,
+                avatar: true,
+                id: true,
+                status: true,
+              },
+            },
+            playerB: {
+              select: {
+                username: true,
+                avatar: true,
+                id: true,
+                status: true,
+              },
+            },
+            winner: {
+              select: {
+                username: true,
+                avatar: true,
+                id: true,
+                status: true,
+              },
+            },
           },
         },
         matchHistoryB: {
           include: {
-            playerA: true,
-            playerB: true,
-            winner: true,
+            playerA: {
+              select: {
+                username: true,
+                avatar: true,
+                id: true,
+                status: true,
+              },
+            },
+            playerB: {
+              select: {
+                username: true,
+                avatar: true,
+                id: true,
+                status: true,
+              },
+            },
+            winner: {
+              select: {
+                username: true,
+                avatar: true,
+                id: true,
+                status: true,
+              },
+            },
           },
         },
       },
@@ -164,29 +193,18 @@ export class UserService {
     return [...myUser.matchHistoryA, ...myUser.matchHistoryB];
   }
 
-  async calculateRank() {
-    const users = await this.prisma.user.findMany({
-      select: {
-        id: true,
-      },
-      orderBy: {
-        lp: 'desc',
-      },
-    });
-    for (let i = 0; i < users.length; i++) {
-      await this.prisma.user.update({
-        where: { id: users[i].id },
-        data: { g_rank: i + 1 },
-      });
-    }
-  }
   async getLeaderBoard() {
     //if no match played yet?
     if ((await this.prisma.match.count()) === 0) {
       return [];
     }
-    await this.calculateRank();
+    await this.gameService.calculateRank();
     const users = await this.prisma.user.findMany({
+      where: {
+        id: {
+          not: 1,
+        },
+      },
       select: {
         id: true,
         username: true,

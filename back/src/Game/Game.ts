@@ -60,11 +60,10 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         setTimeout(() => {
           client.emit('InvitationDeclined');
           client.disconnect();
-          
         }, 2000);
-  
-          return;
-        }
+
+        return;
+      }
 
       this.activeSockets.set(client, user);
     } catch (e) {
@@ -98,11 +97,9 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         this.server,
       );
     } catch (e) {
-    
       return;
     }
   }
-
 
   @SubscribeMessage('InvitePlayer')
   async handleInvitePlayer(client: Socket, targetUserId: number) {
@@ -159,7 +156,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     const room = this.serviceInit.findRoomByPlayerSocket(client, this.rooms);
     const user = this.activeSockets.get(client);
     if (user) {
-      console.log('user is going to be disconnected');
       await this.prisma.user.update({
         where: {
           id: user.id,
@@ -189,5 +185,4 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     }
     this.activeSockets.delete(client);
   }
-
 }

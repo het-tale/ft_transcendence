@@ -1,7 +1,6 @@
 import { Button, ButtonGroup, useToast } from '@chakra-ui/react';
 import { useContext, useEffect, useState } from 'react';
 import client from '../../components/Client';
-import QRCode from 'react-qr-code';
 import { UserType } from '../../Types/User';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { RenderContext } from '../../RenderContext';
@@ -71,14 +70,19 @@ const Manage2fa = (props: Manage2faProps) => {
             }
         };
         generate2fa();
-    });
+    } , []);
     return (
         <>
             <div>
                 <h6 style={{ color: '#CCC', paddingLeft: '15px' }}>
                     Scan The QR code with your Google Authenticator app
                 </h6>
-                <QRCode value={qrCodeImageUrl} style={{ marginLeft: '5rem' }} />
+                {/* <QRCode value={qrCodeImageUrl} style={{ marginLeft: '5rem' }} /> */}
+                <img
+                    src={qrCodeImageUrl}
+                    alt="qr code"
+                    style={{ marginLeft: '5rem' }}
+                />
             </div>
             <form
                 style={{ padding: '15px' }}

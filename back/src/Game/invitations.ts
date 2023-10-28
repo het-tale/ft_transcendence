@@ -25,11 +25,16 @@ export class Invitations {
       },
     });
     const receiver = await this.prisma.user.findUnique({
-        where: {
-            id: targetUserId,
-        },
+      where: {
+        id: targetUserId,
+      },
     });
-    if (!receiver || !receiver || sender === receiver || sender.status === 'InGame') {
+    if (
+      !receiver ||
+      !receiver ||
+      sender === receiver ||
+      sender.status === 'InGame'
+    ) {
       setTimeout(() => {
         client.emit('InvitationDeclined');
       }, 2000);
@@ -111,7 +116,7 @@ export class Invitations {
       if (!pendingInvitation) {
         setTimeout(() => {
           client.emit('InvitationDeclined');
-        }, 1000);
+        }, 2000);
 
         return;
       }
@@ -125,7 +130,8 @@ export class Invitations {
       });
       setTimeout(() => {
         client.emit('InvitationDeclined');
-      }, 1000);
+      }, 2000);
+
       return;
     }
     const sender_player = invitationRoom.players.find(
@@ -136,7 +142,7 @@ export class Invitations {
       setTimeout(() => {
         client.emit('InvitationDeclined');
         sender_player.socket?.emit('InvitationDeclined');
-      }, 1000);
+      }, 2000);
 
       return;
     }
@@ -153,11 +159,10 @@ export class Invitations {
     if (!pendingInvitation) {
       sender_player.socket.leave(roomId);
       rooms.delete(roomId);
-        setTimeout(() => {
-            client.emit('InvitationDeclined');
-            sender_player.socket?.emit('InvitationDeclined');
-
-        }, 2000);
+      setTimeout(() => {
+        client.emit('InvitationDeclined');
+        sender_player.socket?.emit('InvitationDeclined');
+      }, 2000);
 
       return;
     }
@@ -185,7 +190,7 @@ export class Invitations {
       client.emit('GAME INVITE', true);
       client.emit('InitGame', gamedata);
       client.emit('JoinRoom', roomId);
-    }, 1000);
+    }, 2000);
     await this.prisma.user.update({
       where: {
         id: receiver_player.id,
@@ -205,7 +210,7 @@ export class Invitations {
           activeSockets,
         );
       });
-    }, 1000);
+    }, 2000);
   }
 
   async declineInvitation(
