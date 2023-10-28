@@ -30,7 +30,6 @@ import { SearchUsers } from '../components/SearchUsers';
 import { AchievementUnlocked } from './AchievementUnlocked';
 import { Achievement } from '../Types/Achievement';
 import { MessageType } from '../Types/Message';
-import { set } from 'react-hook-form';
 import User from '../components/User';
 
 interface Props {
@@ -45,7 +44,6 @@ export const Layout = ({ children }: Props) => {
     const renderData: RenderContextType = React.useContext(RenderContext);
     const toast = useToast();
     const token = localStorage.getItem('token');
-    const [roomId, setRoomId] = useState<string>('');
     const [user, setUser] = React.useState<UserType>();
     const [users, setUsers] = React.useState<UserType[]>([]);
     const navigate = useNavigate();
@@ -123,7 +121,6 @@ export const Layout = ({ children }: Props) => {
                 position: 'bottom-right'
             });
             renderData.setRenderData(!renderData.renderData);
-            // setRoomId(data.roomId);
         });
         socketGame.on('InvitationDeclined', () => {
             toast({
