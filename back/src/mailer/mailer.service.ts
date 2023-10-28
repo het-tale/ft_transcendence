@@ -7,10 +7,6 @@ import Mail from 'nodemailer/lib/mailer';
 export class MailerService {
   private nodemailerTransport: Mail;
   constructor(private readonly configService: ConfigService) {
-    // console.log(
-    //   configService.getOrThrow('EMAIL_PASSWORD'),
-    //   configService.get('EMAIL_USER'),
-    // );
     this.nodemailerTransport = createTransport({
       host: 'smtp.office365.com',
       port: 587,

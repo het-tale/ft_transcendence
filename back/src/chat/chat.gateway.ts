@@ -46,7 +46,7 @@ export class ChatGateway
   private connectedUsers: { clientId: string; username: string }[] = [];
 
   afterInit() {
-    console.log('Initialized');
+    console.log('Chat gateway initialized');
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
@@ -95,7 +95,6 @@ export class ChatGateway
       }
       if (offlineAchievements.length > 0) {
         client.emit('offlineAchievements', offlineAchievements);
-        console.log(offlineAchievements);
         await this.achievementsService.removeOfflineAchievements(user.username);
       }
     } catch (err) {
@@ -109,7 +108,6 @@ export class ChatGateway
       (user) => user.clientId === client.id,
     );
     if (!user) return;
-    console.log(user.username, 'disconnected');
     await this.dmService.changeUserStatus(user.username, 'offline');
     this.io.emit('userOffline', client.id);
     this.connectedUsers = this.connectedUsers.filter(
@@ -127,7 +125,6 @@ export class ChatGateway
       const sender = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       );
-      console.log(sender.clientId, client.id, 'Im in send message');
       const receiver = this.connectedUsers.find(
         (user) => user.username === data.to,
       );

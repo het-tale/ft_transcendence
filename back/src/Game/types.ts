@@ -18,7 +18,14 @@ export class Paddle {
 }
 
 export class Ball {
-  constructor(x: number, y: number, radius: number, dx: number, dy: number, lastcolision: number) {
+  constructor(
+    x: number,
+    y: number,
+    radius: number,
+    dx: number,
+    dy: number,
+    lastcolision: number,
+  ) {
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -101,7 +108,7 @@ export class Room {
           RADIUS,
           BALLDX,
           -BALLDX,
-        Date.now(),
+          Date.now(),
         );
         break;
       case random < 0.6:
@@ -111,7 +118,7 @@ export class Room {
           RADIUS,
           -BALLDX,
           BALLDX,
-        Date.now(),
+          Date.now(),
         );
         break;
       case random < 0.8:
@@ -121,7 +128,7 @@ export class Room {
           RADIUS,
           -BALLDX,
           -BALLDX,
-        Date.now(),
+          Date.now(),
         );
         break;
       default:
@@ -131,7 +138,7 @@ export class Room {
           RADIUS,
           BALLDX,
           BALLDX,
-        Date.now(),
+          Date.now(),
         );
         break;
     }

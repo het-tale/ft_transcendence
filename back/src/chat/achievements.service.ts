@@ -114,7 +114,7 @@ export class AchievementsService {
       },
     });
     const achievement = await this.getAchievement('The Unstoppable Block-nado');
-    if (user.blockedBy.length < 20) return { achievement, isUnlocked: false };
+    if (user.blockedBy.length < 2) return { achievement, isUnlocked: false };
     const isUnlocked = await this.checkIfAchiever(user, achievement, true);
 
     return { achievement, isUnlocked };

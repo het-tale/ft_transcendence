@@ -20,5 +20,6 @@ import { SecurityController } from './security.controller';
   ],
   controllers: [AuthController, SecurityController],
   providers: [AuthService, JwtStrategy, Strategy42, SecurityService],
+  exports: [AuthService],
 })
 export class AuthModule {}

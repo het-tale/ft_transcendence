@@ -8,20 +8,6 @@ import { GameUpdate } from 'src/Game/Game-Update';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService, private gameService: GameUpdate) {}
-  async getUserById(id: number) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-      include: {
-        blocked: true,
-        sentFriendRequests: true,
-      },
-    });
-    if (!user) {
-      throw new HttpException('User not found', 404);
-    }
-
-    return user;
-  }
   async changeUsername(username: string, user: User) {
     try {
       await this.prisma.user.update({
@@ -147,16 +133,58 @@ export class UserService {
       select: {
         matchHistoryA: {
           include: {
-            playerA: true,
-            playerB: true,
-            winner: true,
+            playerA: {
+              select: {
+                username: true,
+                avatar: true,
+                id: true,
+                status: true,
+              },
+            },
+            playerB: {
+              select: {
+                username: true,
+                avatar: true,
+                id: true,
+                status: true,
+              },
+            },
+            winner: {
+              select: {
+                username: true,
+                avatar: true,
+                id: true,
+                status: true,
+              },
+            },
           },
         },
         matchHistoryB: {
           include: {
-            playerA: true,
-            playerB: true,
-            winner: true,
+            playerA: {
+              select: {
+                username: true,
+                avatar: true,
+                id: true,
+                status: true,
+              },
+            },
+            playerB: {
+              select: {
+                username: true,
+                avatar: true,
+                id: true,
+                status: true,
+              },
+            },
+            winner: {
+              select: {
+                username: true,
+                avatar: true,
+                id: true,
+                status: true,
+              },
+            },
           },
         },
       },

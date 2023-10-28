@@ -16,6 +16,7 @@ import { TwoFaVerificationGuard } from 'src/guards/two-fa-verification.guard';
 import { User } from '@prisma/client';
 import { ChangePasswordDto, TChangePassword, Tname, NameDto } from 'src/dto';
 import { UseZodGuard } from 'nestjs-zod';
+import { AuthService } from 'src/auth/auth.service';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -24,7 +25,10 @@ import { UseZodGuard } from 'nestjs-zod';
 @UseGuards(JwtAuthenticationGuard)
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private authService: AuthService,
+  ) {}
 
   @Get('search-users/:beginWith')
   async searchUsers(
@@ -77,6 +81,6 @@ export class UserController {
 
   @Get(':id')
   async getUserById(@Param('id', ParseIntPipe) id: number) {
-    return await this.userService.getUserById(id);
+    return await this.authService.getUser(id);
   }
 }
