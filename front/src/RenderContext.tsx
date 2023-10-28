@@ -8,6 +8,7 @@ export interface RenderContextType {
     setNotification?: React.Dispatch<React.SetStateAction<boolean>>;
     buttonClicked?: React.MutableRefObject<HTMLButtonElement | null>;
     user?: UserType;
+    setUser?: React.Dispatch<React.SetStateAction<UserType | undefined>>;
     firstTime?: boolean;
     setFirstTime?: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -19,5 +20,6 @@ export const RenderContext = React.createContext<RenderContextType>({
     setNotification: () => {},
     user: undefined,
     firstTime: true,
-    setFirstTime: () => {}
+    setFirstTime: () => {},
+    setUser: () => {}
 });

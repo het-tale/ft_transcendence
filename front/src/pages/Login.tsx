@@ -26,7 +26,10 @@ function Login(props: any) {
             const condition = await checkAuthentication();
             if (condition === true) {
                 renderData.setRenderData(!renderData.renderData);
-                navigate('/home');
+                if (props.setFirstLogin === true) {
+                    navigate('/complete-profile');
+                    props.setFirstLogin(false);
+                } else navigate('/home');
             } else {
                 toast({
                     title: 'Email not Confirmed.',
@@ -43,7 +46,7 @@ function Login(props: any) {
             setErrorMessage(errorMessage1);
             toast({
                 title: 'Login Failed.',
-                description: errorMessage,
+                description: errorMessage1,
                 status: 'error',
                 duration: 9000,
                 isClosable: true,
@@ -273,7 +276,12 @@ function Login(props: any) {
                 </div>
                 <form onSubmit={(e) => handleLogin(e)}>
                     <div className="form-group">
-                        <label htmlFor="email">Email</label>
+                        <label
+                            htmlFor="email"
+                            className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                        >
+                            Email or Username
+                        </label>
                         <input
                             className="form-control"
                             type="text"
@@ -286,7 +294,12 @@ function Login(props: any) {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="password">Password</label>
+                        <label
+                            htmlFor="password"
+                            className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                        >
+                            Password
+                        </label>
                         <input
                             className="form-control"
                             type="password"

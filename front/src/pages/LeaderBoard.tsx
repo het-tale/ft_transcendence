@@ -10,9 +10,10 @@ import {
     Text,
     AvatarGroup,
     Avatar,
-    AvatarBadge
+    AvatarBadge,
+    Spinner
 } from '@chakra-ui/react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RenderContext } from '../RenderContext';
 import { UserType } from '../Types/User';
 import { GetLeaderBoard } from './GetLeaderBoard';
@@ -23,6 +24,10 @@ export const LeaderBoard = () => {
     const renderData = React.useContext(RenderContext);
     const [users, setUsers] = React.useState<UserType[]>([]);
     const [friends, setFriends] = React.useState<UserType[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    setTimeout(() => {
+        setIsLoading(false);
+    }, 1000);
     useEffect(() => {
         GetLeaderBoard().then((data) => {
             setUsers(data);
@@ -62,6 +67,7 @@ export const LeaderBoard = () => {
                     </AvatarGroup>
                 </Flex>
             </Flex>
+
             <Flex flexDirection={'column'} marginBottom={'2rem'}>
                 <Text
                     fontSize={'xs'}
@@ -71,7 +77,17 @@ export const LeaderBoard = () => {
                 >
                     Your Place in this ladder:
                 </Text>
-                {users?.some((user) => user.id === renderData.user?.id) ? (
+                {isLoading ? (
+                    <Spinner
+                        thickness="4px"
+                        speed="0.65s"
+                        emptyColor="gray.200"
+                        color="#a435f0"
+                        size="xl"
+                        marginTop="10"
+                        marginLeft="45%"
+                    />
+                ) : users?.some((user) => user.id === renderData.user?.id) ? (
                     <Table boxShadow={'md'}>
                         <Tr>
                             <Td>{renderData.user?.g_rank}</Td>
@@ -106,7 +122,17 @@ export const LeaderBoard = () => {
                     'You Have No Place in this ladder'
                 )}
             </Flex>
-            {users?.length > 0 ? (
+            {isLoading ? (
+                <Spinner
+                    thickness="4px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color="#a435f0"
+                    size="xl"
+                    marginTop="10"
+                    marginLeft="45%"
+                />
+            ) : users?.length > 0 ? (
                 <TableContainer borderWidth="1px" borderRadius="lg" p={4}>
                     <Table variant="simple">
                         <Thead>

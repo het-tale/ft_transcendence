@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import '../../css/chat/Right.css';
 import { SocketContext } from '../../socket';
+import { RenderContext } from '../../RenderContext';
 
 const TypingBar = (props: any) => {
     const [message, setMessage] = useState('');
     const socket = React.useContext(SocketContext);
+    const renderData = useContext(RenderContext);
+    // console.log('typing socket', socket);
 
     const sendMessageHandler = (e: any) => {
         e.preventDefault();
@@ -14,6 +17,7 @@ const TypingBar = (props: any) => {
         });
         setMessage('');
         props.setRender(!props.render);
+        // renderData.setRenderData(!renderData.renderData);
     };
     return (
         <form className="typing-bar" onSubmit={sendMessageHandler}>

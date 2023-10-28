@@ -50,8 +50,7 @@ const Dms = (props: any) => {
     };
 
     const { register, handleSubmit } = useForm<SentData>();
-    const handleSendMessage: SubmitHandler<SentData> = (data) => {
-    };
+    const handleSendMessage: SubmitHandler<SentData> = (data) => {};
 
     const tabs = [
         {
@@ -137,6 +136,7 @@ const Dms = (props: any) => {
                 <>
                     <DmsChat
                         userDm={userDm}
+                        setUserDm={setUserDm}
                         render={props.render}
                         setRender={props.setRender}
                         updateUser={updateUser}

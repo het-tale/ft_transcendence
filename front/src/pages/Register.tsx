@@ -270,7 +270,12 @@ function Register() {
                 </div>
                 <form onSubmit={(e) => handleSubmit(e)}>
                     <div className="form-group">
-                        <label htmlFor="username">Username</label>
+                        <label
+                            htmlFor="username"
+                            className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                        >
+                            Username
+                        </label>
                         <input
                             className="form-control"
                             type="text"
@@ -283,7 +288,12 @@ function Register() {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="email">Email</label>
+                        <label
+                            htmlFor="email"
+                            className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                        >
+                            Email
+                        </label>
                         <input
                             className="form-control"
                             type="email"
@@ -296,7 +306,12 @@ function Register() {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="password">Password</label>
+                        <label
+                            htmlFor="password"
+                            className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                        >
+                            Password
+                        </label>
                         <input
                             className="form-control"
                             type="password"

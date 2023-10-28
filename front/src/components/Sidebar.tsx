@@ -10,6 +10,7 @@ import { UserType } from '../Types/User';
 import User from './User';
 import { Notification } from '../Types/Notification';
 import { RenderContext, RenderContextType } from '../RenderContext';
+import { SocketContext } from '../socket';
 
 interface sidebarProps {
     notification?: boolean;
@@ -23,6 +24,7 @@ interface sidebarProps {
 const Sidebar = (props: sidebarProps) => {
     const [user, setUser] = React.useState<UserType>();
     const renderData: RenderContextType = React.useContext(RenderContext);
+    const socket = React.useContext(SocketContext);
     useEffect(() => {
         async function fetchUserData() {
             const userData = await User();
@@ -31,7 +33,21 @@ const Sidebar = (props: sidebarProps) => {
 
         fetchUserData();
     }, []);
+    useEffect(() => {
+        socket.on('userOffline', (data: any) => {
+            console.log('userOffline', data);
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('userOnline', (data: any) => {
+            console.log('userOnline', data);
+            renderData.setRenderData(!renderData.renderData);
+        });
 
+        return () => {
+            socket.off('userOffline');
+            socket.off('userOnline');
+        };
+    });
     return (
         <aside>
             <Link
@@ -44,7 +60,7 @@ const Sidebar = (props: sidebarProps) => {
                 Home
             </Link>
             <Link
-                to={`/chat/rooms-dms/${user?.id}`}
+                to={`/chat/rooms-dms/`}
                 onClick={() => {
                     renderData.setRenderData(!renderData.renderData);
                 }}

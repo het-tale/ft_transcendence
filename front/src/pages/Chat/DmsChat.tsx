@@ -19,7 +19,7 @@ import {
     useDisclosure,
     useToast
 } from '@chakra-ui/react';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { SocketContext, SocketGameContext } from '../../socket';
 import GetDms from './GetDms';
 import { UserType } from '../../Types/User';
@@ -28,11 +28,14 @@ import GetMessages from './GetMessages';
 import User from '../../components/User';
 import ModalConfirm from './ModalConfirm';
 import client from '../../components/Client';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import UserDmInfo from './UserDmInfo';
+import { RenderContext } from '../../RenderContext';
+import UserId from '../Chat/GetUserById';
 
 const DmsChat = (props: any) => {
     const toast = useToast();
+    const renderData = useContext(RenderContext);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const {
         isOpen: isOpen2,
@@ -53,11 +56,12 @@ const DmsChat = (props: any) => {
         }
 
         fetchUserData();
-    }, [props.render]);
+    }, [props.render, renderData.renderData]);
     const [dms, setDms] = React.useState<UserType[]>([]);
     const socket = React.useContext(SocketContext);
     const socketGame = React.useContext(SocketGameContext);
     const [messages, setMessages] = React.useState<MessageType[]>([]);
+    const chatContainerRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
         const res = GetDms().then((data) => {
             setDms(data);
@@ -67,7 +71,13 @@ const DmsChat = (props: any) => {
                   setMessages(data);
               })
             : null;
-    }, [props.render, props.userDm]);
+    }, [props.render, props.userDm, renderData.renderData]);
+    useEffect(() => {
+        chatContainerRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    }, [messages]);
     const handleBlockedUser = () => {
         socket.emit('blockUser', {
             target: props.userDm?.username
@@ -113,6 +123,9 @@ const DmsChat = (props: any) => {
             );
             if (res.status === 200) {
                 props.setRender(!props.render);
+                if (clearOrDelete === 'delete') {
+                    props.setUserDm({});
+                }
             }
         } catch (error: any) {
             toast({
@@ -136,7 +149,26 @@ const DmsChat = (props: any) => {
         props.setRender(!props.render);
         navigate(`/game/`);
     };
-    if (!dms || dms.length === 0 || !props.userDm) return <></>;
+    const location = useLocation();
+    let userId = location.pathname.split('/')[3];
+    React.useEffect(() => {
+        async function fetchUserData() {
+            if (props.userDm?.id !== undefined || Number(userId) === 0) return;
+            const userData = await UserId(Number(userId));
+            props.setUserDm(userData);
+        }
+        fetchUserData();
+    }, [props.render]);
+    if (!props.userDm && Number(userId) !== 0) return <></>;
+    console.log('userId', userId);
+    if (
+        Number(userId) === 0 &&
+        (!dms ||
+            dms.length === 0 ||
+            !props.userDm ||
+            props.userDm.id === undefined)
+    )
+        return <></>;
     return (
         <Flex flexDirection={'column'} justifyContent={'space-between'}>
             <Flex h={'10%'}>
@@ -177,14 +209,20 @@ const DmsChat = (props: any) => {
                         borderRadius={20}
                         marginTop={-25}
                     >
-                        <MenuItem
-                            paddingBottom={2}
-                            bg={'none'}
-                            icon={<BsController />}
-                            onClick={handleSendGameInvitation}
-                        >
-                            Play with me
-                        </MenuItem>
+                        {props.userDm?.id !== user?.id &&
+                        props.userDm?.username !== 'ROBOT' ? (
+                            <MenuItem
+                                paddingBottom={2}
+                                bg={'none'}
+                                icon={<BsController />}
+                                onClick={handleSendGameInvitation}
+                            >
+                                Play with me
+                            </MenuItem>
+                        ) : (
+                            <></>
+                        )}
+
                         <Link to={`/user-profile/${props.userDm?.id}`}>
                             <MenuItem
                                 paddingBottom={2}
@@ -235,41 +273,47 @@ const DmsChat = (props: any) => {
                                 }
                             />
                         </MenuItem>
-                        <MenuItem
-                            bg={'none'}
-                            icon={<BsPersonFillSlash />}
-                            onClick={onOpen}
-                        >
-                            {user?.blocked.some(
-                                (user) => user.id === props.userDm?.id
-                            )
-                                ? 'Unblock'
-                                : 'Block'}
-                            <ModalConfirm
-                                isOpen={isOpen}
-                                onOpen={onOpen}
-                                onClose={onClose}
-                                title={'Block User'}
-                                target={props.userDm?.id}
-                                blocked={blocked}
-                                setBlocked={setBlocked}
-                                socket={socket}
-                                handleBlockedUser={
-                                    user?.blocked.some(
-                                        (user) => user.id === props.userDm?.id
-                                    )
-                                        ? handleUnblockUser
-                                        : handleBlockedUser
-                                }
-                                body={
-                                    user?.blocked.some(
-                                        (user) => user.id === props.userDm?.id
-                                    )
-                                        ? 'Are you sure you want to unblock this user?'
-                                        : 'Are you sure you want to block this user?'
-                                }
-                            />
-                        </MenuItem>
+                        {props.userDm?.id !== user?.id ? (
+                            <MenuItem
+                                bg={'none'}
+                                icon={<BsPersonFillSlash />}
+                                onClick={onOpen}
+                            >
+                                {user?.blocked.some(
+                                    (user) => user.id === props.userDm?.id
+                                )
+                                    ? 'Unblock'
+                                    : 'Block'}
+                                <ModalConfirm
+                                    isOpen={isOpen}
+                                    onOpen={onOpen}
+                                    onClose={onClose}
+                                    title={'Block User'}
+                                    target={props.userDm?.id}
+                                    blocked={blocked}
+                                    setBlocked={setBlocked}
+                                    socket={socket}
+                                    handleBlockedUser={
+                                        user?.blocked.some(
+                                            (user) =>
+                                                user.id === props.userDm?.id
+                                        )
+                                            ? handleUnblockUser
+                                            : handleBlockedUser
+                                    }
+                                    body={
+                                        user?.blocked.some(
+                                            (user) =>
+                                                user.id === props.userDm?.id
+                                        )
+                                            ? 'Are you sure you want to unblock this user?'
+                                            : 'Are you sure you want to block this user?'
+                                    }
+                                />
+                            </MenuItem>
+                        ) : (
+                            <></>
+                        )}
                     </MenuList>
                 </Menu>
             </Flex>
@@ -288,6 +332,7 @@ const DmsChat = (props: any) => {
                         />
                     );
                 })}
+                <div ref={chatContainerRef}></div>
             </div>
             <TypingBar
                 userDm={props.userDm}
