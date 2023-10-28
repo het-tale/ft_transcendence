@@ -17,9 +17,7 @@ function draw(
     otherpad: React.RefObject<Paddle>,
     ball: React.RefObject<Ball>
 ) {
-    if (!ctx) ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     if (ctx && padd.current && otherpad.current && ball.current) {
-        // console.log(padd.current.y + ' ' + ball.current.x + ' ' + otherpad.current.y );
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'rgba(235, 182, 145, 1)';
         ctx.fillRect(
@@ -127,6 +125,7 @@ const Game: React.FC = () => {
     }, 17);
 
     const setupEventListeners = () => {
+        console.log('setting up event listeners');
         canvasRef.current?.addEventListener(
             'mousemove',
             throttleHandleMouseMove
@@ -179,7 +178,7 @@ const Game: React.FC = () => {
             );
             setListning(true);
             const loadDataFromBackend = async () => {
-                await new Promise((resolve) => setTimeout(resolve, 2000));
+                await new Promise((resolve) => setTimeout(resolve, 1000));
                 setDataLoaded(true);
             };
 
@@ -327,8 +326,12 @@ const Game: React.FC = () => {
                     ) : (
                         <>
                             {gameinvite ? (
-                                <div className="game-container">
-                                    <p>Waiting for other player to join</p>
+                                <div className="overlay"> 
+                                    <div className="game-over-container">
+                                        <div className="game-over">
+                                            <p className="parainfo"> Waiting for other player to join ... </p>
+                                        </div>
+                                    </div>
                                 </div>
                             ) : (
                                 <>

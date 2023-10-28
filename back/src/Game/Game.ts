@@ -156,7 +156,6 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     const room = this.serviceInit.findRoomByPlayerSocket(client, this.rooms);
     const user = this.activeSockets.get(client);
     if (user) {
-      console.log('user is going to be disconnected');
       await this.prisma.user.update({
         where: {
           id: user.id,
