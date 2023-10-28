@@ -136,6 +136,7 @@ const Dms = (props: any) => {
                 <>
                     <DmsChat
                         userDm={userDm}
+                        setUserDm={setUserDm}
                         render={props.render}
                         setRender={props.setRender}
                         updateUser={updateUser}

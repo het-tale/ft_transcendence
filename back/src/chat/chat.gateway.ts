@@ -143,7 +143,7 @@ export class ChatGateway
           message: data.message,
         });
       }
-      this.io.to(sender.clientId).emit('privateMessage', {
+      this.io.to(client.id).emit('privateMessage', {
         from: sender.username,
         message: data.message,
       });
