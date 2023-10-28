@@ -99,6 +99,7 @@ export class UserService {
         },
         channel: true,
         isGame: true,
+        roomName: true,
       },
     });
 

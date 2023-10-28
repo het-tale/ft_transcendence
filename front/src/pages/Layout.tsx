@@ -30,6 +30,7 @@ import { SearchUsers } from '../components/SearchUsers';
 import { AchievementUnlocked } from './AchievementUnlocked';
 import { Achievement } from '../Types/Achievement';
 import { MessageType } from '../Types/Message';
+import { set } from 'react-hook-form';
 
 interface Props {
     children?: React.ReactNode;
@@ -59,6 +60,13 @@ export const Layout = ({ children }: Props) => {
 
     //     fetchUserData();
     // }, []);
+
+    useEffect(() => {
+        for (let i = 0; i < invitations.length; i++) {
+            invitations[i].isGame? console.log('game invitation', invitations[i].roomName) : null;
+            invitations[i].isGame? console.log('game invitation', invitations[i].id) : null;
+    }}, [invitations]);
+
     useEffect(() => {
         socket.auth = { token: token };
         socket.connect();
@@ -120,7 +128,7 @@ export const Layout = ({ children }: Props) => {
                 position: 'bottom-right'
             });
             renderData.setRenderData(!renderData.renderData);
-            setRoomId(data.roomId);
+            // setRoomId(data.roomId);
         });
         socketGame.on('InvitationDeclined', () => {
             toast({
@@ -292,11 +300,12 @@ export const Layout = ({ children }: Props) => {
         renderData.setRenderData(!renderData.renderData);
     };
 
-    const handleAcceptRejectGame = (isAccepted: boolean) => {
+    const handleAcceptRejectGame = (isAccepted: boolean, roomName: string) => {
+        console.log('name at accept rject game ', roomName);
         if (isAccepted) {
-            socketGame.emit('AcceptInvitation', roomId);
+            socketGame.emit('AcceptInvitation', roomName);
             navigate(`/game/`);
-        } else socketGame.emit('DeclineInvitation', roomId);
+        } else socketGame.emit('DeclineInvitation', roomName);
         renderData.setRenderData(!renderData.renderData);
         renderData.setNotification &&
             renderData.setNotification(!renderData.notification);
@@ -369,7 +378,7 @@ export const Layout = ({ children }: Props) => {
                                                 color={'#a435f0'}
                                             >
                                                 {invit.isGame
-                                                    ? `${invit.sender.username} invited you to play a game`
+                                                    ? `${invit.sender.username} invited you to play a game at room ${invit.roomName}`
                                                     : `${invit.sender.username} invited you to join ${invit.channel?.name}`}
                                             </Text>
                                             <Flex
@@ -386,7 +395,7 @@ export const Layout = ({ children }: Props) => {
                                                             invit.isGame
                                                                 ? () =>
                                                                       handleAcceptRejectGame(
-                                                                          false
+                                                                          false, invit.roomName!
                                                                       )
                                                                 : () =>
                                                                       handleAcceptReject(
@@ -404,9 +413,9 @@ export const Layout = ({ children }: Props) => {
                                                         color={'white'}
                                                         onClick={
                                                             invit.isGame
-                                                                ? () =>
+                                                            ? () =>
                                                                       handleAcceptRejectGame(
-                                                                          true
+                                                                          true, invit.roomName!
                                                                       )
                                                                 : () =>
                                                                       handleAcceptReject(

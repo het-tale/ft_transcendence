@@ -84,6 +84,7 @@ const Game: React.FC = () => {
     const [loaded, setDataLoaded] = useState(false);
     const [Gamedeclined, setGameDeclined] = useState(false);
     const intialise = useRef(false);
+    const [message, setMessage] = useState<string | null>(null);
     let paddRef = useRef<Paddle | null>(null);
     let otherpaddRef = useRef<Paddle | null>(null);
     let ballRef = useRef<Ball | null>(null);
@@ -153,8 +154,9 @@ const Game: React.FC = () => {
         }
     }, [ctx]);
     useEffect(() => {
+        console.log('init', init);
         if (init && canvasRef.current) setupEventListeners();
-    }, [init]);
+    }, [init, canvasRef.current]);
 
     useEffect(() => {
         if (socket && !listning) {
@@ -174,11 +176,12 @@ const Game: React.FC = () => {
                 setOtherUsername,
                 setGameStarted,
                 setGameinvite,
-                setGameDeclined
+                setGameDeclined,
+                setMessage
             );
             setListning(true);
             const loadDataFromBackend = async () => {
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+                await new Promise((resolve) => setTimeout(resolve, 2000));
                 setDataLoaded(true);
             };
 
@@ -188,7 +191,7 @@ const Game: React.FC = () => {
             canvasRef.current?.removeEventListener(
                 'mousemove',
                 throttleHandleMouseMove
-                );
+            );
             if (socket) {
                 socket.off('InitGame');
                 socket.off('UPDATE');
@@ -204,10 +207,9 @@ const Game: React.FC = () => {
                 socket.disconnect();
             }
         };
-
     }, [socket]);
 
-    if (Gamedeclined){
+    if (Gamedeclined) {
         setTimeout(() => {
             window.location.href = '/home';
         }, 3000);
@@ -219,11 +221,13 @@ const Game: React.FC = () => {
     };
 
     const handleStartGame = () => {
-        socket? socket.emit('StartGame') : console.log('socket not found');
+        socket ? socket.emit('StartGame') : console.log('socket not found');
         setGameStarted(true);
     };
     const handleStartGamerobot = () => {
-        socket? socket.emit('StartGameRobot') : console.log('socket not found');
+        socket
+            ? socket.emit('StartGameRobot')
+            : console.log('socket not found');
         setGameStarted(true);
     };
 
@@ -315,6 +319,7 @@ const Game: React.FC = () => {
                             <div className="game-over-container">
                                 <div className="game-over">
                                     <p className="paraInfo">Game Declined .</p>
+                                    <p className="paraInfo">{message}</p>
                                 </div>
                             </div>
                         </div>
@@ -326,29 +331,39 @@ const Game: React.FC = () => {
                     ) : (
                         <>
                             {gameinvite ? (
-                                <div className="overlay"> 
+                                <div className="overlay">
                                     <div className="game-over-container">
                                         <div className="game-over">
-                                            <p className="parainfo"> Waiting for other player to join ... </p>
+                                            <p className="parainfo">
+                                                {' '}
+                                                Waiting for other player to join
+                                                ...{' '}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                             ) : (
                                 <>
-                                    <button
-                                        className="start-button"
-                                        id="firstButton"
-                                        onClick={handleStartGame}
-                                    >
-                                        Start Game
-                                    </button>
+                                    {!gameOver &&
+                                    !gameStarted &&
+                                    !Gamedeclined ? (
+                                        <>
+                                            <button
+                                                className="start-button"
+                                                id="firstButton"
+                                                onClick={handleStartGame}
+                                            >
+                                                Start Game
+                                            </button>
 
-                                    <button
-                                        className="start-button"
-                                        onClick={handleStartGamerobot}
-                                    >
-                                        Start Game with robot
-                                    </button>
+                                            <button
+                                                className="start-button"
+                                                onClick={handleStartGamerobot}
+                                            >
+                                                Start Game with robot
+                                            </button>
+                                        </>
+                                    ) : null}
                                 </>
                             )}
                         </>
