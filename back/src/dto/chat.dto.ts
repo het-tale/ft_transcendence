@@ -32,7 +32,6 @@ export enum typeEnum {
   'protected',
 }
 
-
 export class TCreateRoom {
   @IsEnum(typeEnum, { message: 'type must be public, private or protected' })
   type: string;

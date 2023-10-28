@@ -60,11 +60,10 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         setTimeout(() => {
           client.emit('InvitationDeclined');
           client.disconnect();
-          
         }, 2000);
-  
-          return;
-        }
+
+        return;
+      }
 
       this.activeSockets.set(client, user);
     } catch (e) {
@@ -98,11 +97,9 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         this.server,
       );
     } catch (e) {
-    
       return;
     }
   }
-
 
   @SubscribeMessage('InvitePlayer')
   async handleInvitePlayer(client: Socket, targetUserId: number) {
@@ -189,5 +186,4 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     }
     this.activeSockets.delete(client);
   }
-
 }

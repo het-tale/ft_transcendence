@@ -381,7 +381,14 @@ export class DMService {
         },
       },
       include: {
-        participants: true,
+        participants: {
+          select: {
+            id: true,
+            username: true,
+            status: true,
+            avatar: true,
+          },
+        },
       },
       orderBy: {
         updatedAt: 'desc',

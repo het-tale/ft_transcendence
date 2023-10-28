@@ -11,7 +11,16 @@ export class FriendsService {
         id: user.id,
       },
       include: {
-        friends: true,
+        friends: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+            status: true,
+            email: true,
+            login: true,
+          },
+        },
       },
     });
 
@@ -23,7 +32,16 @@ export class FriendsService {
         id: user.id,
       },
       include: {
-        blocked: true,
+        blocked: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+            status: true,
+            email: true,
+            login: true,
+          },
+        },
       },
     });
 
@@ -43,7 +61,16 @@ export class FriendsService {
         username,
       },
       include: {
-        friends: true,
+        friends: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+            status: true,
+            email: true,
+            login: true,
+          },
+        },
       },
     });
     if (!otherUser) {

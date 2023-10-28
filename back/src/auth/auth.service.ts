@@ -16,7 +16,6 @@ import {
 } from 'src/dto';
 import { ConfirmationService } from 'src/confirmation/confirmation.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { generateRandomAvatar } from 'src/utils/generate-random-avatar';
 import { User } from '@prisma/client';
 
@@ -27,7 +26,6 @@ export class AuthService {
     private jwt: JwtService,
     private conf: ConfigService,
     private confirmationService: ConfirmationService,
-    private cloudinary: CloudinaryService,
   ) {}
   async signup(dto: TSignupData) {
     try {
@@ -172,14 +170,42 @@ export class AuthService {
     const email = await this.confirmationService.confirmEmail(token);
     await this.updatePassword(dto, email);
   }
-  async getUser(user: User) {
+  async getUser(userId: number) {
     const myUser = await this.prisma.user.findUnique({
-      where: { email: user.email },
-      include: {
-        blocked: true,
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        avatar: true,
+        login: true,
+        status: true,
+
+        g_rank: true,
+        lp: true,
+        win_rate: true,
+        matchwin: true,
+        matchlose: true,
+
+        isEmailConfirmed: true,
+        isPasswordRequired: true,
+
+        is2FaVerified: true,
+        is2FaEnabled: true,
+
+        blocked: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+            status: true,
+          },
+        },
         sentFriendRequests: true,
       },
     });
+    if (!myUser)
+      throw new HttpException('user not found', HttpStatus.NOT_FOUND);
 
     return myUser;
   }

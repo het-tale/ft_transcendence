@@ -89,12 +89,51 @@ export class ChannelService {
       where: {
         name: channelName,
       },
-      include: {
-        participants: true,
-        muted: true,
-        admins: true,
-        banned: true,
-        owner: true,
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+        type: true,
+        participants: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+            status: true,
+          },
+        },
+        muted: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+            status: true,
+          },
+        },
+        admins: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+            status: true,
+          },
+        },
+        banned: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+            status: true,
+          },
+        },
+        owner: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+            status: true,
+          },
+        },
       },
     });
     if (!channel)
