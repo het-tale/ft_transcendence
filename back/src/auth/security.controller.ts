@@ -25,6 +25,7 @@ import { UseZodGuard } from 'nestjs-zod';
 import { TwoFaVerificationGuard } from 'src/guards/two-fa-verification.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileValidationPipe } from 'src/utils/file-validation.pipe';
+import { Header } from '@nestjs/common';
 
 @ApiTags('Authentication protected routes')
 @ApiBearerAuth()
@@ -34,7 +35,7 @@ import { FileValidationPipe } from 'src/utils/file-validation.pipe';
 export class SecurityController {
   constructor(private securityService: SecurityService) {}
   @Get('2fa/generate')
-  // @Header('Content-Type', 'image/png')
+  @Header('Content-Type', 'image/png')
   async generate2Fa(@Req() request: { user: User }) {
     const code = await this.securityService.generate2Fa(request.user);
 
