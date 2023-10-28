@@ -209,8 +209,7 @@ const DmsChat = (props: any) => {
                         borderRadius={20}
                         marginTop={-25}
                     >
-                        {props.userDm?.id !== user?.id &&
-                        props.userDm?.username !== 'ROBOT' ? (
+                        {props.userDm?.id !== user?.id ? (
                             <MenuItem
                                 paddingBottom={2}
                                 bg={'none'}
