@@ -28,10 +28,10 @@ import GetMessages from './GetMessages';
 import User from '../../components/User';
 import ModalConfirm from './ModalConfirm';
 import client from '../../components/Client';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import UserDmInfo from './UserDmInfo';
-import { render } from '@testing-library/react';
 import { RenderContext } from '../../RenderContext';
+import UserId from '../Chat/GetUserById';
 
 const DmsChat = (props: any) => {
     const toast = useToast();
@@ -149,11 +149,24 @@ const DmsChat = (props: any) => {
         props.setRender(!props.render);
         navigate(`/game/`);
     };
+    const location = useLocation();
+    let userId = location.pathname.split('/')[3];
+    React.useEffect(() => {
+        async function fetchUserData() {
+            if (props.userDm?.id !== undefined || Number(userId) === 0) return;
+            const userData = await UserId(Number(userId));
+            props.setUserDm(userData);
+        }
+        fetchUserData();
+    }, [props.render]);
+    if (!props.userDm && Number(userId) !== 0) return <></>;
+    console.log('userId', userId);
     if (
-        !dms ||
-        dms.length === 0 ||
-        !props.userDm ||
-        props.userDm.id === undefined
+        Number(userId) === 0 &&
+        (!dms ||
+            dms.length === 0 ||
+            !props.userDm ||
+            props.userDm.id === undefined)
     )
         return <></>;
     return (

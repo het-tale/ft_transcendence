@@ -157,6 +157,21 @@ function App() {
                             {/**----------------Chat Pages ----------------------*/}
                             <Route path="chat">
                                 <Route
+                                    path="rooms-dms/"
+                                    element={
+                                        <ProtectRoutes>
+                                            <Layout
+                                                children={
+                                                    <Chat
+                                                        update={update}
+                                                        setUpdate={setUpdate}
+                                                    />
+                                                }
+                                            />
+                                        </ProtectRoutes>
+                                    }
+                                />
+                                <Route
                                     path="rooms-dms/:id"
                                     element={
                                         <ProtectRoutes>

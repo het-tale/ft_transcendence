@@ -1,6 +1,7 @@
 import { Card, CardBody, Image, Stack, Heading, Text } from '@chakra-ui/react';
 import { UserType } from '../../Types/User';
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface MessageUserProps {
     profile: string;
@@ -40,6 +41,7 @@ const MessageUser = ({
     setUpdateClass,
     activeCard
 }: MessageUserProps) => {
+    const navigate = useNavigate();
     const HandleDm = (id: number | undefined) => {
         if (
             setUserDm &&
@@ -53,9 +55,9 @@ const MessageUser = ({
             setUpdateUser(!updateUser);
             setUpdateClass(id);
         }
+        navigate(`/chat/rooms-dms/${dm?.id}`);
     };
-    useEffect(() => {
-    }, [updateClass]);
+    useEffect(() => {}, [updateClass]);
     return (
         <div>
             <button onClick={() => HandleDm(dm?.id)} style={{ width: '100%' }}>
