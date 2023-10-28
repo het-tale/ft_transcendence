@@ -22,8 +22,13 @@ const MessageContent = ({
     const [sender, setSender] = React.useState<UserType>();
     React.useEffect(() => {
         async function fetchUserData() {
-            const userData = await UserId(Number(userSendId));
-            setSender(userData);
+            if (room) {
+                const userData = await UserId(Number(userSendId));
+                setSender(userData);
+                return;
+            } else {
+                return;
+            }
         }
 
         fetchUserData();

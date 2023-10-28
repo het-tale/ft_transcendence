@@ -14,11 +14,11 @@ export default function Chat(props: BrowseChannelsProps) {
     const toast = useToast();
     const [dms, setDms] = React.useState<UserType[]>([]);
     const [roomDms, setRoomDms] = React.useState<Channel[]>([]);
-    // const [updateDm, setUpdateDm] = React.useState(false);
 
     useEffect(() => {
         GetDms().then((data) => {
             setDms(data);
+            // console.log('UPDATE DM');
         });
         GetRoomDms().then((data) => {
             setRoomDms(data);
@@ -27,43 +27,34 @@ export default function Chat(props: BrowseChannelsProps) {
     socket.on('privateMessage', (data: any) => {
         setRender(!render);
     });
-    socket.on('userOffline', (data: any) => {
-        setRender(!render);
-    });
-    socket.on('userOnline', (data: any) => {
-        setRender(!render);
-    });
     socket.on('roomCreateError', (data: any) => {
         setRender(!render);
     });
     useEffect(() => {
-        const timer = setTimeout(() => {
-            socket.on('privateMessageError', (data: any) => {
-
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'top-right'
-                });
+        socket.on('privateMessageError', (data: any) => {
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 1000,
+                isClosable: true,
+                position: 'top-right'
             });
-            socket.on('roomMessageError', (data: any) => {
-
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'top-right'
-                });
+        });
+        socket.on('roomMessageError', (data: any) => {
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 1000,
+                isClosable: true,
+                position: 'top-right'
             });
-        }, 500);
+        });
 
         return () => {
-            clearTimeout(timer);
+            socket.off('privateMessageError');
+            socket.off('roomMessageError');
         };
     });
     socket.on('roomMessage', (data: any) => {

@@ -26,12 +26,17 @@ const UserDmInfo = (props: MessageUserProps) => {
     const socket = React.useContext(SocketContext);
     const [update, setUpdate] = React.useState(false);
 
-    socket.on('userOffline', (data: any) => {
-        setUpdate(!update);
-    });
-    socket.on('userOnline', (data: any) => {
-        setUpdate(!update);
-    });
+    // socket.on('userOffline', (data: any) => {
+    //     // console.log('USER OFFLINE', data);
+    //     // console.log('RENDER Before', update);
+    //     setUpdate(!update);
+    //     // console.log('RENDER after', update);
+    // });
+    // socket.on('userOnline', (data: any) => {
+    //     // console.log('USER ONLINE', data);
+    //     setUpdate(!update);
+    // });
+    // console.log('User ID', props.id);
     React.useEffect(() => {
         async function fetchUserData() {
             const userData = await UserId(Number(props.id));

@@ -36,14 +36,6 @@ function App() {
     const buttonClicked = useRef<HTMLButtonElement | null>(null);
     const [user, setUser] = React.useState<UserType>();
     const [firstTime, setFirstTime] = React.useState(true);
-    React.useEffect(() => {
-        async function fetchUserData() {
-            const userData = await User();
-            setUser(userData);
-        }
-
-        fetchUserData();
-    }, [renderData]);
     return (
         <BrowserRouter>
             <SocketContext.Provider value={socket}>
@@ -57,7 +49,8 @@ function App() {
                             buttonClicked: buttonClicked,
                             user: user,
                             firstTime: firstTime,
-                            setFirstTime: setFirstTime
+                            setFirstTime: setFirstTime,
+                            setUser: setUser
                         }}
                     >
                         <Routes>
