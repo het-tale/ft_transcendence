@@ -160,7 +160,6 @@ const DmsChat = (props: any) => {
         fetchUserData();
     }, [props.render]);
     if (!props.userDm && Number(userId) !== 0) return <></>;
-    console.log('userId', userId);
     if (
         Number(userId) === 0 &&
         (!dms ||

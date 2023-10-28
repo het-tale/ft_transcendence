@@ -7,6 +7,7 @@ import { ChannelService } from './channel.service';
 import { FriendsService } from './friends.service';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { AchievementsService } from './achievements.service';
+import { ChatbotService } from 'src/chatbot/chatbot.service';
 
 @Module({
   imports: [JwtModule.register({}), CloudinaryModule],
@@ -17,6 +18,7 @@ import { AchievementsService } from './achievements.service';
     ChannelService,
     FriendsService,
     AchievementsService,
+    ChatbotService,
   ],
 })
 export class ChatModule {}

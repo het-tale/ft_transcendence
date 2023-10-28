@@ -12,12 +12,14 @@ export class ChatbotService {
 
   async getChatbotResponse(userMessage: string): Promise<string> {
     const userPrompt = [
-      { role: 'system', content: 'You are a chatbot assistant for the PingPong game.' },
+      { role: 'system', content: 'You are a chatbot assistant for the PingPong game simulation in 2d contain two players\
+       a paddle for each and a ball to play with your response must be in one line\
+       to start the game player can use buttons and it can be controled by the mouse  .' },
       { role: 'user', content: userMessage },
     ];
 
     try {
-      const prompt = userPrompt.map((m) => `${m.role}: ${m.content}`).join('\n');
+      const prompt = userPrompt.map((m) => `${m.content}`).join('\n');
       const response = await this.openai.completions.create({
         model: 'text-davinci-002',
         prompt,
