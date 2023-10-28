@@ -14,6 +14,7 @@ export type Invitation = {
     channel: Channel;
     channelId: number;
     isGame: boolean;
+    roomName: string | null;
 };
 
 export type FriendRequest = {

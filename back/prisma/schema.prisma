@@ -90,6 +90,7 @@ model Invitation {
   isReceiverOnline Boolean @default(false)
   status           String  @default("pending")
   isGame    Boolean  @default(false)
+  roomName      String?
 
   sender     User    @relation("InvitationSender", fields: [senderId], references: [id])
   senderId   Int

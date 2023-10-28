@@ -4,6 +4,8 @@ import { Socket } from 'socket.io';
 import { User } from '@prisma/client';
 import { GameData, OTHERPADDLE, PADDLE, Player, Room } from './types';
 import { GameStartEvent } from './game-start-event';
+import { Server } from 'socket.io';
+import { set } from 'nestjs-zod/z';
 
 @Injectable()
 export class Invitations {
@@ -16,6 +18,7 @@ export class Invitations {
     rooms: Map<string, Room>,
     targetUserId: number,
     activeSockets: Map<Socket, User>,
+    server: Server,
   ) {
     const sender_player = activeSockets.get(client);
     if (!sender_player) throw new Error('undefined user ');
@@ -29,6 +32,7 @@ export class Invitations {
         id: targetUserId,
       },
     });
+
     if (
       !receiver ||
       !receiver ||
@@ -41,8 +45,23 @@ export class Invitations {
 
       return;
     }
-    const invitationRoom = new Room(`invite_${sender.id}_${receiver.id}`);
+    if (receiver.username === 'ROBOT') {
+      setTimeout(() => {
+        this.serviceStart.StartGameEventRobot(client, rooms, activeSockets, server);
+        client.emit('GAME STARTED', true);
+      }, 2000);
+
+      return;
+    }
+
+    const name = Math.random().toString(36).substring(7)
+    const invitationRoom = new Room(`${name}_${sender.id}_${receiver.id}`);
     invitationRoom.isinvit = true;
+
+
+    console.log('\x1b[32m%s\x1b[0m', 'sending invit ' + invitationRoom.roomName);
+
+
     const player = new Player(
       1,
       sender.id,
@@ -61,6 +80,7 @@ export class Invitations {
         senderId: sender.id,
         receiverId: receiver.id,
         isGame: true,
+        roomName: invitationRoom.roomName,
       },
     });
     const invitationData = {
@@ -70,9 +90,9 @@ export class Invitations {
     };
 
     const [key, value] = Array.from(activeSockets.entries()).find(
-      ([key, value]) => value.id === targetUserId,
-    );
-    key.emit('ReceiveInvitation', invitationData);
+      ([_, value]) => value.id === targetUserId
+    ) || [null, null];
+    key?.emit('ReceiveInvitation', invitationData);
     const gamedata: GameData = {
       playerpad: player.paddle,
       otherpad: PADDLE,
@@ -83,6 +103,7 @@ export class Invitations {
       id: player.number,
     };
     setTimeout(() => {
+      if (!key) client.emit('TargetUserOffline'); // to be handled in frontend (show notification to sender)
       client.emit('GAME INVITE', true);
       client.emit('InitGame', gamedata);
       client.emit('JoinRoom', invitationRoom.roomName);
@@ -101,11 +122,15 @@ export class Invitations {
   async acceptInvitation(
     client: Socket,
     rooms: Map<string, Room>,
-    roomId: string,
+    roomName: string,
     activeSockets: Map<Socket, User>,
   ) {
-    const invitationRoom = rooms.get(roomId);
+
+    console.log('\x1b[32m%s\x1b[0m', 'acceptInvitation' + roomName);
+
+    const invitationRoom = rooms.get(roomName);
     if (!invitationRoom) {
+      console.log('no room fond ');
       const pendingInvitation = await this.prisma.invitation.findFirst({
         where: {
           receiverId: activeSockets.get(client).id,
@@ -114,8 +139,9 @@ export class Invitations {
         },
       });
       if (!pendingInvitation) {
+        console.log('no pending invitation');
         setTimeout(() => {
-          client.emit('InvitationDeclined');
+          client.emit('InvitationDeclined', "no pending invitation found !!");
         }, 2000);
 
         return;
@@ -129,7 +155,7 @@ export class Invitations {
         },
       });
       setTimeout(() => {
-        client.emit('InvitationDeclined');
+        client.emit('InvitationDeclined', "no room found the sender left the room !!");
       }, 2000);
 
       return;
@@ -141,7 +167,7 @@ export class Invitations {
     if (!sender_player || !receiver_player) {
       setTimeout(() => {
         client.emit('InvitationDeclined');
-        sender_player.socket?.emit('InvitationDeclined');
+        sender_player.socket?.emit('InvitationDeclined', "no room found the reciever left the room !!");
       }, 2000);
 
       return;
@@ -157,11 +183,11 @@ export class Invitations {
       },
     });
     if (!pendingInvitation) {
-      sender_player.socket.leave(roomId);
-      rooms.delete(roomId);
+      sender_player.socket.leave(roomName);
+      rooms.delete(roomName);
       setTimeout(() => {
-        client.emit('InvitationDeclined');
-        sender_player.socket?.emit('InvitationDeclined');
+        client.emit('InvitationDeclined', "no pending invitation found !!");
+        sender_player.socket?.emit('InvitationDeclined', "no pending invitation found !!");
       }, 2000);
 
       return;
@@ -174,9 +200,9 @@ export class Invitations {
         status: 'accepted',
       },
     });
-    const player = new Player(2, receiver_player.id, client, PADDLE, roomId, 0);
+    const player = new Player(2, receiver_player.id, client, PADDLE, roomName, 0);
     invitationRoom.players.push(player);
-    client.join(roomId);
+    client.join(roomName);
     const gamedata: GameData = {
       playerpad: player.paddle,
       otherpad: OTHERPADDLE,
@@ -189,7 +215,7 @@ export class Invitations {
     setTimeout(() => {
       client.emit('GAME INVITE', true);
       client.emit('InitGame', gamedata);
-      client.emit('JoinRoom', roomId);
+      client.emit('JoinRoom', roomName);
     }, 2000);
     await this.prisma.user.update({
       where: {
@@ -216,14 +242,14 @@ export class Invitations {
   async declineInvitation(
     client: Socket,
     rooms: Map<string, Room>,
-    roomId: string,
+    roomName: string,
     activeSockets: Map<Socket, User>,
   ) {
-    const room = rooms.get(roomId);
+    const room = rooms.get(roomName);
+    if (room) {
     const sender_player = room.players.find(
       (player) => player.socket !== client,
     );
-    const receiver = room.players.find((player) => player.socket === client);
     const sender_user = activeSockets.get(sender_player.socket);
     const receiver_user = activeSockets.get(client);
     const pendingInvitation = await this.prisma.invitation.findFirst({
@@ -235,8 +261,8 @@ export class Invitations {
       },
     });
     if (!pendingInvitation) {
-      sender_player.socket?.leave(roomId);
-      rooms.delete(roomId);
+      sender_player.socket?.leave(roomName);
+      rooms.delete(roomName);
 
       return;
     }
@@ -256,8 +282,9 @@ export class Invitations {
         status: 'online',
       },
     });
-    sender_player.socket?.emit('InvitationDeclined');
-    sender_player.socket?.leave(roomId);
-    rooms.delete(roomId);
+    sender_player.socket?.emit('InvitationDeclined', "the reciever declined the invitation !!");
+    sender_player.socket?.leave(roomName);
+  }
+    rooms.delete(roomName);
   }
 }

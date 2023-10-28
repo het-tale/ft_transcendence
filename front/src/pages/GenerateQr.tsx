@@ -12,7 +12,6 @@ const GenerateQr = () => {
             },
             responseType: 'blob'
         });
-        console.log('data', response);
         //    setQr(response.data);
         // const url = createObjectURL(response);
         qr = response.data.Blob;
