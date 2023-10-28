@@ -24,13 +24,14 @@ export default function Chat(props: BrowseChannelsProps) {
             setRoomDms(data);
         });
     }, [render, props.update]);
-    socket.on('privateMessage', (data: any) => {
-        setRender(!render);
-    });
-    socket.on('roomCreateError', (data: any) => {
-        setRender(!render);
-    });
     useEffect(() => {
+        socket.on('privateMessage', (data: any) => {
+            console.log('privateMessage', data);
+            setRender(!render);
+        });
+        socket.on('roomCreateError', (data: any) => {
+            setRender(!render);
+        });
         socket.on('privateMessageError', (data: any) => {
             toast({
                 title: 'Error',
@@ -55,6 +56,8 @@ export default function Chat(props: BrowseChannelsProps) {
         return () => {
             socket.off('privateMessageError');
             socket.off('roomMessageError');
+            socket.off('privateMessage');
+            socket.off('roomCreateError');
         };
     });
     socket.on('roomMessage', (data: any) => {

@@ -60,7 +60,7 @@ const Sidebar = (props: sidebarProps) => {
                 Home
             </Link>
             <Link
-                to={`/chat/rooms-dms/${user?.id}`}
+                to={`/chat/rooms-dms/`}
                 onClick={() => {
                     renderData.setRenderData(!renderData.renderData);
                 }}

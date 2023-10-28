@@ -1,12 +1,15 @@
 import { Flex } from '@chakra-ui/react';
 import '../../css/chat/left.css';
 import { Image } from '@chakra-ui/react';
+import { useLocation } from 'react-router-dom';
 const RightSide = (props: any) => {
+    const location = useLocation();
+    const userId = location.pathname.split('/')[3];
     return (
         <Flex w="100%" h="100%" bg="#E9ECEF" justify="space-between">
             <div className="container">
                 {props.tabs.map((tab: any, i: any) =>
-                    props.firstLoad !== '' ? (
+                    props.firstLoad !== '' || userId !== null ? (
                         <div key={i}>
                             {props.currentTab === `${tab.id}` && (
                                 <div>{tab.rightSide}</div>
