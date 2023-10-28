@@ -28,11 +28,20 @@ const ModalBodyUi = (props: any) => {
     };
     return (
         <form
-            style={{ padding: '5px' }}
+            style={{ padding: '10px' }}
             onSubmit={handleSubmit(handleCreateChannel)}
         >
             <div className="form-group">
-                <label htmlFor="name">Channel Name</label>
+                <label
+                    htmlFor="name"
+                    style={{
+                        color: '#a435f0',
+                        fontFamily: 'sans-serif',
+                        fontWeight: 'bold'
+                    }}
+                >
+                    Channel Name
+                </label>
                 <input
                     className="form-control"
                     type="text"
@@ -42,9 +51,18 @@ const ModalBodyUi = (props: any) => {
                     {...register('room', { required: true })}
                 />
             </div>
-            <FormControl as="fieldset">
-                <FormLabel>Channel Type</FormLabel>
-                <RadioGroup>
+            <FormControl as="fieldset" marginTop={'-22px'}>
+                <label
+                    htmlFor="name"
+                    style={{
+                        color: '#a435f0',
+                        fontFamily: 'sans-serif',
+                        fontWeight: 'bold'
+                    }}
+                >
+                    Channel Type
+                </label>
+                <RadioGroup marginTop={'-12px'}>
                     <HStack spacing="24px">
                         <Radio
                             value="public"
@@ -52,8 +70,17 @@ const ModalBodyUi = (props: any) => {
                             {...register('type', {
                                 onChange: props.handleRadioChange
                             })}
+                            style={{ color: 'white' }}
                         >
-                            Public
+                            <span
+                                style={{
+                                    color: '#212A3E',
+                                    fontSize: '14px',
+                                    fontWeight: 'lighter'
+                                }}
+                            >
+                                Public
+                            </span>
                         </Radio>
                         <Radio
                             value="private"
@@ -61,8 +88,17 @@ const ModalBodyUi = (props: any) => {
                             {...register('type', {
                                 onChange: props.handleRadioChange
                             })}
+                            className="form-check-input"
                         >
-                            Private
+                            <span
+                                style={{
+                                    color: '#212A3E',
+                                    fontWeight: 'lighter',
+                                    fontSize: '14px'
+                                }}
+                            >
+                                Private
+                            </span>
                         </Radio>
                         <Radio
                             value="protected"
@@ -71,7 +107,15 @@ const ModalBodyUi = (props: any) => {
                                 onChange: props.handleRadioChange
                             })}
                         >
-                            Protected
+                            <span
+                                style={{
+                                    color: '#212A3E',
+                                    fontWeight: 'lighter',
+                                    fontSize: '14px'
+                                }}
+                            >
+                                Protected
+                            </span>
                         </Radio>
                     </HStack>
                 </RadioGroup>

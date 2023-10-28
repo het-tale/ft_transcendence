@@ -9,7 +9,9 @@ import {
     MenuList,
     MenuItem,
     useDisclosure,
-    useToast
+    useToast,
+    Avatar,
+    AvatarBadge
 } from '@chakra-ui/react';
 import {
     BsThreeDotsVertical,
@@ -17,7 +19,9 @@ import {
     BsPersonDashFill,
     BsPersonXFill,
     BsGearFill,
-    BsPersonCircle
+    BsPersonCircle,
+    BsStarFill,
+    BsStar
 } from 'react-icons/bs';
 import '../../../css/chat/channelSetting.css';
 import { ChannelInfoProps } from './ChannelInfo';
@@ -287,17 +291,17 @@ const MemberInfo = (props: ChannelInfoProps) => {
         <Flex bg={'#F5F5F5'} p={'10px'} marginBottom={8} marginTop={-6}>
             <Box w={'90%'}>
                 <Flex>
-                    <Image
-                        src={props.participant?.avatar}
-                        borderRadius={'30px'}
-                        width={'50px'}
-                        height={'50px'}
-                        marginRight={'10px'}
-                    />
+                    <Avatar src={props.participant?.avatar} size={'md'}>
+                        {props.participant?.id === props.room?.owner.id ? (
+                            <AvatarBadge>
+                                <BsStarFill style={{ color: '#a435f0' }} />
+                            </AvatarBadge>
+                        ) : null}
+                    </Avatar>
                     <Text
                         as="h6"
                         size="sm"
-                        marginLeft={'-5px'}
+                        marginLeft={'5px'}
                         marginTop={'20px'}
                     >
                         {props.participant?.username}
