@@ -30,6 +30,7 @@ import { SocketContext } from '../../../socket';
 import React, { useEffect } from 'react';
 import client from '../../../components/Client';
 import { Link } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
 const MemberInfo = (props: ChannelInfoProps) => {
     const socket = React.useContext(SocketContext);
@@ -49,7 +50,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
         onOpen: onOpen4,
         onClose: onClose4
     } = useDisclosure();
-    const toast = useToast();
+    const toast1 = useToast();
     const handleSetAdmin = () => {
         socket.emit('addAdmin', {
             room: props.ChannelDm?.name,
@@ -72,7 +73,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
             props.setRender && props.setRender(!props.render);
             onClose();
         } catch (error: any) {
-            toast({
+            toast1({
                 title: 'Error',
                 description: error.response.data.message,
                 status: 'error',
@@ -123,170 +124,7 @@ const MemberInfo = (props: ChannelInfoProps) => {
         props.setRender && props.setRender(!props.render);
         onClose4();
     };
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            socket.on('adminAddError', (data: any) => {
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
-            socket.on('adminAdded', (data: any) => {
-                toast({
-                    title: 'Success',
-                    description: data,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
-            socket.on('userMuted', (data: any) => {
-                toast({
-                    title: 'success',
-                    description: data,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
-            socket.on('userMuteError', (data: any) => {
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
-            socket.on('userKicked', (data: any) => {
-                toast({
-                    title: 'success',
-                    description: data,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
-            socket.on('userKickError', (data: any) => {
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
 
-            socket.on('userUnmuted', (data: any) => {
-                toast({
-                    title: 'success',
-                    description: data,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
-            socket.on('userUnmuteError', (data: any) => {
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
-            socket.on('userBanned', (data: any) => {
-                toast({
-                    title: 'success',
-                    description: data,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
-            socket.on('userBanError', (data: any) => {
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
-
-            socket.on('userUnbanned', (data: any) => {
-                toast({
-                    title: 'success',
-                    description: data,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
-            socket.on('userUnbanError', (data: any) => {
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
-            socket.on('roomLeft', (data: any) => {
-                toast({
-                    title: 'success',
-                    description: data,
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
-            socket.on('roomLeaveError', (data: any) => {
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-                props.setRender && props.setRender(!props.render);
-            });
-        }, 500);
-
-        return () => {
-            clearTimeout(timer);
-        };
-    });
     return (
         <Flex bg={'#F5F5F5'} p={'10px'} marginBottom={8} marginTop={-6}>
             <Box w={'90%'}>
