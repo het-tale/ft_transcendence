@@ -11,6 +11,7 @@ import { GameModule } from './Game/Game.Module';
 import { UserModule } from './user/user.module';
 import { RobotUserService } from './utils/robot-user.service';
 import { AchievementService } from './utils/achievements-creation.service';
+import { ChatbotModule } from './chatbot/chatbot.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AchievementService } from './utils/achievements-creation.service';
     ChatModule,
     GameModule,
     UserModule,
+    ChatbotModule,
   ],
   providers: [RobotUserService, AchievementService],
 })

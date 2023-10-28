@@ -10,6 +10,7 @@ export class DMService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private conf: ConfigService,
+    private chatbot: ConfigService,
   ) {}
   async verifyToken(token: string | string[]) {
     if (token instanceof Array) {
