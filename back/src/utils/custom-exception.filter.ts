@@ -17,6 +17,8 @@ export class CustomExceptionFilter extends BaseExceptionFilter {
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
+      if (status === HttpStatus.INTERNAL_SERVER_ERROR)
+        status = HttpStatus.BAD_REQUEST;
       const responseObj = exception.getResponse();
       message = responseObj['message'] || responseObj || null;
       errors = responseObj['errors'] || null;

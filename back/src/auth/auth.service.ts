@@ -18,6 +18,7 @@ import { ConfirmationService } from 'src/confirmation/confirmation.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { generateRandomAvatar } from 'src/utils/generate-random-avatar';
 import { User } from '@prisma/client';
+import { GameUpdate } from 'src/Game/Game-Update';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +27,7 @@ export class AuthService {
     private jwt: JwtService,
     private conf: ConfigService,
     private confirmationService: ConfirmationService,
+    private gameService: GameUpdate,
   ) {}
   async signup(dto: TSignupData) {
     try {
@@ -171,6 +173,7 @@ export class AuthService {
     await this.updatePassword(dto, email);
   }
   async getUser(userId: number) {
+    await this.gameService.calculateRank();
     const myUser = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {

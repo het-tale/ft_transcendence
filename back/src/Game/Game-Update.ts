@@ -99,7 +99,7 @@ export class GameUpdate {
     room.ball.x > CONTAINERWIDTH / 2? room.players[1].paddle.y += (targetY - room.players[1].paddle.y) * 0.08 : null
     const maxY = CONTAINERHIEGHT - room.players[1].paddle.height;
     room.players[1].paddle.y = Math.max(0, Math.min(room.players[1].paddle.y, maxY));
-  
+
     if (
       room.ball.y - room.ball.radius <= 0 ||
       room.ball.y + room.ball.radius >= CONTAINERHIEGHT
@@ -330,9 +330,14 @@ export class GameUpdate {
       select: {
         id: true,
       },
-      orderBy: {
-        lp: 'desc',
-      },
+      orderBy: [
+        {
+          lp: 'desc',
+        },
+        {
+          id: 'asc',
+        },
+      ],
     });
     for (let i = 0; i < users.length; i++) {
       await this.prisma.user.update({
