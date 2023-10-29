@@ -181,7 +181,7 @@ export class ChatGateway
     } catch (err) {
       if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2002')
-          err.message = 'duplicate unique data: room name';
+          err.message = 'this channel name is already taken';
       }
       client.emit('roomCreateError', err.message);
     }
@@ -654,6 +654,10 @@ export class ChatGateway
       });
       this.io.to(client.id).emit('usernameChanged');
     } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === 'P2002')
+          err.message = 'this username is already taken';
+      }
       client.emit('usernameChangeError', err.message);
     }
   }

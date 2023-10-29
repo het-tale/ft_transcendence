@@ -13,15 +13,18 @@ export class CustomExceptionFilter extends BaseExceptionFilter {
     const response = ctx.getResponse();
     let status = HttpStatus.BAD_REQUEST;
     let message = 'Bad Request';
+    let errors = null;
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
-      message = exception.getResponse()['message'] || message;
+      const responseObj = exception.getResponse();
+      message = responseObj['message'] || responseObj || null;
+      errors = responseObj['errors'] || null;
     }
-
     response.status(status).json({
       statusCode: status,
       message: message,
+      errors: errors,
     });
   }
 }
