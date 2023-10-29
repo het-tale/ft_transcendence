@@ -116,46 +116,46 @@ export class ChatGateway
     );
   }
 
-  @SubscribeMessage('privateMessageROBOT')
-  async handlePrivateMessageROBOT(
-    @MessageBody() data: TDM,
-    @ConnectedSocket() client: Socket,
-  ) {
-    try {
-      if (data.message === '') return;
-      const sender = this.connectedUsers.find(
-        (user) => user.clientId === client.id,
-      );
-      const receiver = this.connectedUsers.find(
-        (user) => user.username === data.to,
-      );
-      const sentAt = new Date();
-      let isPending = true;
-      if (receiver) isPending = false;
-      await this.dmService.saveMessage({
-        sender: sender.username,
-        receiver: data.to,
-        message: data.message,
-        date: sentAt,
-        isPending,
-      });
+  // @SubscribeMessage('privateMessageROBOT')
+  // async handlePrivateMessageROBOT(
+  //   @MessageBody() data: TDM,
+  //   @ConnectedSocket() client: Socket,
+  // ) {
+  //   try {
+  //     if (data.message === '') return;
+  //     const sender = this.connectedUsers.find(
+  //       (user) => user.clientId === client.id,
+  //     );
+  //     const receiver = this.connectedUsers.find(
+  //       (user) => user.username === data.to,
+  //     );
+  //     const sentAt = new Date();
+  //     let isPending = true;
+  //     if (receiver) isPending = false;
+  //     await this.dmService.saveMessage({
+  //       sender: sender.username,
+  //       receiver: data.to,
+  //       message: data.message,
+  //       date: sentAt,
+  //       isPending,
+  //     });
 
-      console.log('Message is for the chatbot');
-      const userMessage = data.message;
+  //     console.log('Message is for the chatbot');
+  //     const userMessage = data.message;
 
-      const chatbotResponse = await this.chatbotService.getChatbotResponse(userMessage, 'text-davinci-003', 0.7);
-      console.log('chatbotResponse', chatbotResponse);
+  //     const chatbotResponse = await this.chatbotService.getChatbotResponse(userMessage, 'text-davinci-003', 0.7);
+  //     console.log('chatbotResponse', chatbotResponse);
 
-      const data2 = {
-        to: 'ROBOT',
-        message: chatbotResponse,
-      };
-      this.handlePrivateMessage(data2, client);
-    }
-    catch (err) {
-      client.emit('privateMessageError', err.message);
-    }
-  }
+  //     const data2 = {
+  //       to: 'ROBOT',
+  //       message: chatbotResponse,
+  //     };
+  //     this.handlePrivateMessage(data2, client);
+  //   }
+  //   catch (err) {
+  //     client.emit('privateMessageError', err.message);
+  //   }
+  // }
 
   @SubscribeMessage('privateMessage')
   async handlePrivateMessage(
@@ -171,12 +171,9 @@ export class ChatGateway
         (user) => user.username === data.to,
       );
 
-      console.log('receiver username ', data.to);
-      console.log('and message contain  ', data.message);
-
       const sentAt = new Date();
       let isPending = true;
-      if (receiver) isPending = false;
+      if (receiver || data.to === 'ROBOT') isPending = false;
       await this.dmService.saveMessage({
         sender: sender.username,
         receiver: data.to,
@@ -190,6 +187,8 @@ export class ChatGateway
           message: data.message,
         });
       }
+      if (data.to === 'ROBOT')
+        await this.dmService.handleRobotResponse(data.message, sender.username);
       this.io.to(client.id).emit('privateMessage', {
         from: sender.username,
         message: data.message,

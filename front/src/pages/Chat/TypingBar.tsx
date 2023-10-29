@@ -12,19 +12,19 @@ const TypingBar = (props: any) => {
     const sendMessageHandler = (e: any) => {
         e.preventDefault();
         console.log('sending message to ', props.userDm.username);
-        if (props.userDm.username === 'ROBOT')
-        {
-            socket.emit('privateMessageROBOT', {
-                message: message,
-                to: props.userDm.username
-            })
-        }
-        else {
+        // if (props.userDm.username === 'ROBOT')
+        // {
+        //     socket.emit('privateMessageROBOT', {
+        //         message: message,
+        //         to: props.userDm.username
+        //     })
+        // }
+        // else {
              socket.emit('privateMessage', {
             message: message,
             to: props.userDm.username
         });
-        }
+        // }
         setMessage('');
         props.setRender(!props.render);
         // renderData.setRenderData(!renderData.renderData);

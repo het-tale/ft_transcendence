@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { FriendRequest, Message, User } from '@prisma/client';
+import { ChatbotService } from 'src/chatbot/chatbot.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -10,7 +11,7 @@ export class DMService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private conf: ConfigService,
-    private chatbot: ConfigService,
+    private chatbot: ChatbotService,
   ) {}
   async verifyToken(token: string | string[]) {
     if (token instanceof Array) {
@@ -427,5 +428,15 @@ export class DMService {
       if (error.code === 'P2002') throw new Error('Username already taken');
       else throw new Error(error.message);
     }
+  }
+  async handleRobotResponse(message: string, username: string) {
+    const chatbotResponse = await this.chatbot.getChatbotResponse(message, 'text-davinci-003', 0.7);
+    this.saveMessage({
+      sender: 'ROBOT',
+      receiver: username,
+      message: chatbotResponse,
+      date: new Date(),
+      isPending: false,
+    });
   }
 }
