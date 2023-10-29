@@ -9,6 +9,7 @@ import { TwoFaModule } from 'src/2fa/two-fa.module';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { SecurityService } from './security.service';
 import { SecurityController } from './security.controller';
+import { GameModule } from 'src/Game/Game.Module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SecurityController } from './security.controller';
     ConfirmationModule,
     TwoFaModule,
     CloudinaryModule,
+    GameModule,
   ],
   controllers: [AuthController, SecurityController],
   providers: [AuthService, JwtStrategy, Strategy42, SecurityService],
