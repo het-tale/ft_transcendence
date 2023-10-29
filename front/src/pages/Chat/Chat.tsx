@@ -33,6 +33,15 @@ export default function Chat(props: BrowseChannelsProps) {
             setRender(!render);
         });
         socket.on('roomCreateError', (data: any) => {
+            console.log('roomCreateError', data);
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 1000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
             setRender(!render);
         });
         socket.on('privateMessageError', (data: any) => {
@@ -42,7 +51,7 @@ export default function Chat(props: BrowseChannelsProps) {
                 status: 'error',
                 duration: 1000,
                 isClosable: true,
-                position: 'top-right'
+                position: 'bottom-right'
             });
         });
         socket.on('roomMessage', (data: any) => {
