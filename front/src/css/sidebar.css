@@ -88,3 +88,19 @@ aside {
     padding: 14px;
     z-index: 4;
   }
+
+  .chat-icon {
+    position: relative;
+  }
+  
+  .badge {
+    position: absolute;
+    top: 5px;
+    right: 7rem;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  
