@@ -10,14 +10,15 @@ import {
     Text,
     Image,
     Center,
-    useDisclosure
+    useDisclosure,
+    useToast
 } from '@chakra-ui/react';
 import { BsPencilFill, BsBoxArrowRight } from 'react-icons/bs';
 import '../../../css/chat/channelSetting.css';
 import { Channel } from '../../../Types/Channel';
 import MemberInfo from './MemberInfo';
 import { UserType } from '../../../Types/User';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SocketContext } from '../../../socket';
 import ModalUi from '../../../components/ModalUi';
 import BodySetOwnerModal from './BodySetOwnerModal';
@@ -54,6 +55,7 @@ const ChannelInfo = (props: ChannelInfoProps) => {
         onClose: onClose4
     } = useDisclosure();
     const socket = React.useContext(SocketContext);
+    const toast1 = useToast();
 
     const handleLeaveChannel = () => {
         socket.emit('leaveRoom', {
@@ -61,6 +63,185 @@ const ChannelInfo = (props: ChannelInfoProps) => {
         });
         props.setRender && props.setRender(!props.render);
     };
+
+    useEffect(() => {
+        if (socket === null) return;
+        socket.on('adminAddError', (data: any) => {
+            toast1({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
+        });
+        socket.on('adminAdded', (data: any) => {
+            toast1({
+                title: 'Success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            // toast.success('Admin added');
+            console.log('admin added');
+            // props.setRender && props.setRender(!props.render);
+        });
+        socket.on('userMuted', (data: any) => {
+            toast1({
+                title: 'success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
+        });
+        socket.on('userMuteError', (data: any) => {
+            toast1({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
+        });
+        socket.on('userKicked', (data: any) => {
+            toast1({
+                title: 'success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
+        });
+        socket.on('userKickError', (data: any) => {
+            toast1({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
+        });
+
+        socket.on('userUnmuted', (data: any) => {
+            toast1({
+                title: 'success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
+        });
+        socket.on('userUnmuteError', (data: any) => {
+            toast1({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
+        });
+        socket.on('userBanned', (data: any) => {
+            toast1({
+                title: 'success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
+        });
+        socket.on('userBanError', (data: any) => {
+            toast1({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
+        });
+
+        socket.on('userUnbanned', (data: any) => {
+            toast1({
+                title: 'success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
+        });
+        socket.on('userUnbanError', (data: any) => {
+            toast1({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
+        });
+        socket.on('roomLeft', (data: any) => {
+            toast1({
+                title: 'success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
+        });
+        socket.on('roomLeaveError', (data: any) => {
+            toast1({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
+        });
+
+        return () => {
+            socket.off('adminAddError');
+            socket.off('adminAdded');
+            socket.off('userMuted');
+            socket.off('userMuteError');
+            socket.off('userKicked');
+            socket.off('userKickError');
+            socket.off('userUnmuted');
+            socket.off('userUnmuteError');
+            socket.off('userBanned');
+            socket.off('userBanError');
+            socket.off('userUnbanned');
+            socket.off('userUnbanError');
+            socket.off('roomLeft');
+            socket.off('roomLeaveError');
+        };
+    }, [socket]);
 
     return (
         <div>

@@ -94,6 +94,7 @@ export class ChannelService {
         name: true,
         avatar: true,
         type: true,
+        ownerId: true,
         participants: {
           select: {
             id: true,

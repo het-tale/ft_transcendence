@@ -32,7 +32,7 @@ const MessageContent = ({
         }
 
         fetchUserData();
-    });
+    }, []);
     return (
         <div className={`${parent}`} key={message}>
             <div className={`${name} ${recvRoom}`}>{message}</div>
