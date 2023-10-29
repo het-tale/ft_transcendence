@@ -52,11 +52,13 @@ export class AuthService {
       return obj;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002')
+        if (error.code === 'P2002') {
+          const field: string = error.meta?.target[0] ?? '';
           throw new HttpException(
-            'duplicate unique data',
+            `this ${field} is already taken`,
             HttpStatus.FORBIDDEN,
           );
+        }
       }
 
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

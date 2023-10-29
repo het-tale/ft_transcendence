@@ -1141,29 +1141,35 @@ export class ChannelService {
     });
   }
   async changeChannelName(oldName: string, newName: string, user: User) {
-    const channel = await this.prisma.channel.findUnique({
-      where: {
-        name: oldName,
-      },
-      include: {
-        admins: true,
-      },
-    });
-    if (!channel) {
-      throw new HttpException('channel not found', 404);
+    try {
+      const channel = await this.prisma.channel.findUnique({
+        where: {
+          name: oldName,
+        },
+        include: {
+          admins: true,
+        },
+      });
+      if (!channel) {
+        throw new HttpException('channel not found', 404);
+      }
+      const isAdmin = channel.admins.some((admin) => admin.id === user.id);
+      if (!isAdmin) {
+        throw new HttpException('user is not an admin', 400);
+      }
+      await this.prisma.channel.update({
+        where: {
+          name: oldName,
+        },
+        data: {
+          name: newName,
+        },
+      });
+    } catch (err) {
+      if (err.code === 'P2002')
+        throw new HttpException('channel name is taken', 400);
+      else throw new HttpException(err.message, 400);
     }
-    const isAdmin = channel.admins.some((admin) => admin.id === user.id);
-    if (!isAdmin) {
-      throw new HttpException('user is not an admin', 400);
-    }
-    await this.prisma.channel.update({
-      where: {
-        name: oldName,
-      },
-      data: {
-        name: newName,
-      },
-    });
   }
   async changeChannelType(dto: Troom, user: User) {
     const channel = await this.prisma.channel.findUnique({
