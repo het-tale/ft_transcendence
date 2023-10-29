@@ -143,11 +143,11 @@ export class ChatGateway
       console.log('Message is for the chatbot');
       const userMessage = data.message;
 
-      const chatbotResponse = await this.chatbotService.getChatbotResponse(userMessage);
+      const chatbotResponse = await this.chatbotService.getChatbotResponse(userMessage, 'text-davinci-003', 0.7);
       console.log('chatbotResponse', chatbotResponse);
 
       const data2 = {
-        to: sender.username,
+        to: 'ROBOT',
         message: chatbotResponse,
       };
       this.handlePrivateMessage(data2, client);

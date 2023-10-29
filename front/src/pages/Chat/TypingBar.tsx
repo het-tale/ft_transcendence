@@ -37,7 +37,7 @@ const TypingBar = (props: any) => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
             />
-            <button type="submit" className="excludeSubmit">
+            <button type="submit" className="excludeSubmit" onClick={(e) => sendMessageHandler(e)}>
                 <i className="fas fa-paper-plane"></i>
             </button>
         </form>

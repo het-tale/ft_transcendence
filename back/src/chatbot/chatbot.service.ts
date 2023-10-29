@@ -10,19 +10,18 @@ export class ChatbotService {
     this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   }
 
-  async getChatbotResponse(userMessage: string): Promise<string> {
+  async getChatbotResponse(userMessage: string, model: string, temperature: number): Promise<string> {
     const userPrompt = [
-      { role: 'system', content: 'You are a chatbot assistant for the PingPong game simulation in 2d contain two players\
-       a paddle for each and a ball to play with your response must be in one line\
-       to start the game player can use buttons and it can be controled by the mouse  .' },
+      { role: 'system', content: 'You are a chatbot assistant for the PingPong game. but you can respond about all online games, your answer can take as long as you want' },
       { role: 'user', content: userMessage },
     ];
 
     try {
-      const prompt = userPrompt.map((m) => `${m.content}`).join('\n');
+      const prompt = userPrompt.map((m) => m.content);
       const response = await this.openai.completions.create({
-        model: 'text-davinci-002',
+        model,
         prompt,
+        temperature,
       });
 
       if (response.choices && response.choices.length > 0) {
