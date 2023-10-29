@@ -21,25 +21,21 @@ export class GameStartEvent {
     server: Server,
   ) {
     let exist = false;
-    // console.log('start game event');
     const user_player = activeSockets.get(client);
     if (!user_player) throw new Error('undefined user ');
-    // console.log('user_player');
     const user = await this.prisma.user.findFirst({
       where: {
         id: user_player.id,
       },
     });
     if (user.status === 'InGame') {
-      // console.log('user is in game at start game');
       setTimeout(() => {
-        client.emit('InvitationDeclined');
+        client.emit('InvitationDeclined', 'you are already in an other game !!');
         client.disconnect();
       }, 2000);
 
       return;
     } else {
-      // console.log('user update status');
       await this.prisma.user.update({
         where: {
           id: user.id,
@@ -127,7 +123,7 @@ export class GameStartEvent {
     if (!user) throw new Error('undefined user ');
     if (user.status === 'InGame') {
       setTimeout(() => {
-        client.emit('InvitationDeclined');
+        client.emit('InvitationDeclined', 'you are already in an other game !!');
         client.disconnect();
       }, 2000);
 

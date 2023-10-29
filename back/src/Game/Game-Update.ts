@@ -95,28 +95,11 @@ export class GameUpdate {
 
   async updateGamerobot(room: Room, activeSockets: Map<Socket, User>) {
     const robotpaddle = room.players[1].paddle;
-
-    const randomError = Math.random();
-    const errorFactor = 0.3;
-
-    const paddleCenterY = robotpaddle.y + robotpaddle.height / 2;
-    const ballY = room.ball.y;
-    const yDifference = ballY - paddleCenterY;
-
-    if (randomError < errorFactor) {
-      room.players[1].paddle.y +=
-        Math.random() * 2 * robotpaddle.dy - robotpaddle.dy;
-    } else {
-      room.players[1].paddle.y +=
-        yDifference > 0 ? robotpaddle.dy : -robotpaddle.dy;
-    }
-
+    const targetY = room.ball.y - robotpaddle.height / 2;
+    room.ball.x > CONTAINERWIDTH / 2? room.players[1].paddle.y += (targetY - room.players[1].paddle.y) * 0.08 : null
     const maxY = CONTAINERHIEGHT - room.players[1].paddle.height;
-    if (room.players[1].paddle.y < 0) {
-      room.players[1].paddle.y = 0;
-    } else if (room.players[1].paddle.y > maxY) {
-      room.players[1].paddle.y = maxY;
-    }
+    room.players[1].paddle.y = Math.max(0, Math.min(room.players[1].paddle.y, maxY));
+  
     if (
       room.ball.y - room.ball.radius <= 0 ||
       room.ball.y + room.ball.radius >= CONTAINERHIEGHT

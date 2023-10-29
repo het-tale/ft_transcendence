@@ -53,10 +53,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       !this.robot ? this.AddRobotToSOckets() : null;
       const token = client.handshake.auth.token;
       const user = await this.serviceInit.verifyToken(token);
-      // console.log('user is connected');
       if (!user) throw new Error('undefined user ');
       if (user.status === 'InGame') {
-        // console.log('user is in game at connection');
         setTimeout(() => {
           client.emit('InvitationDeclined');
           client.disconnect();
@@ -109,6 +107,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         this.rooms,
         targetUserId,
         this.activeSockets,
+        this.server,
       );
     } catch (e) {
       return;

@@ -20,7 +20,8 @@ export function ListenOnSocket(
   setOtherUsername: React.Dispatch<React.SetStateAction<string | null>>,
   setGameStarted: React.Dispatch<React.SetStateAction<boolean>>,
   setGameinvite: React.Dispatch<React.SetStateAction<boolean>>,
-  setGameDeclined: React.Dispatch<React.SetStateAction<boolean>>
+  setGameDeclined: React.Dispatch<React.SetStateAction<boolean>>,
+  setMessage: React.Dispatch<React.SetStateAction<string | null>>
 ) {
   socket.on("connect", () => {
   });
@@ -40,6 +41,8 @@ export function ListenOnSocket(
 
   socket.on("InvitationDeclined", (message: string) => {
     setGameDeclined(true);
+    setGameinvite(false);
+    setMessage(message);
   });
 	
   socket.on("JoinRoom", (message: string) => {
@@ -52,8 +55,9 @@ export function ListenOnSocket(
     setGameStarted(true);
     // setGameinvite(false);
   });
-
+  
   socket.on("GAME INVITE", (message: boolean) => {
+    console.log("GAME INVITE");
     setGameinvite(true);
   });
 

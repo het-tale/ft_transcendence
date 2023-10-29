@@ -8,7 +8,6 @@ export const GetBrowsedChannels = async () => {
             }
         });
         if (res.status === 200) {
-            console.log('RES DATAAAAA');
             return res.data;
         } else {
             return null;
