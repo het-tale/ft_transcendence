@@ -98,7 +98,7 @@ export default function Chat(props: BrowseChannelsProps) {
             // socket.off('channelDeleted');
             // socket.off('channelDeleteError');
         };
-    }, []);
+    });
     return (
         <Dms
             socket={socket}
