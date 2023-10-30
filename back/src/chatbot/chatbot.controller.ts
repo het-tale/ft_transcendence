@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Query } from '@nestjs/common';
+import { Controller, Body} from '@nestjs/common';
 import { ChatbotService } from './chatbot.service';
 
 @Controller('chatbot')
@@ -7,11 +7,9 @@ export class ChatbotController {
 
   async sendMessage(
     @Body() body: { message: string },
-    @Query('model') model: string,
-    @Query('temperature') temperature: number,
   ): Promise<string> {
     const userMessage = body.message;
-    const chatbotResponse = await this.chatbotService.getChatbotResponse(userMessage, model, temperature);
+    const chatbotResponse = await this.chatbotService.getChatbotResponse(userMessage);
     return chatbotResponse;
   }
 }

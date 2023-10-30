@@ -10,22 +10,36 @@ export class ChatbotService {
     this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   }
 
-  async getChatbotResponse(userMessage: string, model: string, temperature: number): Promise<string> {
+  async getChatbotResponse(userMessage: string ): Promise<string> {
     const userPrompt = [
-      { role: 'system', content: 'You are a chatbot assistant for the PingPong game. but you can respond about all online games, your answer can take as long as you want' },
+      { role: 'chatbot', content: 'The following is a conversation with a chatbot assistant of enligne games and telling some jokes . The assistant is helpful, creative, clever, and very friendly.' },
       { role: 'user', content: userMessage },
     ];
 
     try {
       const prompt = userPrompt.map((m) => m.content);
       const response = await this.openai.completions.create({
-        model,
-        prompt,
-        temperature,
+        model: 'davinci-instruct-beta',
+        prompt: prompt.join('\n'),
+        temperature: 0.5,
+        max_tokens: 200,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0.3,
+        stop: '',
       });
 
       if (response.choices && response.choices.length > 0) {
-        return response.choices[0].text;
+        const chatbotResponse = response.choices[0].text;
+        const chatbotResponseArray = chatbotResponse.split('\n');
+        console.log('chatbotResponse', chatbotResponseArray);
+        for (const message of chatbotResponseArray) {
+          if (message.trim() !== '') {
+            return message;
+          }
+        }
+        console.log('chatbotResponse', chatbotResponseArray);
+        return chatbotResponse;
       } else {
         throw new Error('Chatbot response is empty.');
       }

@@ -430,7 +430,7 @@ export class DMService {
     }
   }
   async handleRobotResponse(message: string, username: string) {
-    const chatbotResponse = await this.chatbot.getChatbotResponse(message, 'text-davinci-003', 0.7);
+    const chatbotResponse = await this.chatbot.getChatbotResponse(message);
     this.saveMessage({
       sender: 'ROBOT',
       receiver: username,
