@@ -56,8 +56,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       if (!user) throw new Error('undefined user ');
       if (user.status === 'InGame') {
         setTimeout(() => {
-          client.emit('InvitationDeclined');
-          client.disconnect();
+          client.emit('InvitationDeclined', 'You are in other game');
+          client.disconnect(false);
         }, 2000);
 
         return;
@@ -151,7 +151,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  async handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket, ...args: boolean[]) {
     const room = this.serviceInit.findRoomByPlayerSocket(client, this.rooms);
     const user = this.activeSockets.get(client);
     if (user) {
