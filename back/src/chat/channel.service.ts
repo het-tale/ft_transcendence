@@ -166,22 +166,22 @@ export class ChannelService {
   }
 
   async changeOfflineInvitationsStatus(invitations: Invitation[]) {
-    const updatedConversations = await Promise.all(
+    const updatedInvitations = await Promise.all(
       invitations.map(async (invitation) => {
-        const updatedConversation = await this.prisma.message.update({
+        const updatedInvitation = await this.prisma.invitation.update({
           where: {
             id: invitation.id,
           },
           data: {
-            isPending: false,
+            isReceiverOnline: true,
           },
         });
 
-        return updatedConversation;
+        return updatedInvitation;
       }),
     );
 
-    return updatedConversations;
+    return updatedInvitations;
   }
   async getOfflineChannelMessages(userId: number) {
     const messages = await this.prisma.message.findMany({
@@ -228,8 +228,7 @@ export class ChannelService {
         username: data.receiver,
       },
     });
-    if (!userReceiver)
-      throw new Error('user not found');
+    if (!userSender || !userReceiver) throw new Error('user not found');
     const room = await this.prisma.channel.findUnique({
       where: {
         name: data.room,
