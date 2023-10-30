@@ -66,6 +66,7 @@ const RoomsChat = (props: RoomsChatProps) => {
     }, [props.render, props.channelDm]);
     useEffect(() => {
         async function fetchRoomData() {
+            if (props.channelDm?.name === undefined) return;
             const roomData = await Room(props.channelDm?.name);
             setRoom(roomData);
         }

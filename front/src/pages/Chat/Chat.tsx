@@ -7,6 +7,7 @@ import { UserType } from '../../Types/User';
 import GetRoomDms from './GetRoomDms';
 import { Channel } from '../../Types/Channel';
 import { BrowseChannelsProps } from './Channels/BrowseChannels';
+import { RenderContext } from '../../RenderContext';
 
 export default function Chat(props: BrowseChannelsProps) {
     const socket = React.useContext(SocketContext);
@@ -14,6 +15,7 @@ export default function Chat(props: BrowseChannelsProps) {
     const toast = useToast();
     const [dms, setDms] = React.useState<UserType[]>([]);
     const [roomDms, setRoomDms] = React.useState<Channel[]>([]);
+    const renderData = React.useContext(RenderContext);
 
     useEffect(() => {
         GetDms().then((data) => {
@@ -27,9 +29,19 @@ export default function Chat(props: BrowseChannelsProps) {
     useEffect(() => {
         socket.on('privateMessage', (data: any) => {
             console.log('privateMessage', data);
+            renderData.setCount && renderData.setCount(renderData.count! + 1);
             setRender(!render);
         });
         socket.on('roomCreateError', (data: any) => {
+            console.log('roomCreateError', data);
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 1000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
             setRender(!render);
         });
         socket.on('privateMessageError', (data: any) => {
@@ -39,8 +51,11 @@ export default function Chat(props: BrowseChannelsProps) {
                 status: 'error',
                 duration: 1000,
                 isClosable: true,
-                position: 'top-right'
+                position: 'bottom-right'
             });
+        });
+        socket.on('roomMessage', (data: any) => {
+            setRender(!render);
         });
         socket.on('roomMessageError', (data: any) => {
             toast({
@@ -58,10 +73,8 @@ export default function Chat(props: BrowseChannelsProps) {
             socket.off('roomMessageError');
             socket.off('privateMessage');
             socket.off('roomCreateError');
+            socket.off('roomMessage');
         };
-    });
-    socket.on('roomMessage', (data: any) => {
-        setRender(!render);
     });
     return (
         <Dms

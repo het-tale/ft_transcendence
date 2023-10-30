@@ -36,6 +36,7 @@ function App() {
     const buttonClicked = useRef<HTMLButtonElement | null>(null);
     const [user, setUser] = React.useState<UserType>();
     const [firstTime, setFirstTime] = React.useState(true);
+    const [count, setCount] = React.useState(0);
     return (
         <BrowserRouter>
             <SocketContext.Provider value={socket}>
@@ -50,7 +51,9 @@ function App() {
                             user: user,
                             firstTime: firstTime,
                             setFirstTime: setFirstTime,
-                            setUser: setUser
+                            setUser: setUser,
+                            count: count,
+                            setCount: setCount
                         }}
                     >
                         <Routes>

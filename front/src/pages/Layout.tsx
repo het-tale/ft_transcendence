@@ -65,7 +65,23 @@ export const Layout = ({ children }: Props) => {
         socket.connect();
         socketGame.auth = { token: token };
         socketGame.connect();
+        socket.on('exception', (err) => {
+            console.log('exception', err);
+            if (err.message.length > 0) {
+                for (let i = 0; i < err.message.length; i++) {
+                    toast({
+                        title: 'Error',
+                        description: err.message[i],
+                        status: 'error',
+                        duration: 9000,
+                        isClosable: true,
+                        position: 'bottom-right'
+                    });
+                }
+            }
+        });
         socket.on('roomInvitation', (data: any) => {
+            console.log('roomInvitation', data);
             toast({
                 title: 'success',
                 description: data.from,
@@ -77,6 +93,7 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('roomInvitationError', (data: any) => {
+            console.log('roomInvitationError', data);
             toast({
                 title: 'Error',
                 description: data,
@@ -280,6 +297,7 @@ export const Layout = ({ children }: Props) => {
             socket.off('offlineAchievements');
             socket.off('usernameChanged');
             socket.off('usernameChangeError');
+            socket.off('exception');
         };
     }, [socket]);
 
@@ -387,7 +405,8 @@ export const Layout = ({ children }: Props) => {
                                                             invit.isGame
                                                                 ? () =>
                                                                       handleAcceptRejectGame(
-                                                                          false, invit.roomName!
+                                                                          false,
+                                                                          invit.roomName!
                                                                       )
                                                                 : () =>
                                                                       handleAcceptReject(
@@ -405,9 +424,10 @@ export const Layout = ({ children }: Props) => {
                                                         color={'white'}
                                                         onClick={
                                                             invit.isGame
-                                                            ? () =>
+                                                                ? () =>
                                                                       handleAcceptRejectGame(
-                                                                          true, invit.roomName!
+                                                                          true,
+                                                                          invit.roomName!
                                                                       )
                                                                 : () =>
                                                                       handleAcceptReject(

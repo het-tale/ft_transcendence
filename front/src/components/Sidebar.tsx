@@ -64,8 +64,12 @@ const Sidebar = (props: sidebarProps) => {
                 onClick={() => {
                     renderData.setRenderData(!renderData.renderData);
                 }}
+                className="chat-icon"
             >
                 <BsChatRightFill className="fa" />
+                {/* {renderData.count! > 0 && (
+                    <span className="badge">{renderData.count!}</span>
+                )} */}
                 Chat
             </Link>
             <Link to="" onClick={props.onOpen}>

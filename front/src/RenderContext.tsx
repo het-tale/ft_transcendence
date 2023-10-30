@@ -11,6 +11,8 @@ export interface RenderContextType {
     setUser?: React.Dispatch<React.SetStateAction<UserType | undefined>>;
     firstTime?: boolean;
     setFirstTime?: React.Dispatch<React.SetStateAction<boolean>>;
+    count?: number;
+    setCount?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const RenderContext = React.createContext<RenderContextType>({
@@ -21,5 +23,7 @@ export const RenderContext = React.createContext<RenderContextType>({
     user: undefined,
     firstTime: true,
     setFirstTime: () => {},
-    setUser: () => {}
+    setUser: () => {},
+    count: 0,
+    setCount: () => {}
 });
