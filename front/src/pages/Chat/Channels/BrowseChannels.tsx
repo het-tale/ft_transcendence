@@ -3,6 +3,7 @@ import ChannelCard from './ChannelCard';
 import { Channel } from '../../../Types/Channel';
 import React, { useEffect } from 'react';
 import { GetBrowsedChannels } from './GetBrowsedChannels';
+import { RenderContext } from '../../../RenderContext';
 
 export interface BrowseChannelsProps {
     update?: boolean;
@@ -11,11 +12,12 @@ export interface BrowseChannelsProps {
 
 const BrowseChannels = (props: BrowseChannelsProps) => {
     const [browseChannels, setBrowseChannels] = React.useState<Channel[]>([]);
+    const renderData = React.useContext(RenderContext);
     useEffect(() => {
         GetBrowsedChannels().then((res) => {
             setBrowseChannels(res);
         });
-    }, [props.update]);
+    }, [props.update, renderData.renderData]);
     return (
         <Grid
             templateColumns="repeat(5, 1fr)"

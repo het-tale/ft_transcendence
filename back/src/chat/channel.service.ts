@@ -228,6 +228,8 @@ export class ChannelService {
         username: data.receiver,
       },
     });
+    if (!userReceiver)
+      throw new Error('user not found');
     const room = await this.prisma.channel.findUnique({
       where: {
         name: data.room,

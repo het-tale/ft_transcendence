@@ -25,7 +25,7 @@ export default function Chat(props: BrowseChannelsProps) {
         GetRoomDms().then((data) => {
             setRoomDms(data);
         });
-    }, [render, props.update]);
+    }, [render, props.update, renderData.renderData]);
     useEffect(() => {
         socket.on('privateMessage', (data: any) => {
             console.log('privateMessage', data);
