@@ -11,6 +11,7 @@ import User from './User';
 import { Notification } from '../Types/Notification';
 import { RenderContext, RenderContextType } from '../RenderContext';
 import { SocketContext } from '../socket';
+import { useToast } from '@chakra-ui/react';
 
 interface sidebarProps {
     notification?: boolean;
@@ -24,6 +25,7 @@ interface sidebarProps {
 const Sidebar = (props: sidebarProps) => {
     const [user, setUser] = React.useState<UserType>();
     const renderData: RenderContextType = React.useContext(RenderContext);
+    const toast = useToast();
     const socket = React.useContext(SocketContext);
     useEffect(() => {
         async function fetchUserData() {
@@ -42,12 +44,36 @@ const Sidebar = (props: sidebarProps) => {
             console.log('userOnline', data);
             renderData.setRenderData(!renderData.renderData);
         });
+        socket.on('roomCreated', (data: any) => {
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('roomCreateError', (data: any) => {
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('roomJoined', (data: any) => {
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socket.on('roomJoinError', (data: any) => {
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+        });
 
         return () => {
             socket.off('userOffline');
             socket.off('userOnline');
+            socket.off('roomCreated');
+            socket.off('roomCreateError');
+            socket.off('roomJoined');
+            socket.off('roomJoinError');
         };
     });
+
     return (
         <aside>
             <Link

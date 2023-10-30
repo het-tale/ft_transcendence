@@ -252,7 +252,13 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                 <CardBody>
                     <Center>
                         <Button
-                            onClick={onOpen3}
+                            onClick={
+                                props.room?.admins.some(
+                                    (admin) => admin.id === props.user?.id
+                                )
+                                    ? onOpen3
+                                    : () => {}
+                            }
                             backgroundColor={'transparent'}
                             h={'150px'}
                         >
@@ -291,30 +297,34 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                         >
                             {props.ChannelDm?.name}
                         </Text>
-                        <Button onClick={onOpen2}>
-                            <IconButton
-                                variant="ghost"
-                                colorScheme="gray"
-                                aria-label=""
-                                icon={<BsPencilFill />}
-                                color={'#a435f0'}
-                            />
-                            <ModalUi
-                                isOpen={isOpen2}
-                                onOpen={onOpen2}
-                                onClose={onClose2}
-                                title={'Change Channel Name'}
-                                body={
-                                    <ChangeChannelNameModal
-                                        onClose={onClose2}
-                                        setRender={props.setRender}
-                                        render={props.render}
-                                        channelDm={props.room}
-                                        user={props.user}
-                                    />
-                                }
-                            />
-                        </Button>
+                        {props.room?.admins.some(
+                            (admin) => admin.id === props.user?.id
+                        ) ? (
+                            <Button onClick={onOpen2}>
+                                <IconButton
+                                    variant="ghost"
+                                    colorScheme="gray"
+                                    aria-label=""
+                                    icon={<BsPencilFill />}
+                                    color={'#a435f0'}
+                                />
+                                <ModalUi
+                                    isOpen={isOpen2}
+                                    onOpen={onOpen2}
+                                    onClose={onClose2}
+                                    title={'Change Channel Name'}
+                                    body={
+                                        <ChangeChannelNameModal
+                                            onClose={onClose2}
+                                            setRender={props.setRender}
+                                            render={props.render}
+                                            channelDm={props.room}
+                                            user={props.user}
+                                        />
+                                    }
+                                />
+                            </Button>
+                        ) : null}
                     </Flex>
 
                     <Flex justifyContent={'space-between'} marginTop={2}>
@@ -325,32 +335,36 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                             marginTop={2}
                             color={'#a435f0'}
                         >
-                            Change Channel Type
+                            {props.ChannelDm?.type} Channel
                         </Text>
-                        <Button onClick={onOpen4}>
-                            <IconButton
-                                variant="ghost"
-                                colorScheme="gray"
-                                aria-label=""
-                                icon={<BsPencilFill />}
-                                color={'#a435f0'}
-                            />
-                            <ModalUi
-                                isOpen={isOpen4}
-                                onOpen={onOpen4}
-                                onClose={onClose4}
-                                title={'Change Channel Type'}
-                                body={
-                                    <ChangeChannelTypeModal
-                                        onClose={onClose4}
-                                        setRender={props.setRender}
-                                        render={props.render}
-                                        channelDm={props.room}
-                                        user={props.user}
-                                    />
-                                }
-                            />
-                        </Button>
+                        {props.room?.admins.some(
+                            (admin) => admin.id === props.user?.id
+                        ) ? (
+                            <Button onClick={onOpen4}>
+                                <IconButton
+                                    variant="ghost"
+                                    colorScheme="gray"
+                                    aria-label=""
+                                    icon={<BsPencilFill />}
+                                    color={'#a435f0'}
+                                />
+                                <ModalUi
+                                    isOpen={isOpen4}
+                                    onOpen={onOpen4}
+                                    onClose={onClose4}
+                                    title={'Change Channel Type'}
+                                    body={
+                                        <ChangeChannelTypeModal
+                                            onClose={onClose4}
+                                            setRender={props.setRender}
+                                            render={props.render}
+                                            channelDm={props.room}
+                                            user={props.user}
+                                        />
+                                    }
+                                />
+                            </Button>
+                        ) : null}
                     </Flex>
                 </CardBody>
                 <CardFooter

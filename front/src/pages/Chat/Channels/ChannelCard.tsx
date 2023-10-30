@@ -54,36 +54,36 @@ const ChannelCard = (props: BrowseChannelsCardProps) => {
         onClose();
     };
 
-    socket.on('roomCreated', (data: any) => {
-        if (props.setUpdateChannel)
-            props.setUpdateChannel(!props.updateChannel);
-    });
-    socket.on('roomCreateError', (data: any) => {
-        if (props.setUpdateChannel)
-            props.setUpdateChannel(!props.updateChannel);
-    });
-    socket.on('roomJoined', (data: any) => {
-        if (props.setUpdateChannel)
-            props.setUpdateChannel(!props.updateChannel);
-    });
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            socket.on('roomJoinError', (data: any) => {
-                toast({
-                    title: 'Error',
-                    description: data,
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    position: 'bottom-right'
-                });
-            });
-        }, 500);
+    // socket.on('roomCreated', (data: any) => {
+    //     if (props.setUpdateChannel)
+    //         props.setUpdateChannel(!props.updateChannel);
+    // });
+    // socket.on('roomCreateError', (data: any) => {
+    //     if (props.setUpdateChannel)
+    //         props.setUpdateChannel(!props.updateChannel);
+    // });
+    // socket.on('roomJoined', (data: any) => {
+    //     if (props.setUpdateChannel)
+    //         props.setUpdateChannel(!props.updateChannel);
+    // });
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         socket.on('roomJoinError', (data: any) => {
+    //             toast({
+    //                 title: 'Error',
+    //                 description: data,
+    //                 status: 'error',
+    //                 duration: 9000,
+    //                 isClosable: true,
+    //                 position: 'bottom-right'
+    //             });
+    //         });
+    //     }, 500);
 
-        return () => {
-            clearTimeout(timer);
-        };
-    });
+    //     return () => {
+    //         clearTimeout(timer);
+    //     };
+    // });
 
     return (
         <Card maxW="sm">

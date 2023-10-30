@@ -25,7 +25,7 @@ export default function Chat(props: BrowseChannelsProps) {
         GetRoomDms().then((data) => {
             setRoomDms(data);
         });
-    }, [render, props.update]);
+    }, [render, props.update, renderData.renderData]);
     useEffect(() => {
         socket.on('privateMessage', (data: any) => {
             console.log('privateMessage', data);
@@ -67,15 +67,38 @@ export default function Chat(props: BrowseChannelsProps) {
                 position: 'top-right'
             });
         });
-
+        // socket.on('channelDeleted', () => {
+        //     toast({
+        //         title: 'Success',
+        //         description: 'Channel deleted',
+        //         status: 'success',
+        //         duration: 9000,
+        //         isClosable: true,
+        //         position: 'bottom-right'
+        //     });
+        //     setRender(!render);
+        // });
+        // socket.on('channelDeleteError', (data: string) => {
+        //     toast({
+        //         title: 'Error',
+        //         description: data,
+        //         status: 'error',
+        //         duration: 9000,
+        //         isClosable: true,
+        //         position: 'bottom-right'
+        //     });
+        //     setRender(!render);
+        // });
         return () => {
             socket.off('privateMessageError');
             socket.off('roomMessageError');
             socket.off('privateMessage');
             socket.off('roomCreateError');
             socket.off('roomMessage');
+            // socket.off('channelDeleted');
+            // socket.off('channelDeleteError');
         };
-    });
+    }, []);
     return (
         <Dms
             socket={socket}
