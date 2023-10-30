@@ -82,56 +82,52 @@ const UserInfo = (props: UserInfoProps) => {
         }
     };
     return (
-        <div className="container" style={{ width: '600px' }}>
-            <Center
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+        <Flex
+            className="container"
+            style={{ width: '600px' }}
+            flexDirection={'column'}
+            gap={'3%'}
+        >
+            <Button
+                onClick={props.isMyProfile ? onOpen4 : () => {}}
+                marginTop={'10rem'}
+                marginBottom={'10rem'}
+                background={'transparent'}
             >
                 <Image
                     objectFit="cover"
                     src={user?.avatar}
                     alt="profile"
-                    borderRadius={'50%'}
-                    w={200}
+                    borderRadius={'10%'}
+                    w={'50rem'}
                     alignItems={'center'}
-                    _hover={{ cursor: 'pointer', opacity: '0.5' }}
                 />
-                {props.isMyProfile ? (
-                    <>
-                        {isHovered && (
-                            <IconButton
-                                icon={<EditIcon />}
-                                aria-label="Edit Image"
-                                transform="translate(-300%, -20%)"
-                                zIndex="1"
-                                colorScheme="purple"
-                                opacity={'0.8'}
-                                onClick={onOpen4}
+            </Button>
+            {props.isMyProfile ? (
+                <>
+                    <ModalUi
+                        isOpen={isOpen4}
+                        onOpen={onOpen4}
+                        onClose={onClose4}
+                        title={'Change Avatar'}
+                        body={
+                            <EditAvatarBody
+                                user={user}
+                                onClose={onClose4}
+                                isHovered={isHovered}
+                                setIsHovered={setIsHovered}
                             />
-                        )}
-                        <ModalUi
-                            isOpen={isOpen4}
-                            onOpen={onOpen4}
-                            onClose={onClose4}
-                            title={'Change Avatar'}
-                            body={
-                                <EditAvatarBody
-                                    user={user}
-                                    onClose={onClose4}
-                                    isHovered={isHovered}
-                                    setIsHovered={setIsHovered}
-                                />
-                            }
-                        />
-                    </>
-                ) : null}
-            </Center>
+                        }
+                    />
+                </>
+            ) : null}
 
-            <Flex justifyContent={'space-between'} marginTop={12}>
+            <Flex gap={'2px'} marginTop={12}>
                 <Text
                     textAlign={'center'}
-                    fontSize={14}
-                    fontFamily={'Krona One'}
+                    fontSize={30}
+                    fontFamily={'sans-serif'}
+                    fontWeight={'bold'}
                     marginTop={2}
                 >
                     {user?.username}
@@ -143,10 +139,11 @@ const UserInfo = (props: UserInfoProps) => {
                             colorScheme="purple"
                             backgroundColor={'transparent'}
                             aria-label=""
-                            icon={<BsPencilFill />}
+                            icon={<EditIcon />}
                             color={'#a435f0'}
                             onClick={onOpen}
-                            size={'sm'}
+                            size={'md'}
+                            marginTop={3}
                         />
                         <ModalUi
                             isOpen={isOpen}
@@ -165,21 +162,25 @@ const UserInfo = (props: UserInfoProps) => {
             </Flex>
             {props.isMyProfile ? (
                 <>
-                    <Flex justifyContent={'space-between'} marginTop={2}>
+                    <Flex gap={'2px'} marginTop={2}>
                         <Text
                             textAlign={'center'}
                             fontSize={14}
-                            fontFamily={'Krona One'}
+                            fontFamily={'sans-serif'}
                             marginTop={2}
+                            fontWeight={'bold'}
                         >
-                            Change Password
+                            <span style={{ textDecoration: 'underline' }}>
+                                Password:
+                            </span>{' '}
+                            ***********
                         </Text>
                         <IconButton
                             variant="ghost"
                             colorScheme="purple"
                             backgroundColor={'transparent'}
                             aria-label=""
-                            icon={<BsPencilFill />}
+                            icon={<EditIcon />}
                             color={'#a435f0'}
                             onClick={onOpen2}
                         />
@@ -196,21 +197,25 @@ const UserInfo = (props: UserInfoProps) => {
                             }
                         />
                     </Flex>
-                    <Flex justifyContent={'space-between'} marginTop={2}>
+                    <Flex gap={'2px'} marginTop={2}>
                         <Text
                             textAlign={'center'}
                             fontSize={14}
-                            fontFamily={'Krona One'}
+                            fontFamily={'sans-serif'}
+                            fontWeight={'bold'}
                             marginTop={2}
                         >
-                            {user?.is2FaEnabled ? 'Disable 2FA' : 'Enable 2FA'}
+                            <span style={{ textDecoration: 'underline' }}>
+                                2 Factor Authentication:
+                            </span>
+                            {user?.is2FaEnabled ? ' Disable' : ' Enable'}
                         </Text>
                         <IconButton
                             variant="ghost"
                             colorScheme="purple"
                             backgroundColor={'transparent'}
                             aria-label=""
-                            icon={<BsPencilFill />}
+                            icon={<EditIcon />}
                             color={'#a435f0'}
                             onClick={user?.is2FaEnabled ? disable2fa : onOpen3}
                         />
@@ -225,13 +230,15 @@ const UserInfo = (props: UserInfoProps) => {
                 </>
             ) : null}
 
-            <Flex justifyContent={'space-between'} marginTop={2}>
+            <Flex gap={'2px'} marginTop={2}>
                 <Text
                     textAlign={'center'}
                     fontSize={14}
-                    fontFamily={'Krona One'}
+                    fontFamily={'sans-serif'}
+                    fontWeight={'bold'}
                     marginTop={2}
                 >
+                    <span style={{ textDecoration: 'underline' }}>Email: </span>
                     {user?.email}
                 </Text>
             </Flex>
@@ -264,7 +271,7 @@ const UserInfo = (props: UserInfoProps) => {
                     </Button>
                 </>
             )}
-        </div>
+        </Flex>
     );
 };
 
