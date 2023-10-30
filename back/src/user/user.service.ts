@@ -205,6 +205,9 @@ export class UserService {
         id: {
           not: 1,
         },
+        username: {
+          not: null,
+        },
       },
       select: {
         id: true,
