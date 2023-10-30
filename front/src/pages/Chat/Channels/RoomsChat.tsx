@@ -14,7 +14,7 @@ import {
 import { Channel } from '../../../Types/Channel';
 import ChannelDmInfo from './ChannelDmInfo';
 import ChannelTypingBar from './ChannelTypingBar';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { UserType } from '../../../Types/User';
 import User from '../../../components/User';
 import { MessageType } from '../../../Types/Message';
@@ -42,6 +42,7 @@ const RoomsChat = (props: RoomsChatProps) => {
     const [room, setRoom] = React.useState<Channel>();
     const [messages, setMessages] = React.useState<MessageType[]>([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const chatContainerRef = useRef<HTMLDivElement | null>(null);
     const {
         isOpen: isOpen2,
         onOpen: onOpen2,
@@ -65,6 +66,12 @@ const RoomsChat = (props: RoomsChatProps) => {
             : null;
     }, [props.render, props.channelDm]);
     useEffect(() => {
+        chatContainerRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    }, [messages]);
+    useEffect(() => {
         async function fetchRoomData() {
             if (props.channelDm?.name === undefined) return;
             const roomData = await Room(props.channelDm?.name);
@@ -77,28 +84,35 @@ const RoomsChat = (props: RoomsChatProps) => {
             room: props.channelDm?.name
         });
     };
-    socket.on('channelDeleted', (data: any) => {
-        toast({
-            title: 'Success',
-            description: data,
-            status: 'success',
-            duration: 9000,
-            isClosable: true,
-            position: 'bottom-right'
+    useEffect(() => {
+        socket.on('channelDeleted', () => {
+            toast({
+                title: 'Success',
+                description: 'Channel Deleted',
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
         });
-        props.setRender && props.setRender(!props.render);
-    });
-    socket.on('channelDeleteError', (data: any) => {
-        toast({
-            title: 'Error',
-            description: data,
-            status: 'error',
-            duration: 9000,
-            isClosable: true,
-            position: 'bottom-right'
+        socket.on('channelDeleteError', (data: string) => {
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            props.setRender && props.setRender(!props.render);
         });
-        props.setRender && props.setRender(!props.render);
-    });
+        return () => {
+            socket.off('channelDeleted');
+            socket.off('channelDeleteError');
+        };
+    }, []);
+
     if (!props.channelDm) return <></>;
     return (
         <Flex flexDirection={'row'}>
@@ -108,7 +122,15 @@ const RoomsChat = (props: RoomsChatProps) => {
                 <>
                     <Flex flexDirection={'column'} width={'100%'}>
                         <Flex>
-                            <Box width={'98%'}>
+                            <Box
+                                width={
+                                    room.admins.some(
+                                        (admin) => admin.id === user?.id
+                                    )
+                                        ? '98%'
+                                        : '100%'
+                                }
+                            >
                                 <button
                                     onClick={props.handleRenderActions}
                                     style={{
@@ -117,9 +139,9 @@ const RoomsChat = (props: RoomsChatProps) => {
                                     }}
                                 >
                                     <ChannelDmInfo
-                                        profile={props.channelDm.avatar}
-                                        type={props.channelDm.type}
-                                        name={props.channelDm.name}
+                                        profile={room.avatar}
+                                        type={room.type}
+                                        name={room.name}
                                         showChannelInfo={showChannelInfo}
                                         setShowChannelInfo={setShowChannelInfo}
                                         setRender={props.setRender}
@@ -238,10 +260,11 @@ const RoomsChat = (props: RoomsChatProps) => {
                                     />
                                 );
                             })}
+                            <div ref={chatContainerRef}></div>
                         </div>
                         <Box flex={1}>
                             <ChannelTypingBar
-                                ChannelDm={props.channelDm}
+                                ChannelDm={room}
                                 render={props.render}
                                 setRender={props.setRender}
                                 user={user}
@@ -257,7 +280,7 @@ const RoomsChat = (props: RoomsChatProps) => {
             ) && showChannelInfo ? (
                 <div className="container">
                     <ChannelInfo
-                        ChannelDm={props.channelDm}
+                        ChannelDm={room}
                         user={user}
                         render={props.render}
                         setRender={props.setRender}
