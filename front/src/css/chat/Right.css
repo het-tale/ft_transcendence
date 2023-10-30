@@ -64,7 +64,7 @@
     background-color: var(--fakhti);
     color: var(--white);
     border-radius: 50px 50px 10px 50px;
-    height: 40px;
+    height: fit-content;
     padding: 10px 13px;
     margin-bottom: 5px;
     width: fit-content;
@@ -76,7 +76,7 @@
     background-color: #d4d9dd;
     color: #808080;
     border-radius: 50px 50px 50px 10px;
-    height: 40px;
+    height: fit-content;
     padding: 10px 13px;
     width: fit-content;
     margin-bottom: 7px;

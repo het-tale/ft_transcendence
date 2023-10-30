@@ -42,16 +42,28 @@ function Login(props: any) {
                 navigate('/confirm-email');
             }
         } catch (error: any) {
-            const errorMessage1 = error?.response?.data?.message;
-            setErrorMessage(errorMessage1);
-            toast({
-                title: 'Login Failed.',
-                description: errorMessage1,
-                status: 'error',
-                duration: 9000,
-                isClosable: true,
-                position: 'bottom-right'
-            });
+            const errors = error?.response?.data?.errors;
+            if (errors) {
+                for (let index = 0; index < errors?.length; index++) {
+                    toast({
+                        title: 'Error.',
+                        description: errors[index].code,
+                        status: 'error',
+                        duration: 5000,
+                        isClosable: true,
+                        position: 'bottom-right'
+                    });
+                }
+            } else {
+                toast({
+                    title: 'Error.',
+                    description: error?.response?.data?.message,
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+            }
         }
     };
 
