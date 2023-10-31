@@ -57,7 +57,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       if (user.status === 'InGame') {
         setTimeout(() => {
           client.emit('InvitationDeclined', 'You are in other game');
-          client.disconnect(false);
+          this.activeSockets.delete(client);
         }, 2000);
 
         return;
@@ -122,6 +122,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         this.rooms,
         roomId,
         this.activeSockets,
+        this.server,
       );
     } catch (e) {
       return;
@@ -136,6 +137,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         this.rooms,
         roomId,
         this.activeSockets,
+        this.server,
       );
     } catch (e) {
       return;
@@ -155,6 +157,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
     const room = this.serviceInit.findRoomByPlayerSocket(client, this.rooms);
     const user = this.activeSockets.get(client);
     if (user) {
+      console.log('changing staatus to enline of user ', user.username);
       await this.prisma.user.update({
         where: {
           id: user.id,

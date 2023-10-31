@@ -124,6 +124,7 @@ export class Invitations {
     rooms: Map<string, Room>,
     roomName: string,
     activeSockets: Map<Socket, User>,
+    server: Server
   ) {
 
     console.log('\x1b[32m%s\x1b[0m', 'acceptInvitation' + roomName);
@@ -244,6 +245,7 @@ export class Invitations {
     rooms: Map<string, Room>,
     roomName: string,
     activeSockets: Map<Socket, User>,
+    server: Server
   ) {
     const room = rooms.get(roomName);
     if (room) {

@@ -81,7 +81,7 @@ export class GameUpdate {
       if (room.rounds === 0) this.dataupdatetostop(room, activeSockets);
       else this.resetBall(room.ball, player, otherPlayer);
     }
-    playerSocket.emit('UPDATE', {
+    playerSocket?.emit('UPDATE', {
       ball: room.ball,
       paddle: playerPaddle,
       otherPaddle: otherPaddle,
@@ -132,7 +132,6 @@ export class GameUpdate {
   async OtherAvatar(
     client: Socket,
     room: Room,
-    activeSockets: Map<Socket, User>,
   ) {
     const player = room.players.find((p) => p.socket === client);
     const otherPlayer = room.players.find((player) => player.socket !== client);

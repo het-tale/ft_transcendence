@@ -31,7 +31,7 @@ export class GameStartEvent {
     if (user.status === 'InGame') {
       setTimeout(() => {
         client.emit('InvitationDeclined', 'you are already in an other game !!');
-        client.disconnect();
+        activeSockets.delete(client)
       }, 2000);
 
       return;
@@ -113,6 +113,8 @@ export class GameStartEvent {
     activeSockets: Map<Socket, User>,
     server: Server,
   ) {
+    try
+    {
     const user_player = activeSockets.get(client);
     if (!user_player) throw new Error('undefined user ');
     const user = await this.prisma.user.findUnique({
@@ -124,7 +126,7 @@ export class GameStartEvent {
     if (user.status === 'InGame') {
       setTimeout(() => {
         client.emit('InvitationDeclined', 'you are already in an other game !!');
-        client.disconnect();
+        // activeSockets.delete(client);
       }, 2000);
 
       return;
@@ -138,6 +140,7 @@ export class GameStartEvent {
         },
       });
     }
+    console.log('status changed to ingame ')
     const room = new Room(Math.random().toString(36).substring(7));
     rooms.set(room.roomName, room);
     const player = new Player(
@@ -168,8 +171,14 @@ export class GameStartEvent {
     };
     client.emit('JoinRoom', room.roomName);
     client.emit('InitGame', gamedata);
+    console.log(user.username, 'startting game at ', room.roomName)
     server.to(room.roomName).emit('StartGame', room.roomName);
     this.startGame(true, room, client, rooms, activeSockets);
+  } catch(error)
+    {
+    return ;
+
+  }
   }
 
   async startGame(
@@ -179,7 +188,7 @@ export class GameStartEvent {
     rooms: Map<string, Room>,
     activeSockets: Map<Socket, User>,
   ) {
-    this.serviceUpdate.OtherAvatar(client, room, activeSockets);
+    this.serviceUpdate.OtherAvatar(client, room );
     if (!room.gameActive) {
       room.gameActive = true;
       const speed = INTERVAL;
