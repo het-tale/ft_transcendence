@@ -47,7 +47,7 @@ export class ChatController {
     @Param('username') username: string,
     @Req() request: { user: User },
   ) {
-    return this.dmService.deleteDm(username, request.user);
+    return await this.dmService.deleteDm(username, request.user);
   }
 
   @Get('search-conversations/:startsWith')
