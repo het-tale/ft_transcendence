@@ -82,19 +82,17 @@ export class GameUpdate {
       if (room.rounds === 0) this.dataupdatetostop(room, activeSockets);
       else this.resetBall(room.ball, player, otherPlayer);
     }
-    // server.to(room.roomName).emit('UPDATE', {');
-    server.to(room.roomName).emit('UPDATE', {
+    playerSocket?.emit('UPDATE', {
       ball: room.ball,
       paddle: playerPaddle,
       otherPaddle: otherPaddle,
       who: playerSocket?.id
     });
-    // server.to(room.players[1].socket?.id).emit('UPDATE', {
-    //   ball: room.ball,
-    //   paddle: otherPaddle,
-    //   otherPaddle: playerPaddle,
-    //   who: playerSocket?.id
-    // });
+    otherPlayerSocket?.emit('UPDATE', {
+      ball: room.ball,
+      paddle: otherPaddle,
+      otherPaddle: playerPaddle,
+    });
   }
 
   async updateGamerobot(room: Room, activeSockets: Map<Socket, User>, server: Server) {
@@ -105,6 +103,13 @@ export class GameUpdate {
     room.players[1].paddle.y = Math.max(0, Math.min(room.players[1].paddle.y, maxY));
 
     this.colisionrobot(room, activeSockets, server);
+
+    if (
+      room.ball.y - room.ball.radius <= 0 ||
+      room.ball.y + room.ball.radius >= CONTAINERHIEGHT
+    ) {
+      room.ball.dy *= -1;
+    }
     if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL) {
       room.lastspeedincrease = Date.now();
       room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
@@ -333,9 +338,14 @@ export class GameUpdate {
       select: {
         id: true,
       },
-      orderBy: {
-        lp: 'desc',
-      },
+      orderBy: [
+        {
+          lp: 'desc',
+        },
+        {
+          id: 'asc',
+        },
+      ],
     });
     for (let i = 0; i < users.length; i++) {
       await this.prisma.user.update({

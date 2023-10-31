@@ -104,8 +104,8 @@ export class DMService {
     }
 
     let { conversation, name } = await this.getConversationByParticipants(
-      user1.username,
-      user2.username,
+      user1.email,
+      user2.email,
     );
     if (!conversation) {
       conversation = await this.prisma.conversation.create({
@@ -124,7 +124,7 @@ export class DMService {
         },
       });
     }
-    name = `${user1.username} and ${user2.username}`;
+    name = `${user1.email} and ${user2.email}`;
     await this.prisma.conversation.update({
       where: {
         id: conversation.id,
@@ -158,8 +158,8 @@ export class DMService {
       throw new HttpException('user not found', 404);
     }
     const { conversation } = await this.getConversationByParticipants(
-      user.username,
-      username,
+      user.email,
+      user1.email,
     );
     if (!conversation) {
       throw new HttpException('no conversation found', 404);
@@ -185,9 +185,17 @@ export class DMService {
   }
   async deleteDm(username: string, user: User) {
     try {
+      const user1 = await this.prisma.user.findUnique({
+        where: {
+          username,
+        },
+      });
+      if (!user1) {
+        throw new HttpException('user not found', 404);
+      }
       const { conversation } = await this.getConversationByParticipants(
-        user.username,
-        username,
+        user.email,
+        user1.email,
       );
       if (!conversation) {
         throw new HttpException('no conversation found', 404);
@@ -235,9 +243,14 @@ export class DMService {
   async deleteConversation(username: string, user: User) {
     try {
       await this.deleteDm(username, user);
+      const user1 = await this.prisma.user.findUnique({
+        where: {
+          username,
+        },
+      });
       const { conversation } = await this.getConversationByParticipants(
-        user.username,
-        username,
+        user.email,
+        user1.email,
       );
       if (
         conversation.isDeletedBy !== user.id &&

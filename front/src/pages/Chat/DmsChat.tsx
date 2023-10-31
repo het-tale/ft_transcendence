@@ -107,6 +107,7 @@ const DmsChat = (props: any) => {
         props.setRender(!props.render);
     });
 
+    const navigate = useNavigate();
     const handleClearDeleteChat = async (clearOrDelete: string) => {
         const str =
             clearOrDelete === 'clear'
@@ -125,6 +126,7 @@ const DmsChat = (props: any) => {
                 props.setRender(!props.render);
                 if (clearOrDelete === 'delete') {
                     props.setUserDm({});
+                    navigate('/chat/rooms-dms');
                 }
             }
         } catch (error: any) {
@@ -143,7 +145,6 @@ const DmsChat = (props: any) => {
     const handleProfile = () => {
         <Link to="/user-profile" />;
     };
-    const navigate = useNavigate();
     const handleSendGameInvitation = () => {
         socketGame.emit('InvitePlayer', props.userDm?.id);
         props.setRender(!props.render);

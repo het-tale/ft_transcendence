@@ -26,32 +26,7 @@ const EditUserNameBody = (props: EditUserNameBodyProps) => {
             name: data.username
         });
         renderData.setRenderData(!renderData.renderData);
-        // const sentData = {
-        //     name: data.username
-        // };
-        // try {
-        //     const response = await client.post(
-        //         `user/change-username`,
-        //         sentData,
-        //         {
-        //             headers: {
-        //                 Authorization: 'Bearer ' + localStorage.getItem('token')
-        //             }
-        //         }
-        //     );
-        //     renderData.setRenderData(!renderData.renderData);
-        //     props.onClose();
-        // } catch (error: any) {
-        //     toast({
-        //         title: 'Error',
-        //         description: error.response.data.message,
-        //         status: 'error',
-        //         duration: 9000,
-        //         isClosable: true,
-        //         position: 'bottom-right'
-        //     });
-        //     props.onClose();
-        // }
+        props.onClose();
     };
     return (
         <form

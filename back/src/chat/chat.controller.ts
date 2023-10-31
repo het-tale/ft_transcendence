@@ -10,18 +10,18 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { DMService } from './dm.service';
-import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
-import { EmailConfirmationGuard } from 'src/guards/email-confirmation.guard';
-import { TwoFaVerificationGuard } from 'src/guards/two-fa-verification.guard';
-import { ChannelService } from './channel.service';
-import { User } from '@prisma/client';
-import { FriendsService } from './friends.service';
-import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
+import { User } from '@prisma/client';
 import { UseZodGuard } from 'nestjs-zod';
+import { AdminDto, NameDto, RoomDto, Tadmin, Tname, Troom } from 'src/dto';
+import { EmailConfirmationGuard } from 'src/guards/email-confirmation.guard';
+import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
+import { TwoFaVerificationGuard } from 'src/guards/two-fa-verification.guard';
 import { FileValidationPipe } from 'src/utils/file-validation.pipe';
-import { AdminDto, NameDto, RoomDto, Troom, Tadmin, Tname } from 'src/dto';
+import { ChannelService } from './channel.service';
+import { DMService } from './dm.service';
+import { FriendsService } from './friends.service';
 
 ApiTags('Chat');
 @Controller('chat')

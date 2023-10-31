@@ -55,11 +55,15 @@ export class ChatGateway
     const token = client.handshake.auth.token ?? client.handshake.headers.token;
     try {
       const user = await this.dmService.verifyToken(token);
-      if (!user.username) throw new Error('Username must be provided');
+      if (!user.username) {
+        console.log('Username must be provided');
+        throw new Error('Username must be provided');
+      }
       this.connectedUsers.push({
         clientId: client.id,
         username: user.username,
       });
+      // console.log('connectedUsers', this.connectedUsers);
       await this.dmService.changeUserStatus(user.username, 'online');
       this.io.emit('userOnline', client.id);
       await this.channelService.rejoinRooms(user.id, client);
@@ -199,6 +203,7 @@ export class ChatGateway
       if (obj.isUnlocked)
         this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
     } catch (err) {
+      console.error('heeeere', err);
       client.emit('privateMessageError', err.message);
     }
   }
@@ -227,7 +232,7 @@ export class ChatGateway
     } catch (err) {
       if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2002')
-          err.message = 'duplicate unique data: room name';
+          err.message = 'this channel name is already taken';
       }
       client.emit('roomCreateError', err.message);
     }
@@ -696,10 +701,14 @@ export class ChatGateway
           current.username = data.name;
         }
 
-        return user;
+        return current;
       });
-      this.io.to(client.id).emit('usernameChanged');
+      this.io.emit('usernameChanged');
     } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === 'P2002')
+          err.message = 'this username is already taken';
+      }
       client.emit('usernameChangeError', err.message);
     }
   }

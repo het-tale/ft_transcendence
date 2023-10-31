@@ -4,6 +4,7 @@ import { SocketContext } from '../../../socket';
 import { Channel } from '../../../Types/Channel';
 import { UserType } from '../../../Types/User';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { RenderContext } from '../../../RenderContext';
 
 interface Invitation {
     username: string;
@@ -19,13 +20,16 @@ interface InviteUsersModalProps {
 
 const InviteUsersModal = (props: InviteUsersModalProps) => {
     const socket = React.useContext(SocketContext);
+    const renderData = React.useContext(RenderContext);
     const { register, handleSubmit } = useForm<Invitation>();
     const handleInvitation: SubmitHandler<Invitation> = (data) => {
+        console.log('handleInvitation', data);
         socket.emit('sendRoomInvitation', {
             room: props.channelDm?.name,
             target: data.username
         });
         props.setRender && props.setRender(!props.render);
+        renderData.setRenderData(!renderData.renderData);
         props.onClose();
     };
 
