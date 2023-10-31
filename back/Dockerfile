@@ -1,6 +1,7 @@
 FROM node:18
 
 RUN npm install -g npm@latest
+RUN npm install -g openai
 
 COPY ./back/* /back/
 

@@ -29,6 +29,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { AchievementsService } from './achievements.service';
 import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import { BadRequestTransformationFilter } from './validation.filter';
+import { ChatbotService } from 'src/chatbot/chatbot.service';
 
 @UseFilters(BadRequestTransformationFilter)
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -41,6 +42,7 @@ export class ChatGateway
     private channelService: ChannelService,
     private friendsService: FriendsService,
     private achievementsService: AchievementsService,
+    private chatbotService: ChatbotService,
   ) {}
   @WebSocketServer() io: Server;
   private connectedUsers: { clientId: string; username: string }[] = [];
@@ -118,6 +120,47 @@ export class ChatGateway
     );
   }
 
+  // @SubscribeMessage('privateMessageROBOT')
+  // async handlePrivateMessageROBOT(
+  //   @MessageBody() data: TDM,
+  //   @ConnectedSocket() client: Socket,
+  // ) {
+  //   try {
+  //     if (data.message === '') return;
+  //     const sender = this.connectedUsers.find(
+  //       (user) => user.clientId === client.id,
+  //     );
+  //     const receiver = this.connectedUsers.find(
+  //       (user) => user.username === data.to,
+  //     );
+  //     const sentAt = new Date();
+  //     let isPending = true;
+  //     if (receiver) isPending = false;
+  //     await this.dmService.saveMessage({
+  //       sender: sender.username,
+  //       receiver: data.to,
+  //       message: data.message,
+  //       date: sentAt,
+  //       isPending,
+  //     });
+
+  //     console.log('Message is for the chatbot');
+  //     const userMessage = data.message;
+
+  //     const chatbotResponse = await this.chatbotService.getChatbotResponse(userMessage, 'text-davinci-003', 0.7);
+  //     console.log('chatbotResponse', chatbotResponse);
+
+  //     const data2 = {
+  //       to: 'ROBOT',
+  //       message: chatbotResponse,
+  //     };
+  //     this.handlePrivateMessage(data2, client);
+  //   }
+  //   catch (err) {
+  //     client.emit('privateMessageError', err.message);
+  //   }
+  // }
+
   @SubscribeMessage('privateMessage')
   async handlePrivateMessage(
     @MessageBody() data: TDM,
@@ -131,9 +174,10 @@ export class ChatGateway
       const receiver = this.connectedUsers.find(
         (user) => user.username === data.to,
       );
+
       const sentAt = new Date();
       let isPending = true;
-      if (receiver) isPending = false;
+      if (receiver || data.to === 'ROBOT') isPending = false;
       await this.dmService.saveMessage({
         sender: sender.username,
         receiver: data.to,
@@ -147,6 +191,8 @@ export class ChatGateway
           message: data.message,
         });
       }
+      if (data.to === 'ROBOT')
+        await this.dmService.handleRobotResponse(data.message, sender.username);
       this.io.to(client.id).emit('privateMessage', {
         from: sender.username,
         message: data.message,

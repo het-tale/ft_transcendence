@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Socket } from 'socket.io';
 import { User } from '@prisma/client';
-import { GameData, OTHERPADDLE, PADDLE, Player, Room } from './types';
+import { GameData, OTHERPADDLE, PADDLE, Paddle, Player, Room } from './types';
 import { GameStartEvent } from './game-start-event';
 import { Server } from 'socket.io';
 import { set } from 'nestjs-zod/z';
@@ -57,6 +57,8 @@ export class Invitations {
     const name = Math.random().toString(36).substring(7)
     const invitationRoom = new Room(`${name}_${sender.id}_${receiver.id}`);
     invitationRoom.isinvit = true;
+    const padd = new Paddle(PADDLE.x, PADDLE.y, PADDLE.width, PADDLE.height, PADDLE.dy);
+    const otherpad = new Paddle(OTHERPADDLE.x, OTHERPADDLE.y, OTHERPADDLE.width, OTHERPADDLE.height, OTHERPADDLE.dy);
 
 
     console.log('\x1b[32m%s\x1b[0m', 'sending invit ' + invitationRoom.roomName);
@@ -66,7 +68,7 @@ export class Invitations {
       1,
       sender.id,
       client,
-      OTHERPADDLE,
+      otherpad,
       invitationRoom.roomName,
       0,
     );
@@ -95,7 +97,7 @@ export class Invitations {
     key?.emit('ReceiveInvitation', invitationData);
     const gamedata: GameData = {
       playerpad: player.paddle,
-      otherpad: PADDLE,
+      otherpad: padd,
       ball: invitationRoom.ball,
       playerScore: 0,
       otherScore: 0,
@@ -124,6 +126,7 @@ export class Invitations {
     rooms: Map<string, Room>,
     roomName: string,
     activeSockets: Map<Socket, User>,
+    server: Server
   ) {
 
     console.log('\x1b[32m%s\x1b[0m', 'acceptInvitation' + roomName);
@@ -200,12 +203,14 @@ export class Invitations {
         status: 'accepted',
       },
     });
-    const player = new Player(2, receiver_player.id, client, PADDLE, roomName, 0);
+    const padd = new Paddle(PADDLE.x, PADDLE.y, PADDLE.width, PADDLE.height, PADDLE.dy);
+    const otherpad = new Paddle(OTHERPADDLE.x, OTHERPADDLE.y, OTHERPADDLE.width, OTHERPADDLE.height, OTHERPADDLE.dy);
+    const player = new Player(2, receiver_player.id, client, padd, roomName, 0);
     invitationRoom.players.push(player);
     client.join(roomName);
     const gamedata: GameData = {
       playerpad: player.paddle,
-      otherpad: OTHERPADDLE,
+      otherpad: otherpad,
       ball: invitationRoom.ball,
       playerScore: 0,
       otherScore: 0,
@@ -234,6 +239,7 @@ export class Invitations {
           client,
           rooms,
           activeSockets,
+          server,
         );
       });
     }, 2000);
@@ -243,7 +249,7 @@ export class Invitations {
     client: Socket,
     rooms: Map<string, Room>,
     roomName: string,
-    activeSockets: Map<Socket, User>,
+    activeSockets: Map<Socket, User>
   ) {
     const room = rooms.get(roomName);
     if (room) {

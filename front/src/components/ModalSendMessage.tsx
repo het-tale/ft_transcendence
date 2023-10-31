@@ -10,6 +10,12 @@ const ModalSendMessage = (props: any) => {
     const socket = React.useContext(SocketContext);
     const { register, handleSubmit } = useForm<SentData>();
     const handleSendMessage: SubmitHandler<SentData> = (data) => {
+        // if (data.to === 'ROBOT') {
+        //     socket.emit('privateMessageROBOT', {
+        //         message: data.message,
+        //         to: data.to
+        //     });
+        // } else
         socket.emit('privateMessage', {
             message: data.message,
             to: data.to

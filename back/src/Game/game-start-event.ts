@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import { GameData, INTERVAL, OTHERPADDLE, PADDLE, Player, Room } from './types';
+import { GameData, INTERVAL, OTHERPADDLE, PADDLE, Paddle, Player, Room } from './types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
@@ -31,7 +31,7 @@ export class GameStartEvent {
     if (user.status === 'InGame') {
       setTimeout(() => {
         client.emit('InvitationDeclined', 'you are already in an other game !!');
-        client.disconnect();
+        activeSockets.delete(client)
       }, 2000);
 
       return;
@@ -45,6 +45,8 @@ export class GameStartEvent {
         },
       });
     }
+    const padd = new Paddle(PADDLE.x, PADDLE.y, PADDLE.width, PADDLE.height, PADDLE.dy);
+    const otherpad = new Paddle(OTHERPADDLE.x, OTHERPADDLE.y, OTHERPADDLE.width, OTHERPADDLE.height, OTHERPADDLE.dy);
     for (const existRoom of rooms.values()) {
       if (existRoom.players.length === 1 && !existRoom.isinvit) {
         exist = true;
@@ -53,7 +55,7 @@ export class GameStartEvent {
           2,
           user.id,
           client,
-          PADDLE,
+          padd,
           existRoom.roomName,
           0,
         );
@@ -61,17 +63,17 @@ export class GameStartEvent {
         client.join(existRoom.roomName);
         const gamedata: GameData = {
           playerpad: player.paddle,
-          otherpad: OTHERPADDLE,
+          otherpad: otherpad,
           ball: existRoom.ball,
           playerScore: 0,
           otherScore: 0,
           rounds: existRoom.rounds,
           id: 2,
         };
-        client.emit('JoinRoom', existRoom.roomName);
-        client.emit('InitGame', gamedata);
+        server.to(client.id).emit('JoinRoom', existRoom.roomName);
+        server.to(client.id).emit('InitGame', gamedata);
         server.to(existRoom.roomName).emit('StartGame', existRoom.roomName);
-        this.startGame(false, existRoom, client, rooms, activeSockets);
+        this.startGame(false, existRoom, client, rooms, activeSockets, server);
         break;
       }
     }
@@ -85,7 +87,7 @@ export class GameStartEvent {
         1,
         user.id,
         client,
-        OTHERPADDLE,
+        otherpad,
         room.roomName,
         0,
       );
@@ -94,7 +96,7 @@ export class GameStartEvent {
 
       const gamedata: GameData = {
         playerpad: player.paddle,
-        otherpad: PADDLE,
+        otherpad: padd,
         ball: room.ball,
         playerScore: 0,
         otherScore: 0,
@@ -113,6 +115,8 @@ export class GameStartEvent {
     activeSockets: Map<Socket, User>,
     server: Server,
   ) {
+    try
+    {
     const user_player = activeSockets.get(client);
     if (!user_player) throw new Error('undefined user ');
     const user = await this.prisma.user.findUnique({
@@ -124,7 +128,7 @@ export class GameStartEvent {
     if (user.status === 'InGame') {
       setTimeout(() => {
         client.emit('InvitationDeclined', 'you are already in an other game !!');
-        client.disconnect();
+        // activeSockets.delete(client);
       }, 2000);
 
       return;
@@ -138,13 +142,16 @@ export class GameStartEvent {
         },
       });
     }
+    console.log('status changed to ingame ')
     const room = new Room(Math.random().toString(36).substring(7));
+    const padd = new Paddle(PADDLE.x, PADDLE.y, PADDLE.width, PADDLE.height, PADDLE.dy);
+    const otherpad = new Paddle(OTHERPADDLE.x, OTHERPADDLE.y, OTHERPADDLE.width, OTHERPADDLE.height, OTHERPADDLE.dy);
     rooms.set(room.roomName, room);
     const player = new Player(
       1,
       user.id,
       client,
-      OTHERPADDLE,
+      otherpad,
       room.roomName,
       0,
     );
@@ -153,13 +160,13 @@ export class GameStartEvent {
         username: 'ROBOT',
       },
     });
-    const robot = new Player(2, robotUser.id, null, PADDLE, room.roomName, 0);
+    const robot = new Player(2, robotUser.id, null, padd, room.roomName, 0);
     room.players.push(player);
     room.players.push(robot);
     client.join(room.roomName);
     const gamedata: GameData = {
       playerpad: player.paddle,
-      otherpad: OTHERPADDLE,
+      otherpad: otherpad,
       ball: room.ball,
       playerScore: 0,
       otherScore: 0,
@@ -168,8 +175,14 @@ export class GameStartEvent {
     };
     client.emit('JoinRoom', room.roomName);
     client.emit('InitGame', gamedata);
+    console.log(user.username, 'startting game at ', room.roomName)
     server.to(room.roomName).emit('StartGame', room.roomName);
-    this.startGame(true, room, client, rooms, activeSockets);
+    this.startGame(true, room, client, rooms, activeSockets, server);
+  } catch(error)
+    {
+    return ;
+
+  }
   }
 
   async startGame(
@@ -178,8 +191,9 @@ export class GameStartEvent {
     client: Socket,
     rooms: Map<string, Room>,
     activeSockets: Map<Socket, User>,
+    server: Server,
   ) {
-    this.serviceUpdate.OtherAvatar(client, room, activeSockets);
+    this.serviceUpdate.OtherAvatar(client, room );
     if (!room.gameActive) {
       room.gameActive = true;
       const speed = INTERVAL;
@@ -190,8 +204,8 @@ export class GameStartEvent {
           return;
         }
         robot
-          ? this.serviceUpdate.updateGamerobot(room, activeSockets)
-          : this.serviceUpdate.updateGame(room, activeSockets);
+          ? this.serviceUpdate.updateGamerobot(room, activeSockets, server)
+          : this.serviceUpdate.updateGame(room, activeSockets, server);
       });
       this.serviceInit.createMatch(room);
     }
