@@ -263,6 +263,8 @@ export const Layout = ({ children }: Props) => {
                 isClosable: true,
                 position: 'bottom-right'
             });
+            //reload page
+            window.location.reload();
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('usernameChangeError', (data: string) => {
