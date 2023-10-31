@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import { GameData, INTERVAL, OTHERPADDLE, PADDLE, Player, Room } from './types';
+import { GameData, INTERVAL, OTHERPADDLE, PADDLE, Paddle, Player, Room } from './types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
@@ -45,6 +45,8 @@ export class GameStartEvent {
         },
       });
     }
+    const padd = new Paddle(PADDLE.x, PADDLE.y, PADDLE.width, PADDLE.height, PADDLE.dy);
+    const otherpad = new Paddle(OTHERPADDLE.x, OTHERPADDLE.y, OTHERPADDLE.width, OTHERPADDLE.height, OTHERPADDLE.dy);
     for (const existRoom of rooms.values()) {
       if (existRoom.players.length === 1 && !existRoom.isinvit) {
         exist = true;
@@ -53,7 +55,7 @@ export class GameStartEvent {
           2,
           user.id,
           client,
-          PADDLE,
+          padd,
           existRoom.roomName,
           0,
         );
@@ -61,7 +63,7 @@ export class GameStartEvent {
         client.join(existRoom.roomName);
         const gamedata: GameData = {
           playerpad: player.paddle,
-          otherpad: OTHERPADDLE,
+          otherpad: otherpad,
           ball: existRoom.ball,
           playerScore: 0,
           otherScore: 0,
@@ -85,7 +87,7 @@ export class GameStartEvent {
         1,
         user.id,
         client,
-        OTHERPADDLE,
+        otherpad,
         room.roomName,
         0,
       );
@@ -94,7 +96,7 @@ export class GameStartEvent {
 
       const gamedata: GameData = {
         playerpad: player.paddle,
-        otherpad: PADDLE,
+        otherpad: padd,
         ball: room.ball,
         playerScore: 0,
         otherScore: 0,
@@ -142,12 +144,14 @@ export class GameStartEvent {
     }
     console.log('status changed to ingame ')
     const room = new Room(Math.random().toString(36).substring(7));
+    const padd = new Paddle(PADDLE.x, PADDLE.y, PADDLE.width, PADDLE.height, PADDLE.dy);
+    const otherpad = new Paddle(OTHERPADDLE.x, OTHERPADDLE.y, OTHERPADDLE.width, OTHERPADDLE.height, OTHERPADDLE.dy);
     rooms.set(room.roomName, room);
     const player = new Player(
       1,
       user.id,
       client,
-      OTHERPADDLE,
+      otherpad,
       room.roomName,
       0,
     );
@@ -156,13 +160,13 @@ export class GameStartEvent {
         username: 'ROBOT',
       },
     });
-    const robot = new Player(2, robotUser.id, null, PADDLE, room.roomName, 0);
+    const robot = new Player(2, robotUser.id, null, padd, room.roomName, 0);
     room.players.push(player);
     room.players.push(robot);
     client.join(room.roomName);
     const gamedata: GameData = {
       playerpad: player.paddle,
-      otherpad: OTHERPADDLE,
+      otherpad: otherpad,
       ball: room.ball,
       playerScore: 0,
       otherScore: 0,

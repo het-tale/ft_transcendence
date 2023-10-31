@@ -82,19 +82,19 @@ export class GameUpdate {
       if (room.rounds === 0) this.dataupdatetostop(room, activeSockets);
       else this.resetBall(room.ball, player, otherPlayer);
     }
-    console.log(playerSocket?.id);
-    server.to(playerSocket?.id).emit('UPDATE', {
+    // server.to(room.roomName).emit('UPDATE', {');
+    server.to(room.roomName).emit('UPDATE', {
       ball: room.ball,
       paddle: playerPaddle,
       otherPaddle: otherPaddle,
       who: playerSocket?.id
     });
-    server.to(otherPlayerSocket?.id).emit('UPDATE', {
-      ball: room.ball,
-      paddle: otherPaddle,
-      otherPaddle: playerPaddle,
-      who: playerSocket?.id
-    });
+    // server.to(room.players[1].socket?.id).emit('UPDATE', {
+    //   ball: room.ball,
+    //   paddle: otherPaddle,
+    //   otherPaddle: playerPaddle,
+    //   who: playerSocket?.id
+    // });
   }
 
   async updateGamerobot(room: Room, activeSockets: Map<Socket, User>, server: Server) {

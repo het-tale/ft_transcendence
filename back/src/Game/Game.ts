@@ -136,8 +136,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
         client,
         this.rooms,
         roomId,
-        this.activeSockets,
-        this.server,
+        this.activeSockets
       );
     } catch (e) {
       return;
