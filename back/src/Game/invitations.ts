@@ -235,6 +235,7 @@ export class Invitations {
           client,
           rooms,
           activeSockets,
+          server,
         );
       });
     }, 2000);

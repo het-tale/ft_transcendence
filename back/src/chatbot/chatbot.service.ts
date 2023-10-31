@@ -10,39 +10,17 @@ export class ChatbotService {
     this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   }
 
-  async getChatbotResponse(userMessage: string ): Promise<string> {
-    const userPrompt = [
-      { role: 'chatbot', content: 'The following is a conversation with a chatbot assistant of enligne games and telling some jokes . The assistant is helpful, creative, clever, and very friendly.' },
-      { role: 'user', content: userMessage },
-    ];
-
+  async getChatbotResponse(userMessage: string ): Promise<string>  {
     try {
-      const prompt = userPrompt.map((m) => m.content);
-      const response = await this.openai.completions.create({
-        model: 'davinci-instruct-beta',
-        prompt: prompt.join('\n'),
-        temperature: 0.5,
-        max_tokens: 200,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.3,
-        stop: '',
+      const response = await this.openai.chat.completions.create({
+        messages: [{ role: 'system', content: 'you are a chatbot af a twinpong which is a pong game created by Mchliyah, Slahrach and Het-tale, you can talk about 42 network ,your name is Laarbi you are a student in 1337 codding school in bengurir morocco and you are very funny. all your answers are short' },
+      { role: 'user', content: userMessage}],
+        model: 'gpt-3.5-turbo',
       });
-
       if (response.choices && response.choices.length > 0) {
-        const chatbotResponse = response.choices[0].text;
-        const chatbotResponseArray = chatbotResponse.split('\n');
-        console.log('chatbotResponse', chatbotResponseArray);
-        for (const message of chatbotResponseArray) {
-          if (message.trim() !== '') {
-            return message;
-          }
-        }
-        console.log('chatbotResponse', chatbotResponseArray);
-        return chatbotResponse;
-      } else {
-        throw new Error('Chatbot response is empty.');
+        return response.choices[0].message?.content;
       }
+      return "sorry something went wrong";
     } catch (error) {
       Logger.error('Error occurred while getting the chatbot response', error, 'ChatbotService');
       throw new Error('An error occurred while getting the chatbot response');

@@ -68,10 +68,10 @@ export class GameStartEvent {
           rounds: existRoom.rounds,
           id: 2,
         };
-        client.emit('JoinRoom', existRoom.roomName);
-        client.emit('InitGame', gamedata);
+        server.to(client.id).emit('JoinRoom', existRoom.roomName);
+        server.to(client.id).emit('InitGame', gamedata);
         server.to(existRoom.roomName).emit('StartGame', existRoom.roomName);
-        this.startGame(false, existRoom, client, rooms, activeSockets);
+        this.startGame(false, existRoom, client, rooms, activeSockets, server);
         break;
       }
     }
@@ -173,7 +173,7 @@ export class GameStartEvent {
     client.emit('InitGame', gamedata);
     console.log(user.username, 'startting game at ', room.roomName)
     server.to(room.roomName).emit('StartGame', room.roomName);
-    this.startGame(true, room, client, rooms, activeSockets);
+    this.startGame(true, room, client, rooms, activeSockets, server);
   } catch(error)
     {
     return ;
@@ -187,6 +187,7 @@ export class GameStartEvent {
     client: Socket,
     rooms: Map<string, Room>,
     activeSockets: Map<Socket, User>,
+    server: Server,
   ) {
     this.serviceUpdate.OtherAvatar(client, room );
     if (!room.gameActive) {
@@ -199,8 +200,8 @@ export class GameStartEvent {
           return;
         }
         robot
-          ? this.serviceUpdate.updateGamerobot(room, activeSockets)
-          : this.serviceUpdate.updateGame(room, activeSockets);
+          ? this.serviceUpdate.updateGamerobot(room, activeSockets, server)
+          : this.serviceUpdate.updateGame(room, activeSockets, server);
       });
       this.serviceInit.createMatch(room);
     }

@@ -17,6 +17,7 @@ import { stopGame } from './Game_Stop';
 import { TAchievement } from 'src/dto';
 import { Injectable } from '@nestjs/common';
 import { GameInit } from './Game-Init';
+import { Server } from 'socket.io';
 
 @Injectable()
 export class GameUpdate {
@@ -61,7 +62,7 @@ export class GameUpdate {
     }
   }
 
-  async colisionrobot(room: Room, activeSockets: Map<Socket, User>) {
+  async colisionrobot(room: Room, activeSockets: Map<Socket, User>, server: Server) {
     const player = room.players[0];
     const otherPlayer = room.players[1];
     const playerSocket = player.socket;
@@ -81,32 +82,29 @@ export class GameUpdate {
       if (room.rounds === 0) this.dataupdatetostop(room, activeSockets);
       else this.resetBall(room.ball, player, otherPlayer);
     }
-    playerSocket?.emit('UPDATE', {
+    console.log(playerSocket?.id);
+    server.to(playerSocket?.id).emit('UPDATE', {
       ball: room.ball,
       paddle: playerPaddle,
       otherPaddle: otherPaddle,
+      who: playerSocket?.id
     });
-    otherPlayerSocket?.emit('UPDATE', {
+    server.to(otherPlayerSocket?.id).emit('UPDATE', {
       ball: room.ball,
       paddle: otherPaddle,
       otherPaddle: playerPaddle,
+      who: playerSocket?.id
     });
   }
 
-  async updateGamerobot(room: Room, activeSockets: Map<Socket, User>) {
+  async updateGamerobot(room: Room, activeSockets: Map<Socket, User>, server: Server) {
     const robotpaddle = room.players[1].paddle;
     const targetY = room.ball.y - robotpaddle.height / 2;
     room.ball.x > CONTAINERWIDTH / 2? room.players[1].paddle.y += (targetY - room.players[1].paddle.y) * 0.08 : null
     const maxY = CONTAINERHIEGHT - room.players[1].paddle.height;
     room.players[1].paddle.y = Math.max(0, Math.min(room.players[1].paddle.y, maxY));
-  
-    if (
-      room.ball.y - room.ball.radius <= 0 ||
-      room.ball.y + room.ball.radius >= CONTAINERHIEGHT
-    ) {
-      room.ball.dy *= -1;
-    }
-    this.colisionrobot(room, activeSockets);
+
+    this.colisionrobot(room, activeSockets, server);
     if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL) {
       room.lastspeedincrease = Date.now();
       room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
@@ -114,6 +112,12 @@ export class GameUpdate {
     }
     room.ball.x += room.ball.dx;
     room.ball.y += room.ball.dy;
+    if (
+      room.ball.y - room.ball.radius <= 0 ||
+      room.ball.y + room.ball.radius >= CONTAINERHIEGHT
+    ) {
+      room.ball.dy *= -1;
+    }
   }
 
   async UpdatePaddle(client: Socket, eventData: any, rooms: Map<string, Room>) {
@@ -149,7 +153,8 @@ export class GameUpdate {
     player.socket?.emit('OTHER AVATAR', otherUser.avatar, otherUser.username);
   }
 
-  async updateGame(room: Room, activeSockets: Map<Socket, User>) {
+  async updateGame(room: Room, activeSockets: Map<Socket, User>, server: Server) {
+    this.colisionrobot(room, activeSockets, server);
     if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL) {
       room.lastspeedincrease = Date.now();
       room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
@@ -164,7 +169,6 @@ export class GameUpdate {
       // Reverse the vertical velocity of the ball
       room.ball.dy *= -1;
     }
-    this.colisionrobot(room, activeSockets);
   }
 
   async getclient(client: Socket, activeSockets: Map<Socket, User>) {
