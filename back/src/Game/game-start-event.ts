@@ -128,7 +128,7 @@ export class GameStartEvent {
     if (user.status === 'InGame') {
       setTimeout(() => {
         client.emit('InvitationDeclined', 'you are already in an other game !!');
-        // activeSockets.delete(client);
+        activeSockets.delete(client);
       }, 2000);
 
       return;
