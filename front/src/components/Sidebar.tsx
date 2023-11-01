@@ -63,6 +63,19 @@ const Sidebar = (props: sidebarProps) => {
                 position: 'bottom-right'
             });
         });
+        socket.on('usernameChanged', () => {
+            toast({
+                title: 'success',
+                description: 'Username changed',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            //reload page
+            // window.location.reload();
+            renderData.setRenderData(!renderData.renderData);
+        });
 
         return () => {
             socket.off('userOffline');
@@ -71,6 +84,7 @@ const Sidebar = (props: sidebarProps) => {
             socket.off('roomCreateError');
             socket.off('roomJoined');
             socket.off('roomJoinError');
+            socket.off('usernameChanged');
         };
     });
 

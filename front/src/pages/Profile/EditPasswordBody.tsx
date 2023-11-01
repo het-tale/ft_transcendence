@@ -38,14 +38,28 @@ const EditPasswordBody = (props: EditPasswordBodyProps) => {
             props.onClose();
         } catch (error: any) {
             console.log('error', error);
-            toast({
-                title: 'Error',
-                description: error.response.data.message,
-                status: 'error',
-                duration: 9000,
-                isClosable: true,
-                position: 'bottom-right'
-            });
+            const errors = error?.response?.data?.errors;
+            if (errors) {
+                for (let index = 0; index < errors?.length; index++) {
+                    toast({
+                        title: 'Error.',
+                        description: errors[index].message,
+                        status: 'error',
+                        duration: 5000,
+                        isClosable: true,
+                        position: 'bottom-right'
+                    });
+                }
+            } else {
+                toast({
+                    title: 'Error.',
+                    description: error?.response?.data?.message,
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                    position: 'bottom-right'
+                });
+            }
             props.onClose();
         }
     };
