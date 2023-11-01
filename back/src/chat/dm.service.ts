@@ -442,12 +442,19 @@ export class DMService {
       else throw new Error(error.message);
     }
   }
-  async handleRobotResponse(message: string, username: string, userId: number) {
-    const chatbotResponse = await this.chatbot.getChatbotResponse(message, userId);
+  async handleRobotResponse(message: string, username: string) {
+    const userId = (
+      await this.prisma.user.findUnique({
+        where: {
+          username,
+        },
+      })
+    ).id;
+    const botResponse = await this.chatbot.getChatbotResponse(message, userId);
     this.saveMessage({
       sender: 'ROBOT',
       receiver: username,
-      message: chatbotResponse,
+      message: botResponse,
       date: new Date(),
       isPending: false,
     });
