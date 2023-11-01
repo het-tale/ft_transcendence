@@ -49,6 +49,16 @@ const DmsChat = (props: any) => {
     } = useDisclosure();
     const [user, setUser] = React.useState<UserType>();
     const [blocked, setBlocked] = React.useState(false);
+    const location = useLocation();
+    let userId = location.pathname.split('/')[3];
+    React.useEffect(() => {
+        async function fetchUserData() {
+            if (props.userDm?.id !== undefined || Number(userId) === 0) return;
+            const userData = await UserId(Number(userId));
+            props.setUserDm(userData);
+        }
+        fetchUserData();
+    }, [props.render, renderData.renderData]);
     useEffect(() => {
         async function fetchUserData() {
             const userData = await User();
@@ -60,14 +70,16 @@ const DmsChat = (props: any) => {
     const [dms, setDms] = React.useState<UserType[]>([]);
     const socket = React.useContext(SocketContext);
     const socketGame = React.useContext(SocketGameContext);
-    const [messages, setMessages] = React.useState<MessageType[]>([]);
+    const [messages, setMessages] = React.useState<MessageType[] | undefined>(
+        []
+    );
     const chatContainerRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
         const res = GetDms().then((data) => {
             setDms(data);
         });
         const res2 = props.userDm
-            ? GetMessages(props.userDm?.username).then((data) => {
+            ? GetMessages(props.userDm?.id).then((data) => {
                   setMessages(data);
               })
             : null;
@@ -150,16 +162,6 @@ const DmsChat = (props: any) => {
         props.setRender(!props.render);
         navigate(`/game/`);
     };
-    const location = useLocation();
-    let userId = location.pathname.split('/')[3];
-    React.useEffect(() => {
-        async function fetchUserData() {
-            if (props.userDm?.id !== undefined || Number(userId) === 0) return;
-            const userData = await UserId(Number(userId));
-            props.setUserDm(userData);
-        }
-        fetchUserData();
-    }, [props.render]);
     if (!props.userDm && Number(userId) !== 0) return <></>;
     if (
         Number(userId) === 0 &&

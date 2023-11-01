@@ -28,9 +28,10 @@ export default function Chat(props: BrowseChannelsProps) {
     }, [render, props.update, renderData.renderData]);
     useEffect(() => {
         socket.on('privateMessage', (data: any) => {
-            console.log('privateMessage', data);
+            console.log('privateMessage Data', data);
             renderData.setCount && renderData.setCount(renderData.count! + 1);
             setRender(!render);
+            renderData.setRenderData(!renderData.renderData);
         });
         socket.on('roomCreateError', (data: any) => {
             console.log('roomCreateError', data);
@@ -275,8 +276,10 @@ export default function Chat(props: BrowseChannelsProps) {
     return (
         <Dms
             socket={socket}
-            render={render}
-            setRender={setRender}
+            // render={render}
+            // setRender={setRender}
+            render={renderData.renderData}
+            setRender={renderData.setRenderData}
             toast={toast}
             dms={dms}
             setDms={setDms}

@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import '../../css/chat/Right.css';
 import { SocketContext } from '../../socket';
 import { RenderContext } from '../../RenderContext';
+import UserId from './GetUserById';
 
 const TypingBar = (props: any) => {
     const [message, setMessage] = useState('');
@@ -9,9 +10,10 @@ const TypingBar = (props: any) => {
     const renderData = useContext(RenderContext);
     // console.log('typing socket', socket);
 
-    const sendMessageHandler = (e: any) => {
+    const sendMessageHandler = async (e: any) => {
         e.preventDefault();
-        console.log('sending message to ', props.userDm.username);
+        const userData = await UserId(props.userDm.id);
+        console.log('sending message to ', userData?.username);
         // if (props.userDm.username === 'ROBOT')
         // {
         //     socket.emit('privateMessageROBOT', {
@@ -20,14 +22,14 @@ const TypingBar = (props: any) => {
         //     })
         // }
         // else {
-             socket.emit('privateMessage', {
+        socket.emit('privateMessage', {
             message: message,
-            to: props.userDm.username
+            to: userData?.username
         });
         // }
         setMessage('');
         props.setRender(!props.render);
-        // renderData.setRenderData(!renderData.renderData);
+        renderData.setRenderData(!renderData.renderData);
     };
     return (
         <form className="typing-bar" onSubmit={sendMessageHandler}>
@@ -37,7 +39,11 @@ const TypingBar = (props: any) => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
             />
-            <button type="submit" className="excludeSubmit" onClick={(e) => sendMessageHandler(e)}>
+            <button
+                type="submit"
+                className="excludeSubmit"
+                onClick={(e) => sendMessageHandler(e)}
+            >
                 <i className="fas fa-paper-plane"></i>
             </button>
         </form>

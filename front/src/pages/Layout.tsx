@@ -266,19 +266,19 @@ export const Layout = ({ children }: Props) => {
             });
             renderData.setRenderData(!renderData.renderData);
         });
-        socket.on('usernameChanged', () => {
-            toast({
-                title: 'success',
-                description: 'Username changed',
-                status: 'success',
-                duration: 5000,
-                isClosable: true,
-                position: 'bottom-right'
-            });
-            //reload page
-            window.location.reload();
-            renderData.setRenderData(!renderData.renderData);
-        });
+        // socket.on('usernameChanged', () => {
+        //     toast({
+        //         title: 'success',
+        //         description: 'Username changed',
+        //         status: 'success',
+        //         duration: 5000,
+        //         isClosable: true,
+        //         position: 'bottom-right'
+        //     });
+        //     //reload page
+        //     // window.location.reload();
+        //     renderData.setRenderData(!renderData.renderData);
+        // });
         socket.on('usernameChangeError', (data: string) => {
             toast({
                 title: 'error',
