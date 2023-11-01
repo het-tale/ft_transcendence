@@ -20,9 +20,14 @@ export class GameStartEvent {
     activeSockets: Map<Socket, User>,
     server: Server,
   ) {
+    try{
     let exist = false;
     const user_player = activeSockets.get(client);
-    if (!user_player) throw new Error('undefined user ');
+    if (!user_player)
+    {
+      client.emit('InvitationDeclined');
+      throw new Error('undefined user ');
+    }
     const user = await this.prisma.user.findFirst({
       where: {
         id: user_player.id,
@@ -109,7 +114,12 @@ export class GameStartEvent {
       client.emit('JoinRoom', room.roomName);
       client.emit('InitGame', gamedata);
     }
+  } catch(error)
+    {
+    return ;
   }
+  }
+
 
   async StartGameEventRobot(
     client: Socket,
@@ -120,7 +130,10 @@ export class GameStartEvent {
     try
     {
     const user_player = activeSockets.get(client);
-    if (!user_player) throw new Error('undefined user ');
+    if (!user_player) {
+      client.emit('InvitationDeclined');
+      throw new Error('undefined user ');
+    }
     const user = await this.prisma.user.findUnique({
       where: {
         id: user_player.id,
