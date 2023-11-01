@@ -80,6 +80,7 @@ export const Layout = ({ children }: Props) => {
                 }
             }
         });
+
         socket.on('roomInvitation', (data: any) => {
             console.log('roomInvitation', data);
             toast({
@@ -139,10 +140,21 @@ export const Layout = ({ children }: Props) => {
             });
             renderData.setRenderData(!renderData.renderData);
         });
-        socketGame.on('InvitationDeclined', () => {
+        socketGame.on('InvitationDeclined', (data: string) => {
             toast({
                 title: 'InvitationDeclined',
-                description: '',
+                description: data,
+                status: 'info',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            renderData.setRenderData(!renderData.renderData);
+        });
+        socketGame.on('GameDeclined', (data: string) => {
+            toast({
+                title: 'GameDeclined',
+                description: data,
                 status: 'info',
                 duration: 9000,
                 isClosable: true,

@@ -67,36 +67,209 @@ export default function Chat(props: BrowseChannelsProps) {
                 position: 'top-right'
             });
         });
-        // socket.on('channelDeleted', () => {
-        //     toast({
-        //         title: 'Success',
-        //         description: 'Channel deleted',
-        //         status: 'success',
-        //         duration: 9000,
-        //         isClosable: true,
-        //         position: 'bottom-right'
-        //     });
-        //     setRender(!render);
-        // });
-        // socket.on('channelDeleteError', (data: string) => {
-        //     toast({
-        //         title: 'Error',
-        //         description: data,
-        //         status: 'error',
-        //         duration: 9000,
-        //         isClosable: true,
-        //         position: 'bottom-right'
-        //     });
-        //     setRender(!render);
-        // });
+        socket.on('channelDeleted', () => {
+            console.log('channelDeleted');
+            toast({
+                title: 'Success',
+                description: 'Channel deleted',
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+        socket.on('channelDeleteError', (data: string) => {
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+        socket.on('adminAddError', (data: any) => {
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+        socket.on('adminAdded', (data: any) => {
+            toast({
+                title: 'Success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            console.log('admin added');
+            setRender(!render);
+        });
+        socket.on('userMuted', (data: any) => {
+            toast({
+                title: 'success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+        socket.on('userMuteError', (data: any) => {
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+        socket.on('userKicked', (data: any) => {
+            console.log('userKicked', data);
+            toast({
+                title: 'success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+        socket.on('userKickError', (data: any) => {
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+
+        socket.on('userUnmuted', (data: any) => {
+            toast({
+                title: 'success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+        socket.on('userUnmuteError', (data: any) => {
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+        socket.on('userBanned', (data: any) => {
+            toast({
+                title: 'success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+        socket.on('userBanError', (data: any) => {
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+
+        socket.on('userUnbanned', (data: any) => {
+            toast({
+                title: 'success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+        socket.on('userUnbanError', (data: any) => {
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+        socket.on('roomLeft', (data: any) => {
+            toast({
+                title: 'success',
+                description: data,
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
+        socket.on('roomLeaveError', (data: any) => {
+            toast({
+                title: 'Error',
+                description: data,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'bottom-right'
+            });
+            setRender(!render);
+        });
         return () => {
             socket.off('privateMessageError');
             socket.off('roomMessageError');
             socket.off('privateMessage');
             socket.off('roomCreateError');
             socket.off('roomMessage');
-            // socket.off('channelDeleted');
-            // socket.off('channelDeleteError');
+            socket.off('channelDeleted');
+            socket.off('channelDeleteError');
+            socket.off('userKicked');
+            socket.off('userKickError');
+            socket.off('userMuted');
+            socket.off('userMuteError');
+            socket.off('userUnmuted');
+            socket.off('userUnmuteError');
+            socket.off('userBanned');
+            socket.off('userBanError');
+            socket.off('userUnbanned');
+            socket.off('userUnbanError');
+            socket.off('roomLeft');
+            socket.off('roomLeaveError');
+            socket.off('adminAddError');
+            socket.off('adminAdded');
         };
     });
     return (

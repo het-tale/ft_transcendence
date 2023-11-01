@@ -83,35 +83,36 @@ const RoomsChat = (props: RoomsChatProps) => {
         socket.emit('deleteChannel', {
             room: props.channelDm?.name
         });
+        props.setRender && props.setRender(!props.render);
     };
-    useEffect(() => {
-        socket.on('channelDeleted', () => {
-            toast({
-                title: 'Success',
-                description: 'Channel Deleted',
-                status: 'success',
-                duration: 9000,
-                isClosable: true,
-                position: 'bottom-right'
-            });
-            props.setRender && props.setRender(!props.render);
-        });
-        socket.on('channelDeleteError', (data: string) => {
-            toast({
-                title: 'Error',
-                description: data,
-                status: 'error',
-                duration: 9000,
-                isClosable: true,
-                position: 'bottom-right'
-            });
-            props.setRender && props.setRender(!props.render);
-        });
-        return () => {
-            socket.off('channelDeleted');
-            socket.off('channelDeleteError');
-        };
-    }, []);
+    // useEffect(() => {
+    //     socket.on('channelDeleted', () => {
+    //         toast({
+    //             title: 'Success',
+    //             description: 'Channel Deleted',
+    //             status: 'success',
+    //             duration: 9000,
+    //             isClosable: true,
+    //             position: 'bottom-right'
+    //         });
+    //         props.setRender && props.setRender(!props.render);
+    //     });
+    //     socket.on('channelDeleteError', (data: string) => {
+    //         toast({
+    //             title: 'Error',
+    //             description: data,
+    //             status: 'error',
+    //             duration: 9000,
+    //             isClosable: true,
+    //             position: 'bottom-right'
+    //         });
+    //         props.setRender && props.setRender(!props.render);
+    //     });
+    //     return () => {
+    //         socket.off('channelDeleted');
+    //         socket.off('channelDeleteError');
+    //     };
+    // }, []);
 
     if (!props.channelDm) return <></>;
     return (
@@ -209,7 +210,13 @@ const RoomsChat = (props: RoomsChatProps) => {
                                                 icon={<BsBoxArrowLeft />}
                                                 onClick={
                                                     room.type === 'protected'
-                                                        ? onOpen2
+                                                        ? () => {
+                                                              onOpen2();
+                                                              props.setRender &&
+                                                                  props.setRender(
+                                                                      !props.render
+                                                                  );
+                                                          }
                                                         : handleDeleteChannel
                                                 }
                                             >
