@@ -51,7 +51,11 @@ export class ChannelService {
         name: channelName,
       },
       include: {
-        messages: true,
+        messages: {
+          orderBy: {
+            sentAt: 'asc',
+          },
+        },
         banned: true,
         participants: true,
       },
@@ -1024,6 +1028,7 @@ export class ChannelService {
     username: string,
     io: Server,
     connected: { clientId: string; username: string }[],
+    password: string,
   ) {
     const user = await this.prisma.user.findUnique({
       where: {
@@ -1047,6 +1052,13 @@ export class ChannelService {
     const isOwner = channel.ownerId === user.id;
     if (!isOwner) {
       throw new Error('user is not the owner');
+    }
+    if (channel.type === 'protected') {
+      if (password === null) throw new Error('password is required');
+      const isPasswordValid = await argon.verify(channel.hash, password);
+      if (!isPasswordValid) {
+        throw new Error('invalid password');
+      }
     }
     await Promise.all(
       channel.participants.map(async (participant) => {

@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   UsePipes,
   ValidationPipe,
+  Header,
 } from '@nestjs/common';
 import { SecurityService } from './security.service';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
@@ -25,8 +26,6 @@ import { UseZodGuard } from 'nestjs-zod';
 import { TwoFaVerificationGuard } from 'src/guards/two-fa-verification.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileValidationPipe } from 'src/utils/file-validation.pipe';
-import { Header } from '@nestjs/common';
-
 @ApiTags('Authentication protected routes')
 @ApiBearerAuth()
 @UseGuards(EmailConfirmationGuard)
