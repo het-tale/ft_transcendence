@@ -7,6 +7,8 @@ import User from '../../components/User';
 import { UserType } from '../../Types/User';
 import { ListenOnSocket } from './Game.lisners';
 import { SocketGameContext } from '../../socket';
+import { Button, Flex } from '@chakra-ui/react';
+import { BsBoxArrowLeft } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 
 export type MySocket = ReturnType<typeof io>;
@@ -214,7 +216,6 @@ const Game: React.FC = () => {
     if (Gamedeclined) {
         setTimeout(() => {
             navigate('/home');
-            // window.location.href = '/home';
         }, 3000);
     }
 
@@ -234,166 +235,204 @@ const Game: React.FC = () => {
         setGameStarted(true);
     };
 
+    const handleDisconnectSocket = () => {
+        console.log('disconnecting socket');
+        socket?.disconnect();
+        navigate('/home');
+    };
     return (
-        <div className="containerGame">
-            {!loaded ? (
-                <div className="overlay">
-                    <p className="paraInfo">Loading ...</p>
-                </div>
-            ) : (
-                <>
-                    <div className="container-profile">
-                        {id !== 1 ? (
-                            <>
-                                <div className="player-profile">
-                                    <img
-                                        src={
-                                            otherAvatar
-                                                ? otherAvatar
-                                                : '/assets/circles-menu-1.gif'
-                                        }
-                                        alt="Other Profile"
-                                    />
-                                    <div className="player-username">
-                                        {otherUsername
-                                            ? otherUsername
-                                            : ' waiting ... '}
-                                        <div className="player-score">
-                                            {otherScore}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="vs-image">
-                                    <img src="/assets/versus.png" alt="VS" />
-                                </div>
-                                <div className="player-profile">
-                                    <div className="player-username">
-                                        {user?.username}
-                                        <div className="player-score">
-                                            {playerScore}
-                                        </div>
-                                    </div>
-                                    <img
-                                        src={user?.avatar}
-                                        alt="Player Profile"
-                                    />
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div className="player-profile">
-                                    <img
-                                        src={user?.avatar}
-                                        alt="Player Profile"
-                                    />
-                                    <div className="player-username">
-                                        {user?.username}
-                                        <div className="player-score">
-                                            {playerScore}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="vs-image">
-                                    <img src="/assets/versus.png" alt="VS" />
-                                </div>
-                                <div className="player-profile">
-                                    <div className="player-username">
-                                        {otherUsername
-                                            ? otherUsername
-                                            : ' waiting ... '}
-                                        <div className="player-score">
-                                            {otherScore}
-                                        </div>
-                                    </div>
-                                    <img
-                                        src={
-                                            otherAvatar
-                                                ? otherAvatar
-                                                : '/assets/circles-menu-1.gif'
-                                        }
-                                        alt="Other Profile"
-                                    />
-                                </div>
-                            </>
-                        )}
+        <Flex
+            h={'100vh'}
+            flexDirection={'column'}
+            backgroundColor={'rgba(185, 49, 252, 0.2)'}
+            backdropFilter="blur(10px) hue-rotate(90deg)"
+        >
+            <Button
+                w={'fit-content'}
+                marginTop={'15px'}
+                marginLeft={'15px'}
+                p={'14px'}
+                bg={'#a435f0'}
+                color={'white'}
+                onClick={handleDisconnectSocket}
+            >
+                <BsBoxArrowLeft style={{ marginRight: '5px' }} size={'18'} />
+                Exit The Game
+            </Button>
+            <div className="containerGame">
+                {!loaded ? (
+                    <div className="overlay">
+                        <p className="paraInfo">Loading ...</p>
                     </div>
-                    {Gamedeclined ? (
-                        <div className="overlay">
-                            <div className="game-over-container">
-                                <div className="game-over">
-                                    <p className="paraInfo">Game Declined .</p>
-                                    <p className="paraInfo">{message}</p>
-                                </div>
-                            </div>
-                        </div>
-                    ) : null}
-                    {gameStarted ? (
-                        <div className="game-container" ref={gameContainer}>
-                            <canvas ref={canvasRef} width={720} height={480} />
-                        </div>
-                    ) : (
-                        <>
-                            {gameinvite ? (
-                                <div className="overlay">
-                                    <div className="game-over-container">
-                                        <div className="game-over">
-                                            <p className="parainfo">
-                                                {' '}
-                                                Waiting for other player to join
-                                                ...{' '}
-                                            </p>
+                ) : (
+                    <>
+                        <div className="container-profile">
+                            {id !== 1 ? (
+                                <>
+                                    <div className="player-profile">
+                                        <img
+                                            src={
+                                                otherAvatar
+                                                    ? otherAvatar
+                                                    : '/assets/circles-menu-1.gif'
+                                            }
+                                            alt="Other Profile"
+                                        />
+                                        <div className="player-username">
+                                            {otherUsername
+                                                ? otherUsername
+                                                : ' waiting ... '}
+                                            <div className="player-score">
+                                                {otherScore}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                    <div className="vs-image">
+                                        <img
+                                            src="/assets/versus.png"
+                                            alt="VS"
+                                        />
+                                    </div>
+                                    <div className="player-profile">
+                                        <div className="player-username">
+                                            {user?.username}
+                                            <div className="player-score">
+                                                {playerScore}
+                                            </div>
+                                        </div>
+                                        <img
+                                            src={user?.avatar}
+                                            alt="Player Profile"
+                                        />
+                                    </div>
+                                </>
                             ) : (
                                 <>
-                                    {!gameOver &&
-                                    !gameStarted &&
-                                    !Gamedeclined ? (
-                                        <>
-                                            <button
-                                                className="start-button"
-                                                id="firstButton"
-                                                onClick={handleStartGame}
-                                            >
-                                                Start Game
-                                            </button>
-
-                                            <button
-                                                className="start-button"
-                                                onClick={handleStartGamerobot}
-                                            >
-                                                Start Game with robot
-                                            </button>
-                                        </>
-                                    ) : null}
+                                    <div className="player-profile">
+                                        <img
+                                            src={user?.avatar}
+                                            alt="Player Profile"
+                                        />
+                                        <div className="player-username">
+                                            {user?.username}
+                                            <div className="player-score">
+                                                {playerScore}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="vs-image">
+                                        <img
+                                            src="/assets/versus.png"
+                                            alt="VS"
+                                        />
+                                    </div>
+                                    <div className="player-profile">
+                                        <div className="player-username">
+                                            {otherUsername
+                                                ? otherUsername
+                                                : ' waiting ... '}
+                                            <div className="player-score">
+                                                {otherScore}
+                                            </div>
+                                        </div>
+                                        <img
+                                            src={
+                                                otherAvatar
+                                                    ? otherAvatar
+                                                    : '/assets/circles-menu-1.gif'
+                                            }
+                                            alt="Other Profile"
+                                        />
+                                    </div>
                                 </>
                             )}
-                        </>
-                    )}
-                </>
-            )}
-            {gameOver ? (
-                <div className="overlay">
-                    <div className="game-over-container">
-                        <div className="game-over">
-                            <p className="paraInfo">Game Over.</p>
-                            <p className="paraInfo">
-                                {playerScore > otherScore
-                                    ? 'you won'
-                                    : 'you lost'}
-                            </p>
                         </div>
-                        <button
-                            className="home-button"
-                            onClick={handleHomeNavigation}
-                        >
-                            Go to Home
-                        </button>
+                        {Gamedeclined ? (
+                            <div className="overlay">
+                                <div className="game-over-container">
+                                    <div className="game-over">
+                                        <p className="paraInfo">
+                                            Game Declined .
+                                        </p>
+                                        <p className="paraInfo">{message}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : null}
+                        {gameStarted ? (
+                            <div className="game-container" ref={gameContainer}>
+                                <canvas
+                                    ref={canvasRef}
+                                    width={720}
+                                    height={480}
+                                />
+                            </div>
+                        ) : (
+                            <>
+                                {gameinvite ? (
+                                    <div className="overlay">
+                                        <div className="game-over-container">
+                                            <div className="game-over">
+                                                <p className="parainfo">
+                                                    {' '}
+                                                    Waiting for other player to
+                                                    join ...{' '}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {!gameOver &&
+                                        !gameStarted &&
+                                        !Gamedeclined ? (
+                                            <>
+                                                <button
+                                                    className="start-button"
+                                                    id="firstButton"
+                                                    onClick={handleStartGame}
+                                                >
+                                                    Start Game
+                                                </button>
+
+                                                <button
+                                                    className="start-button"
+                                                    onClick={
+                                                        handleStartGamerobot
+                                                    }
+                                                >
+                                                    Start Game with robot
+                                                </button>
+                                            </>
+                                        ) : null}
+                                    </>
+                                )}
+                            </>
+                        )}
+                    </>
+                )}
+                {gameOver ? (
+                    <div className="overlay">
+                        <div className="game-over-container">
+                            <div className="game-over">
+                                <p className="paraInfo">Game Over.</p>
+                                <p className="paraInfo">
+                                    {playerScore > otherScore
+                                        ? 'you won'
+                                        : 'you lost'}
+                                </p>
+                            </div>
+                            <button
+                                className="home-button"
+                                onClick={handleHomeNavigation}
+                            >
+                                Go to Home
+                            </button>
+                        </div>
                     </div>
-                </div>
-            ) : null}
-        </div>
+                ) : null}
+            </div>
+        </Flex>
     );
 };
 

@@ -220,7 +220,8 @@ function App() {
                                 path="/game/"
                                 element={
                                     <ProtectRoutes>
-                                        <Layout children={<GamePage />} />
+                                        <GamePage />
+                                        {/* <Layout children={<GamePage />} /> */}
                                     </ProtectRoutes>
                                 }
                             ></Route>
