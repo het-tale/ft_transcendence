@@ -112,7 +112,9 @@ export class Invitations {
       client.emit('InitGame', gamedata);
       client.emit('JoinRoom', invitationRoom.roomName);
     }, 1000);
-
+    const user = activeSockets.get(client);
+    const updatedUser = { ...user, status: 'InGame' };
+    activeSockets.set(client, updatedUser);
     await this.prisma.user.update({
       where: {
         id: sender.id,
@@ -228,6 +230,9 @@ export class Invitations {
       client.emit('InitGame', gamedata);
       client.emit('JoinRoom', roomName);
     }, 2000);
+    const user = activeSockets.get(client);
+    const updatedUser = { ...user, status: 'InGame' };
+    activeSockets.set(client, updatedUser);
     await this.prisma.user.update({
       where: {
         id: receiver_player.id,

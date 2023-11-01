@@ -31,11 +31,13 @@ export class GameStartEvent {
     if (user.status === 'InGame') {
       setTimeout(() => {
         client.emit('InvitationDeclined', 'you are already in an other game !!');
-        activeSockets.delete(client)
       }, 2000);
 
       return;
     } else {
+      const user = activeSockets.get(client);
+      const updatedUser = { ...user, status: 'InGame' };
+      activeSockets.set(client, updatedUser );
       await this.prisma.user.update({
         where: {
           id: user.id,
@@ -128,11 +130,14 @@ export class GameStartEvent {
     if (user.status === 'InGame') {
       setTimeout(() => {
         client.emit('InvitationDeclined', 'you are already in an other game !!');
-        activeSockets.delete(client);
       }, 2000);
 
       return;
     } else {
+      const user = activeSockets.get(client);
+      const updatedUser = { ...user, status: 'InGame' };
+      activeSockets.set(client, updatedUser);
+      console.log('\x1b[32m user status', activeSockets.get(client).status );
       await this.prisma.user.update({
         where: {
           id: user.id,
@@ -142,7 +147,6 @@ export class GameStartEvent {
         },
       });
     }
-    console.log('status changed to ingame ')
     const room = new Room(Math.random().toString(36).substring(7));
     const padd = new Paddle(PADDLE.x, PADDLE.y, PADDLE.width, PADDLE.height, PADDLE.dy);
     const otherpad = new Paddle(OTHERPADDLE.x, OTHERPADDLE.y, OTHERPADDLE.width, OTHERPADDLE.height, OTHERPADDLE.dy);
@@ -175,7 +179,6 @@ export class GameStartEvent {
     };
     client.emit('JoinRoom', room.roomName);
     client.emit('InitGame', gamedata);
-    console.log(user.username, 'startting game at ', room.roomName)
     server.to(room.roomName).emit('StartGame', room.roomName);
     this.startGame(true, room, client, rooms, activeSockets, server);
   } catch(error)

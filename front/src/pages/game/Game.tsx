@@ -7,6 +7,7 @@ import User from '../../components/User';
 import { UserType } from '../../Types/User';
 import { ListenOnSocket } from './Game.lisners';
 import { SocketGameContext } from '../../socket';
+import { useNavigate } from 'react-router-dom';
 
 export type MySocket = ReturnType<typeof io>;
 
@@ -209,14 +210,16 @@ const Game: React.FC = () => {
         };
     }, [socket]);
 
+    const navigate = useNavigate();
     if (Gamedeclined) {
         setTimeout(() => {
-            window.location.href = '/home';
+            navigate('/home');
+            // window.location.href = '/home';
         }, 3000);
     }
 
     const handleHomeNavigation = () => {
-        window.location.href = '/home';
+        navigate('/home');
         socket?.disconnect();
     };
 
