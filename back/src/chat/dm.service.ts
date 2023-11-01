@@ -442,8 +442,8 @@ export class DMService {
       else throw new Error(error.message);
     }
   }
-  async handleRobotResponse(message: string, username: string) {
-    const chatbotResponse = await this.chatbot.getChatbotResponse(message);
+  async handleRobotResponse(message: string, username: string, userId: number) {
+    const chatbotResponse = await this.chatbot.getChatbotResponse(message, userId);
     this.saveMessage({
       sender: 'ROBOT',
       receiver: username,
