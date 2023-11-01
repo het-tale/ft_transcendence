@@ -56,14 +56,12 @@ export class ChatGateway
     try {
       const user = await this.dmService.verifyToken(token);
       if (!user.username) {
-        console.log('Username must be provided');
         throw new Error('Username must be provided');
       }
       this.connectedUsers.push({
         clientId: client.id,
         username: user.username,
       });
-      // console.log('connectedUsers', this.connectedUsers);
       await this.dmService.changeUserStatus(user.username, 'online');
       this.io.emit('userOnline', client.id);
       await this.channelService.rejoinRooms(user.id, client);
@@ -120,47 +118,6 @@ export class ChatGateway
     );
   }
 
-  // @SubscribeMessage('privateMessageROBOT')
-  // async handlePrivateMessageROBOT(
-  //   @MessageBody() data: TDM,
-  //   @ConnectedSocket() client: Socket,
-  // ) {
-  //   try {
-  //     if (data.message === '') return;
-  //     const sender = this.connectedUsers.find(
-  //       (user) => user.clientId === client.id,
-  //     );
-  //     const receiver = this.connectedUsers.find(
-  //       (user) => user.username === data.to,
-  //     );
-  //     const sentAt = new Date();
-  //     let isPending = true;
-  //     if (receiver) isPending = false;
-  //     await this.dmService.saveMessage({
-  //       sender: sender.username,
-  //       receiver: data.to,
-  //       message: data.message,
-  //       date: sentAt,
-  //       isPending,
-  //     });
-
-  //     console.log('Message is for the chatbot');
-  //     const userMessage = data.message;
-
-  //     const chatbotResponse = await this.chatbotService.getChatbotResponse(userMessage, 'text-davinci-003', 0.7);
-  //     console.log('chatbotResponse', chatbotResponse);
-
-  //     const data2 = {
-  //       to: 'ROBOT',
-  //       message: chatbotResponse,
-  //     };
-  //     this.handlePrivateMessage(data2, client);
-  //   }
-  //   catch (err) {
-  //     client.emit('privateMessageError', err.message);
-  //   }
-  // }
-
   @SubscribeMessage('privateMessage')
   async handlePrivateMessage(
     @MessageBody() data: TDM,
@@ -191,19 +148,23 @@ export class ChatGateway
           message: data.message,
         });
       }
-      if (data.to === 'ROBOT')
-        await this.dmService.handleRobotResponse(data.message, sender.username);
       this.io.to(client.id).emit('privateMessage', {
         from: sender.username,
         message: data.message,
       });
+      if (data.to === 'ROBOT') {
+        await this.dmService.handleRobotResponse(data.message, sender.username);
+        this.io.to(client.id).emit('privateMessage', {
+          from: 'ROBOT',
+          message: '...',
+        });
+      }
       const obj = await this.achievementsService.check100SentMessages(
         sender.username,
       );
       if (obj.isUnlocked)
         this.io.to(client.id).emit('achievementUnlocked', obj.achievement);
     } catch (err) {
-      console.error('heeeere', err);
       client.emit('privateMessageError', err.message);
     }
   }
@@ -675,13 +636,14 @@ export class ChatGateway
       const clientUsername = this.connectedUsers.find(
         (user) => user.clientId === client.id,
       ).username;
-      this.io.to(data.room).emit('channelDeleted');
       await this.channelService.deleteChannel(
         data.room,
         clientUsername,
         this.io,
         this.connectedUsers,
+        data.password ? data.password : null,
       );
+      this.io.to(data.room).emit('channelDeleted');
     } catch (err) {
       client.emit('channelDeleteError', err.message);
     }
