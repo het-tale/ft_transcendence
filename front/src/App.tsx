@@ -27,6 +27,7 @@ import { Layout } from './pages/Layout';
 import { Verify2Fa } from './pages/Profile/Verify2Fa';
 import User from './components/User';
 import { UserType } from './Types/User';
+import { NotFound } from './pages/NotFound';
 
 function App() {
     const [firstLogin, setFirstLogin] = React.useState(false);
@@ -225,6 +226,7 @@ function App() {
                                     </ProtectRoutes>
                                 }
                             ></Route>
+                            <Route path="/*" element={<NotFound />} />
                         </Routes>
                     </RenderContext.Provider>
                 </SocketGameContext.Provider>
