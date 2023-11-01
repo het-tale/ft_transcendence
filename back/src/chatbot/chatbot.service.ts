@@ -22,7 +22,6 @@ export class ChatbotService {
       }
       return "sorry something went wrong";
     } catch (error) {
-      Logger.error('Error occurred while getting the chatbot response', error, 'ChatbotService');
       throw new Error('An error occurred while getting the chatbot response');
     }
   }

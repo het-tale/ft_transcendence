@@ -54,10 +54,10 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       const token = client.handshake.auth.token;
       const user = await this.serviceInit.verifyToken(token);
       if (!user) throw new Error('undefined user ');
+      console.log('user connected ', user.username, ' status ', user.status);
       if (user.status === 'InGame') {
         setTimeout(() => {
           client.emit('InvitationDeclined', 'You are in other game');
-          this.activeSockets.delete(client);
         }, 2000);
 
         return;
@@ -155,7 +155,8 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   async handleDisconnect(client: Socket, ...args: boolean[]) {
     const room = this.serviceInit.findRoomByPlayerSocket(client, this.rooms);
     const user = this.activeSockets.get(client);
-    if (user) {
+    user? console.log('\x1b[41m user disconnected ', user.status): null;
+    if (user && user.status === 'InGame') {
       console.log('changing staatus to enline of user ', user.username);
       await this.prisma.user.update({
         where: {

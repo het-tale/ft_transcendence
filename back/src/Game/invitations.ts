@@ -20,6 +20,8 @@ export class Invitations {
     activeSockets: Map<Socket, User>,
     server: Server,
   ) {
+    try {
+
     const sender_player = activeSockets.get(client);
     if (!sender_player) throw new Error('undefined user ');
     const sender = await this.prisma.user.findUnique({
@@ -110,7 +112,9 @@ export class Invitations {
       client.emit('InitGame', gamedata);
       client.emit('JoinRoom', invitationRoom.roomName);
     }, 1000);
-
+    const user = activeSockets.get(client);
+    const updatedUser = { ...user, status: 'InGame' };
+    activeSockets.set(client, updatedUser);
     await this.prisma.user.update({
       where: {
         id: sender.id,
@@ -119,6 +123,9 @@ export class Invitations {
         status: 'InGame',
       },
     });
+  } catch (e) {
+      console.log(e);
+    }
   }
 
   async acceptInvitation(
@@ -128,6 +135,7 @@ export class Invitations {
     activeSockets: Map<Socket, User>,
     server: Server
   ) {
+    try {
 
     console.log('\x1b[32m%s\x1b[0m', 'acceptInvitation' + roomName);
 
@@ -222,6 +230,9 @@ export class Invitations {
       client.emit('InitGame', gamedata);
       client.emit('JoinRoom', roomName);
     }, 2000);
+    const user = activeSockets.get(client);
+    const updatedUser = { ...user, status: 'InGame' };
+    activeSockets.set(client, updatedUser);
     await this.prisma.user.update({
       where: {
         id: receiver_player.id,
@@ -243,6 +254,9 @@ export class Invitations {
         );
       });
     }, 2000);
+  } catch (e) {
+      console.log(e);
+    }
   }
 
   async declineInvitation(
@@ -251,6 +265,7 @@ export class Invitations {
     roomName: string,
     activeSockets: Map<Socket, User>
   ) {
+    try {
     const room = rooms.get(roomName);
     if (room) {
     const sender_player = room.players.find(
@@ -292,5 +307,9 @@ export class Invitations {
     sender_player.socket?.leave(roomName);
   }
     rooms.delete(roomName);
+  }
+  catch (e) {
+      console.log(e);
+    }
   }
 }

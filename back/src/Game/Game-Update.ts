@@ -102,7 +102,6 @@ export class GameUpdate {
     const maxY = CONTAINERHIEGHT - room.players[1].paddle.height;
     room.players[1].paddle.y = Math.max(0, Math.min(room.players[1].paddle.y, maxY));
     this.colisionrobot(room, activeSockets, server);
-
     if (Date.now() - room.lastspeedincrease > SPEED_INTERVAL) {
       room.lastspeedincrease = Date.now();
       room.ball.dx += room.ball.dx > 0 ? INCREASE_SPEED : -INCREASE_SPEED;
