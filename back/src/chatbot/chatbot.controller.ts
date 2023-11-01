@@ -6,10 +6,11 @@ export class ChatbotController {
   constructor(private chatbotService: ChatbotService) {}
 
   async sendMessage(
-    @Body() body: { message: string },
+    @Body() body: { message: string , userId: number},
   ): Promise<string> {
     const userMessage = body.message;
-    const chatbotResponse = await this.chatbotService.getChatbotResponse(userMessage);
+    const userId = body.userId;
+    const chatbotResponse = await this.chatbotService.getChatbotResponse(userMessage, userId);
     return chatbotResponse;
   }
 }
