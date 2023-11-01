@@ -153,7 +153,7 @@ export class ChatGateway
         message: data.message,
       });
       if (data.to === 'ROBOT') {
-        await this.dmService.handleRobotResponse(data.message, sender.username, 2);// i have used 2 just to test i need to pass the user id (sender id ) , it used to track the conversation 
+        await this.dmService.handleRobotResponse(data.message, sender.username);
         this.io.to(client.id).emit('privateMessage', {
           from: 'ROBOT',
           message: '...',
