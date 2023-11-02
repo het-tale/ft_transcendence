@@ -5,7 +5,6 @@ import { User } from '@prisma/client';
 import { GameData, OTHERPADDLE, PADDLE, Paddle, Player, Room } from './types';
 import { GameStartEvent } from './game-start-event';
 import { Server } from 'socket.io';
-import { set } from 'nestjs-zod/z';
 
 @Injectable()
 export class Invitations {
@@ -38,11 +37,19 @@ export class Invitations {
     if (
       !receiver ||
       !receiver ||
-      sender === receiver ||
-      sender.status === 'InGame'
+      sender === receiver 
     ) {
       setTimeout(() => {
-        client.emit('InvitationDeclined');
+      console.log('gamedeclined invitations  43' );
+        client.emit('GameDeclined', 'user not found !!');
+      }, 2000);
+
+      return;
+    }
+    if (sender.status === 'InGame'){
+      setTimeout(() => {
+        console.log('InvitationDeclined invitation  51' );
+        client.emit('InvitationDeclined', 'you are already in an other game !!');
       }, 2000);
 
       return;
@@ -55,17 +62,22 @@ export class Invitations {
 
       return;
     }
+    const updatedUser = { ...sender, status: 'InGame' };
+    activeSockets.set(client, updatedUser);
+    await this.prisma.user.update({
+      where: {
+        id: sender.id,
+      },
+      data: {
+        status: 'InGame',
+      },
+    });
 
     const name = Math.random().toString(36).substring(7)
     const invitationRoom = new Room(`${name}_${sender.id}_${receiver.id}`);
     invitationRoom.isinvit = true;
     const padd = new Paddle(PADDLE.x, PADDLE.y, PADDLE.width, PADDLE.height, PADDLE.dy);
     const otherpad = new Paddle(OTHERPADDLE.x, OTHERPADDLE.y, OTHERPADDLE.width, OTHERPADDLE.height, OTHERPADDLE.dy);
-
-
-    console.log('\x1b[32m%s\x1b[0m', 'sending invit ' + invitationRoom.roomName);
-
-
     const player = new Player(
       1,
       sender.id,
@@ -112,17 +124,7 @@ export class Invitations {
       client.emit('InitGame', gamedata);
       client.emit('JoinRoom', invitationRoom.roomName);
     }, 1000);
-    const user = activeSockets.get(client);
-    const updatedUser = { ...user, status: 'InGame' };
-    activeSockets.set(client, updatedUser);
-    await this.prisma.user.update({
-      where: {
-        id: sender.id,
-      },
-      data: {
-        status: 'InGame',
-      },
-    });
+
   } catch (e) {
       console.log(e);
     }
@@ -136,73 +138,56 @@ export class Invitations {
     server: Server
   ) {
     try {
-
-    console.log('\x1b[32m%s\x1b[0m', 'acceptInvitation' + roomName);
-
-    const invitationRoom = rooms.get(roomName);
-    if (!invitationRoom) {
-      console.log('no room fond ');
-      const pendingInvitation = await this.prisma.invitation.findFirst({
+    const receiver_user = activeSockets.get(client);
+    const pendingInvitation = await this.prisma.invitation.findFirst({
         where: {
-          receiverId: activeSockets.get(client).id,
+          receiverId: receiver_user?.id,
           isGame: true,
           status: 'pending',
         },
-      });
-      if (!pendingInvitation) {
-        console.log('no pending invitation');
+    });
+
+    if (!pendingInvitation) {
         setTimeout(() => {
+        console.log('InvitationDeclined invitations 153' );
           client.emit('InvitationDeclined', "no pending invitation found !!");
         }, 2000);
 
         return;
       }
-      await this.prisma.invitation.update({
-        where: {
-          id: pendingInvitation.id,
-        },
-        data: {
-          status: 'rejected',
-        },
-      });
+
+    const invitationRoom = rooms.get(roomName);
+    if (!invitationRoom || invitationRoom.players.length === 0) {
       setTimeout(() => {
+        console.log('InvitationDeclined invitations 162' );
         client.emit('InvitationDeclined', "no room found the sender left the room !!");
       }, 2000);
 
+      await this.prisma.invitation.update({
+          where: {
+            id: pendingInvitation.id,
+          },
+          data: {
+            status: 'rejected',
+          },
+        });
       return;
     }
+  
     const sender_player = invitationRoom.players.find(
       (player) => player.socket !== client,
     );
-    const receiver_player = activeSockets.get(client);
-    if (!sender_player || !receiver_player) {
+    if (!sender_player || !receiver_user) {
       setTimeout(() => {
+
+        console.log('InvitationDeclined invitations 183' );
         client.emit('InvitationDeclined');
         sender_player.socket?.emit('InvitationDeclined', "no room found the reciever left the room !!");
       }, 2000);
 
       return;
     }
-    const otheruser = activeSockets.get(sender_player.socket);
 
-    const pendingInvitation = await this.prisma.invitation.findFirst({
-      where: {
-        receiverId: receiver_player.id,
-        senderId: otheruser.id,
-        isGame: true,
-        status: 'pending',
-      },
-    });
-    if (!pendingInvitation) {
-      sender_player.socket.leave(roomName);
-      rooms.delete(roomName);
-      setTimeout(() => {
-        client.emit('InvitationDeclined', "no pending invitation found !!");
-        sender_player.socket?.emit('InvitationDeclined', "no pending invitation found !!");
-      }, 2000);
-
-      return;
-    }
     await this.prisma.invitation.update({
       where: {
         id: pendingInvitation.id,
@@ -211,9 +196,19 @@ export class Invitations {
         status: 'accepted',
       },
     });
+    const updatedUser = { ...receiver_user, status: 'InGame' };
+    activeSockets.set(client, updatedUser);
+    await this.prisma.user.update({
+      where: {
+        id: receiver_user.id,
+      },
+      data: {
+        status: 'InGame',
+      },
+    });
     const padd = new Paddle(PADDLE.x, PADDLE.y, PADDLE.width, PADDLE.height, PADDLE.dy);
     const otherpad = new Paddle(OTHERPADDLE.x, OTHERPADDLE.y, OTHERPADDLE.width, OTHERPADDLE.height, OTHERPADDLE.dy);
-    const player = new Player(2, receiver_player.id, client, padd, roomName, 0);
+    const player = new Player(2, receiver_user.id, client, padd, roomName, 0);
     invitationRoom.players.push(player);
     client.join(roomName);
     const gamedata: GameData = {
@@ -230,17 +225,7 @@ export class Invitations {
       client.emit('InitGame', gamedata);
       client.emit('JoinRoom', roomName);
     }, 2000);
-    const user = activeSockets.get(client);
-    const updatedUser = { ...user, status: 'InGame' };
-    activeSockets.set(client, updatedUser);
-    await this.prisma.user.update({
-      where: {
-        id: receiver_player.id,
-      },
-      data: {
-        status: 'InGame',
-      },
-    });
+
     setTimeout(() => {
       invitationRoom.players.forEach((player) => {
         player.socket?.emit('GAME STARTED', true);
@@ -266,23 +251,23 @@ export class Invitations {
     activeSockets: Map<Socket, User>
   ) {
     try {
+      const receiver_user = activeSockets.get(client);
     const room = rooms.get(roomName);
     if (room) {
     const sender_player = room.players.find(
       (player) => player.socket !== client,
     );
     const sender_user = activeSockets.get(sender_player.socket);
-    const receiver_user = activeSockets.get(client);
     const pendingInvitation = await this.prisma.invitation.findFirst({
       where: {
-        receiverId: receiver_user.id,
-        senderId: sender_user.id,
+        receiverId: receiver_user?.id,
+        senderId: sender_user?.id,
         isGame: true,
         status: 'pending',
       },
     });
     if (!pendingInvitation) {
-      sender_player.socket?.leave(roomName);
+      sender_player?.socket?.leave(roomName);
       rooms.delete(roomName);
 
       return;
@@ -303,8 +288,8 @@ export class Invitations {
         status: 'online',
       },
     });
-    sender_player.socket?.emit('InvitationDeclined', "the reciever declined the invitation !!");
-    sender_player.socket?.leave(roomName);
+    sender_player?.socket?.emit('InvitationDeclined', "the reciever declined the invitation !!");
+    sender_player?.socket?.leave(roomName);
   }
     rooms.delete(roomName);
   }
