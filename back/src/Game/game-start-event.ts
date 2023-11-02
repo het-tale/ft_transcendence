@@ -25,7 +25,8 @@ export class GameStartEvent {
     const user_player = activeSockets.get(client);
     if (!user_player)
     {
-      client.emit('InvitationDeclined');
+      console.log('gamedeclined start event 28' );
+      client.emit('GameDeclined');
       throw new Error('undefined user ');
     }
     const user = await this.prisma.user.findFirst({
@@ -35,7 +36,8 @@ export class GameStartEvent {
     });
     if (user.status === 'InGame') {
       setTimeout(() => {
-        client.emit('InvitationDeclined', 'you are already in an other game !!');
+      console.log('gamedeclined start event 39' );
+        client.emit('GameDeclined', 'you are already in an other game !!');
       }, 2000);
 
       return;
@@ -131,7 +133,8 @@ export class GameStartEvent {
     {
     const user_player = activeSockets.get(client);
     if (!user_player) {
-      client.emit('InvitationDeclined');
+      console.log('gamedeclined start event 136' );
+      client.emit('GameDeclined');
       throw new Error('undefined user ');
     }
     const user = await this.prisma.user.findUnique({
@@ -142,7 +145,8 @@ export class GameStartEvent {
     if (!user) throw new Error('undefined user ');
     if (user.status === 'InGame') {
       setTimeout(() => {
-        client.emit('InvitationDeclined', 'you are already in an other game !!');
+      console.log('gamedeclined start event 148' );
+        client.emit('GameDeclined', 'you are already in an other game !!');
       }, 2000);
 
       return;
@@ -150,7 +154,6 @@ export class GameStartEvent {
       const user = activeSockets.get(client);
       const updatedUser = { ...user, status: 'InGame' };
       activeSockets.set(client, updatedUser);
-      console.log('\x1b[32m user status', activeSockets.get(client).status );
       await this.prisma.user.update({
         where: {
           id: user.id,

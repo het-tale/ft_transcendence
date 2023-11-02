@@ -39,7 +39,14 @@ export function ListenOnSocket(
 	setOtherUsername(username);
 	  });
 
+  socket.on("GameDeclined", (message: string) => {
+    console.log("GameDeclined event received");
+    setGameDeclined(true);
+    setGameinvite(false);
+    setMessage(message);
+  });
   socket.on("InvitationDeclined", (message: string) => {
+    console.log("InvitationDeclined event received");
     setGameDeclined(true);
     setGameinvite(false);
     setMessage(message);
