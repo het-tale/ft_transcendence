@@ -100,6 +100,7 @@ const UserInfo = (props: UserInfoProps) => {
                     alt="profile"
                     borderRadius={'10%'}
                     w={'50rem'}
+                    h={'25rem'}
                     alignItems={'center'}
                 />
             </Button>
