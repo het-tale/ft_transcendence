@@ -416,7 +416,7 @@ export class DMService {
       const user1 = conversation.participants.find(
         (participant) => participant.id !== user.id,
       );
-      if (conversation.name === `${user.username} and ${user.username}`)
+      if (conversation.name === `${user.email} and ${user.email}`)
         return conversation.participants[0];
 
       return user1;

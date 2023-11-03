@@ -70,9 +70,10 @@ const Dms = (props: any) => {
                         />
                         <button className="newChannel" onClick={onOpen}>
                             <BsPlusLg
-                                size={'2rem'}
-                                style={{ marginLeft: '1.2rem' }}
+                                size={'3rem'}
+                               
                                 title="Create New Message"
+                                
                             />
                         </button>
                         <ModalUi
@@ -163,16 +164,16 @@ const Dms = (props: any) => {
 
                         <button className="newChannel" onClick={onOpen}>
                             <BsPlusLg
-                                size={'2rem'}
-                                style={{ marginLeft: '1rem' }}
+                                size={'3rem'}
+                                
                                 title="Add new Channel"
                             />
                         </button>
                         <button className="newChannel">
                             <Link to="/chat/browse-channels">
                                 <BsBrowserChrome
-                                    size={'2rem'}
-                                    style={{ marginLeft: '1rem' }}
+                                    size={'3rem'}
+                                    
                                     title="Explore Channels"
                                 />
                             </Link>
