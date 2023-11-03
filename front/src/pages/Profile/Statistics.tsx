@@ -38,7 +38,7 @@ const Statistics = (props: StatisticsProps) => {
                     {achievements?.length > 0 ? (
                         achievements.map((achievement) => {
                             return (
-                                <ListItem>
+                                <ListItem key={achievement?.id}>
                                     <Avatar
                                         src={achievement.icon}
                                         size={'md'}

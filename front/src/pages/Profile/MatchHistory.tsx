@@ -47,7 +47,7 @@ const MatchHistory = (props: MatchHistoryProps) => {
                             style={{ boxShadow: 'none' }}
                             marginBottom={'0.5rem'}
                         >
-                            <Grid templateColumns="repeat(5, 1fr)" gap={40}>
+                            <Grid templateColumns="repeat(5, 1fr)" gap={40} key={match?.id}>
                                 <GridItem w="200%" h="10">
                                     <Flex>
                                         <Image
