@@ -60,6 +60,7 @@ const Dms = (props: any) => {
                 <>
                     <Flex justify={'space-between'}>
                         <Search
+                        key={props.dms?.id}
                             name="tabDesign"
                             setName={setName}
                             filter={name}
@@ -99,8 +100,9 @@ const Dms = (props: any) => {
                         props.dms.length > 0 ? (
                             props.dms?.map((dm: UserType) => {
                                 return dm ? (
-                                    <Link to={`/chat/rooms-dms/${dm?.id}`}>
+                                    <Link to={`/chat/rooms-dms/${dm?.id}`} key={dm?.id}>
                                         <MessageUser
+                                        
                                             profile={dm?.avatar}
                                             name={dm?.username}
                                             dm={dm}
@@ -130,7 +132,6 @@ const Dms = (props: any) => {
                     ) : (
                         <></>
                     )}
-                    {/* {console.log('USERDM', userDm)} */}
                 </>
             ),
             rightSide: (
@@ -153,6 +154,7 @@ const Dms = (props: any) => {
                 <>
                     <Flex justify={'space-between'}>
                         <Search
+                        key={props.roomDms?.id}
                             name="tabDesign"
                             isDm={false}
                             setName={setName}
@@ -203,6 +205,7 @@ const Dms = (props: any) => {
                             props.roomDms?.map((room: Channel) => {
                                 return (
                                     <ChannelDisplay
+                                    key={room?.id}
                                         profile={room.avatar}
                                         type={room.type}
                                         name={room.name}

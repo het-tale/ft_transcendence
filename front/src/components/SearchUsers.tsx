@@ -41,7 +41,7 @@ export const SearchUsers = (props: SearchUsersProps) => {
 
                     {props.users.map((user) => {
                         return (
-                            <CardBody>
+                            <CardBody key={user?.id}>
                                 <Stack divider={<StackDivider />} spacing="4">
                                     <Box>
                                         <Flex

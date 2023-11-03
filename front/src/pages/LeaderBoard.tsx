@@ -44,28 +44,6 @@ export const LeaderBoard = () => {
                 width={'full'}
             >
                 <h1>LeaderBoard</h1>
-                <Flex flexDirection={'column'}>
-                    <Text
-                        fontSize={'xs'}
-                        fontFamily={'Krona One'}
-                        fontStyle={'italic'}
-                        color={'#a435f0'}
-                    >
-                        Your Friends in this ladder:
-                    </Text>
-                    <AvatarGroup size="md" max={3}>
-                        {friends?.map((friend) => {
-                            return users?.some(
-                                (user) => user.id === friend.id
-                            ) ? (
-                                <Avatar
-                                    name={friend?.username}
-                                    src={friend?.avatar}
-                                />
-                            ) : null;
-                        })}
-                    </AvatarGroup>
-                </Flex>
             </Flex>
 
             <Flex flexDirection={'column'} marginBottom={'2rem'}>
@@ -89,6 +67,7 @@ export const LeaderBoard = () => {
                     />
                 ) : users?.some((user) => user.id === renderData.user?.id) ? (
                     <Table boxShadow={'md'}>
+                        <Tbody>
                         <Tr>
                             <Td>{renderData.user?.g_rank}</Td>
                             <Td>
@@ -117,6 +96,7 @@ export const LeaderBoard = () => {
                             </Td>
                             <Td>{renderData.user?.win_rate}</Td>
                         </Tr>
+                        </Tbody>
                     </Table>
                 ) : (
                     'You Have No Place in this ladder'
@@ -147,7 +127,7 @@ export const LeaderBoard = () => {
                         <Tbody>
                             {users?.map((user) => {
                                 return (
-                                    <Tr>
+                                    <Tr key={user?.id}>
                                         <Td>{user?.g_rank}</Td>
                                         <Td>
                                             <Flex

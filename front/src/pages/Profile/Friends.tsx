@@ -55,6 +55,7 @@ const Friends = (props: FriendsProps) => {
                         h={'100px'}
                         w={'100%'}
                         style={{ boxShadow: 'none' }}
+                        key={friend?.id}
                     >
                         <Flex>
                             <Flex>
