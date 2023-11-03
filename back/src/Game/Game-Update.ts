@@ -72,14 +72,12 @@ export class GameUpdate {
     this.intersections(room, playerPaddle, otherPaddle);
     if (room.ball.x + room.ball.radius > CONTAINERWIDTH) {
       player.score++;
-      room.rounds--;
-      if (room.rounds === 0) this.dataupdatetostop(room, activeSockets);
+      if (player.score === 3) this.dataupdatetostop(room, activeSockets);
       else this.resetBall(room.ball, player, otherPlayer);
     }
     if (room.ball.x - room.ball.radius <= 0) {
       otherPlayer.score++;
-      room.rounds--;
-      if (room.rounds === 0) this.dataupdatetostop(room, activeSockets);
+      if (otherPlayer.score === 3) this.dataupdatetostop(room, activeSockets);
       else this.resetBall(room.ball, player, otherPlayer);
     }
     playerSocket?.emit('UPDATE', {
