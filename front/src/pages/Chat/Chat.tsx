@@ -276,10 +276,8 @@ export default function Chat(props: BrowseChannelsProps) {
     return (
         <Dms
             socket={socket}
-            // render={render}
-            // setRender={setRender}
-            render={renderData.renderData}
-            setRender={renderData.setRenderData}
+            render={render}
+            setRender={setRender}
             toast={toast}
             dms={dms}
             setDms={setDms}

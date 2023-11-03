@@ -11,6 +11,7 @@ import { UserType } from '../../Types/User';
 import React from 'react';
 import UserId from './GetUserById';
 import { SocketContext } from '../../socket';
+import { RenderContext } from '../../RenderContext';
 
 interface MessageUserProps {
     children?: React.ReactNode;
@@ -25,6 +26,7 @@ const UserDmInfo = (props: MessageUserProps) => {
     const [user, setUser] = React.useState<UserType>();
     const socket = React.useContext(SocketContext);
     const [update, setUpdate] = React.useState(false);
+    const renderData = React.useContext(RenderContext);
 
     // socket.on('userOffline', (data: any) => {
     //     // console.log('USER OFFLINE', data);
@@ -43,7 +45,7 @@ const UserDmInfo = (props: MessageUserProps) => {
             setUser(userData);
         }
         fetchUserData();
-    }, [update, props.updateUser, props.render, props.id]);
+    }, [update, props.updateUser, props.render, props.id, renderData.renderData]);
     return (
         <div>
             <button style={{ width: '100%' }}>
