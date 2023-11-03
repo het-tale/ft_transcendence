@@ -3,7 +3,7 @@ import '../../css/chat/tab.css';
 import React from 'react';
 const LeftSide = (props: any) => {
     return (
-        <div className="container">
+        <div className="container" style={props.isChat ? {width: '40%'} : {}}>
             <div className="tabs">
                 {props.tabs.map((tab: any, i: any) => (
                     <button

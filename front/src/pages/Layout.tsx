@@ -162,6 +162,14 @@ export const Layout = ({ children }: Props) => {
             });
             renderData.setRenderData(!renderData.renderData);
         });
+        socketGame.on('InGame', () => {
+            console.log('User in Gameee');
+            renderData.setRenderData(!renderData.renderData);
+        });        
+        socketGame.on('OutGame', () => {
+            console.log('User out of Gameee');
+            renderData.setRenderData(!renderData.renderData);
+        });
         socket.on('frienRequest', (data: any) => {
             toast({
                 title: 'success',
@@ -298,6 +306,9 @@ export const Layout = ({ children }: Props) => {
             socket.off('roomInvitationDeclined');
             socketGame.off('ReceiveInvitation');
             socketGame.off('InvitationDeclined');
+            socketGame.off('GameDeclined');
+            socketGame.off('InGame');
+            socketGame.off('OutGame');
             socket.off('frienRequest');
             socket.off('friendRequestSent');
             socket.off('friendRequestError');

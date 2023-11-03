@@ -95,9 +95,9 @@ const UserDmInfo = (props: MessageUserProps) => {
                                 <Text
                                     w={'10px'}
                                     backgroundColor={
-                                        user?.status === 'online'
-                                            ? 'green'
-                                            : '#808080'
+                                        user?.status === 'offline'
+                                            ? '#808080'
+                                            : 'green'
                                     }
                                     h={'10px'}
                                     borderRadius={'50%'}

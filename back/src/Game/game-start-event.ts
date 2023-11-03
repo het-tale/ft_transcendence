@@ -54,6 +54,7 @@ export class GameStartEvent {
         },
       });
     }
+    server.to(client.id).emit('InGame');
     const padd = new Paddle(PADDLE.x, PADDLE.y, PADDLE.width, PADDLE.height, PADDLE.dy);
     const otherpad = new Paddle(OTHERPADDLE.x, OTHERPADDLE.y, OTHERPADDLE.width, OTHERPADDLE.height, OTHERPADDLE.dy);
     for (const existRoom of rooms.values()) {
@@ -213,6 +214,7 @@ export class GameStartEvent {
     server: Server,
   ) {
     this.serviceUpdate.OtherAvatar(client, room );
+    client.broadcast.emit("InGame");
     if (!room.gameActive) {
       room.gameActive = true;
       const speed = INTERVAL;

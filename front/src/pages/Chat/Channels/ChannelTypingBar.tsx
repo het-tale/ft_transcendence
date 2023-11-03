@@ -18,7 +18,7 @@ const ChannelTypingBar = (props: ChannelTypingBarProps) => {
     const sendRoomMessageHandler = (e: any) => {
         e.preventDefault();
         socket.emit('sendRoomMessage', {
-            message: message,
+            message: message.trim(),
             room: props.ChannelDm?.name,
             date: new Date(),
             sender: props.user?.username

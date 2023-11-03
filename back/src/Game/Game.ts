@@ -164,6 +164,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
           status: 'online',
         },
       });
+      client.broadcast.emit("OutGame");
     }
     if (room) {
       if (room.players.length === 2) {
