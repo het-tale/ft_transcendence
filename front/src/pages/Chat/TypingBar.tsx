@@ -23,7 +23,7 @@ const TypingBar = (props: any) => {
         // }
         // else {
         socket.emit('privateMessage', {
-            message: message,
+            message: message.trim(),
             to: userData?.username
         });
         // }

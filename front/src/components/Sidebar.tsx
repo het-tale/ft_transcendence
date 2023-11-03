@@ -86,7 +86,7 @@ const Sidebar = (props: sidebarProps) => {
             socket.off('roomJoinError');
             socket.off('usernameChanged');
         };
-    });
+    }, []);
 
     return (
         <aside>

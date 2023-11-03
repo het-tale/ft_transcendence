@@ -51,7 +51,7 @@ export function ListenOnSocket(
     setGameinvite(false);
     setMessage(message);
   });
-	
+
   socket.on("JoinRoom", (message: string) => {
   });
 

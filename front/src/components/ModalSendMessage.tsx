@@ -17,7 +17,7 @@ const ModalSendMessage = (props: any) => {
         //     });
         // } else
         socket.emit('privateMessage', {
-            message: data.message,
+            message: data.message.trim(),
             to: data.to
         });
         props.onClose();
