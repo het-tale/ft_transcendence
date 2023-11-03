@@ -18,7 +18,7 @@ interface sidebarProps {
     setNotification?: React.Dispatch<React.SetStateAction<boolean>>;
     notifArray?: Notification[];
     isOpen?: boolean;
-    onOpen?: () => void;
+    onOpen: () => void;
     onClose?: () => void;
 }
 
@@ -112,7 +112,7 @@ const Sidebar = (props: sidebarProps) => {
                 )} */}
                 Chat
             </Link>
-            <Link to="" onClick={props.onOpen}>
+            <Link to="" onClick={() => {props.onOpen();  renderData.setRenderData(!renderData.renderData);}}>
                 <BsBellFill className="fa" />
                 Notifications
             </Link>
