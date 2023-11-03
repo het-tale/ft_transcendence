@@ -13,7 +13,7 @@ const Logout = () => {
         socket.disconnect();
         renderData.setRenderData(!renderData.renderData);
         navigate('/');
-    });
+    }, []);
     return <></>;
 };
 

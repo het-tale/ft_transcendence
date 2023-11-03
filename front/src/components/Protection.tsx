@@ -30,7 +30,7 @@ const ProtectPassword = (props: any) => {
         };
 
         checkAuthentication();
-    });
+    }, []);
 
     if (isLoggedIn) {
         if (isProtected) {
