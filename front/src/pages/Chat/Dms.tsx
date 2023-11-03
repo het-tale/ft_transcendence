@@ -254,6 +254,7 @@ const Dms = (props: any) => {
                     handleTabClick={handleTabClick}
                     tabs={tabs}
                     currentTab={currentTab}
+                    isChat={true}
                 />
                 <div className="delimiter"></div>
                 <RightSide
