@@ -272,7 +272,7 @@ export default function Chat(props: BrowseChannelsProps) {
             socket.off('adminAddError');
             socket.off('adminAdded');
         };
-    }, [socket]);
+    }, [socket, render]);
     return (
         <Dms
             socket={socket}
