@@ -285,7 +285,7 @@ const RoomsChat = (props: RoomsChatProps) => {
             {room?.participants.some(
                 (participant) => participant.id === user?.id
             ) && showChannelInfo ? (
-                <div className="container">
+                <div className="container" style={{width: '40%'}}>
                     <ChannelInfo
                         ChannelDm={room}
                         user={user}
