@@ -25,7 +25,7 @@ export class GameStartEvent {
     const user_player = activeSockets.get(client);
     if (!user_player)
     {
-      //console.log('gamedeclined start event 28' );
+      console.log('gamedeclined start event 28' );
       client.emit('GameDeclined');
       throw new Error('undefined user ');
     }
@@ -36,7 +36,7 @@ export class GameStartEvent {
     });
     if (user.status === 'InGame') {
       setTimeout(() => {
-      //console.log('gamedeclined start event 39' );
+      console.log('gamedeclined start event 39' );
         client.emit('GameDeclined', 'you are already in an other game !!');
       }, 2000);
 
@@ -113,7 +113,7 @@ export class GameStartEvent {
         rounds: room.rounds,
         id: player.number,
       };
-      // //console.log('gamedata about to be sent');
+      // console.log('gamedata about to be sent');
       client.emit('JoinRoom', room.roomName);
       client.emit('InitGame', gamedata);
     }
@@ -134,7 +134,7 @@ export class GameStartEvent {
     {
     const user_player = activeSockets.get(client);
     if (!user_player) {
-      //console.log('gamedeclined start event 136' );
+      console.log('gamedeclined start event 136' );
       client.emit('GameDeclined');
       throw new Error('undefined user ');
     }
@@ -146,7 +146,7 @@ export class GameStartEvent {
     if (!user) throw new Error('undefined user ');
     if (user.status === 'InGame') {
       setTimeout(() => {
-      //console.log('gamedeclined start event 148' );
+      console.log('gamedeclined start event 148' );
         client.emit('GameDeclined', 'you are already in an other game !!');
       }, 2000);
 

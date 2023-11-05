@@ -37,7 +37,7 @@ const ChangeChannelNameModal = (props: ChangeChannelNameModalProps) => {
             props.setRender && props.setRender(!props.render);
             props.onClose();
         } catch (error: any) {
-            //console.log('change error', error);
+            console.log('change error', error);
             const errors = error?.response?.data?.errors;
             if (errors) {
                 for (let index = 0; index < errors?.length; index++) {

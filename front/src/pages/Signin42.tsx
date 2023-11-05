@@ -20,7 +20,7 @@ const Signin42 = () => {
             }
         })
         .catch((error) => {
-            //console.log('Error', error);
+            console.log('Error', error);
             navigate('/');
         });
     return <div></div>;
