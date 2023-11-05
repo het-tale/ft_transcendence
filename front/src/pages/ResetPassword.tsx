@@ -38,7 +38,7 @@ const ResetPassword = () => {
         } catch (error: any) {
             const errors = error?.response?.data?.errors;
             if (errors) {
-                console.log('errors', errors);
+                //console.log('errors', errors);
                 for (let index = 0; index < errors?.length; index++) {
                     toast({
                         title: 'Error.',

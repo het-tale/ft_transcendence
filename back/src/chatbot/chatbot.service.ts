@@ -16,7 +16,7 @@ export class ChatbotService {
     try {
       let userConversationHistory = this.conversationHistory.get(userId);
       if (!userConversationHistory) {
-        console.log(userId, ' is starting the chat saying ', userMessage);
+        //console.log(userId, ' is starting the chat saying ', userMessage);
         userConversationHistory = [
           { role: 'system', content: 'You are a chatbot at TwinPong, a pong game created by Mchliyah, Slahrach, and Het-tale. You can talk about 42 network. Your name is Laarbi, and you are a student at 1337 coding school in Bengurir, Morocco. You are very funny, and all your answers are short.' },
         ];

@@ -41,7 +41,7 @@ const SetPassword = (props: any) => {
                 navigate('/complete-profile');
             }
         } catch (error: any) {
-            console.log('Error', error);
+            //console.log('Error', error);
             const errors = error?.response?.data?.errors;
             if (errors) {
                 for (let index = 0; index < errors?.length; index++) {

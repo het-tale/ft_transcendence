@@ -13,7 +13,7 @@ export const GetBrowsedChannels = async () => {
             return null;
         }
     } catch (error) {
-        console.log('Error', error);
+        //console.log('Error', error);
         return null;
     }
 };

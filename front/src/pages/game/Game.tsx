@@ -129,7 +129,7 @@ const Game: React.FC = () => {
     }, 17);
 
     const setupEventListeners = () => {
-        console.log('setting up event listeners');
+        //console.log('setting up event listeners');
         canvasRef.current?.addEventListener(
             'mousemove',
             throttleHandleMouseMove
@@ -157,14 +157,14 @@ const Game: React.FC = () => {
         }
     }, [ctx]);
     useEffect(() => {
-        console.log('init', init);
+        //console.log('init', init);
         if (init && canvasRef.current) setupEventListeners();
     }, [init, canvasRef.current]);
 
     useEffect(() => {
         if (socket && !listning) {
-            console.log('listning on socket');
-            console.log('gameinvite', gameinvite);
+            //console.log('listning on socket');
+            //console.log('gameinvite', gameinvite);
             ListenOnSocket(
                 socket,
                 setPadd,
@@ -206,7 +206,7 @@ const Game: React.FC = () => {
                 socket.off('connect');
                 socket.off('error');
                 socket.off('connected');
-                console.log('unmounting');
+                //console.log('unmounting');
                 socket.disconnect();
             }
         };
@@ -225,18 +225,18 @@ const Game: React.FC = () => {
     };
 
     const handleStartGame = () => {
-        socket ? socket.emit('StartGame') : console.log('socket not found');
+        socket ? socket.emit('StartGame') : //console.log('socket not found');
         setGameStarted(true);
     };
     const handleStartGamerobot = () => {
         socket
             ? socket.emit('StartGameRobot')
-            : console.log('socket not found');
+            : //console.log('socket not found');
         setGameStarted(true);
     };
 
     const handleDisconnectSocket = () => {
-        console.log('disconnecting socket');
+        //console.log('disconnecting socket');
         socket?.disconnect();
         navigate('/home');
     };

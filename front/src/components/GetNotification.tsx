@@ -13,7 +13,7 @@ export const GetPendingFriendRequests = async () => {
             return null;
         }
     } catch (error) {
-        console.log('Error', error);
+        //console.log('Error', error);
         return null;
     }
 };
@@ -31,7 +31,7 @@ export const GetPendingInvitations = async () => {
             return null;
         }
     } catch (error) {
-        console.log('Error pending invitations', error);
+        //console.log('Error pending invitations', error);
         return null;
     }
 };

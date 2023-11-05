@@ -40,13 +40,13 @@ export function ListenOnSocket(
 	  });
 
   socket.on("GameDeclined", (message: string) => {
-    console.log("GameDeclined event received");
+    //console.log("GameDeclined event received");
     setGameDeclined(true);
     setGameinvite(false);
     setMessage(message);
   });
   socket.on("InvitationDeclined", (message: string) => {
-    console.log("InvitationDeclined event received");
+    //console.log("InvitationDeclined event received");
     setGameDeclined(true);
     setGameinvite(false);
     setMessage(message);
@@ -64,7 +64,7 @@ export function ListenOnSocket(
   });
   
   socket.on("GAME INVITE", (message: boolean) => {
-    console.log("GAME INVITE");
+    //console.log("GAME INVITE");
     setGameinvite(true);
   });
 
