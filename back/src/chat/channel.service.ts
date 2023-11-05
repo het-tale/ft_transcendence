@@ -248,7 +248,6 @@ export class ChannelService {
     });
 
     if (!room) {
-      console.log('room not found');
       throw new Error('room not found or user is not an admin');
     }
 

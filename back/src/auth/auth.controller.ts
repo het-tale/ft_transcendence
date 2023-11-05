@@ -53,8 +53,6 @@ export class AuthController {
   @UseZodGuard('body', AuthSignInDto)
   @Post('signin')
   async signin(@Body() dto: TSigninData) {
-    console.log(dto);
-
     return await this.authService.signin(dto);
   }
 

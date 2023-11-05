@@ -40,7 +40,6 @@ export class Invitations {
       sender === receiver 
     ) {
       setTimeout(() => {
-      console.log('gamedeclined invitations  43' );
         client.emit('GameDeclined', 'user not found !!');
       }, 2000);
 
@@ -48,7 +47,6 @@ export class Invitations {
     }
     if (sender.status === 'InGame'){
       setTimeout(() => {
-        console.log('InvitationDeclined invitation  51' );
         client.emit('InvitationDeclined', 'you are already in an other game !!');
       }, 2000);
 
@@ -119,14 +117,13 @@ export class Invitations {
       id: player.number,
     };
     setTimeout(() => {
-      if (!key) client.emit('TargetUserOffline'); // to be handled in frontend (show notification to sender)
+      if (!key) client.emit('TargetUserOffline');
       client.emit('GAME INVITE', true);
       client.emit('InitGame', gamedata);
       client.emit('JoinRoom', invitationRoom.roomName);
     }, 1000);
 
   } catch (e) {
-      console.log(e);
     }
   }
 
@@ -149,7 +146,6 @@ export class Invitations {
 
     if (!pendingInvitation) {
         setTimeout(() => {
-        console.log('InvitationDeclined invitations 153' );
           client.emit('InvitationDeclined', "no pending invitation found !!");
         }, 2000);
 
@@ -159,7 +155,6 @@ export class Invitations {
     const invitationRoom = rooms.get(roomName);
     if (!invitationRoom || invitationRoom.players.length === 0) {
       setTimeout(() => {
-        console.log('InvitationDeclined invitations 162' );
         client.emit('InvitationDeclined', "no room found the sender left the room !!");
       }, 2000);
 
@@ -179,8 +174,6 @@ export class Invitations {
     );
     if (!sender_player || !receiver_user) {
       setTimeout(() => {
-
-        console.log('InvitationDeclined invitations 183' );
         client.emit('InvitationDeclined');
         sender_player.socket?.emit('InvitationDeclined', "no room found the reciever left the room !!");
       }, 2000);
@@ -240,7 +233,6 @@ export class Invitations {
       });
     }, 2000);
   } catch (e) {
-      console.log(e);
     }
   }
 
@@ -294,7 +286,6 @@ export class Invitations {
     rooms.delete(roomName);
   }
   catch (e) {
-      console.log(e);
     }
   }
 }

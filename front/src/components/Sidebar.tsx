@@ -37,11 +37,9 @@ const Sidebar = (props: sidebarProps) => {
     }, []);
     useEffect(() => {
         socket.on('userOffline', (data: any) => {
-            console.log('userOffline', data);
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('userOnline', (data: any) => {
-            console.log('userOnline', data);
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('roomCreated', (data: any) => {

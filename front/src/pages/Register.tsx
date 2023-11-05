@@ -43,7 +43,6 @@ function Register() {
                 // navigate('/login');
             })
             .catch((error) => {
-                console.log('register error', error);
                 const errors = error?.response?.data?.errors;
                 if (errors) {
                     for (let index = 0; index < errors?.length; index++) {

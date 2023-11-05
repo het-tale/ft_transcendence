@@ -8,12 +8,10 @@ const TypingBar = (props: any) => {
     const [message, setMessage] = useState('');
     const socket = React.useContext(SocketContext);
     const renderData = useContext(RenderContext);
-    // console.log('typing socket', socket);
 
     const sendMessageHandler = async (e: any) => {
         e.preventDefault();
         const userData = await UserId(props.userDm.id);
-        console.log('sending message to ', userData?.username);
         // if (props.userDm.username === 'ROBOT')
         // {
         //     socket.emit('privateMessageROBOT', {

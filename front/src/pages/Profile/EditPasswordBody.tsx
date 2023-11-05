@@ -37,7 +37,6 @@ const EditPasswordBody = (props: EditPasswordBodyProps) => {
             renderData.setRenderData(!renderData.renderData);
             props.onClose();
         } catch (error: any) {
-            console.log('error', error);
             const errors = error?.response?.data?.errors;
             if (errors) {
                 for (let index = 0; index < errors?.length; index++) {

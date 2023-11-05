@@ -21,7 +21,8 @@ export function ListenOnSocket(
   setGameStarted: React.Dispatch<React.SetStateAction<boolean>>,
   setGameinvite: React.Dispatch<React.SetStateAction<boolean>>,
   setGameDeclined: React.Dispatch<React.SetStateAction<boolean>>,
-  setMessage: React.Dispatch<React.SetStateAction<string | null>>
+  setMessage: React.Dispatch<React.SetStateAction<string | null>>,
+  setIswiner: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   socket.on("connect", () => {
   });
@@ -40,13 +41,11 @@ export function ListenOnSocket(
 	  });
 
   socket.on("GameDeclined", (message: string) => {
-    console.log("GameDeclined event received");
     setGameDeclined(true);
     setGameinvite(false);
     setMessage(message);
   });
   socket.on("InvitationDeclined", (message: string) => {
-    console.log("InvitationDeclined event received");
     setGameDeclined(true);
     setGameinvite(false);
     setMessage(message);
@@ -60,11 +59,9 @@ export function ListenOnSocket(
 
   socket.on("GAME STARTED", (message: boolean) => {
     setGameStarted(true);
-    // setGameinvite(false);
   });
   
   socket.on("GAME INVITE", (message: boolean) => {
-    console.log("GAME INVITE");
     setGameinvite(true);
   });
 
@@ -76,8 +73,9 @@ export function ListenOnSocket(
       setOtherpad(update.otherPaddle);
     }
   );
-  socket.on("GAME OVER", (payload: any) => {
-	setGameOver(true);
+  socket.on("GAME OVER", (payload: boolean) => {
+	  setGameOver(true);
+    setIswiner(payload);
   });
   socket.on(
     "UPDATE SCORE",

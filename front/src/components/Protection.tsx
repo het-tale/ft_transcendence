@@ -17,14 +17,11 @@ const ProtectPassword = (props: any) => {
                         setIsProtected(response.isPasswordRequired);
                     } else if (props.name === 'confirmation') {
                         setIsProtected(!response.isEmailConfirmed);
-                        console.log('Email', response.isEmailConfirmed);
                     }
                 } else {
                     navigate('/');
-                    console.log('Hello from protecting email', response);
                 }
             } catch (error) {
-                console.log('Hello from protecting email', error);
                 navigate('/');
             }
         };

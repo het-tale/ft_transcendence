@@ -157,7 +157,7 @@ export class Room {
 }
 
 export const INTERVAL = 20;
-export const INCREASE_SPEED = 1;
+export const INCREASE_SPEED = 1.2;
 export const SPEED_INTERVAL = 1000;
 export const CONTAINERHIEGHT = 480;
 export const CONTAINERWIDTH = 720;
