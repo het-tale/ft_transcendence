@@ -34,7 +34,6 @@ const EditAvatarBody = (props: EditAvatarProps) => {
             props.onClose();
             props.setIsHovered && props.setIsHovered(false);
         } catch (error: any) {
-            console.log('error', error);
             toast({
                 title: 'Error',
                 description: error.response.data.message,

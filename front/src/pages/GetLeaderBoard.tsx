@@ -13,7 +13,6 @@ export const GetLeaderBoard = async () => {
             return null;
         }
     } catch (error) {
-        console.log('Error leader', error);
         return null;
     }
 };

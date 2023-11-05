@@ -79,7 +79,6 @@ const Search = (props: SearchProps) => {
                 : GetRoomDms().then((data) => {
                       props.setDms && props.setDms(data);
                   });
-            console.log('THIS IS THE ERROR', error);
         }
     };
     const HandleGlobalSearch = async () => {

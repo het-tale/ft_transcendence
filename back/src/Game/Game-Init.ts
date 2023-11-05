@@ -66,7 +66,6 @@ export class GameInit {
         },
       });
     } catch (e) {
-      console.log(e);
     }
   }
 

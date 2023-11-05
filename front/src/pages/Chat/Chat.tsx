@@ -20,7 +20,6 @@ export default function Chat(props: BrowseChannelsProps) {
     useEffect(() => {
         GetDms().then((data) => {
             setDms(data);
-            // console.log('UPDATE DM');
         });
         GetRoomDms().then((data) => {
             setRoomDms(data);
@@ -28,13 +27,11 @@ export default function Chat(props: BrowseChannelsProps) {
     }, [render, props.update, renderData.renderData]);
     useEffect(() => {
         socket.on('privateMessage', (data: any) => {
-            console.log('privateMessage Data', data);
             renderData.setCount && renderData.setCount(renderData.count! + 1);
             setRender(!render);
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('roomCreateError', (data: any) => {
-            console.log('roomCreateError', data);
             toast({
                 title: 'Error',
                 description: data,
@@ -69,7 +66,6 @@ export default function Chat(props: BrowseChannelsProps) {
             });
         });
         socket.on('channelDeleted', () => {
-            console.log('channelDeleted');
             toast({
                 title: 'Success',
                 description: 'Channel deleted',
@@ -111,7 +107,6 @@ export default function Chat(props: BrowseChannelsProps) {
                 isClosable: true,
                 position: 'bottom-right'
             });
-            console.log('admin added');
             setRender(!render);
         });
         socket.on('userMuted', (data: any) => {
@@ -137,7 +132,6 @@ export default function Chat(props: BrowseChannelsProps) {
             setRender(!render);
         });
         socket.on('userKicked', (data: any) => {
-            console.log('userKicked', data);
             toast({
                 title: 'success',
                 description: data,

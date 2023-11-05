@@ -35,7 +35,6 @@ const ProtectRoutes = (props: any) => {
                         socket.connect();
                     }
                 } else {
-                    console.log('Unprotected route');
                     navigate('/');
                 }
             } catch (error) {

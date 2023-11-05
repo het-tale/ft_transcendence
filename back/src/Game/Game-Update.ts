@@ -71,13 +71,13 @@ export class GameUpdate {
     const otherPaddle = otherPlayer.paddle;
     this.intersections(room, playerPaddle, otherPaddle);
     if (room.ball.x + room.ball.radius > CONTAINERWIDTH) {
-      player.score++;
-      if (player.score === 3) this.dataupdatetostop(room, activeSockets);
+      ++player.score;
+      if (player.score === 3) return this.dataupdatetostop(room, activeSockets);
       else this.resetBall(room.ball, player, otherPlayer);
     }
     if (room.ball.x - room.ball.radius <= 0) {
-      otherPlayer.score++;
-      if (otherPlayer.score === 3) this.dataupdatetostop(room, activeSockets);
+      ++otherPlayer.score;
+      if (otherPlayer.score === 3) return this.dataupdatetostop(room, activeSockets);
       else this.resetBall(room.ball, player, otherPlayer);
     }
     playerSocket?.emit('UPDATE', {
@@ -161,7 +161,6 @@ export class GameUpdate {
       room.ball.y - room.ball.radius <= 0 ||
       room.ball.y + room.ball.radius > CONTAINERHIEGHT
     ) {
-      // Reverse the vertical velocity of the ball
       room.ball.dy *= -1;
     }
   }
@@ -395,7 +394,6 @@ export class GameUpdate {
       room.players[0].score < room.players[1].score
         ? room.players[0]
         : room.players[1];
-
     await this.prisma.match.update({
       where: { id: room.id },
       data: {
@@ -421,8 +419,8 @@ export class GameUpdate {
         },
       },
     });
-    winer.socket?.emit('GAME OVER', { winner: true });
-    looser.socket?.emit('GAME OVER', { winner: false });
+    winer.socket?.emit('GAME OVER', true );
+    looser.socket?.emit('GAME OVER', false );
     room.gameActive = false;
     await this.calculateWinRate(winer.id);
     await this.calculateWinRate(looser.id);
@@ -451,7 +449,6 @@ export class GameUpdate {
     const obj6 = await this.checkFirstLoss(looser.id);
     if (obj6.isUnlocked)
       looser.socket?.emit('achievementUnlocked', obj6.achievement);
-
     stopGame(room, activeSockets);
   }
 }

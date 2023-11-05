@@ -112,6 +112,5 @@ export class SecurityService {
         avatar: result,
       },
     });
-    console.log(result);
   }
 }

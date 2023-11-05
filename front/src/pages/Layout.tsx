@@ -66,7 +66,6 @@ export const Layout = ({ children }: Props) => {
         socketGame.auth = { token: token };
         socketGame.connect();
         socket.on('exception', (err) => {
-            console.log('exception', err);
             if (err.message.length > 0) {
                 for (let i = 0; i < err.message.length; i++) {
                     toast({
@@ -82,7 +81,6 @@ export const Layout = ({ children }: Props) => {
         });
 
         socket.on('roomInvitation', (data: any) => {
-            console.log('roomInvitation', data);
             toast({
                 title: 'success',
                 description: data.from,
@@ -94,7 +92,6 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('roomInvitationError', (data: any) => {
-            console.log('roomInvitationError', data);
             toast({
                 title: 'Error',
                 description: data,
@@ -163,11 +160,9 @@ export const Layout = ({ children }: Props) => {
             renderData.setRenderData(!renderData.renderData);
         });
         socketGame.on('InGame', () => {
-            console.log('User in Gameee');
             renderData.setRenderData(!renderData.renderData);
         });        
         socketGame.on('OutGame', () => {
-            console.log('User out of Gameee');
             renderData.setRenderData(!renderData.renderData);
         });
         socket.on('frienRequest', (data: any) => {
@@ -336,7 +331,6 @@ export const Layout = ({ children }: Props) => {
     };
 
     const handleAcceptRejectGame = (isAccepted: boolean, roomName: string) => {
-        console.log('name at accept rject game ', roomName);
         if (isAccepted) {
             socketGame.emit('AcceptInvitation', roomName);
             navigate(`/game/`);

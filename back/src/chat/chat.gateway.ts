@@ -48,7 +48,6 @@ export class ChatGateway
   private connectedUsers: { clientId: string; username: string }[] = [];
 
   afterInit() {
-    console.log('Chat gateway initialized');
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {

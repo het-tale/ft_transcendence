@@ -21,7 +21,6 @@ const Signin42 = () => {
                 }
             })
             .catch((error) => {
-                console.log('Error', error);
                 navigate('/');
             });
     }, []);

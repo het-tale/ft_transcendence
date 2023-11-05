@@ -78,6 +78,7 @@ const Game: React.FC = () => {
     const gameContainer = useRef<HTMLDivElement>(null);
     const [gameStarted, setGameStarted] = useState(false);
     const [gameOver, setGameOver] = useState(false);
+    const [iswiner, setIswiner] = useState(false)
     const canvasRef = useRef<HTMLCanvasElement>(
         null
     ) as React.RefObject<HTMLCanvasElement>;
@@ -129,7 +130,6 @@ const Game: React.FC = () => {
     }, 17);
 
     const setupEventListeners = () => {
-        console.log('setting up event listeners');
         canvasRef.current?.addEventListener(
             'mousemove',
             throttleHandleMouseMove
@@ -157,14 +157,11 @@ const Game: React.FC = () => {
         }
     }, [ctx]);
     useEffect(() => {
-        console.log('init', init);
         if (init && canvasRef.current) setupEventListeners();
     }, [init, canvasRef.current]);
 
     useEffect(() => {
         if (socket && !listning) {
-            console.log('listning on socket');
-            console.log('gameinvite', gameinvite);
             ListenOnSocket(
                 socket,
                 setPadd,
@@ -180,7 +177,8 @@ const Game: React.FC = () => {
                 setGameStarted,
                 setGameinvite,
                 setGameDeclined,
-                setMessage
+                setMessage,
+                setIswiner
             );
             setListning(true);
             const loadDataFromBackend = async () => {
@@ -206,7 +204,6 @@ const Game: React.FC = () => {
                 socket.off('connect');
                 socket.off('error');
                 socket.off('connected');
-                console.log('unmounting');
                 socket.disconnect();
             }
         };
@@ -225,18 +222,15 @@ const Game: React.FC = () => {
     };
 
     const handleStartGame = () => {
-        socket ? socket.emit('StartGame') : console.log('socket not found');
+        socket ? socket.emit('StartGame') : null;
         setGameStarted(true);
     };
     const handleStartGamerobot = () => {
-        socket
-            ? socket.emit('StartGameRobot')
-            : console.log('socket not found');
+        socket ? socket.emit('StartGameRobot') : null;
         setGameStarted(true);
     };
 
     const handleDisconnectSocket = () => {
-        console.log('disconnecting socket');
         socket?.disconnect();
         navigate('/home');
     };
@@ -417,7 +411,7 @@ const Game: React.FC = () => {
                             <div className="game-over">
                                 <p className="paraInfo">Game Over.</p>
                                 <p className="paraInfo">
-                                    {playerScore > otherScore
+                                    {iswiner
                                         ? 'you won'
                                         : 'you lost'}
                                 </p>
