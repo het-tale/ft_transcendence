@@ -68,34 +68,37 @@ export const LeaderBoard = () => {
                 ) : users?.some((user) => user.id === renderData.user?.id) ? (
                     <Table boxShadow={'md'}>
                         <Tbody>
-                        <Tr>
-                            <Td>{renderData.user?.g_rank}</Td>
-                            <Td>
-                                <Flex
-                                    flexDirection={'row'}
-                                    alignItems={'center'}
-                                >
-                                    <Avatar
-                                        src={renderData.user?.avatar}
-                                        marginRight={'2'}
+                            <Tr>
+                                <Td>{renderData.user?.g_rank}</Td>
+                                <Td>
+                                    <Flex
+                                        flexDirection={'row'}
+                                        alignItems={'center'}
                                     >
-                                        <AvatarBadge
-                                            boxSize="1.25em"
-                                            bg={
-                                                renderData.user?.status ===
-                                                'offline'
-                                                    ? '#ccc'
-                                                    : 'green.500'
-                                            }
-                                        />
-                                    </Avatar>
-                                    <Text marginTop={'1rem'} fontSize={'md'}>
-                                        {renderData.user?.username}
-                                    </Text>
-                                </Flex>
-                            </Td>
-                            <Td>{renderData.user?.win_rate}</Td>
-                        </Tr>
+                                        <Avatar
+                                            src={renderData.user?.avatar}
+                                            marginRight={'2'}
+                                        >
+                                            <AvatarBadge
+                                                boxSize="1.25em"
+                                                bg={
+                                                    renderData.user?.status ===
+                                                    'offline'
+                                                        ? '#ccc'
+                                                        : 'green.500'
+                                                }
+                                            />
+                                        </Avatar>
+                                        <Text
+                                            marginTop={'1rem'}
+                                            fontSize={'md'}
+                                        >
+                                            {renderData.user?.username}
+                                        </Text>
+                                    </Flex>
+                                </Td>
+                                <Td>{renderData.user?.lp}</Td>
+                            </Tr>
                         </Tbody>
                     </Table>
                 ) : (
@@ -120,7 +123,7 @@ export const LeaderBoard = () => {
                                 <Th color={'#a435f0'}>Rank</Th>
                                 <Th color={'#a435f0'}>User</Th>
                                 <Th isNumeric color={'#a435f0'}>
-                                    Win Rate,%
+                                    LP
                                 </Th>
                             </Tr>
                         </Thead>
@@ -156,7 +159,7 @@ export const LeaderBoard = () => {
                                                 </Text>
                                             </Flex>
                                         </Td>
-                                        <Td isNumeric>{user?.win_rate}</Td>
+                                        <Td isNumeric>{user?.lp}</Td>
                                     </Tr>
                                 );
                             })}
