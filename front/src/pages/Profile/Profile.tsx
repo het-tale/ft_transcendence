@@ -37,7 +37,7 @@ const Profile = () => {
         GetFriendsList().then((data) => {
             setFriends(data);
         });
-        GetMutualFriendsList(user?.username).then((data) => {
+        GetMutualFriendsList(Number(id)).then((data) => {
             setMutualFriends(data);
         });
     }, [renderData.renderData]);
