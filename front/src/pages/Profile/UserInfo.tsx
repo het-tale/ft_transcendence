@@ -20,6 +20,7 @@ import EditAvatarBody from './EditAvatarBody';
 import Manage2fa from './Manage2fa';
 import { RenderContext } from '../../RenderContext';
 import client from '../../components/Client';
+import { useNavigate } from 'react-router-dom';
 
 interface UserInfoProps {
     user?: UserType;
@@ -80,6 +81,10 @@ const UserInfo = (props: UserInfoProps) => {
             });
             renderData.setRenderData(!renderData.renderData);
         }
+    };
+    const navigate = useNavigate();
+    const handleSendMessage = () => {
+        navigate(`/chat/rooms-dms/${user?.id}`);
     };
     return (
         <Flex
@@ -245,6 +250,14 @@ const UserInfo = (props: UserInfoProps) => {
             </Flex>
             {props.isMyProfile ? null : (
                 <>
+                    <Button
+                        w={'100%'}
+                        bg={'#a435f0'}
+                        color={'white'}
+                        onClick={handleSendMessage}
+                    >
+                        Send Message
+                    </Button>
                     <Button
                         w={'100%'}
                         bg={'#a435f0'}
