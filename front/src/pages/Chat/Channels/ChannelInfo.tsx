@@ -122,13 +122,7 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                             (admin) => admin.id === props.user?.id
                         ) ? (
                             <Button onClick={onOpen2}>
-                                <IconButton
-                                    variant="ghost"
-                                    colorScheme="gray"
-                                    aria-label=""
-                                    icon={<BsPencilFill />}
-                                    color={'#a435f0'}
-                                />
+                                <BsPencilFill color={'#a435f0'} />
                                 <ModalUi
                                     isOpen={isOpen2}
                                     onOpen={onOpen2}
@@ -162,13 +156,7 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                             (admin) => admin.id === props.user?.id
                         ) ? (
                             <Button onClick={onOpen4}>
-                                <IconButton
-                                    variant="ghost"
-                                    colorScheme="gray"
-                                    aria-label=""
-                                    icon={<BsPencilFill />}
-                                    color={'#a435f0'}
-                                />
+                                <BsPencilFill color={'#a435f0'} />
                                 <ModalUi
                                     isOpen={isOpen4}
                                     onOpen={onOpen4}
@@ -230,6 +218,7 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                                 render={props.render}
                                 setRender={props.setRender}
                                 room={props.room}
+                                key={ban.id}
                             />
                         ))}
                     </CardBody>
