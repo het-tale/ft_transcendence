@@ -132,23 +132,23 @@ const RoomsChat = (props: RoomsChatProps) => {
                                         : '100%'
                                 }
                             >
-                                <button
+                                {/* <button
                                     onClick={props.handleRenderActions}
                                     style={{
                                         background: 'transparent',
                                         width: '100%'
                                     }}
-                                >
-                                    <ChannelDmInfo
-                                        profile={room.avatar}
-                                        type={room.type}
-                                        name={room.name}
-                                        showChannelInfo={showChannelInfo}
-                                        setShowChannelInfo={setShowChannelInfo}
-                                        setRender={props.setRender}
-                                        render={props.render}
-                                    />
-                                </button>
+                                > */}
+                                <ChannelDmInfo
+                                    profile={room.avatar}
+                                    type={room.type}
+                                    name={room.name}
+                                    showChannelInfo={showChannelInfo}
+                                    setShowChannelInfo={setShowChannelInfo}
+                                    setRender={props.setRender}
+                                    render={props.render}
+                                />
+                                {/* </button> */}
                             </Box>
                             {room.admins.some(
                                 (admin) => admin.id === user?.id
@@ -285,7 +285,7 @@ const RoomsChat = (props: RoomsChatProps) => {
             {room?.participants.some(
                 (participant) => participant.id === user?.id
             ) && showChannelInfo ? (
-                <div className="container" style={{width: '40%'}}>
+                <div className="container" style={{ width: '40%' }}>
                     <ChannelInfo
                         ChannelDm={room}
                         user={user}

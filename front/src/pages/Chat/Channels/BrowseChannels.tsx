@@ -28,7 +28,7 @@ const BrowseChannels = (props: BrowseChannelsProps) => {
             {browseChannels ? (
                 browseChannels.map((channel: Channel) => {
                     return (
-                        <GridItem w="100%">
+                        <GridItem w="100%" key={channel.id}>
                             <ChannelCard
                                 ChannelInfo={channel}
                                 updateChannel={props.update}
