@@ -161,7 +161,7 @@ export const Layout = ({ children }: Props) => {
         });
         socketGame.on('InGame', () => {
             renderData.setRenderData(!renderData.renderData);
-        });        
+        });
         socketGame.on('OutGame', () => {
             renderData.setRenderData(!renderData.renderData);
         });
@@ -395,6 +395,7 @@ export const Layout = ({ children }: Props) => {
                                         w={'100%'}
                                         style={{ boxShadow: 'none' }}
                                         marginBottom={2}
+                                        key={'Game' + invit.id}
                                     >
                                         <Flex
                                             w={'full'}
@@ -479,6 +480,7 @@ export const Layout = ({ children }: Props) => {
                                         w={'100%'}
                                         style={{ boxShadow: 'none' }}
                                         marginBottom={2}
+                                        key={'friend' + friend.id}
                                     >
                                         <Flex
                                             w={'full'}
