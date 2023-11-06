@@ -315,7 +315,7 @@ export const Layout = ({ children }: Props) => {
             socketGame.off('achievementUnlocked');
             socket.off('offlineMessages');
             socket.off('offlineAchievements');
-            socket.off('usernameChanged');
+            // socket.off('usernameChanged');
             socket.off('usernameChangeError');
             socket.off('exception');
         };

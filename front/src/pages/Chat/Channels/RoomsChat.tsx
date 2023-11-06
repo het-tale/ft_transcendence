@@ -14,7 +14,7 @@ import {
 import { Channel } from '../../../Types/Channel';
 import ChannelDmInfo from './ChannelDmInfo';
 import ChannelTypingBar from './ChannelTypingBar';
-import React, { useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { UserType } from '../../../Types/User';
 import User from '../../../components/User';
 import { MessageType } from '../../../Types/Message';
@@ -25,6 +25,7 @@ import ModalUi from '../../../components/ModalUi';
 import InviteUsersModal from './InviteUsersModal';
 import { SocketContext } from '../../../socket';
 import DeletChannelModal from './DeletChannelModal';
+import { RenderContext } from '../../../RenderContext';
 
 export interface RoomsChatProps {
     handleRenderActions: () => void;
@@ -43,6 +44,7 @@ const RoomsChat = (props: RoomsChatProps) => {
     const [messages, setMessages] = React.useState<MessageType[]>([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const chatContainerRef = useRef<HTMLDivElement | null>(null);
+    const renderData = useContext(RenderContext);
     const {
         isOpen: isOpen2,
         onOpen: onOpen2,
@@ -78,7 +80,7 @@ const RoomsChat = (props: RoomsChatProps) => {
             setRoom(roomData);
         }
         fetchRoomData();
-    }, [props.render, props.update, props.channelDm]);
+    }, [props.render, props.update, props.channelDm, renderData.renderData]);
     const handleDeleteChannel = () => {
         socket.emit('deleteChannel', {
             room: props.channelDm?.name
