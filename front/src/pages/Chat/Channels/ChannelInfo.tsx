@@ -194,7 +194,7 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                 <CardBody>
                     {props.room?.participants?.map((participant) => (
                         <MemberInfo
-                            key={participant.id}
+                            key={'participant' + participant.id}
                             ChannelDm={props.ChannelDm}
                             user={props.user}
                             participant={participant}
@@ -218,7 +218,7 @@ const ChannelInfo = (props: ChannelInfoProps) => {
                                 render={props.render}
                                 setRender={props.setRender}
                                 room={props.room}
-                                key={ban.id}
+                                key={'banned' + ban.id}
                             />
                         ))}
                     </CardBody>
