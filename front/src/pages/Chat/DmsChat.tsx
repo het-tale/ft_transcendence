@@ -50,12 +50,14 @@ const DmsChat = (props: any) => {
     const [user, setUser] = React.useState<UserType>();
     const [blocked, setBlocked] = React.useState(false);
     const location = useLocation();
+    const [receiver, setReceiver] = React.useState<UserType>();
     let userId = location.pathname.split('/')[3];
     React.useEffect(() => {
         async function fetchUserData() {
             if (props.userDm?.id !== undefined || Number(userId) === 0) return;
             const userData = await UserId(Number(userId));
             props.setUserDm(userData);
+            setReceiver(userData);
         }
         fetchUserData();
     }, [props.render, renderData.renderData]);
@@ -90,9 +92,11 @@ const DmsChat = (props: any) => {
             block: 'nearest'
         });
     }, [messages]);
-    const handleBlockedUser = () => {
+    const handleBlockedUser = async () => {
+        const userData = await UserId(Number(userId));
+        // console.log(userData);
         socket.emit('blockUser', {
-            target: props.userDm?.username
+            target: userData?.username
         });
         setBlocked(true);
         props.setRender(!props.render);
@@ -104,9 +108,10 @@ const DmsChat = (props: any) => {
     socket.on('userBlockError', (data: any) => {
         props.setRender(!props.render);
     });
-    const handleUnblockUser = () => {
+    const handleUnblockUser = async () => {
+        const userData = await UserId(Number(userId));
         socket.emit('unblockUser', {
-            target: props.userDm?.username
+            target: userData?.username
         });
         setBlocked(false);
         props.setRender(!props.render);
@@ -126,8 +131,9 @@ const DmsChat = (props: any) => {
                 ? 'clear-conversation'
                 : 'delete-conversation';
         try {
+            const userData = await UserId(Number(userId));
             const res = await client.delete(
-                `chat/${str}/${props.userDm?.username}`,
+                `chat/${str}/${userData?.username}`,
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
