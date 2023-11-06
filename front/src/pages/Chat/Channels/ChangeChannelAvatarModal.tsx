@@ -4,6 +4,7 @@ import { Channel } from '../../../Types/Channel';
 import { UserType } from '../../../Types/User';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import client from '../../../components/Client';
+import { RenderContext } from '../../../RenderContext';
 
 interface changeAvatar {
     file: FileList;
@@ -23,6 +24,7 @@ const ChangeChannelAvatarModal = (props: ChangeChannelAvatarModalProps) => {
     const { register, handleSubmit } = useForm<changeAvatar>();
     const formData = new FormData();
     formData.append('file', image);
+    const renderData = React.useContext(RenderContext);
     const handleChangeAvatar: SubmitHandler<changeAvatar> = async (data) => {
         try {
             await client.post(
@@ -35,6 +37,7 @@ const ChangeChannelAvatarModal = (props: ChangeChannelAvatarModalProps) => {
                 }
             );
             props.setRender && props.setRender(!props.render);
+            renderData.setRenderData(!renderData.renderData);
             props.onClose();
         } catch (error: any) {
             toast({
