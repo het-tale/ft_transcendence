@@ -85,6 +85,7 @@ const Game: React.FC = () => {
     const ctx = canvasRef.current?.getContext('2d') as CanvasRenderingContext2D;
     const socketGame = React.useContext(SocketGameContext);
     const [gameinvite, setGameinvite] = useState(false);
+    const [reciever, setReciever] = useState<string | null>(null);
     const [loaded, setDataLoaded] = useState(false);
     const [Gamedeclined, setGameDeclined] = useState(false);
     const intialise = useRef(false);
@@ -178,7 +179,8 @@ const Game: React.FC = () => {
                 setGameinvite,
                 setGameDeclined,
                 setMessage,
-                setIswiner
+                setIswiner,
+                setReciever
             );
             setListning(true);
             const loadDataFromBackend = async () => {
@@ -369,7 +371,7 @@ const Game: React.FC = () => {
                                             <div className="game-over">
                                                 <p className="parainfo">
                                                     {' '}
-                                                    Waiting for other player to
+                                                    Waiting for {reciever} to
                                                     join ...{' '}
                                                 </p>
                                             </div>

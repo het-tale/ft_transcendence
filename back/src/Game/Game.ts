@@ -54,14 +54,13 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
       const token = client.handshake.auth.token;
       const user = await this.serviceInit.verifyToken(token);
       if (!user) throw new Error('undefined user ');
-      // if (user.status === 'InGame') {
-      //   setTimeout(() => {
-      //   console.log('InvitationDeclined game 59' );
-      //     client.emit('InvitationDeclined', 'You are in other game');
-      //   }, 2000);
+      if (user.status === 'InGame') {
+        setTimeout(() => {
+          client.emit('GameDeclined', 'You are in other game');
+        }, 2000);
 
-      //   return;
-      // }
+        return;
+      }
 
       this.activeSockets.set(client, user);
     } catch (e) {

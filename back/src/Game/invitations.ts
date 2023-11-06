@@ -45,9 +45,16 @@ export class Invitations {
 
       return;
     }
-    if (sender.status === 'InGame'){
+    if (sender.status === 'InGame') {
       setTimeout(() => {
         client.emit('InvitationDeclined', 'you are already in an other game !!');
+      }, 2000);
+
+      return;
+    }
+    if (receiver.status === 'InGame') {
+      setTimeout(() => {
+        client.emit('InvitationDeclined', 'the reciever is already in an other game try again later!!');
       }, 2000);
 
       return;
@@ -118,7 +125,7 @@ export class Invitations {
     };
     setTimeout(() => {
       if (!key) client.emit('TargetUserOffline');
-      client.emit('GAME INVITE', true);
+      client.emit('GAME INVITE', receiver.username);
       client.emit('InitGame', gamedata);
       client.emit('JoinRoom', invitationRoom.roomName);
     }, 1000);
@@ -214,7 +221,7 @@ export class Invitations {
       id: player.number,
     };
     setTimeout(() => {
-      client.emit('GAME INVITE', true);
+      client.emit('GAME INVITE', "");
       client.emit('InitGame', gamedata);
       client.emit('JoinRoom', roomName);
     }, 2000);
