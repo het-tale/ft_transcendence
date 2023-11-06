@@ -94,7 +94,6 @@ const DmsChat = (props: any) => {
     }, [messages]);
     const handleBlockedUser = async () => {
         const userData = await UserId(Number(userId));
-        // console.log(userData);
         socket.emit('blockUser', {
             target: userData?.username
         });

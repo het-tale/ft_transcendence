@@ -243,6 +243,18 @@ export class FriendsService {
           },
         },
       });
+      await this.prisma.user.update({
+        where: {
+          id: blocked.id,
+        },
+        data: {
+          friends: {
+            disconnect: {
+              id: client.id,
+            },
+          },
+        },
+      });
     }
   }
   async unblockUser(clientUsername: string, blockedUsername: string) {

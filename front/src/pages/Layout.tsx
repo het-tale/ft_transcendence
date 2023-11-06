@@ -16,7 +16,7 @@ import NavbarSearch from '../components/NavbarSearch';
 import Sidebar from '../components/Sidebar';
 import '../css/sidebar.css';
 import { useEffect, useState } from 'react';
-import { FriendRequest, Invitation } from '../Types/Invitation';
+import { FriendRequest, Invitation, gameinvitdata } from '../Types/Invitation';
 import React from 'react';
 import { SocketContext, SocketGameContext } from '../socket';
 import { RenderContext, RenderContextType } from '../RenderContext';
@@ -330,11 +330,15 @@ export const Layout = ({ children }: Props) => {
         renderData.setRenderData(!renderData.renderData);
     };
 
-    const handleAcceptRejectGame = (isAccepted: boolean, roomName: string) => {
+    const handleAcceptRejectGame = (isAccepted: boolean, roomName: string, id : number) => {
+        const invitdata: gameinvitdata = {
+            roomName: roomName,
+            id : id
+        }
         if (isAccepted) {
-            socketGame.emit('AcceptInvitation', roomName);
+            socketGame.emit('AcceptInvitation', invitdata);
             navigate(`/game/`);
-        } else socketGame.emit('DeclineInvitation', roomName);
+        } else socketGame.emit('DeclineInvitation', invitdata);
         renderData.setRenderData(!renderData.renderData);
         renderData.setNotification &&
             renderData.setNotification(!renderData.notification);
@@ -426,7 +430,8 @@ export const Layout = ({ children }: Props) => {
                                                                 ? () =>
                                                                       handleAcceptRejectGame(
                                                                           false,
-                                                                          invit.roomName!
+                                                                          invit.roomName!,
+                                                                          invit.sender.id
                                                                       )
                                                                 : () =>
                                                                       handleAcceptReject(
@@ -447,7 +452,8 @@ export const Layout = ({ children }: Props) => {
                                                                 ? () =>
                                                                       handleAcceptRejectGame(
                                                                           true,
-                                                                          invit.roomName!
+                                                                          invit.roomName!,
+                                                                            invit.sender.id
                                                                       )
                                                                 : () =>
                                                                       handleAcceptReject(
