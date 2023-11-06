@@ -22,7 +22,8 @@ export function ListenOnSocket(
   setGameinvite: React.Dispatch<React.SetStateAction<boolean>>,
   setGameDeclined: React.Dispatch<React.SetStateAction<boolean>>,
   setMessage: React.Dispatch<React.SetStateAction<string | null>>,
-  setIswiner: React.Dispatch<React.SetStateAction<boolean>>
+  setIswiner: React.Dispatch<React.SetStateAction<boolean>>,
+  setReciever: React.Dispatch<React.SetStateAction<string | null>>
 ) {
   socket.on("connect", () => {
   });
@@ -61,8 +62,9 @@ export function ListenOnSocket(
     setGameStarted(true);
   });
   
-  socket.on("GAME INVITE", (message: boolean) => {
+  socket.on("GAME INVITE", (message: string) => {
     setGameinvite(true);
+    setReciever(message);
   });
 
   socket.on(
