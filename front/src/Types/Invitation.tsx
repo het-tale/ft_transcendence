@@ -1,3 +1,4 @@
+import { type } from 'os';
 import { Channel } from './Channel';
 import { UserType } from './User';
 
@@ -28,3 +29,8 @@ export type FriendRequest = {
     receiver: UserType;
     receiverId: number;
 };
+
+export type gameinvitdata = {
+    roomName: string;
+    id : number;
+}

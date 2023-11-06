@@ -22,7 +22,7 @@ const MatchHistory = (props: MatchHistoryProps) => {
     const [matchHistory, setMatchHistory] = React.useState<Match[]>([]);
     const renderData = useContext(RenderContext);
     useEffect(() => {
-        GetMatchHistory(props.username).then((data) => {
+        GetMatchHistory(props.id!).then((data) => {
             setMatchHistory(data);
         });
     }, [renderData.renderData]);

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Socket } from 'socket.io';
 import { User } from '@prisma/client';
-import { GameData, OTHERPADDLE, PADDLE, Paddle, Player, Room } from './types';
+import { GameData, OTHERPADDLE, PADDLE, Paddle, Player, Room, gameinvitdata } from './types';
 import { GameStartEvent } from './game-start-event';
 import { Server } from 'socket.io';
 
@@ -36,15 +36,33 @@ export class Invitations {
 
     if (
       !receiver ||
-      !receiver ||
+      !sender ||
       sender === receiver 
     ) {
       setTimeout(() => {
-        client.emit('GameDeclined', 'user not found !!');
+        client.emit('InvitationDeclined', 'user not found !!');
       }, 2000);
 
       return;
     }
+
+   const allreadyinvit = await this.prisma.invitation.findFirst({
+      where: {
+        senderId: sender.id,
+        receiverId: receiver.id,
+        isGame: true,
+        status: 'pending',
+      },
+    });
+
+    if (allreadyinvit) {
+      setTimeout(() => {
+        client.emit('InvitationDeclined', 'you already sent an invitation to this user !!');
+      }, 2000);
+
+      return;
+    }
+
     if (sender.status === 'InGame') {
       setTimeout(() => {
         client.emit('InvitationDeclined', 'you are already in an other game !!');
@@ -137,15 +155,17 @@ export class Invitations {
   async acceptInvitation(
     client: Socket,
     rooms: Map<string, Room>,
-    roomName: string,
     activeSockets: Map<Socket, User>,
-    server: Server
+    server: Server,
+    invitdata: gameinvitdata,
+    
   ) {
     try {
     const receiver_user = activeSockets.get(client);
     const pendingInvitation = await this.prisma.invitation.findFirst({
         where: {
           receiverId: receiver_user?.id,
+          senderId: invitdata.senderId,
           isGame: true,
           status: 'pending',
         },
@@ -159,7 +179,7 @@ export class Invitations {
         return;
       }
 
-    const invitationRoom = rooms.get(roomName);
+    const invitationRoom = rooms.get(invitdata.roomName);
     if (!invitationRoom || invitationRoom.players.length === 0) {
       setTimeout(() => {
         client.emit('InvitationDeclined', "no room found the sender left the room !!");
@@ -208,9 +228,9 @@ export class Invitations {
     });
     const padd = new Paddle(PADDLE.x, PADDLE.y, PADDLE.width, PADDLE.height, PADDLE.dy);
     const otherpad = new Paddle(OTHERPADDLE.x, OTHERPADDLE.y, OTHERPADDLE.width, OTHERPADDLE.height, OTHERPADDLE.dy);
-    const player = new Player(2, receiver_user.id, client, padd, roomName, 0);
+    const player = new Player(2, receiver_user.id, client, padd, invitdata.roomName, 0);
     invitationRoom.players.push(player);
-    client.join(roomName);
+    client.join(invitdata.roomName);
     const gamedata: GameData = {
       playerpad: player.paddle,
       otherpad: otherpad,
@@ -223,7 +243,7 @@ export class Invitations {
     setTimeout(() => {
       client.emit('GAME INVITE', "");
       client.emit('InitGame', gamedata);
-      client.emit('JoinRoom', roomName);
+      client.emit('JoinRoom', invitdata.roomName);
     }, 2000);
 
     setTimeout(() => {
@@ -246,28 +266,26 @@ export class Invitations {
   async declineInvitation(
     client: Socket,
     rooms: Map<string, Room>,
-    roomName: string,
-    activeSockets: Map<Socket, User>
+    activeSockets: Map<Socket, User>,
+    invitdata: gameinvitdata,
   ) {
     try {
-      const receiver_user = activeSockets.get(client);
-    const room = rooms.get(roomName);
-    if (room) {
-    const sender_player = room.players.find(
-      (player) => player.socket !== client,
-    );
-    const sender_user = activeSockets.get(sender_player.socket);
+    const receiver_user = activeSockets.get(client);
     const pendingInvitation = await this.prisma.invitation.findFirst({
       where: {
         receiverId: receiver_user?.id,
-        senderId: sender_user?.id,
+        senderId: invitdata.senderId,
         isGame: true,
         status: 'pending',
       },
     });
-    if (!pendingInvitation) {
-      sender_player?.socket?.leave(roomName);
-      rooms.delete(roomName);
+    const room = rooms.get(invitdata.roomName);
+    const sender_player = room?.players.find(
+      (player) => player.socket !== client,
+    );
+    if (!pendingInvitation ) {
+      sender_player?.socket?.leave(invitdata.roomName);
+      rooms.delete(invitdata.roomName);
 
       return;
     }
@@ -279,18 +297,20 @@ export class Invitations {
         status: 'rejected',
       },
     });
+    if (room) {
+    const sender_user = activeSockets.get(sender_player?.socket);
     this.prisma.user.update({
       where: {
-        id: sender_user.id,
+        id: sender_user?.id,
       },
       data: {
         status: 'online',
       },
     });
     sender_player?.socket?.emit('InvitationDeclined', "the reciever declined the invitation !!");
-    sender_player?.socket?.leave(roomName);
+    sender_player?.socket?.leave(invitdata.roomName);
   }
-    rooms.delete(roomName);
+    rooms.delete(invitdata.roomName);
   }
   catch (e) {
     }

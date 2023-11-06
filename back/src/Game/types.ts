@@ -180,3 +180,8 @@ export const OTHERPADDLE = new Paddle(
   CONTAINERHIEGHT * 0.15,
   3,
 );
+
+export type gameinvitdata = {
+  roomName: string;
+  senderId : number;
+}

@@ -7,7 +7,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Room } from './types';
+import { Room, gameinvitdata } from './types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GameInit } from './Game-Init';
 import { GameStartEvent } from './game-start-event';
@@ -114,14 +114,14 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('AcceptInvitation')
-  async handleAcceptInvitation(client: Socket, roomId: string) {
+  async handleAcceptInvitation(client: Socket, invitdata: gameinvitdata,) {
     try {
       this.serviceInvitations.acceptInvitation(
         client,
         this.rooms,
-        roomId,
         this.activeSockets,
         this.server,
+        invitdata,
       );
     } catch (e) {
       return;
@@ -129,13 +129,13 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('DeclineInvitation')
-  async handleDeclineInvitation(client: Socket, roomId: string) {
+  async handleDeclineInvitation(client: Socket, invitdata: gameinvitdata,) {
     try {
       this.serviceInvitations.declineInvitation(
         client,
         this.rooms,
-        roomId,
-        this.activeSockets
+        this.activeSockets,
+        invitdata,
       );
     } catch (e) {
       return;

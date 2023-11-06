@@ -1,8 +1,10 @@
 import client from '../../components/Client';
+import UserId from '../Chat/GetUserById';
 
-export const GetMatchHistory = async (username: string | undefined) => {
+export const GetMatchHistory = async (id: number) => {
     try {
-        const res = await client.get(`user/match-history/${username}`, {
+        const userData = await UserId(id);
+        const res = await client.get(`user/match-history/${userData.username}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
