@@ -119,9 +119,9 @@ const Game: React.FC = () => {
                 canvasrect.height
             );
             const relativeMouseY = (mouseYRelative / canvasrect.height) * 100;
-            socket.emit('UpdatePlayerPaddle', {
-                relativeMouseY: relativeMouseY
-            });
+            socket.emit('UpdatePlayerPaddle', 
+                relativeMouseY
+            );
         }
     };
 

@@ -101,7 +101,6 @@ export class ChatGateway
       }
     } catch (err) {
       client.disconnect();
-      console.error('Authentication failed:', err.message);
     }
   }
 
