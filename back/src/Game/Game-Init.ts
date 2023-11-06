@@ -47,7 +47,6 @@ export class GameInit {
           room.id = match.id;
         })
         .catch((error) => {
-          console.error('Error creating match:', error);
         });
       await this.prisma.user.update({
         where: { id: playerid },

@@ -144,7 +144,7 @@ export class Game implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('UpdatePlayerPaddle')
-  handleUpdatePaddle(client: Socket, eventData: any) {
+  handleUpdatePaddle(client: Socket, eventData: number) {
     try {
       this.serviceUpdate.UpdatePaddle(client, eventData, this.rooms);
     } catch (e) {

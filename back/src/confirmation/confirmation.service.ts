@@ -81,7 +81,6 @@ export class ConfirmationService {
         html,
       });
     } catch (error) {
-      console.error(error);
 
       throw new HttpException('Sending email failed', 400);
     }

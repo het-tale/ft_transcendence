@@ -71,12 +71,12 @@ export class GameUpdate {
     const otherPaddle = otherPlayer.paddle;
     this.intersections(room, playerPaddle, otherPaddle);
     if (room.ball.x + room.ball.radius > CONTAINERWIDTH) {
-      ++player.score;
+      player.score++;
       if (player.score === 3) return this.dataupdatetostop(room, activeSockets);
       else this.resetBall(room.ball, player, otherPlayer);
     }
     if (room.ball.x - room.ball.radius <= 0) {
-      ++otherPlayer.score;
+      otherPlayer.score++;
       if (otherPlayer.score === 3) return this.dataupdatetostop(room, activeSockets);
       else this.resetBall(room.ball, player, otherPlayer);
     }
@@ -115,14 +115,14 @@ export class GameUpdate {
     }
   }
 
-  async UpdatePaddle(client: Socket, eventData: any, rooms: Map<string, Room>) {
+  async UpdatePaddle(client: Socket, eventData: number, rooms: Map<string, Room>) {
     const room = this.serviceInit.findRoomByPlayerSocket(client, rooms);
 
     if (room) {
       const player = room.players.find((p) => p.socket === client);
 
       if (player) {
-        const relativeMouseYPercentage = eventData.relativeMouseY;
+        const relativeMouseYPercentage = eventData;
         player.paddle.y = (relativeMouseYPercentage / 100) * CONTAINERHIEGHT;
       }
     }
