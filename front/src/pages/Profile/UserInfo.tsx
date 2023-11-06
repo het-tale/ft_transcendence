@@ -98,6 +98,8 @@ const UserInfo = (props: UserInfoProps) => {
                 marginTop={'10rem'}
                 marginBottom={'10rem'}
                 background={'transparent'}
+                border={'none'}
+                style={{ backgroundColor: 'transparent' }}
             >
                 <Image
                     objectFit="cover"
